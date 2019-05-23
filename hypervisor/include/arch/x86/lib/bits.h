@@ -229,4 +229,9 @@ static inline bool name(uint16_t nr_arg, volatile op_type *addr)	\
 build_bitmap_testandclear(bitmap_test_and_clear_nolock, "q", uint64_t, "")
 build_bitmap_testandclear(bitmap_test_and_clear_lock, "q", uint64_t, BUS_LOCK)
 
+static inline uint16_t bitmap_weight(uint64_t bits)
+{
+	return __builtin_popcountl(bits);
+}
+
 #endif /* BITS_H*/

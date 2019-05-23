@@ -57,23 +57,38 @@ static bool check_vm_uuid_collision(uint16_t vm_id)
 bool sanitize_vm_config(void)
 {
 	bool ret = true;
-	uint16_t vm_id;
-	uint64_t sos_pcpu_bitmap, pre_launch_pcpu_bitmap;
+	uint16_t vm_id, vcpu_id, nr;
+	uint64_t sos_pcpu_bitmap, pre_launch_pcpu_bitmap = 0U, vm_pcpu_bitmap;
 	struct acrn_vm_config *vm_config;
 
 	sos_pcpu_bitmap = (uint64_t)((((uint64_t)1U) << get_pcpu_nums()) - 1U);
-	pre_launch_pcpu_bitmap = 0U;
 	/* All physical CPUs except ocuppied by Pre-launched VMs are all
-	 * belong to SOS_VM. i.e. The pcpu_bitmap of a SOS_VM is decided
-	 * by pcpu_bitmap status in PRE_LAUNCHED_VMs.
+	 * belong to SOS_VM. i.e. The vm_pcpu_bitmap of a SOS_VM is decided
+	 * by vm_pcpu_bitmap status in PRE_LAUNCHED_VMs.
 	 * We need to setup a rule, that the vm_configs[] array should follow
 	 * the order of PRE_LAUNCHED_VM first, and then SOS_VM.
 	 */
 	for (vm_id = 0U; vm_id < CONFIG_MAX_VM_NUM; vm_id++) {
 		vm_config = get_vm_config(vm_id);
+		vm_pcpu_bitmap = 0U;
+		for (vcpu_id = 0U; vcpu_id < vm_config->vcpu_num; vcpu_id++) {
+			if (bitmap_weight(vm_config->vcpu_affinity[vcpu_id]) != 1U) {
+				pr_err("%s: vm%u vcpu%u should have only one prefer pcpu!",
+						__func__, vm_id, vcpu_id);
+				ret = false;
+				break;
+			}
+			vm_pcpu_bitmap |= vm_config->vcpu_affinity[vcpu_id];
+		}
+
+		if ((bitmap_weight(vm_pcpu_bitmap) != vm_config->vcpu_num)) {
+			pr_err("%s: One VM cannot have multiple vcpus share one pcpu!", __func__);
+			ret = false;
+		}
+
 		switch (vm_config->load_order) {
 		case PRE_LAUNCHED_VM:
-			if (vm_config->pcpu_bitmap == 0U) {
+			if (vm_config->vcpu_num == 0U) {
 				ret = false;
 			/* GUEST_FLAG_RT must be set if we have GUEST_FLAG_LAPIC_PASSTHROUGH set in guest_flags */
 			} else if (((vm_config->guest_flags & GUEST_FLAG_LAPIC_PASSTHROUGH) != 0U)
@@ -82,7 +97,7 @@ bool sanitize_vm_config(void)
 			}else if (vm_config->epc.size != 0UL) {
 				ret = false;
 			} else {
-				pre_launch_pcpu_bitmap |= vm_config->pcpu_bitmap;
+				pre_launch_pcpu_bitmap |= vm_pcpu_bitmap;
 			}
 			break;
 		default:
