@@ -28,8 +28,8 @@ struct per_cpu_region {
 #ifdef STACK_PROTECTOR
 	struct stack_canary stk_canary;
 #endif
-	struct sched_context sched_ctx;
-	struct sched_object idle;
+	struct sched_control sched_ctl;
+	struct thread_object idle;
 	struct host_gdt gdt;
 	struct tss_64 tss;
 	enum pcpu_boot_state boot_state;
