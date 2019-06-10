@@ -23,7 +23,6 @@ struct per_cpu_region {
 	/* vmxon_region MUST be 4KB-aligned */
 	uint8_t vmxon_region[PAGE_SIZE];
 	void *vmcs_run;
-	struct acrn_vcpu *vcpu;
 	struct acrn_vcpu *ever_run_vcpu;
 #ifdef STACK_PROTECTOR
 	struct stack_canary stk_canary;

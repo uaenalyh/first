@@ -332,8 +332,6 @@ int32_t create_vcpu(uint16_t pcpu_id, struct acrn_vm *vm, struct acrn_vcpu **rtn
 		 * needs revise.
 		 */
 
-		per_cpu(vcpu, pcpu_id) = vcpu;
-
 		pr_info("Create VM%d-VCPU%d, Role: %s", vcpu->vm->vm_id, vcpu->vcpu_id,
 			is_vcpu_bsp(vcpu) ? "PRIMARY" : "SECONDARY");
 

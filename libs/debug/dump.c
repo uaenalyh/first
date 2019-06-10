@@ -113,11 +113,34 @@ static void dump_guest_reg(struct acrn_vcpu *vcpu)
 	pr_acrnlog("\n");
 }
 
+static bool is_idle_thread(const struct thread_object *obj)
+{
+	uint16_t pcpu_id = obj->pcpu_id;
+	return (obj == &per_cpu(idle, pcpu_id));
+}
+
+static struct thread_object *sched_get_current(uint16_t pcpu_id)
+{
+	struct sched_control *ctl = &per_cpu(sched_ctl, pcpu_id);
+	return ctl->curr_obj;
+}
+
+static struct acrn_vcpu *get_running_vcpu(uint16_t pcpu_id)
+{
+	struct thread_object *curr = sched_get_current(pcpu_id);
+	struct acrn_vcpu *vcpu = NULL;
+
+	if ((curr != NULL) && (!is_idle_thread(curr))) {
+		vcpu = list_entry(curr, struct acrn_vcpu, thread_obj);
+	}
+
+	return vcpu;
+}
+
 static void dump_guest_context(uint16_t pcpu_id)
 {
-	struct acrn_vcpu *vcpu;
+	struct acrn_vcpu *vcpu = get_running_vcpu(pcpu_id);
 
-	vcpu = per_cpu(vcpu, pcpu_id);
 	if (vcpu != NULL) {
 		dump_guest_reg(vcpu);
 	}
