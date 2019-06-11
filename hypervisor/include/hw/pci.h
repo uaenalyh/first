@@ -227,9 +227,7 @@ static inline enum pci_bar_type pci_get_bar_type(uint32_t val)
 {
 	enum pci_bar_type type = PCIBAR_NONE;
 
-	if ((val & PCIM_BAR_SPACE) == PCIM_BAR_IO_SPACE) {
-		type = PCIBAR_IO_SPACE;
-	} else {
+	if ((val & PCIM_BAR_SPACE) != PCIM_BAR_IO_SPACE) {
 		switch (val & PCIM_BAR_MEM_TYPE) {
 		case PCIM_BAR_MEM_32:
 		case PCIM_BAR_MEM_1MB:

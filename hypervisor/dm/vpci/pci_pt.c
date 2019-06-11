@@ -30,6 +30,7 @@
 #include <errno.h>
 #include <ept.h>
 #include <mmu.h>
+#include <vmx.h>
 #include <logmsg.h>
 #include "vpci_priv.h"
 
@@ -66,11 +67,6 @@ static uint64_t pci_bar_2_bar_base(const struct pci_bar *pbars, uint32_t nr_bars
 		enum pci_bar_type type = pci_get_bar_type(bar->reg.value);
 
 		switch (type) {
-		case PCIBAR_IO_SPACE:
-			/* IO bar, BITS 31-2 = base address, 4-byte aligned */
-			base = (uint64_t)(bar->reg.bits.io.base);
-			base <<= 2U;
-			break;
 
 		case PCIBAR_MEM32:
 			base = (uint64_t)(bar->reg.bits.mem.base);
@@ -258,6 +254,7 @@ static void vdev_pt_write_vbar(struct pci_vdev *vdev, uint32_t offset, uint32_t 
 		enum pci_bar_type type = pci_get_bar_type(vbar->reg.value);
 
 		switch (type) {
+
 		case PCIBAR_MEM32:
 			base = git_size_masked_bar_base(vbar->size, (uint64_t)val);
 			set_vbar_base(vbar, (uint32_t)base);
@@ -373,8 +370,7 @@ void init_vdev_pt(struct pci_vdev *vdev)
 				break;
 
 			default:
-				vbar->reg.value = 0x0U;
-				vbar->size = 0UL;
+				/* Nothing to do in this case */
 				break;
 			}
 		}
