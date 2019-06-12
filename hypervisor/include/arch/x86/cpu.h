@@ -118,7 +118,11 @@
 #define BOOT_CPU_ID 0U
 
 /* Number of GPRs saved / restored for guest in VCPU structure */
-#define NUM_GPRS 16U
+#define NUM_GPRS              16U
+#define GUEST_STATE_AREA_SIZE 512
+
+/*sizes of various registers within the VCPU data structure */
+#define VMX_CPU_S_FXSAVE_GUEST_AREA_SIZE GUEST_STATE_AREA_SIZE
 
 #ifndef ASSEMBLER
 
@@ -293,6 +297,14 @@ struct ext_context {
 	struct segment_sel es;
 	struct segment_sel fs;
 	struct segment_sel gs;
+
+	uint64_t ia32_star;
+	uint64_t ia32_lstar;
+	uint64_t ia32_fmask;
+	uint64_t ia32_kernel_gs_base;
+
+	/* The 512 bytes area to save the FPU/MMX/SSE states for the guest */
+	uint64_t fxstore_guest_area[VMX_CPU_S_FXSAVE_GUEST_AREA_SIZE / sizeof(uint64_t)] __aligned(16);
 };
 
 /* Function prototypes */

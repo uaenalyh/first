@@ -156,8 +156,12 @@
 #define MSR_IA32_L3_MASK_0            0x00000C90U
 #define MSR_IA32_BNDCFGS              0x00000D90U
 #define MSR_IA32_EFER                 0xC0000080U
+#define MSR_IA32_STAR                 0xC0000081U
+#define MSR_IA32_LSTAR                0xC0000082U
+#define MSR_IA32_FMASK                0xC0000084U
 #define MSR_IA32_FS_BASE              0xC0000100U
 #define MSR_IA32_GS_BASE              0xC0000101U
+#define MSR_IA32_KERNEL_GS_BASE       0xC0000102U
 #define MSR_IA32_TSC_AUX              0xC0000103U
 
 #define MSR_PRMRR_PHYS_BASE        0x000001F4U
