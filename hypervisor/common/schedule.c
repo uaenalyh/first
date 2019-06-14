@@ -142,6 +142,19 @@ void schedule(void)
 	}
 }
 
+void sleep_thread(struct thread_object *obj)
+{
+	uint16_t pcpu_id = obj->pcpu_id;
+
+	get_schedule_lock(pcpu_id);
+	remove_thread_obj(obj, pcpu_id);
+	if (is_running(obj)) {
+		make_reschedule_request(pcpu_id, DEL_MODE_IPI);
+	}
+	set_thread_status(obj, THREAD_STS_BLOCKED);
+	release_schedule_lock(pcpu_id);
+}
+
 void run_sched_thread(struct thread_object *obj)
 {
 	if (obj->thread_entry != NULL) {

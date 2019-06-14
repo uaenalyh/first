@@ -578,25 +578,14 @@ void pause_vcpu(struct acrn_vcpu *vcpu, enum vcpu_state new_state)
 
 	pr_dbg("vcpu%hu paused, new state: %d", vcpu->vcpu_id, new_state);
 
-	get_schedule_lock(pcpu_id);
 	vcpu->prev_state = vcpu->state;
 	vcpu->state = new_state;
 
-	if (vcpu->running) {
-		remove_thread_obj(&vcpu->thread_obj, pcpu_id);
-
-		make_reschedule_request(pcpu_id, DEL_MODE_INIT);
-
-		release_schedule_lock(pcpu_id);
-
-		if (pcpu_id != get_pcpu_id()) {
-			while (vcpu->running) {
-				asm_pause();
-			}
+	sleep_thread(&vcpu->thread_obj);
+	if (pcpu_id != get_pcpu_id()) {
+		while (vcpu->running) {
+			asm_pause();
 		}
-	} else {
-		remove_thread_obj(&vcpu->thread_obj, pcpu_id);
-		release_schedule_lock(pcpu_id);
 	}
 }
 
@@ -662,6 +651,7 @@ int32_t prepare_vcpu(struct acrn_vm *vm, uint16_t pcpu_id)
 		vcpu->thread_obj.sched_ctl = &per_cpu(sched_ctl, pcpu_id);
 		vcpu->thread_obj.thread_entry = vcpu_thread;
 		vcpu->thread_obj.pcpu_id = pcpu_id;
+		vcpu->thread_obj.notify_mode = SCHED_NOTIFY_INIT;
 		vcpu->thread_obj.host_sp = build_stack_frame(vcpu);
 		vcpu->thread_obj.switch_out = context_switch_out;
 		vcpu->thread_obj.switch_in = context_switch_in;
