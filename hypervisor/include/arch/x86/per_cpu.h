@@ -28,6 +28,7 @@ struct per_cpu_region {
 	struct stack_canary stk_canary;
 #endif
 	struct sched_control sched_ctl;
+	struct sched_noop_control sched_noop_ctl;
 	struct thread_object idle;
 	struct host_gdt gdt;
 	struct tss_64 tss;

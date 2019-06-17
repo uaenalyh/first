@@ -310,7 +310,7 @@ void start_vm(struct acrn_vm *vm)
 
 	/* Only start BSP (vid = 0) and let BSP start other APs */
 	bsp = vcpu_from_vid(vm, BOOT_CPU_ID);
-	schedule_vcpu(bsp);
+	launch_vcpu(bsp);
 }
 
 /**

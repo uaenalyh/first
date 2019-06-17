@@ -543,7 +543,7 @@ void pause_vcpu(struct acrn_vcpu *vcpu, enum vcpu_state new_state);
  *
  * @return None
  */
-void schedule_vcpu(struct acrn_vcpu *vcpu);
+void launch_vcpu(struct acrn_vcpu *vcpu);
 
 /**
  * @brief create a vcpu for the vm and mapped to the pcpu.
