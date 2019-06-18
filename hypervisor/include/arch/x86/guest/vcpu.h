@@ -546,6 +546,17 @@ void pause_vcpu(struct acrn_vcpu *vcpu, enum vcpu_state new_state);
 void launch_vcpu(struct acrn_vcpu *vcpu);
 
 /**
+ * @brief kick the vcpu and let it handle pending events
+ *
+ * Kick a vCPU to handle the pending events.
+ *
+ * @param[in] vcpu pointer to vcpu data structure
+ *
+ * @return None
+ */
+void kick_vcpu(const struct acrn_vcpu *vcpu);
+
+/**
  * @brief create a vcpu for the vm and mapped to the pcpu.
  *
  * Create a vcpu for the vm, and mapped to the pcpu.
