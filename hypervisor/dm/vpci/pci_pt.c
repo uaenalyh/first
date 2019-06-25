@@ -127,14 +127,12 @@ static uint64_t get_pbar_base(const struct pci_pdev *pdev, uint32_t idx)
 
 /**
  * @pre vdev != NULL
- * @pre vdev->vpci != NULL
- * @pre vdev->vpci->vm != NULL
  */
 int32_t vdev_pt_read_cfg(const struct pci_vdev *vdev, uint32_t offset, uint32_t bytes, uint32_t *val)
 {
 	int32_t ret = -ENODEV;
 
-	if (is_prelaunched_vm(vdev->vpci->vm) && is_bar_offset(vdev->nr_bars, offset)) {
+	if (is_bar_offset(vdev->nr_bars, offset)) {
 		*val = pci_vdev_read_cfg(vdev, offset, bytes);
 		ret = 0;
 	}
@@ -286,17 +284,14 @@ static void vdev_pt_write_vbar(struct pci_vdev *vdev, uint32_t offset, uint32_t 
 
 /**
  * @pre vdev != NULL
- * @pre vdev->vpci != NULL
- * @pre vdev->vpci->vm != NULL
  * bar write access must be 4 bytes and offset must also be 4 bytes aligned, it will be dropped otherwise
  */
 int32_t vdev_pt_write_cfg(struct pci_vdev *vdev, uint32_t offset, uint32_t bytes, uint32_t val)
 {
 	int32_t ret = -ENODEV;
 
-	/* bar write access must be 4 bytes and offset must also be 4 bytes aligned */
-	if (is_prelaunched_vm(vdev->vpci->vm) && is_bar_offset(vdev->nr_bars, offset)
-		&& (bytes == 4U) && ((offset & 0x3U) == 0U)) {
+	/* bar write access must be 4 bytes and offset must also be 4 bytes aligned*/
+	if (is_bar_offset(vdev->nr_bars, offset) && (bytes == 4U) && ((offset & 0x3U) == 0U)) {
 		vdev_pt_write_vbar(vdev, offset, val);
 		ret = 0;
 	}
@@ -354,9 +349,11 @@ void init_vdev_pt(struct pci_vdev *vdev)
 			if (idx > 0U) {
 				/* For pre-launched VMs: vbar base is predefined in vm_config */
 				vbar_base = vdev->ptdev_config->vbar_base[idx - 1U];
-				/* Write the upper 32-bit of a 64-bit bar */
-				vdev_pt_write_vbar(vdev, pci_bar_offset(idx), (uint32_t)(vbar_base >> 32U));
+			} else {
+				vbar_base = 0UL;
 			}
+			/* Write the upper 32-bit of a 64-bit bar */
+			vdev_pt_write_vbar(vdev, pci_bar_offset(idx), (uint32_t)(vbar_base >> 32U));
 		} else {
 			enum pci_bar_type type = pci_get_bar_type(pbar->reg.value);
 
