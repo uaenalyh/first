@@ -394,10 +394,10 @@ static void init_vdev_for_pdev(struct pci_pdev *pdev, const struct acrn_vm *vm)
 
 		if (ptdev_config != NULL) {
 			/* vbdf is defined in vm_config */
-			vdev->vbdf.value = ptdev_config->vbdf.value;
+			vdev->bdf.value = ptdev_config->vbdf.value;
 		} else {
 			/* vbdf is not defined in vm_config, set it to equal to pbdf */
-			vdev->vbdf.value = pdev->bdf.value;
+			vdev->bdf.value = pdev->bdf.value;
 		}
 
 		init_vhostbridge(vdev);
