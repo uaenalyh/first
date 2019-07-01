@@ -77,8 +77,8 @@ enum _page_table_level {
 	IA32E_PT = 3,
 };
 
-void sanitize_pte_entry(uint64_t *ptep);
-void sanitize_pte(uint64_t *pt_page);
+void sanitize_pte_entry(uint64_t *ptep, const struct memory_ops *mem_ops);
+void sanitize_pte(uint64_t *pt_page, const struct memory_ops *mem_ops);
 /**
  * @brief MMU paging enable
  *

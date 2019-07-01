@@ -204,9 +204,10 @@ static inline uint64_t *pte_offset(const uint64_t *pde, uint64_t addr)
 /*
  * pgentry may means pml4e/pdpte/pde/pte
  */
-static inline void set_pgentry(uint64_t *ptep, uint64_t pte)
+static inline void set_pgentry(uint64_t *ptep, uint64_t pte, const struct memory_ops *mem_ops)
 {
 	*ptep = pte;
+	mem_ops->clflush_pagewalk(ptep);
 }
 
 static inline uint64_t pde_large(uint64_t pde)
