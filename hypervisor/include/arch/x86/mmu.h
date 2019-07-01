@@ -151,12 +151,12 @@ static inline void cache_flush_invalidate_all(void)
 	asm volatile ("   wbinvd\n" : : : "memory");
 }
 
-static inline void clflush(volatile void *p)
+static inline void clflush(const volatile void *p)
 {
 	asm volatile ("clflush (%0)" :: "r"(p));
 }
 
-static inline void clflushopt(volatile void *p)
+static inline void clflushopt(const volatile void *p)
 {
 	asm volatile ("clflushopt (%0)" :: "r"(p));
 }
