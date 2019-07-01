@@ -520,7 +520,6 @@ void reset_vcpu(struct acrn_vcpu *vcpu)
 		vcpu->arch.exception_info.exception = VECTOR_INVALID;
 		vcpu->arch.cur_context = NORMAL_WORLD;
 		vcpu->arch.irq_window_enabled = false;
-		vcpu->arch.inject_event_pending = false;
 		(void)memset((void *)vcpu->arch.vmcs, 0U, PAGE_SIZE);
 
 		for (i = 0; i < NR_WORLD; i++) {
@@ -568,9 +567,6 @@ void pause_vcpu(struct acrn_vcpu *vcpu, enum vcpu_state new_state)
 static void context_switch_out(struct sched_object *prev)
 {
 	struct acrn_vcpu *vcpu = list_entry(prev, struct acrn_vcpu, sched_obj);
-
-	/* cancel event(int, gp, nmi and exception) injection */
-	cancel_event_injection(vcpu);
 
 	atomic_store32(&vcpu->running, 0U);
 	/* do prev vcpu context switch out */
