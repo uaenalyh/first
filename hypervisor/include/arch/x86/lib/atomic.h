@@ -56,24 +56,6 @@ static inline void name(volatile type *ptr, type v)	\
 build_atomic_store(atomic_store32, "l", uint32_t)
 build_atomic_store(atomic_store64, "q", uint64_t)
 
-#define build_atomic_inc(name, size, type)		\
-static inline void name(type *ptr)			\
-{							\
-	asm volatile(BUS_LOCK "inc" size " %0"		\
-			: "=m" (*ptr)			\
-			:  "m" (*ptr));			\
-}
-build_atomic_inc(atomic_inc16, "w", uint16_t)
-
-#define build_atomic_dec(name, size, type)		\
-static inline void name(type *ptr)			\
-{							\
-	asm volatile(BUS_LOCK "dec" size " %0"		\
-			: "=m" (*ptr)			\
-			:  "m" (*ptr));			\
-}
-build_atomic_dec(atomic_dec16, "w", uint16_t)
-
 #define build_atomic_cmpxchg(name, size, type)			\
 static inline type name(volatile type *ptr, type old, type new)	\
 {								\
