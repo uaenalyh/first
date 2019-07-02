@@ -57,7 +57,14 @@ struct acrn_vlapic {
 
 	uint64_t	msr_apicbase;
 
+	const struct acrn_apicv_ops *ops;
+
 } __aligned(PAGE_SIZE);
+
+struct acrn_apicv_ops {
+};
+
+extern const struct acrn_apicv_ops *apicv_ops;
 
 /**
  * @brief virtual LAPIC
@@ -78,7 +85,7 @@ int32_t vlapic_create(struct acrn_vcpu *vcpu);
  * @pre vlapic->vcpu->vcpu_id < CONFIG_MAX_VCPUS_PER_VM
  */
 void vlapic_init(struct acrn_vlapic *vlapic);
-void vlapic_reset(struct acrn_vlapic *vlapic);
+void vlapic_reset(struct acrn_vlapic *vlapic, const struct acrn_apicv_ops *ops);
 void vlapic_calc_dest(struct acrn_vm *vm, uint64_t *dmask, bool is_broadcast,
 		uint32_t dest, bool phys, bool lowprio);
 /**

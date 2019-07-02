@@ -56,6 +56,8 @@
 
 #define ACRN_DBG_LAPIC		6U
 
+const struct acrn_apicv_ops *apicv_ops;
+
 static struct acrn_vlapic *
 vm_lapic_from_vcpu_id(struct acrn_vm *vm, uint16_t vcpu_id)
 {
@@ -288,8 +290,11 @@ static int32_t vlapic_read(struct acrn_vlapic *vlapic, uint32_t offset_arg, uint
 	return ret;
 }
 
+/*
+ * @pre vlapic != NULL && ops != NULL
+ */
 void
-vlapic_reset(struct acrn_vlapic *vlapic)
+vlapic_reset(struct acrn_vlapic *vlapic, const struct acrn_apicv_ops *ops)
 {
 	uint32_t i;
 	struct lapic_regs *lapic;
@@ -307,6 +312,8 @@ vlapic_reset(struct acrn_vlapic *vlapic)
 	(void)memset((void *)lapic, 0U, sizeof(struct lapic_regs));
 
 	lapic->id.v = vlapic_build_id(vlapic);
+
+	vlapic->ops = ops;
 }
 
 /**
@@ -317,7 +324,7 @@ void
 vlapic_init(struct acrn_vlapic *vlapic)
 {
 
-	vlapic_reset(vlapic);
+	vlapic_reset(vlapic, apicv_ops);
 }
 
 uint64_t vlapic_get_apicbase(const struct acrn_vlapic *vlapic)
