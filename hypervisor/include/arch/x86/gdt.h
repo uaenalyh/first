@@ -40,6 +40,7 @@
  *****************************************************************************/
 /* Number of global 8 byte segments descriptor(s) */
 #define    HOST_GDT_RING0_SEG_SELECTORS   (0x3U)	/* rsvd, code, data */
+#define    HOST_GDT_RING0_DATA_SEL	(0x0010U)
 /* One for each CPU in the hypervisor. */
 
 /*****************************************************************************
