@@ -74,37 +74,6 @@ static inline void name(type *ptr)			\
 }
 build_atomic_dec(atomic_dec16, "w", uint16_t)
 
-/**
- *  #define atomic_set32(P, V)		(*(uint32_t *)(P) |= (V))
- * 
- *  Parameters:
- *  uint32_t*	p	A pointer to memory area that stores source
- *			value and setting result;
- *  uint32_t	v	The value needs to be set.
- */
-static inline void atomic_set32(uint32_t *p, uint32_t v)
-{
-	__asm __volatile(BUS_LOCK "orl %1,%0"
-			:  "+m" (*p)
-			:  "r" (v)
-			:  "cc", "memory");
-}
-
-/*
- *  #define atomic_clear32(P, V)		(*(uint32_t *)(P) &= ~(V))
- *  Parameters:
- *  uint32_t*	p	A pointer to memory area that stores source
- *			value and clearing result;
- *  uint32_t	v	The value needs to be cleared.
- */
-static inline void atomic_clear32(uint32_t *p, uint32_t v)
-{
-	__asm __volatile(BUS_LOCK "andl %1,%0"
-			:  "+m" (*p)
-			:  "r" (~v)
-			:  "cc", "memory");
-}
-
 #define build_atomic_cmpxchg(name, size, type)			\
 static inline type name(volatile type *ptr, type old, type new)	\
 {								\
