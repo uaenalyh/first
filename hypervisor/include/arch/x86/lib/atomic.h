@@ -54,7 +54,6 @@ static inline void name(volatile type *ptr, type v)	\
 			: "cc", "memory");		\
 }
 build_atomic_store(atomic_store32, "l", uint32_t)
-build_atomic_store(atomic_store64, "q", uint64_t)
 
 #define build_atomic_cmpxchg(name, size, type)			\
 static inline type name(volatile type *ptr, type old, type new)	\

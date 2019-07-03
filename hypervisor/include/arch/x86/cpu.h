@@ -307,6 +307,12 @@ static inline void asm_hlt(void)
 	asm volatile ("sti\n" : : : "cc");		  \
 }
 
+/* Synchronizes all write accesses to memory */
+static inline void cpu_write_memory_barrier(void)
+{
+	asm volatile ("sfence\n" : : : "memory");
+}
+
 /* Write the task register */
 #define CPU_LTR_EXECUTE(ltr_ptr)			    \
 {							   \
