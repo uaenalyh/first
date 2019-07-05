@@ -36,7 +36,7 @@
 #include <vm.h>
 #include <logmsg.h>
 
-void vuart_init(struct acrn_vm *vm, struct vuart_config *vu_config)
+void vuart_init(struct acrn_vm *vm, const struct vuart_config *vu_config)
 {
 
 }

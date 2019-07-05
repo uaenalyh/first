@@ -539,7 +539,7 @@ bool is_vuart_intx(struct acrn_vm *vm, uint32_t intx_pin)
 	return ret;
 }
 
-void vuart_init(struct acrn_vm *vm, struct vuart_config *vu_config)
+void vuart_init(struct acrn_vm *vm, const struct vuart_config *vu_config)
 {
 	uint8_t i;
 

@@ -39,7 +39,7 @@
 #define COM1_IRQ		4U
 #define COM2_IRQ		3U
 
-void vuart_init(struct acrn_vm *vm, struct vuart_config *vu_config);
+void vuart_init(struct acrn_vm *vm, const struct vuart_config *vu_config);
 void vuart_deinit(struct acrn_vm *vm);
 
 #endif /* VUART_H */
