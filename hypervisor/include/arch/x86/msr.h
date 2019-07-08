@@ -226,6 +226,7 @@ void update_msr_bitmap_x2apic_passthru(struct acrn_vcpu *vcpu);
 #define PRED_SET_IBPB				(1U << 0U)
 
 #define IA32_ARCH_CAP_SKIP_L1DFL_VMENTRY	(1U << 3U)
+#define IA32_ARCH_CAP_SSB_NO			(1U << 4U)
 #define IA32_ARCH_CAP_MDS_NO			(1U << 5U)
 
 #endif /* MSR_H */
