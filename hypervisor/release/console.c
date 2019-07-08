@@ -6,6 +6,7 @@
 
 #include <types.h>
 #include <pci.h>
+#include <console.h>
 
 void console_init(void) {}
 void console_setup_timer(void) {}
