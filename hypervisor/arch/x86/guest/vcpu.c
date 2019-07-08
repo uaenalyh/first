@@ -561,7 +561,7 @@ void pause_vcpu(struct acrn_vcpu *vcpu, enum vcpu_state new_state)
 	vcpu->state = new_state;
 
 	if (atomic_load32(&vcpu->running) == 1U) {
-		remove_from_cpu_runqueue(&vcpu->sched_obj, vcpu->pcpu_id);
+		remove_from_cpu_runqueue(&vcpu->sched_obj);
 
 		make_reschedule_request(vcpu->pcpu_id, DEL_MODE_INIT);
 
@@ -573,7 +573,7 @@ void pause_vcpu(struct acrn_vcpu *vcpu, enum vcpu_state new_state)
 			}
 		}
 	} else {
-		remove_from_cpu_runqueue(&vcpu->sched_obj, vcpu->pcpu_id);
+		remove_from_cpu_runqueue(&vcpu->sched_obj);
 		release_schedule_lock(vcpu->pcpu_id);
 	}
 }
