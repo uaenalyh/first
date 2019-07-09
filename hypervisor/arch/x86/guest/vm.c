@@ -114,7 +114,7 @@ static void prepare_prelaunched_vm_memmap(struct acrn_vm *vm, const struct acrn_
 	uint32_t i;
 
 	for (i = 0U; i < vm->e820_entry_num; i++) {
-		struct e820_entry *entry = &(vm->e820_entries[i]);
+		const struct e820_entry *entry = &(vm->e820_entries[i]);
 
 		if (entry->length == 0UL) {
 			break;

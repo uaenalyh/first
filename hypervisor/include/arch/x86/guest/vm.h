@@ -96,7 +96,7 @@ struct acrn_vm {
 	struct vm_hw_info hw;	/* Reference to this VM's HW information */
 	struct vm_sw_info sw;	/* Reference to SW associated with this VM */
 	uint32_t e820_entry_num;
-	struct e820_entry *e820_entries;
+	const struct e820_entry *e820_entries;
 	uint16_t vm_id;		    /* Virtual machine identifier */
 	enum vm_state state;	/* VM state */
 	enum vpic_wire_mode wire_mode;
