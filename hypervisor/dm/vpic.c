@@ -30,4 +30,5 @@
 #include <vm.h>
 #include <irq.h>
 #include <assign.h>
+#include <spinlock.h>
 #include <logmsg.h>
