@@ -96,6 +96,7 @@
 #define REAL_MODE_DATA_SEG_AR	   (0x0093U)
 #define REAL_MODE_CODE_SEG_AR	   (0x009fU)
 #define PROTECTED_MODE_DATA_SEG_AR      (0xc093U)
+#define PROTECTED_MODE_CODE_SEG_AR      (0xc09bU)
 #define REAL_MODE_SEG_LIMIT	     (0xffffU)
 #define PROTECTED_MODE_SEG_LIMIT	(0xffffffffU)
 #define DR7_INIT_VALUE		  (0x400UL)
@@ -481,6 +482,18 @@ void set_vcpu_regs(struct acrn_vcpu *vcpu, struct acrn_vcpu_regs *vcpu_regs);
  * @return None
  */
 void reset_vcpu_regs(struct acrn_vcpu *vcpu);
+
+/**
+ * @brief Initialize the protect mode vcpu registers
+ *
+ * Initialize vCPU's all registers in run_context to initial protece mode values.
+ *
+ * @param[inout] vcpu pointer to vcpu data structure
+ * @param[in] vgdt_base_gpa guest physical address of gdt for guest
+ *
+ * @return None
+ */
+void init_vcpu_protect_mode_regs(struct acrn_vcpu *vcpu, uint64_t vgdt_base_gpa);
 
 /**
  * @brief set the vCPU startup entry
