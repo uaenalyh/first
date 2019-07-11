@@ -40,16 +40,6 @@
 
 /**
  * @pre vdev != NULL
- */
-static inline bool msixcap_access(const struct pci_vdev *vdev, uint32_t offset)
-{
-	bool ret = false;
-
-	return ret;
-}
-
-/**
- * @pre vdev != NULL
  * @pre vdev->vpci != NULL
  * @pre vdev->vpci->vm != NULL
  * @pre vdev->pdev != NULL

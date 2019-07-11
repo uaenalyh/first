@@ -96,6 +96,30 @@ static inline bool has_msix_cap(const struct pci_vdev *vdev)
 /**
  * @pre vdev != NULL
  */
+static inline bool msixcap_access(const struct pci_vdev *vdev, uint32_t offset)
+{
+	return (has_msix_cap(vdev) && in_range(offset, vdev->msix.capoff, vdev->msix.caplen));
+}
+
+/**
+ * @pre vdev != NULL
+ */
+static inline bool has_msi_cap(const struct pci_vdev *vdev)
+{
+	return (vdev->msi.capoff != 0U);
+}
+
+/**
+ * @pre vdev != NULL
+ */
+static inline bool msicap_access(const struct pci_vdev *vdev, uint32_t offset)
+{
+       return (has_msi_cap(vdev) && in_range(offset, vdev->msi.capoff, vdev->msi.caplen));
+}
+
+/**
+ * @pre vdev != NULL
+ */
 static inline bool is_hostbridge(const struct pci_vdev *vdev)
 {
 	return (vdev->bdf.value == 0U);
