@@ -61,6 +61,8 @@ union pci_cfgdata {
 	uint32_t data_32[(PCI_REGMAX + 1U) >> 4U];
 };
 
+struct pci_vdev;
+
 struct pci_vdev {
 	const struct acrn_vpci *vpci;
 	/* The bus/device/function triple of the virtual PCI device. */
@@ -82,6 +84,7 @@ struct pci_vdev {
 
 	/* Pointer to corresponding PCI PT device's vm_config */
 	struct acrn_vm_pci_ptdev_config *ptdev_config;
+
 };
 
 struct pci_addr_info {
