@@ -111,4 +111,6 @@ struct acrn_vpci {
 void vpci_init(struct acrn_vm *vm);
 void vpci_cleanup(const struct acrn_vm *vm);
 
+struct pci_vdev_ops *get_vhostbridge_ops(void);
+
 #endif /* VPCI_H_ */

@@ -59,15 +59,20 @@
 
 /* PCI config header registers for all devices */
 #define PCIR_VENDOR	   0x00U
+#define PCIR_DEVICE	   0x02U
 #define PCIR_COMMAND	  0x04U
 #define PCIM_CMD_INTxDIS      0x400U
 #define PCIR_STATUS	   0x06U
 #define PCIM_STATUS_CAPPRESENT    0x0010U
+#define PCIR_REVID	    0x08U
+#define PCIR_SUBCLASS	 0x0AU
+#define PCIR_CLASS	    0x0BU
 #define PCIR_HDRTYPE	  0x0EU
 #define PCIM_HDRTYPE	  0x7FU
 #define PCIM_HDRTYPE_NORMAL   0x00U
 #define PCIM_HDRTYPE_BRIDGE   0x01U
 #define	PCIM_HDRTYPE_CARDBUS  0x02U
+#define PCIM_MFDEV	    0x80U
 #define PCIR_BARS	     0x10U
 #define PCIM_BAR_SPACE	0x01U
 #define PCIM_BAR_IO_SPACE     0x01U
@@ -98,6 +103,10 @@
 #define PCIR_MSI_DATA_64BIT   0xCU
 #define PCIM_MSICTRL_MMC_MASK 0x000EU
 #define PCIM_MSICTRL_MME_MASK 0x0070U
+
+/* PCI device class */
+#define PCIC_BRIDGE	   0x06U
+#define PCIS_BRIDGE_HOST      0x00U
 
 /* MSI-X definitions */
 #define PCIR_MSIX_CTRL	0x2U
