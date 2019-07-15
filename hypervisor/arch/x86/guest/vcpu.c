@@ -13,7 +13,6 @@
 #include <cpu_caps.h>
 #include <per_cpu.h>
 #include <init.h>
-#include <atomic.h>
 #include <vm.h>
 #include <vmcs.h>
 #include <mmu.h>
@@ -358,7 +357,7 @@ int32_t create_vcpu(uint16_t pcpu_id, struct acrn_vm *vm, struct acrn_vcpu **rtn
 		*rtn_vcpu_handle = vcpu;
 
 		vcpu->launched = false;
-		vcpu->running = 0U;
+		vcpu->running = false;
 		vcpu->arch.nr_sipi = 0U;
 		vcpu->state = VCPU_INIT;
 
@@ -528,7 +527,7 @@ void reset_vcpu(struct acrn_vcpu *vcpu)
 		vcpu->state = VCPU_INIT;
 
 		vcpu->launched = false;
-		vcpu->running = 0U;
+		vcpu->running = false;
 		vcpu->arch.nr_sipi = 0U;
 
 		vcpu->arch.exception_info.exception = VECTOR_INVALID;
@@ -560,7 +559,7 @@ void pause_vcpu(struct acrn_vcpu *vcpu, enum vcpu_state new_state)
 	vcpu->prev_state = vcpu->state;
 	vcpu->state = new_state;
 
-	if (atomic_load32(&vcpu->running) == 1U) {
+	if (vcpu->running) {
 		remove_from_cpu_runqueue(&vcpu->sched_obj);
 
 		make_reschedule_request(vcpu->pcpu_id, DEL_MODE_INIT);
@@ -568,7 +567,7 @@ void pause_vcpu(struct acrn_vcpu *vcpu, enum vcpu_state new_state)
 		release_schedule_lock(vcpu->pcpu_id);
 
 		if (vcpu->pcpu_id != pcpu_id) {
-			while (atomic_load32(&vcpu->running) == 1U) {
+			while (vcpu->running) {
 				asm_pause();
 			}
 		}
@@ -582,7 +581,7 @@ static void context_switch_out(struct sched_object *prev)
 {
 	struct acrn_vcpu *vcpu = list_entry(prev, struct acrn_vcpu, sched_obj);
 
-	atomic_store32(&vcpu->running, 0U);
+	vcpu->running = false;
 	/* do prev vcpu context switch out */
 	/* For now, we don't need to invalid ept.
 	 * But if we have more than one vcpu on one pcpu,
@@ -594,7 +593,7 @@ static void context_switch_in(struct sched_object *next)
 {
 	struct acrn_vcpu *vcpu = list_entry(next, struct acrn_vcpu, sched_obj);
 
-	atomic_store32(&vcpu->running, 1U);
+	vcpu->running = true;
 	/* FIXME:
 	 * Now, we don't need to load new vcpu VMCS because
 	 * we only do switch between vcpu loop and idle loop.

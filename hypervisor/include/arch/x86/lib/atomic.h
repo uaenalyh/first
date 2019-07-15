@@ -33,28 +33,6 @@
 
 #define	BUS_LOCK	"lock ; "
 
-#define build_atomic_load(name, size, type)		\
-static inline type name(const volatile type *ptr)	\
-{							\
-	type ret;					\
-	asm volatile("mov" size " %1,%0"		\
-			: "=r" (ret)			\
-			: "m" (*ptr)			\
-			: "cc", "memory");		\
-	return ret;					\
-}
-build_atomic_load(atomic_load32, "l", uint32_t)
-
-#define build_atomic_store(name, size, type)		\
-static inline void name(volatile type *ptr, type v)	\
-{							\
-	asm volatile("mov" size " %1,%0"		\
-			: "=m" (*ptr)			\
-			: "r" (v)			\
-			: "cc", "memory");		\
-}
-build_atomic_store(atomic_store32, "l", uint32_t)
-
 #define build_atomic_cmpxchg(name, size, type)			\
 static inline type name(volatile type *ptr, type old, type new)	\
 {								\
