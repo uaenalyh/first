@@ -67,15 +67,4 @@ static inline type name(volatile type *ptr, type old, type new)	\
 }
 build_atomic_cmpxchg(atomic_cmpxchg64, "q", uint64_t)
 
-#define build_atomic_xadd(name, size, type)			\
-static inline type name(type *ptr, type v)			\
-{								\
-	asm volatile(BUS_LOCK "xadd" size " %0,%1"		\
-			: "+r" (v), "+m" (*ptr)			\
-			:					\
-			: "cc", "memory");			\
-	return v;						\
- }
-build_atomic_xadd(atomic_xadd16, "w", uint16_t)
-
 #endif /* ATOMIC_H*/

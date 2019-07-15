@@ -11,6 +11,16 @@
 #include <timer.h>
 #include "lib.h"
 
+#define build_atomic_xadd(name, size, type)			\
+static inline type name(type *ptr, type v)			\
+{								\
+	asm volatile(BUS_LOCK "xadd" size " %0,%1"		\
+			: "+r" (v), "+m" (*ptr)			\
+			:					\
+			: "cc", "memory");			\
+	return v;						\
+ }
+
 build_atomic_xadd(atomic_xadd32, "l", int32_t)
 
 static inline int32_t atomic_add_return(int32_t *p, int32_t v)
