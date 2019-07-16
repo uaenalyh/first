@@ -2,7 +2,7 @@
 #ifndef HV_KCONFIG
 #define HV_KCONFIG
 #define CONFIG_LOGICAL_PARTITION 1
-#define CONFIG_BOARD "nuc7i7bnh"
+#define CONFIG_BOARD "nuc7i7dnb"
 #define CONFIG_RELEASE 1
 #define CONFIG_MAX_VCPUS_PER_VM 2U
 #define CONFIG_MAX_PCPU_NUM 4U
