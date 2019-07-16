@@ -95,6 +95,10 @@ else
 LDFLAGS += -static
 endif
 
+ifeq ($(CONFIG_RELEASE),y)
+LDFLAGS += -s
+endif
+
 ARCH_CFLAGS += -gdwarf-2
 ARCH_ASFLAGS += -gdwarf-2 -DASSEMBLER=1
 ARCH_ARFLAGS +=
