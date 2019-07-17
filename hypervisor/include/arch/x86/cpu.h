@@ -230,7 +230,7 @@ enum pcpu_boot_state {
 /* Function prototypes */
 void cpu_do_idle(void);
 void cpu_dead(void);
-void init_pcpu_pre(uint16_t pcpu_id_args);
+void init_pcpu_pre(bool is_bsp);
 void init_pcpu_post(uint16_t pcpu_id);
 bool start_pcpus(uint64_t mask);
 void wait_pcpus_offline(uint64_t mask);
