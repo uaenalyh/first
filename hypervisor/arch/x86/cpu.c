@@ -114,15 +114,15 @@ void init_pcpu_pre(bool is_bsp)
 		 */
 		init_pcpu_capabilities();
 
+		if (detect_hardware_support() != 0) {
+			panic("hardware not support!");
+		}
+
 		init_pcpu_model_name();
 
 		/* Initialize the hypervisor paging */
 		init_e820();
 		init_paging();
-
-		if (!pcpu_has_cap(X86_FEATURE_X2APIC)) {
-			panic("x2APIC is not present!");
-		}
 
 		early_init_lapic();
 
@@ -189,10 +189,6 @@ void init_pcpu_post(uint16_t pcpu_id)
 		pr_acrnlog("Detect processor: %s", (get_pcpu_info())->model_name);
 
 		pr_dbg("Core %hu is up", BOOT_CPU_ID);
-
-		if (detect_hardware_support() != 0) {
-			panic("hardware not support!");
-		}
 
 		if (!sanitize_vm_config()) {
 			panic("VM Configuration Error!");
