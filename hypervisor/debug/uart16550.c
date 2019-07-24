@@ -12,7 +12,7 @@
 #include <mmu.h>
 #include "lib.h"
 #include "config_debug.h"
-#include "uart16550.h"
+#include "uart16550_priv.h"
 
 #define MAX_BDF_LEN 8
 
@@ -127,9 +127,14 @@ static void uart16550_set_baud_rate(uint32_t baud_rate)
 
 #define PCIM_BAR_MEM_BASE     0xFFFFFFF0U
 
-void uart16550_init(void)
+void uart16550_init(bool early_boot)
 {
 	if (!uart_enabled) {
+		return;
+	}
+
+	if (!early_boot && !serial_port_mapped) {
+		hv_access_memory_region_update(uart_base_address, PDE_SIZE);
 		return;
 	}
 
@@ -137,10 +142,6 @@ void uart16550_init(void)
 	if (!serial_port_mapped) {
 		serial_pci_bdf.value = get_pci_bdf_value(pci_bdf_info);
 		uart_base_address = pci_pdev_read_cfg(serial_pci_bdf, pci_bar_offset(0), 4U) & PCIM_BAR_MEM_BASE;
-	}
-
-	if (!serial_port_mapped) {
-		hv_access_memory_region_update(uart_base_address, PDE_SIZE);
 	}
 
 	spinlock_init(&uart_rx_lock);

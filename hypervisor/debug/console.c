@@ -13,7 +13,7 @@
 #include <acrn_hv_defs.h>
 #include <vm.h>
 #include "vuart.h"
-#include "uart16550.h"
+#include "uart16550_priv.h"
 #include "lib.h"
 
 #define CONSOLE_KICK_TIMER_TIMEOUT  40UL /* timeout is 40ms*/
@@ -23,7 +23,7 @@ uint16_t console_vmid = ACRN_INVALID_VMID;
 
 void console_init(void)
 {
-	uart16550_init();
+	uart16550_init(false);
 }
 
 void console_putc(const char *ch)

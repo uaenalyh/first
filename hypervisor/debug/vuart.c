@@ -35,7 +35,7 @@
 #include <logmsg.h>
 #include "lib.h"
 #include "vuart.h"
-#include "uart16550.h"
+#include "uart16550_priv.h"
 #include "shell_priv.h"
 
 static struct acrn_vuart vuarts[CONFIG_MAX_VM_NUM][MAX_VUART_NUM_PER_VM];

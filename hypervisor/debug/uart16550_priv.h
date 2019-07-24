@@ -4,8 +4,10 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-#ifndef UART16550_H
-#define UART16550_H
+#ifndef UART16550_PRIV_H
+#define UART16550_PRIV_H
+
+#include <uart16550.h>
 
 /* Register / bit definitions for 16c550 uart */
 /*receive buffer register            | base+00h, dlab=0b r*/
@@ -127,10 +129,8 @@
 /* UART oscillator clock */
 #define UART_CLOCK_RATE	1843200U	/* 1.8432 MHz */
 
-void uart16550_init(void);
 char uart16550_getc(void);
 size_t uart16550_puts(const char *buf, uint32_t len);
 void uart16550_set_property(bool enabled, bool port_mapped, uint64_t base_addr);
-bool is_pci_dbg_uart(union pci_bdf bdf_value);
 
-#endif /* !UART16550_H */
+#endif /* !UART16550_PRIV_H */
