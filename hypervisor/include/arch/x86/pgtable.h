@@ -122,6 +122,7 @@
  * @{
  */
 /* hpa <--> hva, now it is 1:1 mapping */
+
 /**
  * @brief Translate host-physical address to host-virtual address
  *
