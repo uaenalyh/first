@@ -307,13 +307,13 @@ int32_t shutdown_vm(struct acrn_vm *vm)
  */
 void start_vm(struct acrn_vm *vm)
 {
-	struct acrn_vcpu *vcpu = NULL;
+	struct acrn_vcpu *bsp = NULL;
 
 	vm->state = VM_STARTED;
 
 	/* Only start BSP (vid = 0) and let BSP start other APs */
-	vcpu = vcpu_from_vid(vm, 0U);
-	schedule_vcpu(vcpu);
+	bsp = vcpu_from_vid(vm, BOOT_CPU_ID);
+	schedule_vcpu(bsp);
 }
 
 /**
