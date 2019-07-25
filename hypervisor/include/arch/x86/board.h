@@ -7,6 +7,7 @@
 #define BOARD_H
 
 #include <types.h>
+#include <host_pm.h>
 
 /* forward declarations */
 struct acrn_vm;
