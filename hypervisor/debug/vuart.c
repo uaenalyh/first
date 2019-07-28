@@ -453,7 +453,7 @@ static bool vuart_register_io_handler(struct acrn_vm *vm, uint16_t port_base, ui
 }
 
 static void vuart_setup(struct acrn_vm *vm,
-		struct vuart_config *vu_config, uint16_t vuart_idx)
+		const struct vuart_config *vu_config, uint16_t vuart_idx)
 {
 	uint32_t divisor;
 	struct acrn_vuart *vu = &vuarts[vm->vm_id][vuart_idx];
@@ -481,7 +481,7 @@ static void vuart_setup(struct acrn_vm *vm,
 	}
 }
 
-static struct acrn_vuart *find_active_target_vuart(struct vuart_config *vu_config)
+static struct acrn_vuart *find_active_target_vuart(const struct vuart_config *vu_config)
 {
 	struct acrn_vm *target_vm = NULL;
 	struct acrn_vuart *target_vu = NULL, *ret_vu = NULL;
@@ -504,7 +504,7 @@ static struct acrn_vuart *find_active_target_vuart(struct vuart_config *vu_confi
 }
 
 static void vuart_setup_connection(struct acrn_vm *vm,
-		struct vuart_config *vu_config, uint16_t vuart_idx)
+		const struct vuart_config *vu_config, uint16_t vuart_idx)
 {
 	struct acrn_vuart *vu, *t_vu;
 
