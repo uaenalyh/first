@@ -71,7 +71,7 @@ struct acrn_apicv_ops {
 	bool (*x2apic_write_msr_may_valid)(uint32_t offset);
 };
 
-extern const struct acrn_apicv_ops *apicv_ops;
+extern const struct acrn_apicv_ops ptapic_ops;
 
 /**
  * @brief virtual LAPIC
@@ -81,7 +81,6 @@ extern const struct acrn_apicv_ops *apicv_ops;
  */
 
 uint64_t vlapic_get_apicbase(const struct acrn_vlapic *vlapic);
-int32_t vlapic_set_apicbase(struct acrn_vlapic *vlapic, uint64_t new);
 int32_t vlapic_x2apic_read(struct acrn_vcpu *vcpu, uint32_t msr, uint64_t *val);
 int32_t vlapic_x2apic_write(struct acrn_vcpu *vcpu, uint32_t msr, uint64_t val);
 

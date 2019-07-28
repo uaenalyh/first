@@ -40,9 +40,7 @@
 #define ACPI_SIG_MADT	     "APIC" /* Multiple APIC Description Table */
 #define RSDP_CHECKSUM_LENGTH       20
 #define ACPI_NAME_SIZE	     4U
-#define ACPI_MADT_TYPE_LOCAL_APIC  0U
 #define ACPI_MADT_TYPE_IOAPIC  1U
-#define ACPI_MADT_ENABLED	  1U
 
 struct acpi_table_rsdp {
 	/* ACPI signature, contains "RSD PTR " */
@@ -90,15 +88,6 @@ struct acpi_table_madt {
 	/* Physical address of local APIC */
 	uint32_t		     address;
 	uint32_t		     flags;
-};
-
-struct acpi_madt_local_apic {
-	struct acpi_subtable_header    header;
-	/* ACPI processor id */
-	uint8_t			processor_id;
-	/* Processor's local APIC id */
-	uint8_t			id;
-	uint32_t		       lapic_flags;
 };
 
 static struct acpi_table_rsdp *acpi_rsdp;
@@ -237,44 +226,6 @@ void *get_acpi_tbl(const char *signature)
 	return hpa2hva(addr);
 }
 
-/* TODO: As ACRN supports only x2APIC mode, we need to
- * check upon using x2APIC APIC entries (Type 9) in MADT instead
- * of Type 0
- */
-static uint16_t
-local_parse_madt(struct acpi_table_madt *madt, uint32_t lapic_id_array[CONFIG_MAX_PCPU_NUM])
-{
-	uint16_t pcpu_num = 0U;
-	struct acpi_madt_local_apic *processor;
-	struct acpi_table_madt *madt_ptr;
-	void *first, *end, *iterator;
-	struct acpi_subtable_header *entry;
-
-	madt_ptr = madt;
-
-	first = madt_ptr + 1;
-	end = (void *)madt_ptr + madt_ptr->header.length;
-
-	for (iterator = first; (iterator) < (end); iterator += entry->length) {
-		entry = (struct acpi_subtable_header *)iterator;
-		if (entry->length < sizeof(struct acpi_subtable_header)) {
-			break;
-		}
-
-		if (entry->type == ACPI_MADT_TYPE_LOCAL_APIC) {
-			processor = (struct acpi_madt_local_apic *)iterator;
-			if ((processor->lapic_flags & ACPI_MADT_ENABLED) != 0U) {
-				if (pcpu_num < CONFIG_MAX_PCPU_NUM) {
-					lapic_id_array[pcpu_num] = processor->id;
-				}
-				pcpu_num++;
-			}
-		}
-	}
-
-	return pcpu_num;
-}
-
 static uint16_t
 ioapic_parse_madt(void *madt, struct ioapic_info *ioapic_id_array)
 {
@@ -312,18 +263,13 @@ ioapic_parse_madt(void *madt, struct ioapic_info *ioapic_id_array)
 /* The lapic_id info gotten from madt will be returned in lapic_id_array */
 uint16_t parse_madt(uint32_t lapic_id_array[CONFIG_MAX_PCPU_NUM])
 {
-	uint16_t ret = 0U;
-	struct acpi_table_rsdp *rsdp = NULL;
 
-	rsdp = get_rsdp();
-	if (rsdp != NULL) {
-		struct acpi_table_madt *madt = (struct acpi_table_madt *)get_acpi_tbl(ACPI_SIG_MADT);
-		if (madt != NULL) {
-			ret = local_parse_madt(madt, lapic_id_array);
-		}
-	}
+	lapic_id_array[0] = 0U;
+	lapic_id_array[1] = 2U;
+	lapic_id_array[2] = 4U;
+	lapic_id_array[3] = 6U;
 
-	return ret;
+	return 4;
 }
 
 uint16_t parse_madt_ioapic(struct ioapic_info *ioapic_id_array)

@@ -48,15 +48,11 @@
 
 #define	APICBASE_BSP		0x00000100UL
 #define	APICBASE_X2APIC		0x00000400U
-#define APICBASE_XAPIC		0x00000800U
-#define APICBASE_LAPIC_MODE	(APICBASE_XAPIC | APICBASE_X2APIC)
 #define	APICBASE_ENABLED	0x00000800UL
 #define LOGICAL_ID_MASK		0xFU
 #define CLUSTER_ID_MASK		0xFFFF0U
 
 #define ACRN_DBG_LAPIC		6U
-
-const struct acrn_apicv_ops *apicv_ops;
 
 static struct acrn_vlapic *
 vm_lapic_from_vcpu_id(struct acrn_vm *vm, uint16_t vcpu_id)
@@ -302,7 +298,7 @@ vlapic_reset(struct acrn_vlapic *vlapic, const struct acrn_apicv_ops *ops)
 	/*
 	 * Upon reset, vlapic is set to xAPIC mode.
 	 */
-	vlapic->msr_apicbase = DEFAULT_APIC_BASE | APICBASE_ENABLED;
+	vlapic->msr_apicbase = DEFAULT_APIC_BASE | APICBASE_ENABLED | APICBASE_X2APIC;
 
 	if (vlapic->vcpu->vcpu_id == BOOT_CPU_ID) {
 		vlapic->msr_apicbase |= APICBASE_BSP;
@@ -311,7 +307,7 @@ vlapic_reset(struct acrn_vlapic *vlapic, const struct acrn_apicv_ops *ops)
 	lapic = &(vlapic->apic_page);
 	(void)memset((void *)lapic, 0U, sizeof(struct lapic_regs));
 
-	lapic->id.v = vlapic_build_id(vlapic);
+	vlapic_build_x2apic_id(vlapic);
 
 	vlapic->ops = ops;
 }
@@ -324,7 +320,7 @@ void
 vlapic_init(struct acrn_vlapic *vlapic)
 {
 
-	vlapic_reset(vlapic, apicv_ops);
+	vlapic_reset(vlapic, &ptapic_ops);
 }
 
 uint64_t vlapic_get_apicbase(const struct acrn_vlapic *vlapic)
@@ -355,7 +351,7 @@ static bool ptapic_invalid(__unused uint32_t offset)
 	return false;
 }
 
-static const struct acrn_apicv_ops ptapic_ops = {
+const struct acrn_apicv_ops ptapic_ops = {
 	.accept_intr = ptapic_accept_intr,
 	.inject_intr = ptapic_inject_intr,
 	.has_pending_delivery_intr = ptapic_has_pending_delivery_intr,
@@ -364,49 +360,6 @@ static const struct acrn_apicv_ops ptapic_ops = {
 	.x2apic_read_msr_may_valid  = ptapic_invalid,
 	.x2apic_write_msr_may_valid  = ptapic_invalid,
 };
-
-int32_t vlapic_set_apicbase(struct acrn_vlapic *vlapic, uint64_t new)
-{
-	int32_t ret = 0;
-	uint64_t changed;
-	bool change_in_vlapic_mode = false;
-	struct acrn_vcpu *vcpu = vlapic->vcpu;
-
-	if (vlapic->msr_apicbase != new) {
-		changed = vlapic->msr_apicbase ^ new;
-		change_in_vlapic_mode = ((changed & APICBASE_LAPIC_MODE) != 0U);
-
-		/*
-		 * TODO: Logic to check for change in Reserved Bits and Inject GP
-		 */
-
-		/*
-		 * Logic to check for change in Bits 11:10 for vLAPIC mode switch
-		 */
-		if (change_in_vlapic_mode) {
-			if ((new & APICBASE_LAPIC_MODE) ==
-						(APICBASE_XAPIC | APICBASE_X2APIC)) {
-				vlapic_reset(vlapic, &ptapic_ops);
-				vlapic->msr_apicbase = new;
-				vlapic_build_x2apic_id(vlapic);
-				switch_apicv_mode_x2apic(vlapic->vcpu);
-				update_vm_vlapic_state(vcpu->vm);
-			} else {
-				/*
-				 * TODO: Logic to check for Invalid transitions, Invalid State
-				 * and mode switch according to SDM 10.12.5
-				 * Fig. 10-27
-				 */
-			}
-		}
-
-		/*
-		 * TODO: Logic to check for change in Bits 35:12 and Bit 7 and emulate
-		 */
-	}
-
-	return ret;
-}
 
 static inline  uint32_t x2apic_msr_to_regoff(uint32_t msr)
 {

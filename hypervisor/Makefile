@@ -455,7 +455,7 @@ QEMU	:= qemu-system-x86_64
 
 QEMU_CPU := max,level=21
 QEMUOPTS += -machine q35,kernel_irqchip=split,accel=kvm -cpu $(QEMU_CPU)
-QEMUOPTS += -m 4G -smp cpus=4,cores=4,threads=1 -enable-kvm
+QEMUOPTS += -m 4G -smp cpus=8,cores=4,threads=2 -enable-kvm
 QEMUOPTS += -device isa-debug-exit -device intel-iommu,intremap=on,caching-mode=on,device-iotlb=on
 QEMUOPTS += -debugcon file:/dev/stdout
 QEMUOPTS += -serial mon:stdio -display none

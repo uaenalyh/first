@@ -204,7 +204,7 @@ int32_t create_vm(uint16_t vm_id, struct acrn_vm_config *vm_config, struct acrn_
 		spinlock_init(&vm->softirq_dev_lock);
 		spinlock_init(&vm->vm_lock);
 
-		vm->arch_vm.vlapic_state = VM_VLAPIC_XAPIC;
+		vm->arch_vm.vlapic_state = VM_VLAPIC_X2APIC;
 		vm->intr_inject_delay_delta = 0UL;
 
 		/* Set up IO bit-mask such that VM exit occurs on
@@ -400,71 +400,6 @@ void launch_vms(uint16_t pcpu_id)
 			prepare_vm(vm_id, vm_config);
 		}
 	}
-}
-
-/*
- * @brief Update state of vLAPICs of a VM
- * vLAPICs of VM switch between modes in an asynchronous fashion. This API
- * captures the "transition" state triggered when one vLAPIC switches mode.
- * When the VM is created, the state is set to "xAPIC" as all vLAPICs are setup
- * in xAPIC mode.
- *
- * Upon reset, all LAPICs switch to xAPIC mode accroding to SDM 10.12.5
- * Considering VM uses x2apic mode for vLAPIC, in reset or shutdown flow, vLAPIC state
- * moves to "xAPIC" directly without going thru "transition".
- *
- * VM_VLAPIC_X2APIC - All the online vCPUs/vLAPICs of this VM use x2APIC mode
- * VM_VLAPIC_XAPIC - All the online vCPUs/vLAPICs of this VM use xAPIC mode
- * VM_VLAPIC_DISABLED - All the online vCPUs/vLAPICs of this VM are in Disabled mode
- * VM_VLAPIC_TRANSITION - Online vCPUs/vLAPICs of this VM are in between transistion
- *
- * TODO: offline_vcpu need to call this API to reflect the status of rest of the
- * vLAPICs that are online.
- *
- * @pre vm != NULL
- */
-void update_vm_vlapic_state(struct acrn_vm *vm)
-{
-	uint16_t i;
-	struct acrn_vcpu *vcpu;
-	uint16_t vcpus_in_x2apic, vcpus_in_xapic;
-	enum vm_vlapic_state vlapic_state = VM_VLAPIC_XAPIC;
-
-	vcpus_in_x2apic = 0U;
-	vcpus_in_xapic = 0U;
-	spinlock_obtain(&vm->vm_lock);
-	foreach_vcpu(i, vm, vcpu) {
-		vcpus_in_x2apic++;
-	}
-
-	if ((vcpus_in_x2apic == 0U) && (vcpus_in_xapic == 0U)) {
-		/*
-		 * Check if the counts vcpus_in_x2apic and vcpus_in_xapic are zero
-		 * VM_VLAPIC_DISABLED
-		 */
-		vlapic_state = VM_VLAPIC_DISABLED;
-	} else if ((vcpus_in_x2apic != 0U) && (vcpus_in_xapic != 0U)) {
-		/*
-		 * Check if the counts vcpus_in_x2apic and vcpus_in_xapic are non-zero
-		 * VM_VLAPIC_TRANSITION
-		 */
-		vlapic_state = VM_VLAPIC_TRANSITION;
-	} else if (vcpus_in_x2apic != 0U) {
-		/*
-		 * Check if the counts vcpus_in_x2apic is non-zero
-		 * VM_VLAPIC_X2APIC
-		 */
-		vlapic_state = VM_VLAPIC_X2APIC;
-	} else {
-		/*
-		 * Count vcpus_in_xapic is non-zero
-		 * VM_VLAPIC_XAPIC
-		 */
-		vlapic_state = VM_VLAPIC_XAPIC;
-	}
-
-	vm->arch_vm.vlapic_state = vlapic_state;
-	spinlock_release(&vm->vm_lock);
 }
 
 /*

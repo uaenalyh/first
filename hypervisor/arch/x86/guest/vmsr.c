@@ -551,11 +551,6 @@ int32_t wrmsr_vmexit_handler(struct acrn_vcpu *vcpu)
 		err = vmx_wrmsr_pat(vcpu, v);
 		break;
 	}
-	case MSR_IA32_APIC_BASE:
-	{
-		err = vlapic_set_apicbase(vcpu_vlapic(vcpu), v);
-		break;
-	}
 	case MSR_IA32_MCG_STATUS:
 	{
 		if (v != 0U) {

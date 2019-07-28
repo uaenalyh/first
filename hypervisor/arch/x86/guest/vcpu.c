@@ -571,7 +571,7 @@ void reset_vcpu(struct acrn_vcpu *vcpu)
 		vcpu->arch.cur_context = NORMAL_WORLD;
 
 		vlapic = vcpu_vlapic(vcpu);
-		vlapic_reset(vlapic, apicv_ops);
+		vlapic_reset(vlapic, &ptapic_ops);
 
 		reset_vcpu_regs(vcpu);
 	}
