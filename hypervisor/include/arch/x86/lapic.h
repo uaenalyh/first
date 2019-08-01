@@ -116,14 +116,6 @@ void send_startup_ipi(enum intr_cpu_startup_shorthand cpu_startup_shorthand,
 		uint64_t cpu_startup_start_address);
 
 /**
- * @brief Send an IPI to multiple pCPUs
- *
- * @param[in]	dest_mask The mask of destination physical cpus
- * @param[in]	vector The vector of interrupt
- */
-void send_dest_ipi_mask(uint32_t dest_mask, uint32_t vector);
-
-/**
  * @brief Send an IPI to a single pCPU
  *
  * @param[in]	pcpu_id The id of destination physical cpu

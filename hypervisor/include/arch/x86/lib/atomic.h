@@ -33,16 +33,4 @@
 
 #define	BUS_LOCK	"lock ; "
 
-#define build_atomic_cmpxchg(name, size, type)			\
-static inline type name(volatile type *ptr, type old, type new)	\
-{								\
-	type ret;						\
-	asm volatile(BUS_LOCK "cmpxchg" size " %2,%1"		\
-			: "=a" (ret), "+m" (*ptr)		\
-			: "r" (new), "0" (old)			\
-			: "memory");				\
-	return ret;						\
-}
-build_atomic_cmpxchg(atomic_cmpxchg64, "q", uint64_t)
-
 #endif /* ATOMIC_H*/

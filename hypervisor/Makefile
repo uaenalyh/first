@@ -184,7 +184,6 @@ HW_C_SRCS += common/softirq.c
 HW_C_SRCS += common/schedule.c
 HW_C_SRCS += hw/pci.c
 HW_C_SRCS += arch/x86/configs/vm_config.c
-HW_C_SRCS += arch/x86/configs/$(CONFIG_BOARD)/board.c
 HW_C_SRCS += scenarios/$(SCENARIO_NAME)/vm_configurations.c
 ifneq (,$(wildcard scenarios/$(SCENARIO_NAME)/pt_dev.c))
 HW_C_SRCS += scenarios/$(SCENARIO_NAME)/pt_dev.c

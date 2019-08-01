@@ -655,14 +655,6 @@ int32_t prepare_vcpu(struct acrn_vm *vm, uint16_t pcpu_id)
 	if (ret == 0) {
 		set_pcpu_used(pcpu_id);
 
-		/* Update CLOS for this CPU */
-		if (cat_cap_info.enabled) {
-			conf = get_vm_config(vm->vm_id);
-			orig_val = msr_read(MSR_IA32_PQR_ASSOC);
-			final_val = (orig_val & 0xffffffffUL) | (((uint64_t)conf->clos) << 32UL);
-			msr_write_pcpu(MSR_IA32_PQR_ASSOC, final_val, pcpu_id);
-		}
-
 		INIT_LIST_HEAD(&vcpu->sched_obj.run_list);
 		vcpu->sched_obj.thread = vcpu_thread;
 		vcpu->sched_obj.host_sp = build_stack_frame(vcpu);

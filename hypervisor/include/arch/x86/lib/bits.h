@@ -170,7 +170,6 @@ static inline void name(uint16_t nr_arg, volatile op_type *addr)	\
 }
 build_bitmap_clear(bitmap_clear_nolock, "q", uint64_t, "")
 build_bitmap_clear(bitmap_clear_lock, "q", uint64_t, BUS_LOCK)
-build_bitmap_clear(bitmap32_clear_nolock, "l", uint32_t, "")
 
 /*
  * return !!((*addr) & (1UL<<nr));

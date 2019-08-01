@@ -235,8 +235,6 @@ void init_pcpu_post(uint16_t pcpu_id)
 		wait_sync_change(&pcpu_sync, 0UL);
 	}
 
-	setup_clos(pcpu_id);
-
 	enable_smep();
 
 	enable_smap();
@@ -432,27 +430,5 @@ static void pcpu_xsave_init(void)
 				cpu_info->cpuid_leaves[FEAT_1_ECX] |= CPUID_ECX_OSXSAVE;
 			}
 		}
-	}
-}
-
-static void smpcall_write_msr_func(void *data)
-{
-	struct msr_data_struct *msr = (struct msr_data_struct *)data;
-
-	msr_write(msr->msr_index, msr->write_val);
-}
-
-void msr_write_pcpu(uint32_t msr_index, uint64_t value64, uint16_t pcpu_id)
-{
-	struct msr_data_struct msr = {0};
-	uint64_t mask = 0UL;
-
-	if (pcpu_id == get_pcpu_id()) {
-		msr_write(msr_index, value64);
-	} else {
-		msr.msr_index = msr_index;
-		msr.write_val = value64;
-		bitmap_set_nolock(pcpu_id, &mask);
-		smp_call_function(mask, smpcall_write_msr_func, &msr);
 	}
 }

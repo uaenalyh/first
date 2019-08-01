@@ -161,28 +161,6 @@ send_startup_ipi(enum intr_cpu_startup_shorthand cpu_startup_shorthand,
 	msr_write(MSR_IA32_EXT_APIC_ICR, icr.value);
 }
 
-void send_dest_ipi_mask(uint32_t dest_mask, uint32_t vector)
-{
-	union apic_icr icr;
-	uint16_t pcpu_id;
-	uint32_t mask = dest_mask;
-
-	icr.value_32.lo_32 = vector | (INTR_LAPIC_ICR_PHYSICAL << 11U);
-
-	pcpu_id = ffs64(mask);
-
-	while (pcpu_id < CONFIG_MAX_PCPU_NUM) {
-		bitmap32_clear_nolock(pcpu_id, &mask);
-		if (is_pcpu_active(pcpu_id)) {
-			icr.value_32.hi_32 = per_cpu(lapic_id, pcpu_id);
-			msr_write(MSR_IA32_EXT_APIC_ICR, icr.value);
-		} else {
-			pr_err("pcpu_id %d not in active!", pcpu_id);
-		}
-		pcpu_id = ffs64(mask);
-	}
-}
-
 void send_single_ipi(uint16_t pcpu_id, uint32_t vector)
 {
 	union apic_icr icr;

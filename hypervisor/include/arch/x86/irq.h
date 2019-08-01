@@ -74,8 +74,6 @@ struct smp_call_info_data {
 	void *data;
 };
 
-void smp_call_function(uint64_t mask, smp_call_func_t func, void *data);
-
 void init_default_irqs(uint16_t cpu_id);
 
 void dispatch_exception(struct intr_excp_ctx *ctx);

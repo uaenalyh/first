@@ -36,32 +36,6 @@ static void kick_notification(__unused uint32_t irq, __unused void *data)
 	}
 }
 
-void smp_call_function(uint64_t mask, smp_call_func_t func, void *data)
-{
-	uint16_t pcpu_id;
-	struct smp_call_info_data *smp_call;
-
-	/* wait for previous smp call complete, which may run on other cpus */
-	while (atomic_cmpxchg64(&smp_call_mask, 0UL, mask & INVALID_BIT_INDEX) != 0UL);
-	pcpu_id = ffs64(mask);
-	while (pcpu_id < CONFIG_MAX_PCPU_NUM) {
-		bitmap_clear_nolock(pcpu_id, &mask);
-		if (is_pcpu_active(pcpu_id)) {
-			smp_call = &per_cpu(smp_call_info, pcpu_id);
-			smp_call->func = func;
-			smp_call->data = data;
-		} else {
-			/* pcpu is not in active, print error */
-			pr_err("pcpu_id %d not in active!", pcpu_id);
-			bitmap_clear_nolock(pcpu_id, &smp_call_mask);
-		}
-		pcpu_id = ffs64(mask);
-	}
-	send_dest_ipi_mask((uint32_t)smp_call_mask, VECTOR_NOTIFY_VCPU);
-	/* wait for current smp call complete */
-	wait_sync_change(&smp_call_mask, 0UL);
-}
-
 static int32_t request_notification_irq(irq_action_t func, void *data)
 {
 	int32_t retval;
