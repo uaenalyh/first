@@ -35,23 +35,6 @@ vm_sw_loader_t vm_sw_loader;
 
 static struct acrn_vm vm_array[CONFIG_MAX_VM_NUM] __aligned(PAGE_SIZE);
 
-bool is_sos_vm(const struct acrn_vm *vm)
-{
-	return (vm != NULL)  && (get_vm_config(vm->vm_id)->load_order == SOS_VM);
-}
-
-/**
- * @pre vm != NULL
- * @pre vm->vmid < CONFIG_MAX_VM_NUM
- */
-bool is_prelaunched_vm(const struct acrn_vm *vm)
-{
-	struct acrn_vm_config *vm_config;
-
-	vm_config = get_vm_config(vm->vm_id);
-	return (vm_config->load_order == PRE_LAUNCHED_VM);
-}
-
 /**
  * @pre vm != NULL && vm_config != NULL && vm->vmid < CONFIG_MAX_VM_NUM
  */
