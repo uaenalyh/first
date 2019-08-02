@@ -20,6 +20,9 @@
 #define MAX_VM_OS_NAME_LEN	32U
 #define MAX_MOD_TAG_LEN		32U
 
+#define PCI_DEV_TYPE_PTDEV	(1U << 0U)
+#define PCI_DEV_TYPE_HVEMUL	(1U << 1U)
+
 /*
  * PRE_LAUNCHED_VM is launched by ACRN hypervisor, with LAPIC_PT;
  * SOS_VM is launched by ACRN hypervisor, without LAPIC_PT;
@@ -79,9 +82,11 @@ struct acrn_vm_os_config {
 } __aligned(8);
 
 struct acrn_vm_pci_dev_config {
+	uint32_t emu_type;				/* the type how the device is emulated. */
 	union pci_bdf vbdf;				/* virtual BDF of PCI device */
 	union pci_bdf pbdf;				/* physical BDF of PCI device */
 	uint64_t vbar_base[PCI_BAR_COUNT];		/* vbar base address of PCI device */
+	struct pci_pdev *pdev;				/* the physical PCI device if it's a PT device */
 } __aligned(8);
 
 struct acrn_vm_config {

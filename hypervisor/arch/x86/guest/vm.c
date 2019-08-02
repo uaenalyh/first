@@ -27,6 +27,7 @@
 #include <board.h>
 #include <sgx.h>
 #include <sbuf.h>
+#include <pci_dev.h>
 
 vm_sw_loader_t vm_sw_loader;
 
