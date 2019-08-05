@@ -20,6 +20,7 @@ HV_MODDIR ?= $(HV_OBJDIR)/modules
 HV_FILE := acrn
 SUB_MAKEFILES := $(wildcard */Makefile)
 
+BSP_MOD = $(HV_MODDIR)/lib_bsp.a
 LIB_MOD = $(HV_MODDIR)/lib_mod.a
 BOOT_MOD = $(HV_MODDIR)/boot_mod.a
 HW_MOD = $(HV_MODDIR)/hw_mod.a
@@ -106,6 +107,7 @@ ARCH_LDFLAGS +=
 
 ARCH_LDSCRIPT = link_ram.ld
 
+INCLUDE_PATH += bsp
 INCLUDE_PATH += include
 INCLUDE_PATH += include/lib
 INCLUDE_PATH += include/lib/crypto
@@ -134,6 +136,7 @@ export CC AS AR LD OBJCOPY
 export CFLAGS ASFLAGS ARFLAGS LDFLAGS ARCH_CFLAGS ARCH_ASFLAGS ARCH_ARFLAGS ARCH_LDFLAGS
 export HV_OBJDIR HV_MODDIR CONFIG_RELEASE INCLUDE_PATH
 export LIB_DEBUG LIB_RELEASE
+export BSP_MOD
 
 # library componment
 LIB_C_SRCS += lib/string.c
@@ -258,6 +261,7 @@ endif
 PRE_BUILD_SRCS += pre_build/static_checks.c
 PRE_BUILD_OBJS := $(patsubst %.c,$(HV_OBJDIR)/%.o,$(PRE_BUILD_SRCS))
 
+MODULES += $(BSP_MOD)
 MODULES += $(LIB_MOD)
 MODULES += $(BOOT_MOD)
 MODULES += $(HW_MOD)
@@ -394,6 +398,7 @@ $(SUB_MAKEFILES): header
 $(LIB_RELEASE): lib
 
 $(LIB_DEBUG): lib
+$(BSP_MOD): lib
 
 $(HV_OBJDIR)/$(HV_FILE).32.out: $(HV_OBJDIR)/$(HV_FILE).out
 	$(OBJCOPY) -S --section-alignment=0x1000 -O elf32-i386 $< $@

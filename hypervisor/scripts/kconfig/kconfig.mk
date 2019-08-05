@@ -31,4 +31,4 @@ endif
 include include/config.mk
 $(eval $(call override_config,RELEASE,n))
 
-CFLAGS += -include include/config.h
+CFLAGS += -include include/config.h -include bsp.h

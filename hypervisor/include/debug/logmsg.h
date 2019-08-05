@@ -88,6 +88,6 @@ void printf(const char *fmt, ...);
 #define panic(...) 							\
 	do { pr_fatal("PANIC: %s line: %d\n", __func__, __LINE__);	\
 		pr_fatal(__VA_ARGS__); 					\
-		while (1) { asm_pause(); }; } while (0)
+		bsp_fatal_error(); } while (0)
 
 #endif /* LOGMSG_H */

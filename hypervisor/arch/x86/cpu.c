@@ -108,6 +108,8 @@ void init_pcpu_pre(bool is_bsp)
 		 */
 		uart16550_init(true);
 
+		bsp_init();
+
 		/* Get CPU capabilities thru CPUID, including the physical address bit
 		 * limit which is required for initializing paging.
 		 */
@@ -147,6 +149,8 @@ void init_pcpu_pre(bool is_bsp)
 		}
 
 	} else {
+		bsp_init();
+
 		/* Switch this CPU to use the same page tables set-up by the
 		 * primary/boot CPU
 		 */
