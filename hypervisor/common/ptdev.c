@@ -42,8 +42,6 @@ struct ptirq_remapping_info *ptirq_alloc_entry(struct acrn_vm *vm, uint32_t intr
 		entry->vm = vm;
 		entry->intr_count = 0UL;
 
-		INIT_LIST_HEAD(&entry->softirq_node);
-
 		entry->active = false;
 	} else {
 		pr_err("Alloc ptdev irq entry failed");
@@ -57,7 +55,6 @@ void ptirq_release_entry(struct ptirq_remapping_info *entry)
 	uint64_t rflags;
 
 	spinlock_irqsave_obtain(&entry->vm->softirq_dev_lock, &rflags);
-	list_del_init(&entry->softirq_node);
 	spinlock_irqrestore_release(&entry->vm->softirq_dev_lock, rflags);
 
 	bitmap_clear_nolock((entry->ptdev_entry_id) & 0x3FU,

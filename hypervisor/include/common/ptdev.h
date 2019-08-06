@@ -6,7 +6,6 @@
 
 #ifndef PTDEV_H
 #define PTDEV_H
-#include <list.h>
 #include <spinlock.h>
 #include <pci.h>
 #include <timer.h>
@@ -123,7 +122,6 @@ struct ptirq_remapping_info {
 	struct acrn_vm *vm;
 	bool active;	/* true=active, false=inactive*/
 	uint32_t allocated_pirq;
-	struct list_head softirq_node;
 	struct ptirq_msi_info msi;
 
 	uint64_t intr_count;

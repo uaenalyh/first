@@ -18,8 +18,11 @@
 struct sched_object;
 typedef void (*run_thread_t)(struct sched_object *obj);
 typedef void (*prepare_switch_t)(struct sched_object *obj);
+struct sched_context;
+struct acrn_vcpu;
 struct sched_object {
-	struct list_head run_list;
+	struct sched_context *curr_ctx;
+	struct acrn_vcpu *vcpu;
 	uint64_t host_sp;
 	run_thread_t thread;
 	prepare_switch_t prepare_switch_out;
@@ -27,7 +30,7 @@ struct sched_object {
 };
 
 struct sched_context {
-	struct list_head runqueue;
+	struct sched_object *runqueue;
 	uint64_t flags;
 	struct sched_object *curr_obj;
 	spinlock_t scheduler_lock;	/* to protect sched_context and sched_object */
