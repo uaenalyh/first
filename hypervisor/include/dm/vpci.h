@@ -108,9 +108,8 @@ struct acrn_vpci {
 	struct pci_vdev pci_vdevs[CONFIG_MAX_PCI_DEV_NUM];
 };
 
+extern const struct pci_vdev_ops vhostbridge_ops;
 void vpci_init(struct acrn_vm *vm);
 void vpci_cleanup(const struct acrn_vm *vm);
-
-const struct pci_vdev_ops *get_vhostbridge_ops(void);
 
 #endif /* VPCI_H_ */

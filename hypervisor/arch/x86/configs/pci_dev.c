@@ -7,6 +7,7 @@
 #include <vm_config.h>
 #include <pci.h>
 #include <pci_dev.h>
+#include <vpci.h>
 
 /*
  * @pre pdev != NULL;
