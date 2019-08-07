@@ -116,8 +116,6 @@
 
 #define MSI_MAX_CAPLEN	14U
 
-#define HOST_BRIDGE_BDF		0U
-
 union pci_bdf {
 	uint16_t value;
 	struct {

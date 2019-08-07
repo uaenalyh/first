@@ -6,9 +6,7 @@
 
 #include <vm_config.h>
 #include <pci.h>
-
-static uint16_t pcidev_config_num = 0U;
-static struct acrn_vm_pci_dev_config pcidev_config[CONFIG_MAX_PCI_DEV_NUM] = {};
+#include <pci_dev.h>
 
 /*
  * @pre pdev != NULL;
@@ -47,14 +45,34 @@ static bool is_allocated_to_prelaunched_vm(struct pci_pdev *pdev)
  */
 void fill_pci_dev_config(struct pci_pdev *pdev)
 {
+	uint16_t vmid;
+	uint32_t idx;
+	struct acrn_vm_config *vm_config;
 	struct acrn_vm_pci_dev_config *dev_config;
 
 	if (!is_allocated_to_prelaunched_vm(pdev)) {
-		dev_config = &pcidev_config[pcidev_config_num];
-		dev_config->emu_type = (pdev->bdf.value != HOST_BRIDGE_BDF) ? PCI_DEV_TYPE_PTDEV : PCI_DEV_TYPE_HVEMUL;
-		dev_config->vbdf.value = pdev->bdf.value;
-		dev_config->pbdf.value = pdev->bdf.value;
-		dev_config->pdev = pdev;
-		pcidev_config_num++;
+		for (vmid = 0U; vmid < CONFIG_MAX_VM_NUM; vmid++) {
+			vm_config = get_vm_config(vmid);
+			continue;
+
+			/* TODO: revert me if we could split post-launched VM's PTDev from SOS's */
+			for (idx = 0U; idx < SOS_EMULATED_PCI_DEV_NUM; idx++) {
+				dev_config = &vm_config->pci_devs[idx];
+				if (bdf_is_equal(&dev_config->pbdf, &pdev->bdf)) {
+					dev_config->pdev = pdev;
+					break;
+				}
+
+			}
+
+			if (idx == SOS_EMULATED_PCI_DEV_NUM) {
+				dev_config = &vm_config->pci_devs[vm_config->pci_dev_num];
+				dev_config->emu_type = PCI_DEV_TYPE_PTDEV;
+				dev_config->vbdf.value = pdev->bdf.value;
+				dev_config->pbdf.value = pdev->bdf.value;
+				dev_config->pdev = pdev;
+				vm_config->pci_dev_num++;
+			}
+		}
 	}
 }
