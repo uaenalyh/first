@@ -5,6 +5,7 @@
  */
 
 #include <rtl.h>
+#include <list.h>
 #include <bits.h>
 #include <cpu.h>
 #include <per_cpu.h>
@@ -24,7 +25,7 @@ void init_scheduler(void)
 		ctx = &per_cpu(sched_ctx, i);
 
 		spinlock_init(&ctx->scheduler_lock);
-		ctx->runqueue = NULL;
+		INIT_LIST_HEAD(&ctx->runqueue);
 		ctx->flags = 0UL;
 		ctx->curr_obj = NULL;
 	}
@@ -56,28 +57,22 @@ void add_to_cpu_runqueue(struct sched_object *obj, uint16_t pcpu_id)
 {
 	struct sched_context *ctx = &per_cpu(sched_ctx, pcpu_id);
 
-	if (obj->curr_ctx == NULL && ctx->runqueue == NULL) {
-		ctx->runqueue = obj;
-		obj->curr_ctx = ctx;
+	if (list_empty(&obj->run_list)) {
+		list_add_tail(&obj->run_list, &ctx->runqueue);
 	}
 }
 
 void remove_from_cpu_runqueue(struct sched_object *obj)
 {
-	struct sched_context *ctx = obj->curr_ctx;
-
-	if (ctx != NULL) {
-		ctx->runqueue = NULL;
-		obj->curr_ctx = NULL;
-	}
+	list_del_init(&obj->run_list);
 }
 
 static struct sched_object *get_next_sched_obj(struct sched_context *ctx)
 {
 	struct sched_object *obj = NULL;
 
-	if (ctx->runqueue != NULL) {
-		obj = ctx->runqueue;
+	if (!list_empty(&ctx->runqueue)) {
+		obj = get_first_item(&ctx->runqueue, struct sched_object, run_list);
 	} else {
 		obj = &get_cpu_var(idle);
 	}

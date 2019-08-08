@@ -608,7 +608,7 @@ void pause_vcpu(struct acrn_vcpu *vcpu, enum vcpu_state new_state)
 
 static void context_switch_out(struct sched_object *prev)
 {
-	struct acrn_vcpu *vcpu = prev->vcpu;
+	struct acrn_vcpu *vcpu = list_entry(prev, struct acrn_vcpu, sched_obj);
 
 	vcpu->running = false;
 	/* do prev vcpu context switch out */
@@ -620,7 +620,7 @@ static void context_switch_out(struct sched_object *prev)
 
 static void context_switch_in(struct sched_object *next)
 {
-	struct acrn_vcpu *vcpu = next->vcpu;
+	struct acrn_vcpu *vcpu = list_entry(next, struct acrn_vcpu, sched_obj);
 
 	vcpu->running = true;
 	/* FIXME:
@@ -655,7 +655,7 @@ int32_t prepare_vcpu(struct acrn_vm *vm, uint16_t pcpu_id)
 	if (ret == 0) {
 		set_pcpu_used(pcpu_id);
 
-		vcpu->sched_obj.vcpu = vcpu;
+		INIT_LIST_HEAD(&vcpu->sched_obj.run_list);
 		vcpu->sched_obj.thread = vcpu_thread;
 		vcpu->sched_obj.host_sp = build_stack_frame(vcpu);
 		vcpu->sched_obj.prepare_switch_out = context_switch_out;

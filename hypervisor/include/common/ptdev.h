@@ -6,6 +6,7 @@
 
 #ifndef PTDEV_H
 #define PTDEV_H
+#include <list.h>
 #include <spinlock.h>
 #include <pci.h>
 #include <timer.h>
