@@ -293,9 +293,11 @@ static void remove_vdev_pt_iommu_domain(const struct pci_vdev *vdev)
  */
 static struct pci_vdev *find_vdev(const struct acrn_vpci *vpci, union pci_bdf bdf)
 {
-	struct pci_vdev *vdev;
+	struct pci_vdev *vdev = pci_find_vdev(vpci, bdf);
 
-	vdev = pci_find_vdev_by_vbdf(vpci, bdf);
+	if ((vdev != NULL) && (vdev->vpci != vpci)) {
+		vdev = vdev->new_owner;
+	}
 
 	return vdev;
 }
