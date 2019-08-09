@@ -19,7 +19,6 @@
 union source_id (name) = {.msi_id = {.bdf = (a), .entry_nr = (b)} }
 
 union source {
-	uint16_t ioapic_id;
 	union pci_bdf msi;
 };
 

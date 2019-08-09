@@ -275,11 +275,6 @@ static inline uint8_t pci_func(uint16_t bdf)
 	return (uint8_t)(bdf & 0x7U);
 }
 
-static inline uint8_t pci_devfn(uint16_t bdf)
-{
-	return (uint8_t)(bdf & 0xFFU);
-}
-
 /**
  * @pre a != NULL
  * @pre b != NULL

@@ -16,10 +16,6 @@
 #define DMAR_GCMD_REG   0x18U    /* Global command register */
 #define DMAR_GSTS_REG   0x1cU    /* Global status register */
 #define DMAR_RTADDR_REG 0x20U    /* Root entry table */
-#define DMAR_FSTS_REG   0x34U    /* Fault Status register */
-#define DMAR_FECTL_REG  0x38U    /* Fault control register */
-#define DMAR_FEDATA_REG 0x3cU    /* Fault event interrupt data register */
-#define DMAR_FEADDR_REG 0x40U    /* Fault event interrupt addr register */
 #define DMAR_IQT_REG    0x88U    /* Invalidation queue tail register */
 #define DMAR_IQA_REG    0x90U    /* Invalidation queue addr register */
 #define DMAR_IRTA_REG   0xb8U    /* Interrupt remapping table addr register */
@@ -161,41 +157,8 @@ static inline uint64_t dma_iec_index(uint16_t index, uint8_t index_mask)
 
 #define DMA_IOTLB_INVL_ADDR_IH_UNMODIFIED	(((uint64_t)1UL) << 6U)
 
-static inline bool dma_fsts_ppf(uint32_t ppf)
-{
-	return (((ppf >> 1U) & 1U) == 1U);
-}
-
-static inline uint8_t dma_fsts_fri(uint32_t fri)
-{
-	return ((uint8_t)(fri >> 8U) & 0xFFU);
-}
-
-/* FRCD_REGs: upper 64 bits*/
-static inline bool dma_frcd_up_f(uint64_t up_f)
-{
-	return (((up_f >> 63U) & 1UL) == 1UL);
-}
-
-static inline uint8_t dma_frcd_up_t(uint64_t up_t)
-{
-	return ((uint8_t)(up_t >> 62U) & 1U);
-}
-
-static inline uint8_t dma_frcd_up_fr(uint64_t up_fr)
-{
-	return ((uint8_t)(up_fr >> 32U) & 0xffU);
-}
-
-static inline uint16_t dma_frcd_up_sid(uint64_t up_sid)
-{
-	return ((uint16_t)up_sid & 0xffffU);
-}
-
 #define MAX_DRHDS		4
 #define MAX_DRHD_DEVSCOPES	4
-
-#define DRHD_FLAG_INCLUDE_PCI_ALL_MASK      (1U)
 
 struct dmar_dev_scope {
 	enum acpi_dmar_scope_type type;

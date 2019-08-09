@@ -53,10 +53,6 @@ static inline uint64_t dmar_set_bitslice(uint64_t var, uint64_t mask, uint32_t p
 #define DMAR_CTX_TT_UNTRANSLATED    0x0UL
 #define DMAR_CTX_TT_PASSTHROUGH     0x2UL
 
-/* Fault event MSI data register */
-#define DMAR_MSI_DELIVERY_MODE_SHIFT     (8U)
-#define DMAR_MSI_DELIVERY_LOWPRI	 (1U << DMAR_MSI_DELIVERY_MODE_SHIFT)
-
 #define DMAR_INVALIDATION_QUEUE_SIZE	4096U
 #define DMAR_QI_INV_ENTRY_SIZE		16U
 #define DMAR_NUM_IR_ENTRIES_PER_PAGE	256U
@@ -176,7 +172,6 @@ static inline uint16_t vmid_to_domainid(uint16_t vm_id)
 }
 
 static int32_t dmar_register_hrhd(struct dmar_drhd_rt *dmar_unit);
-static struct dmar_drhd_rt *device_to_dmaru(uint16_t segment, uint8_t bus, uint8_t devfun);
 static int32_t register_hrhd_units(void)
 {
 	struct dmar_drhd_rt *drhd_rt;
@@ -412,69 +407,6 @@ static int32_t dmar_register_hrhd(struct dmar_drhd_rt *dmar_unit)
 	return ret;
 }
 
-static struct dmar_drhd_rt *ioapic_to_dmaru(uint16_t ioapic_id, union pci_bdf *sid)
-{
-	struct dmar_drhd_rt *dmar_unit = NULL;
-	uint32_t i, j;
-	bool found = false;
-
-	for (j = 0U; j < platform_dmar_info->drhd_count; j++) {
-		dmar_unit = &dmar_drhd_units[j];
-		for (i = 0U; i < dmar_unit->drhd->dev_cnt; i++) {
-			if ((dmar_unit->drhd->devices[i].type == ACPI_DMAR_SCOPE_TYPE_IOAPIC) &&
-					(dmar_unit->drhd->devices[i].id == ioapic_id)) {
-				sid->bits.f = pci_func((uint8_t)dmar_unit->drhd->devices[i].devfun);
-				sid->bits.d = pci_slot((uint8_t)dmar_unit->drhd->devices[i].devfun);
-				sid->bits.b = dmar_unit->drhd->devices[i].bus;
-				found = true;
-				break;
-			}
-		}
-		if (found) {
-			break;
-		}
-	}
-
-	if (j == platform_dmar_info->drhd_count) {
-		dmar_unit = NULL;
-	}
-
-	return dmar_unit;
-}
-
-static struct dmar_drhd_rt *device_to_dmaru(uint16_t segment, uint8_t bus, uint8_t devfun)
-{
-	struct dmar_drhd_rt *dmar_unit = NULL;
-	uint32_t i, j;
-
-	for (j = 0U; j < platform_dmar_info->drhd_count; j++) {
-		dmar_unit = &dmar_drhd_units[j];
-
-		if (dmar_unit->drhd->segment != segment) {
-			continue;
-		}
-
-		for (i = 0U; i < dmar_unit->drhd->dev_cnt; i++) {
-			if ((dmar_unit->drhd->devices[i].bus == bus) &&
-					(dmar_unit->drhd->devices[i].devfun == devfun)) {
-				break;
-			}
-		}
-
-		/* found exact one or the one which has the same segment number with INCLUDE_PCI_ALL set */
-		if ((i != dmar_unit->drhd->dev_cnt) || ((dmar_unit->drhd->flags & DRHD_FLAG_INCLUDE_PCI_ALL_MASK) != 0U)) {
-			break;
-		}
-	}
-
-	/* not found */
-	if (j == platform_dmar_info->drhd_count) {
-		dmar_unit = NULL;
-	}
-
-	return dmar_unit;
-}
-
 static void dmar_issue_qi_request(struct dmar_drhd_rt *dmar_unit, struct dmar_entry invalidate_desc)
 {
 	struct dmar_entry *invalidate_desc_ptr;
@@ -687,104 +619,6 @@ static void dmar_set_root_table(struct dmar_drhd_rt *dmar_unit)
 	spinlock_release(&(dmar_unit->lock));
 }
 
-static void dmar_fault_event_unmask(struct dmar_drhd_rt *dmar_unit)
-{
-	spinlock_obtain(&(dmar_unit->lock));
-	iommu_write32(dmar_unit, DMAR_FECTL_REG, 0U);
-	spinlock_release(&(dmar_unit->lock));
-}
-
-static void dmar_fault_msi_write(struct dmar_drhd_rt *dmar_unit,
-			uint32_t vector)
-{
-	uint32_t data;
-	uint32_t addr_low;
-	uint32_t lapic_id = get_cur_lapic_id();
-
-	data = DMAR_MSI_DELIVERY_LOWPRI | vector;
-	/* redirection hint: 0
-	 * destination mode: 0
-	 */
-	addr_low = 0xFEE00000U | ((uint32_t)(lapic_id) << 12U);
-
-	spinlock_obtain(&(dmar_unit->lock));
-	iommu_write32(dmar_unit, DMAR_FEDATA_REG, data);
-	iommu_write32(dmar_unit, DMAR_FEADDR_REG, addr_low);
-	spinlock_release(&(dmar_unit->lock));
-}
-
-static void fault_record_analysis(__unused uint64_t low, uint64_t high)
-{
-	if (!dma_frcd_up_f(high)) {
-		/* currently skip PASID related parsing */
-		pr_info("%s, Reason: 0x%x, SID: %x.%x.%x @0x%llx",
-			(dma_frcd_up_t(high) != 0U) ? "Read/Atomic" : "Write", dma_frcd_up_fr(high),
-			pci_bus(dma_frcd_up_sid(high)), pci_slot(dma_frcd_up_sid(high)), pci_func(dma_frcd_up_sid(high)), low);
-	}
-}
-
-static void dmar_fault_handler(uint32_t irq, void *data)
-{
-	struct dmar_drhd_rt *dmar_unit = (struct dmar_drhd_rt *)data;
-	uint32_t fsr;
-	uint32_t index;
-	uint32_t record_reg_offset;
-	struct dmar_entry fault_record;
-	int32_t loop = 0;
-
-	dev_dbg(ACRN_DBG_IOMMU, "%s: irq = %d", __func__, irq);
-
-	fsr = iommu_read32(dmar_unit, DMAR_FSTS_REG);
-
-	while (dma_fsts_ppf(fsr)) {
-		loop++;
-		index = dma_fsts_fri(fsr);
-		record_reg_offset = (uint32_t)dmar_unit->cap_fault_reg_offset + (index * 16U);
-		if (index >= dmar_unit->cap_num_fault_regs) {
-			dev_dbg(ACRN_DBG_IOMMU, "%s: invalid FR Index", __func__);
-			break;
-		}
-
-		/* read 128-bit fault recording register */
-		fault_record.lo_64 = iommu_read64(dmar_unit, record_reg_offset);
-		fault_record.hi_64 = iommu_read64(dmar_unit, record_reg_offset + 8U);
-
-		dev_dbg(ACRN_DBG_IOMMU, "%s: record[%d] @0x%x:  0x%llx, 0x%llx",
-			__func__, index, record_reg_offset, fault_record.lo_64, fault_record.hi_64);
-
-		fault_record_analysis(fault_record.lo_64, fault_record.hi_64);
-
-		/* write to clear */
-		iommu_write64(dmar_unit, record_reg_offset, fault_record.lo_64);
-		iommu_write64(dmar_unit, record_reg_offset + 8U, fault_record.hi_64);
-
-		fsr = iommu_read32(dmar_unit, DMAR_FSTS_REG);
-	}
-}
-
-static void dmar_setup_interrupt(struct dmar_drhd_rt *dmar_unit)
-{
-	uint32_t vector;
-	int32_t retval = 0;
-
-	spinlock_obtain(&(dmar_unit->lock));
-	if (dmar_unit->dmar_irq == IRQ_INVALID) {
-		retval = request_irq(IRQ_INVALID, dmar_fault_handler, dmar_unit, IRQF_NONE);
-		dmar_unit->dmar_irq = (uint32_t)retval;
-	}
-	spinlock_release(&(dmar_unit->lock));
-	/* the panic will only happen before any VM starts running */
-	if (retval < 0 ) {
-		panic("dmar[%d] fail to setup interrupt", dmar_unit->index);
-	}
-
-	vector = irq_to_vector(dmar_unit->dmar_irq);
-	dev_dbg(ACRN_DBG_IOMMU, "irq#%d vector#%d for dmar_unit", dmar_unit->dmar_irq, vector);
-
-	dmar_fault_msi_write(dmar_unit, vector);
-	dmar_fault_event_unmask(dmar_unit);
-}
-
 static void dmar_enable_qi(struct dmar_drhd_rt *dmar_unit)
 {
 	uint32_t status = 0;
@@ -808,7 +642,6 @@ static void dmar_enable_qi(struct dmar_drhd_rt *dmar_unit)
 static void dmar_prepare(struct dmar_drhd_rt *dmar_unit)
 {
 	dev_dbg(ACRN_DBG_IOMMU, "enable dmar uint [0x%x]", dmar_unit->drhd->reg_base_addr);
-	dmar_setup_interrupt(dmar_unit);
 	dmar_set_root_table(dmar_unit);
 	dmar_enable_qi(dmar_unit);
 	dmar_set_intr_remap_table(dmar_unit);
@@ -835,7 +668,7 @@ static int32_t add_iommu_device(struct iommu_domain *domain, uint16_t segment, u
 	uint64_t lo_64 = 0UL;
 	int32_t ret = 0;
 
-	dmar_unit = device_to_dmaru(segment, bus, devfun);
+	dmar_unit = &dmar_drhd_units[1];
 	if (dmar_unit == NULL) {
 		pr_err("no dmar unit found for device: %x:%x.%x", bus, pci_slot(devfun), pci_func(devfun));
 		ret = -EINVAL;
@@ -944,7 +777,7 @@ static int32_t remove_iommu_device(const struct iommu_domain *domain, uint16_t s
 	union pci_bdf sid;
 	int32_t ret = 0;
 
-	dmar_unit = device_to_dmaru(segment, bus, devfun);
+	dmar_unit = &dmar_drhd_units[1];
 	if (dmar_unit == NULL) {
 		pr_err("no dmar unit found for device: %x:%x.%x", bus, pci_slot(devfun), pci_func(devfun));
 		ret = -EINVAL;
@@ -1092,18 +925,9 @@ int32_t init_iommu(void)
 
 	platform_dmar_info = get_dmar_info();
 
-	if ((platform_dmar_info == NULL) || (platform_dmar_info->drhd_count == 0U)) {
-		pr_fatal("%s: can't find dmar info\n", __func__);
-		ret = -ENODEV;
-	} else if (platform_dmar_info->drhd_count > CONFIG_MAX_IOMMU_NUM) {
-		pr_fatal("%s: dmar count(%d) beyond the limitation(%d)\n",
-				__func__, platform_dmar_info->drhd_count, CONFIG_MAX_IOMMU_NUM);
-		ret = -EINVAL;
-	} else {
-		ret = register_hrhd_units();
-		if (ret == 0) {
-			do_action_for_iommus(dmar_prepare);
-		}
+	ret = register_hrhd_units();
+	if (ret == 0) {
+		do_action_for_iommus(dmar_prepare);
 	}
 	return ret;
 }
@@ -1116,14 +940,9 @@ int32_t dmar_assign_irte(struct intr_source intr_src, union dmar_ir_entry irte, 
 	uint64_t trigger_mode;
 	int32_t ret = 0;
 
-	if (intr_src.is_msi) {
-		dmar_unit = device_to_dmaru(0U, (uint8_t)intr_src.src.msi.bits.b, pci_devfn(intr_src.src.msi.value));
-		sid.value = intr_src.src.msi.value;
-		trigger_mode = 0x0UL;
-	} else {
-		dmar_unit = ioapic_to_dmaru(intr_src.src.ioapic_id, &sid);
-		trigger_mode = irte.bits.trigger_mode;
-	}
+	dmar_unit = &dmar_drhd_units[1];
+	sid.value = intr_src.src.msi.value;
+	trigger_mode = 0x0UL;
 
 	if (dmar_unit == NULL) {
 		pr_err("no dmar unit found for device: %x:%x.%x", sid.bits.b, sid.bits.d, sid.bits.f);
@@ -1160,11 +979,7 @@ void dmar_free_irte(struct intr_source intr_src, uint16_t index)
 	union dmar_ir_entry *ir_table, *ir_entry;
 	union pci_bdf sid;
 
-	if (intr_src.is_msi) {
-		dmar_unit = device_to_dmaru(0U, (uint8_t)intr_src.src.msi.bits.b, pci_devfn(intr_src.src.msi.value));
-	} else {
-		dmar_unit = ioapic_to_dmaru(intr_src.src.ioapic_id, &sid);
-	}
+	dmar_unit = &dmar_drhd_units[1];
 
 	if (dmar_unit == NULL) {
 		pr_err("no dmar unit found for device: %x:%x.%x", intr_src.src.msi.bits.b,
