@@ -96,7 +96,7 @@ else
 LDFLAGS += -static
 endif
 
-ifeq ($(CONFIG_RELEASE),y)
+ifeq (y, $(CONFIG_RELEASE))
 LDFLAGS += -s
 endif
 
