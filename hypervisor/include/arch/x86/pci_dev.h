@@ -9,8 +9,6 @@
 
 #include <vm_config.h>
 
-#define SOS_EMULATED_PCI_DEV_NUM	1U
-
 struct pci_pdev;
 void fill_pci_dev_config(struct pci_pdev *pdev);
 

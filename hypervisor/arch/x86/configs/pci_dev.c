@@ -47,7 +47,6 @@ static bool is_allocated_to_prelaunched_vm(struct pci_pdev *pdev)
 void fill_pci_dev_config(struct pci_pdev *pdev)
 {
 	uint16_t vmid;
-	uint32_t idx;
 	struct acrn_vm_config *vm_config;
 	struct acrn_vm_pci_dev_config *dev_config;
 
@@ -56,24 +55,12 @@ void fill_pci_dev_config(struct pci_pdev *pdev)
 			vm_config = get_vm_config(vmid);
 			continue;
 
-			/* TODO: revert me if we could split post-launched VM's PTDev from SOS's */
-			for (idx = 0U; idx < SOS_EMULATED_PCI_DEV_NUM; idx++) {
-				dev_config = &vm_config->pci_devs[idx];
-				if (bdf_is_equal(&dev_config->pbdf, &pdev->bdf)) {
-					dev_config->pdev = pdev;
-					break;
-				}
-
-			}
-
-			if (idx == SOS_EMULATED_PCI_DEV_NUM) {
-				dev_config = &vm_config->pci_devs[vm_config->pci_dev_num];
-				dev_config->emu_type = PCI_DEV_TYPE_PTDEV;
-				dev_config->vbdf.value = pdev->bdf.value;
-				dev_config->pbdf.value = pdev->bdf.value;
-				dev_config->pdev = pdev;
-				vm_config->pci_dev_num++;
-			}
+			dev_config = &vm_config->pci_devs[vm_config->pci_dev_num];
+			dev_config->emu_type = PCI_DEV_TYPE_PTDEV;
+			dev_config->vbdf.value = pdev->bdf.value;
+			dev_config->pbdf.value = pdev->bdf.value;
+			dev_config->pdev = pdev;
+			vm_config->pci_dev_num++;
 		}
 	}
 }
