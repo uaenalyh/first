@@ -79,6 +79,17 @@ static inline int32_t copy_gpa(struct acrn_vm *vm, void *h_ptr_arg, uint64_t gpa
  *   continuous
  * @pre Pointer vm is non-NULL
  */
+int32_t copy_from_gpa(struct acrn_vm *vm, void *h_ptr, uint64_t gpa, uint32_t size)
+{
+	return copy_gpa(vm, h_ptr, gpa, size, 1);
+}
+/* @pre Caller(Guest) should make sure gpa is continuous.
+ * - gpa from hypercall input which from kernel stack is gpa continuous, not
+ *   support kernel stack from vmap
+ * - some other gpa from hypercall parameters, VHM should make sure it's
+ *   continuous
+ * @pre Pointer vm is non-NULL
+ */
 int32_t copy_to_gpa(struct acrn_vm *vm, void *h_ptr, uint64_t gpa, uint32_t size)
 {
 	return copy_gpa(vm, h_ptr, gpa, size, 0);

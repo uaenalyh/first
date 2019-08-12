@@ -28,6 +28,25 @@ void *gpa2hva(struct acrn_vm *vm, uint64_t x);
  * @{
  */
 /**
+ * @brief Copy data from VM GPA space to HV address space
+ *
+ * @param[in] vm The pointer that points to VM data structure
+ * @param[in] h_ptr The pointer that points the start HV address
+ *		  of HV memory region which data is stored in
+ * @param[out] gpa The start GPA address of GPA memory region which data
+ *		 will be copied into
+ * @param[in] size The size (bytes) of GPA memory region which data is
+ *		 stored in
+ *
+ * @pre Caller(Guest) should make sure gpa is continuous.
+ * - gpa from hypercall input which from kernel stack is gpa continuous, not
+ *   support kernel stack from vmap
+ * - some other gpa from hypercall parameters, VHM should make sure it's
+ *   continuous
+ * @pre Pointer vm is non-NULL
+ */
+int32_t copy_from_gpa(struct acrn_vm *vm, void *h_ptr, uint64_t gpa, uint32_t size);
+/**
  * @brief Copy data from HV address space to VM GPA space
  *
  * @param[in] vm The pointer that points to VM data structure

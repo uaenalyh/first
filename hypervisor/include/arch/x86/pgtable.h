@@ -204,14 +204,6 @@ static inline uint64_t *pte_offset(const uint64_t *pde, uint64_t addr)
 /*
  * pgentry may means pml4e/pdpte/pde/pte
  */
-static inline uint64_t get_pgentry(const uint64_t *pte)
-{
-	return *pte;
-}
-
-/*
- * pgentry may means pml4e/pdpte/pde/pte
- */
 static inline void set_pgentry(uint64_t *ptep, uint64_t pte)
 {
 	*ptep = pte;
