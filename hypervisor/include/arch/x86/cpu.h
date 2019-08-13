@@ -231,6 +231,9 @@ enum pcpu_boot_state {
 void cpu_do_idle(void);
 void cpu_dead(void);
 void init_pcpu_pre(bool is_bsp);
+/* The function should be called on the same CPU core as specified by pcpu_id,
+ * hereby, pcpu_id is actually the current physcial cpu id.
+ */
 void init_pcpu_post(uint16_t pcpu_id);
 bool start_pcpus(uint64_t mask);
 void wait_pcpus_offline(uint64_t mask);

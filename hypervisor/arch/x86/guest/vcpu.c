@@ -681,8 +681,6 @@ int32_t prepare_vcpu(struct acrn_vm *vm, uint16_t pcpu_id)
 	int32_t ret;
 	struct acrn_vcpu *vcpu = NULL;
 	char thread_name[16];
-	uint64_t orig_val, final_val;
-	struct acrn_vm_config *conf;
 
 	ret = create_vcpu(pcpu_id, vm, &vcpu);
 	if (ret == 0) {

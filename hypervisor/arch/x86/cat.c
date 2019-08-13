@@ -13,5 +13,7 @@
 #include <logmsg.h>
 #include <cat.h>
 #include <board.h>
+#include <vm_config.h>
+#include <msr.h>
 
 struct cat_hw_info cat_cap_info;
