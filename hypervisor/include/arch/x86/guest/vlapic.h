@@ -85,7 +85,7 @@ int32_t vlapic_x2apic_read(struct acrn_vcpu *vcpu, uint32_t msr, uint64_t *val);
 int32_t vlapic_x2apic_write(struct acrn_vcpu *vcpu, uint32_t msr, uint64_t val);
 
 uint32_t vlapic_get_apicid(const struct acrn_vlapic *vlapic);
-int32_t vlapic_create(struct acrn_vcpu *vcpu);
+void vlapic_create(struct acrn_vcpu *vcpu);
 /**
  * @pre vlapic->vm != NULL
  * @pre vlapic->vcpu->vcpu_id < CONFIG_MAX_VCPUS_PER_VM

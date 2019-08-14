@@ -139,7 +139,7 @@ void vcpu_set_guest_msr(struct acrn_vcpu *vcpu, uint32_t msr, uint64_t val)
 /*
  * Write the eoi_exit_bitmaps to VMCS fields
  */
-void vcpu_set_vmcs_eoi_exit(struct acrn_vcpu *vcpu)
+void vcpu_set_vmcs_eoi_exit(const struct acrn_vcpu *vcpu)
 {
 	pr_dbg("%s", __func__);
 
@@ -416,8 +416,9 @@ int32_t run_vcpu(struct acrn_vcpu *vcpu)
 		pr_info("VM %d Starting VCPU %hu",
 				vcpu->vm->vm_id, vcpu->vcpu_id);
 
-		if (vcpu->arch.vpid != 0U)
+		if (vcpu->arch.vpid != 0U) {
 			exec_vmwrite16(VMX_VPID, vcpu->arch.vpid);
+		}
 
 		/*
 		 * A power-up or a reset invalidates all linear mappings,
@@ -433,8 +434,9 @@ int32_t run_vcpu(struct acrn_vcpu *vcpu)
 		 * currently, there is no other place to do vmcs switch
 		 * Please add IBPB set for future vmcs switch case(like trusty)
 		 */
-		if (ibrs_type == IBRS_RAW)
+		if (ibrs_type == IBRS_RAW) {
 			msr_write(MSR_IA32_PRED_CMD, PRED_SET_IBPB);
+		}
 
 #ifdef CONFIG_L1D_FLUSH_VMENTRY_ENABLED
 		cpu_l1d_flush();
