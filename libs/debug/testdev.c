@@ -10,7 +10,6 @@
 #include <io_req.h>
 
 static struct vm_io_range testdev_range = {
-	.flags = IO_ATTR_RW,
 	.base = 0xf4U,
 	.len = 4U,
 };
