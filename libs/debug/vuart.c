@@ -315,9 +315,10 @@ static void write_reg(struct acrn_vuart *vu, uint16_t reg, uint8_t value_u8)
 	vuart_unlock(vu);
 }
 
-static bool vuart_write(struct acrn_vm *vm, uint16_t offset_arg,
+static bool vuart_write(struct acrn_vcpu *vcpu, uint16_t offset_arg,
 			__unused size_t width, uint32_t value)
 {
+	struct acrn_vm *vm = vcpu->vm;
 	uint16_t offset = offset_arg;
 	struct acrn_vuart *vu = find_vuart_by_port(vm, offset);
 	uint8_t value_u8 = (uint8_t)value;
@@ -337,9 +338,10 @@ static bool vuart_write(struct acrn_vm *vm, uint16_t offset_arg,
 	return true;
 }
 
-static bool vuart_read(struct acrn_vm *vm, struct acrn_vcpu *vcpu, uint16_t offset_arg,
+static bool vuart_read(struct acrn_vcpu *vcpu, uint16_t offset_arg,
 			__unused size_t width)
 {
+	struct acrn_vm *vm = vcpu->vm;
 	uint16_t offset = offset_arg;
 	uint8_t iir, reg, intr_reason;
 	struct acrn_vuart *vu = find_vuart_by_port(vm, offset);
