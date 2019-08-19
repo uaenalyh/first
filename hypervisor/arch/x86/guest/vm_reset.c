@@ -6,6 +6,7 @@
 
 #include <vm.h>
 #include <io.h>
+#include <host_pm.h>
 #include <logmsg.h>
 #include <per_cpu.h>
 #include <vm_reset.h>
