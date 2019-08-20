@@ -180,6 +180,9 @@
 #define MSR_IA32_MISC_ENABLE_LIMIT_CPUID	(1UL << 22U)
 #define MSR_IA32_MISC_ENABLE_XD_DISABLE		(1UL << 34U)
 
+/* Miscellaneous data */
+#define MSR_IA32_MISC_UNRESTRICTED_GUEST	(1U<<5U)
+
 #ifndef ASSEMBLER
 static inline bool pat_mem_type_invalid(uint64_t x)
 {
