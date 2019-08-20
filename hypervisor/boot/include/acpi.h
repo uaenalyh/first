@@ -37,7 +37,7 @@ struct acpi_table_header {
 	char		    asl_compiler_id[4];
 	/* ASL compiler version */
 	uint32_t		asl_compiler_revision;
-};
+} __packed;
 
 struct acpi_table_rsdp {
 	/* ACPI signature, contains "RSD PTR " */
@@ -58,7 +58,7 @@ struct acpi_table_rsdp {
 	uint8_t		 extended_checksum;
 	/* Reserved, must be zero */
 	uint8_t		 reserved[3];
-};
+} __packed;
 
 struct acpi_table_rsdt {
 	/* Common ACPI table header */
@@ -80,12 +80,12 @@ struct acpi_table_madt {
 	/* Physical address of local APIC */
 	uint32_t		     address;
 	uint32_t		     flags;
-};
+} __packed;
 
 struct acpi_subtable_header {
 	uint8_t		   type;
 	uint8_t		   length;
-};
+} __packed;
 
 struct acpi_madt_ioapic {
 	struct acpi_subtable_header    header;
@@ -94,7 +94,7 @@ struct acpi_madt_ioapic {
 	uint8_t				rsvd;
 	uint32_t			addr;
 	uint32_t			gsi_base;
-};
+} __packed;
 
 void *get_acpi_tbl(const char *signature);
 
