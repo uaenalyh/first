@@ -35,73 +35,9 @@
 #include <logmsg.h>
 #include <acrn_common.h>
 
-#define ACPI_SIG_RSDP	     "RSD PTR " /* Root System Description Ptr */
-#define ACPI_OEM_ID_SIZE	   6
-#define ACPI_SIG_MADT	     "APIC" /* Multiple APIC Description Table */
-#define RSDP_CHECKSUM_LENGTH       20
-#define ACPI_NAME_SIZE	     4U
-#define ACPI_MADT_TYPE_IOAPIC  1U
-
-struct acpi_table_rsdp {
-	/* ACPI signature, contains "RSD PTR " */
-	char		    signature[8];
-	/* ACPI 1.0 checksum */
-	uint8_t		 checksum;
-	/* OEM identification */
-	char		    oem_id[ACPI_OEM_ID_SIZE];
-	/* Must be (0) for ACPI 1.0 or (2) for ACPI 2.0+ */
-	uint8_t		 revision;
-	/* 32-bit physical address of the RSDT */
-	uint32_t		rsdt_physical_address;
-	/* Table length in bytes, including header (ACPI 2.0+) */
-	uint32_t		length;
-	/* 64-bit physical address of the XSDT (ACPI 2.0+) */
-	uint64_t		xsdt_physical_address;
-	/* Checksum of entire table (ACPI 2.0+) */
-	uint8_t		 extended_checksum;
-	/* Reserved, must be zero */
-	uint8_t		 reserved[3];
-};
-
-struct acpi_table_rsdt {
-	/* Common ACPI table header */
-	struct acpi_table_header   header;
-	/* Array of pointers to ACPI tables */
-	uint32_t		   table_offset_entry[1];
-} __packed;
-
-struct acpi_table_xsdt {
-	/* Common ACPI table header */
-	struct acpi_table_header    header;
-	/* Array of pointers to ACPI tables */
-	uint64_t		    table_offset_entry[1];
-} __packed;
-
-struct acpi_subtable_header {
-	uint8_t		   type;
-	uint8_t		   length;
-};
-
-struct acpi_table_madt {
-	/* Common ACPI table header */
-	struct acpi_table_header     header;
-	/* Physical address of local APIC */
-	uint32_t		     address;
-	uint32_t		     flags;
-};
-
 static struct acpi_table_rsdp *acpi_rsdp;
-struct acpi_madt_ioapic {
-	struct acpi_subtable_header    header;
-	/* IOAPIC id */
-	uint8_t				id;
-	uint8_t				rsvd;
-	uint32_t			addr;
-	uint32_t			gsi_base;
-};
 
-static struct acpi_table_rsdp*
-found_rsdp(char *base, int32_t length)
+static struct acpi_table_rsdp *found_rsdp(char *base, int32_t length)
 {
 	struct acpi_table_rsdp *rsdp, *ret = NULL;
 	uint8_t *cp, sum;
