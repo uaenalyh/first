@@ -9,14 +9,15 @@
 
 #include <vm_configurations.h>
 
-#define ACPI_OEM_ID_SIZE	   6
+#define ACPI_RSDP_CHECKSUM_LENGTH   20U
 
-#define RSDP_CHECKSUM_LENGTH       20
-#define ACPI_NAME_SIZE	     4U
-#define ACPI_MADT_TYPE_IOAPIC  1U
+#define ACPI_NAME_SIZE	      4U
+#define ACPI_OEM_ID_SIZE	    6U
 
-#define ACPI_SIG_RSDP	     "RSD PTR " /* Root System Description Ptr */
-#define ACPI_SIG_MADT	     "APIC" /* Multiple APIC Description Table */
+#define ACPI_MADT_TYPE_IOAPIC       1U
+
+#define ACPI_SIG_RSDP	    "RSD PTR " /* Root System Description Ptr */
+#define ACPI_SIG_MADT	    "APIC" /* Multiple APIC Description Table */
 
 struct acpi_table_header {
 	/* ASCII table signature */
