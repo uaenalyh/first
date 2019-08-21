@@ -354,7 +354,6 @@ void prepare_vm(uint16_t vm_id, struct acrn_vm_config *vm_config)
 	}
 
 	if (err == 0) {
-		(void)mptable_build(vm);
 		build_vacpi(vm);
 
 		(void )vm_sw_loader(vm);

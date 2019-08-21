@@ -12,7 +12,4 @@
 #ifndef DEFAULT_ACPI_INFO_H
 #define DEFAULT_ACPI_INFO_H
 
-/* APIC */
-#define LAPIC_BASE		0xFEE00000UL
-
 #endif	/* DEFAULT_ACPI_INFO_H */
