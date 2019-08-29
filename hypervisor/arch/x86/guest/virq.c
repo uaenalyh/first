@@ -314,7 +314,7 @@ int32_t acrn_handle_pending_request(struct acrn_vcpu *vcpu)
 	} else {
 
 		if (bitmap_test_and_clear_lock(ACRN_REQUEST_EPT_FLUSH, pending_req_bits)) {
-			invept(vcpu);
+			invept(vcpu->vm->arch_vm.nworld_eptp);
 		}
 
 		if (bitmap_test_and_clear_lock(ACRN_REQUEST_VPID_FLUSH,	pending_req_bits)) {

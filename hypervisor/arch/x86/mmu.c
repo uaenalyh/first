@@ -35,7 +35,6 @@
 #include <mmu.h>
 #include <vmx.h>
 #include <reloc.h>
-#include <vcpu.h>
 #include <vm.h>
 #include <ld_sym.h>
 #include <logmsg.h>
@@ -123,13 +122,12 @@ void flush_vpid_global(void)
 	local_invvpid(VMX_VPID_TYPE_ALL_CONTEXT, 0U, 0UL);
 }
 
-void invept(const struct acrn_vcpu *vcpu)
+void invept(const void *eptp)
 {
 	struct invept_desc desc = {0};
 
 	if (pcpu_has_vmx_ept_cap(VMX_EPT_INVEPT_SINGLE_CONTEXT)) {
-		desc.eptp = hva2hpa(vcpu->vm->arch_vm.nworld_eptp) |
-				(3UL << 3U) | 6UL;
+		desc.eptp = hva2hpa(eptp) | (3UL << 3U) | 6UL;
 		local_invept(INVEPT_TYPE_SINGLE_CONTEXT, desc);
 	} else if (pcpu_has_vmx_ept_cap(VMX_EPT_INVEPT_GLOBAL_CONTEXT)) {
 		local_invept(INVEPT_TYPE_ALL_CONTEXTS, desc);
