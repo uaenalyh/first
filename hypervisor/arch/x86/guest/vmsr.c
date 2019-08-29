@@ -455,6 +455,23 @@ int32_t rdmsr_vmexit_handler(struct acrn_vcpu *vcpu)
 }
 
 /*
+ * If VMX_TSC_OFFSET_FULL is 0, no need to trap the write of IA32_TSC_DEADLINE because there is
+ * no offset between vTSC and pTSC, in this case, only write to vTSC_ADJUST is trapped.
+ */
+static void set_tsc_msr_intercept(struct acrn_vcpu *vcpu, bool intercept)
+{
+	uint8_t *msr_bitmap = vcpu->arch.msr_bitmap;
+
+	if (!intercept) {
+		enable_msr_interception(msr_bitmap, MSR_IA32_TSC_DEADLINE, INTERCEPT_DISABLE);
+		enable_msr_interception(msr_bitmap, MSR_IA32_TSC_ADJUST, INTERCEPT_WRITE);
+	} else {
+		enable_msr_interception(msr_bitmap, MSR_IA32_TSC_DEADLINE, INTERCEPT_READ_WRITE);
+		enable_msr_interception(msr_bitmap, MSR_IA32_TSC_ADJUST, INTERCEPT_READ_WRITE);
+	}
+}
+
+/*
  * Intel SDM 17.17.3: If an execution of WRMSR to the
  * IA32_TIME_STAMP_COUNTER MSR adds (or subtracts) value X from the
  * TSC, the logical processor also adds (or subtracts) value X from
@@ -483,6 +500,8 @@ static void set_guest_tsc(struct acrn_vcpu *vcpu, uint64_t guest_tsc)
 
 	/* write to VMCS because rdtsc and rdtscp are not intercepted */
 	exec_vmwrite64(VMX_TSC_OFFSET_FULL, tsc_delta);
+
+	set_tsc_msr_intercept(vcpu, tsc_delta != 0UL);
 }
 
 /*
@@ -671,5 +690,5 @@ void update_msr_bitmap_x2apic_passthru(struct acrn_vcpu *vcpu)
 	enable_msr_interception(msr_bitmap, MSR_IA32_EXT_XAPICID, INTERCEPT_READ);
 	enable_msr_interception(msr_bitmap, MSR_IA32_EXT_APIC_LDR, INTERCEPT_READ);
 	enable_msr_interception(msr_bitmap, MSR_IA32_EXT_APIC_ICR, INTERCEPT_WRITE);
-	enable_msr_interception(msr_bitmap, MSR_IA32_TSC_DEADLINE, INTERCEPT_DISABLE);
+	set_tsc_msr_intercept(vcpu, exec_vmread64(VMX_TSC_OFFSET_FULL) != 0UL);
 }
