@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <per_cpu.h>
 #include <vm.h>
 #include <softirq.h>
 #include <ptdev.h>
@@ -54,8 +55,8 @@ void ptirq_release_entry(struct ptirq_remapping_info *entry)
 {
 	uint64_t rflags;
 
-	spinlock_irqsave_obtain(&entry->vm->softirq_dev_lock, &rflags);
-	spinlock_irqrestore_release(&entry->vm->softirq_dev_lock, rflags);
+	CPU_INT_ALL_DISABLE(&rflags);
+	CPU_INT_ALL_RESTORE(rflags);
 
 	bitmap_clear_nolock((entry->ptdev_entry_id) & 0x3FU,
 		&ptirq_entry_bitmaps[((entry->ptdev_entry_id) & 0x3FU) >> 6U]);
