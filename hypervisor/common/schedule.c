@@ -13,8 +13,6 @@
 #include <schedule.h>
 #include <sprintf.h>
 
-static uint64_t pcpu_used_bitmap;
-
 void init_scheduler(void)
 {
 	struct sched_context *ctx;
@@ -41,16 +39,6 @@ void release_schedule_lock(uint16_t pcpu_id)
 {
 	struct sched_context *ctx = &per_cpu(sched_ctx, pcpu_id);
 	spinlock_release(&ctx->scheduler_lock);
-}
-
-void set_pcpu_used(uint16_t pcpu_id)
-{
-	bitmap_set_lock(pcpu_id, &pcpu_used_bitmap);
-}
-
-void free_pcpu(uint16_t pcpu_id)
-{
-	bitmap_clear_lock(pcpu_id, &pcpu_used_bitmap);
 }
 
 void add_to_cpu_runqueue(struct sched_object *obj, uint16_t pcpu_id)
