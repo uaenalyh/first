@@ -25,7 +25,6 @@ void cpu_internal_buffers_clear(void);
 struct stack_canary {
 	uint64_t canary;
 };
-void __stack_chk_fail(void);
 void set_fs_base(void);
 #endif
 
