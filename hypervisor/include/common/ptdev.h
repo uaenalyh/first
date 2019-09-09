@@ -8,7 +8,6 @@
 #define PTDEV_H
 #include <list.h>
 #include <spinlock.h>
-#include <pci.h>
 #include <timer.h>
 
 #define PTDEV_INTR_MSI		(1U << 0U)
@@ -17,15 +16,6 @@
 
 #define DEFINE_MSI_SID(name, a, b)	\
 union source_id (name) = {.msi_id = {.bdf = (a), .entry_nr = (b)} }
-
-union source {
-	union pci_bdf msi;
-};
-
-struct intr_source {
-	bool is_msi;
-	union source src;
-};
 
 union irte_index {
 	uint16_t index;
