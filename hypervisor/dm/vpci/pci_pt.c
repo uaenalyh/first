@@ -111,17 +111,6 @@ static uint64_t get_vbar_base(const struct pci_vdev *vdev, uint32_t idx)
 }
 
 /**
- * @brief get pbar's full address in 64-bit
- * For 64-bit MMIO bar, its lower 32-bits base address and upper 32-bits base are combined
- * into one 64-bit base address
- * @pre pdev != NULL
- */
-static uint64_t get_pbar_base(const struct pci_pdev *pdev, uint32_t idx)
-{
-	return pci_bar_2_bar_base(&pdev->bar[0], pdev->nr_bars, idx);
-}
-
-/**
  * @pre vdev != NULL
  */
 void vdev_pt_read_cfg(const struct pci_vdev *vdev, uint32_t offset, uint32_t bytes, uint32_t *val)
@@ -161,7 +150,7 @@ static void vdev_pt_remap_generic_mem_vbar(struct pci_vdev *vdev, uint32_t idx)
 	/* If a new vbar is set (nonzero), set the EPT mapping accordingly */
 	if (vbar_base != 0UL) {
 		uint64_t hpa = gpa2hpa(vdev->vpci->vm, vbar_base);
-		uint64_t pbar_base = get_pbar_base(vdev->pdev, idx); /* pbar (hpa) */
+		uint64_t pbar_base = vbar->base_hpa; /* pbar (hpa) */
 
 		if (hpa != pbar_base) {
 			/* Unmap the existing mapping for new vbar */
@@ -332,6 +321,7 @@ void init_vdev_pt(struct pci_vdev *vdev)
 		vbar->size = 0UL;
 		vbar->reg.value = pbar->reg.value;
 		vbar->is_64bit_high = pbar->is_64bit_high;
+		vbar->base_hpa = pbar->base_hpa;
 
 		if (pbar->is_64bit_high) {
 			ASSERT(idx > 0U, "idx for upper 32-bit of the 64-bit bar should be greater than 0!");
