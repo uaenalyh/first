@@ -38,6 +38,7 @@
 #ifndef CPU_H
 #define CPU_H
 #include <types.h>
+#include <acrn_common.h>
 
 /* Define CPU stack alignment */
 #define CPU_STACK_ALIGN	 16UL
@@ -115,6 +116,9 @@
 
 /* Boot CPU ID */
 #define BOOT_CPU_ID	     0U
+
+/* Number of GPRs saved / restored for guest in VCPU structure */
+#define NUM_GPRS			    16U
 
 #ifndef ASSEMBLER
 
@@ -231,6 +235,66 @@ enum pcpu_boot_state {
 #define	NEED_SHUTDOWN_VM	(2U)
 void make_pcpu_offline(uint16_t pcpu_id);
 bool need_offline(uint16_t pcpu_id);
+
+struct segment_sel {
+	uint16_t selector;
+	uint64_t base;
+	uint32_t limit;
+	uint32_t attr;
+};
+
+/**
+ * @brief registers info saved for vcpu running context
+ */
+struct run_context {
+/* Contains the guest register set.
+ * NOTE: This must be the first element in the structure, so that the offsets
+ * in vmx_asm.S match
+ */
+	union cpu_regs_t {
+		struct acrn_gp_regs regs;
+		uint64_t longs[NUM_GPRS];
+	} cpu_regs;
+
+	/** The guests CR registers 0, 2, 3 and 4. */
+	uint64_t cr0;
+
+	/* CPU_CONTEXT_OFFSET_CR2 =
+	 * offsetof(struct run_context, cr2) = 136
+	 */
+	uint64_t cr2;
+	uint64_t cr4;
+
+	uint64_t rip;
+	uint64_t rflags;
+
+	/* CPU_CONTEXT_OFFSET_IA32_SPEC_CTRL =
+	 * offsetof(struct run_context, ia32_spec_ctrl) = 168
+	 */
+	uint64_t ia32_spec_ctrl;
+	uint64_t ia32_efer;
+};
+
+/*
+ * extended context does not save/restore during vm exit/entry, it's mainly
+ * used in trusty world switch
+ */
+struct ext_context {
+	uint64_t cr3;
+
+	/* segment registers */
+	struct segment_sel idtr;
+	struct segment_sel ldtr;
+	struct segment_sel gdtr;
+	struct segment_sel tr;
+	struct segment_sel cs;
+	struct segment_sel ss;
+	struct segment_sel ds;
+	struct segment_sel es;
+	struct segment_sel fs;
+	struct segment_sel gs;
+
+};
 
 /* Function prototypes */
 void cpu_do_idle(void);
