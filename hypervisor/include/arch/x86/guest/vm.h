@@ -174,7 +174,6 @@ extern vm_sw_loader_t vm_sw_loader;
 
 void vrtc_init(struct acrn_vm *vm);
 
-bool is_lapic_pt_configured(const struct acrn_vm *vm);
 bool is_rt_vm(const struct acrn_vm *vm);
 bool has_rt_vm(void);
 enum vm_vlapic_state check_vm_vlapic_state(const struct acrn_vm *vm);

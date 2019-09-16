@@ -40,16 +40,6 @@ static struct acrn_vm vm_array[CONFIG_MAX_VM_NUM] __aligned(PAGE_SIZE);
 /**
  * @pre vm != NULL && vm_config != NULL && vm->vmid < CONFIG_MAX_VM_NUM
  */
-bool is_lapic_pt_configured(const struct acrn_vm *vm)
-{
-	struct acrn_vm_config *vm_config = get_vm_config(vm->vm_id);
-
-	return ((vm_config->guest_flags & GUEST_FLAG_LAPIC_PASSTHROUGH) != 0U);
-}
-
-/**
- * @pre vm != NULL && vm_config != NULL && vm->vmid < CONFIG_MAX_VM_NUM
- */
 bool is_rt_vm(const struct acrn_vm *vm)
 {
 	struct acrn_vm_config *vm_config = get_vm_config(vm->vm_id);
@@ -134,6 +124,27 @@ static void register_pm_io_handler(struct acrn_vm *vm)
 {
 	if (is_rt_vm(vm)) {
 	}
+}
+
+/**
+ * @brief get bitmap of pCPUs whose vCPUs have LAPIC PT enabled
+ *
+ * @param[in] vm pointer to vm data structure
+ * @pre vm != NULL
+ *
+ * @return pCPU bitmap
+ */
+static uint64_t lapic_pt_enabled_pcpu_bitmap(struct acrn_vm *vm)
+{
+	uint16_t i;
+	struct acrn_vcpu *vcpu;
+	uint64_t bitmap = 0UL;
+
+	foreach_vcpu (i, vm, vcpu) {
+		bitmap_set_nolock(vcpu->pcpu_id, &bitmap);
+	}
+
+	return bitmap;
 }
 
 /**
@@ -239,7 +250,8 @@ int32_t create_vm(uint16_t vm_id, struct acrn_vm_config *vm_config, struct acrn_
 int32_t shutdown_vm(struct acrn_vm *vm)
 {
 	uint16_t i;
-	uint64_t mask = 0UL;
+	uint16_t this_pcpu_id;
+	uint64_t mask;
 	struct acrn_vcpu *vcpu = NULL;
 	struct acrn_vm_config *vm_config = NULL;
 	int32_t ret = 0;
@@ -249,18 +261,31 @@ int32_t shutdown_vm(struct acrn_vm *vm)
 	/* Only allow shutdown paused vm */
 	if (vm->state == VM_PAUSED) {
 		vm->state = VM_POWERED_OFF;
+		this_pcpu_id = get_pcpu_id();
+		mask = lapic_pt_enabled_pcpu_bitmap(vm);
+
+		/*
+		 * If the current pcpu needs to offline itself,
+		 * it will be done after shutdown_vm() completes
+		 * in the idle thread.
+		 */
+		if (bitmap_test(this_pcpu_id, &mask)) {
+			bitmap_clear_nolock(this_pcpu_id, &mask);
+			make_pcpu_offline(this_pcpu_id);
+		}
 
 		foreach_vcpu (i, vm, vcpu) {
 			reset_vcpu(vcpu);
 			offline_vcpu(vcpu);
 
-			bitmap_set_nolock(vcpu->pcpu_id, &mask);
-			make_pcpu_offline(vcpu->pcpu_id);
+			if (bitmap_test(vcpu->pcpu_id, &mask)) {
+				make_pcpu_offline(vcpu->pcpu_id);
+			}
 		}
 
 		wait_pcpus_offline(mask);
 
-		if (is_lapic_pt_configured(vm) && !start_pcpus(mask)) {
+		if ((mask != 0UL) && (!start_pcpus(mask))) {
 			pr_fatal("Failed to start all cpus in mask(0x%llx)", mask);
 			ret = -ETIMEDOUT;
 		}
@@ -279,8 +304,6 @@ int32_t shutdown_vm(struct acrn_vm *vm)
 
 		/* Free EPT allocated resources assigned to VM */
 		destroy_ept(vm);
-
-		ret = 0;
 	} else {
 		ret = -EINVAL;
 	}
