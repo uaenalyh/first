@@ -82,6 +82,8 @@
 #define PCIM_BAR_MEM_64       0x04U
 #define PCIR_CAP_PTR	  0x34U
 #define PCIR_CAP_PTR_CARDBUS  0x14U
+#define PCI_BASE_ADDRESS_MEM_MASK (~0x0fUL)
+#define PCI_BASE_ADDRESS_IO_MASK  (~0x03UL)
 
 #define PCIR_SECBUS_1	 0x19U
 
@@ -192,7 +194,6 @@ struct pci_msix_cap {
 struct pci_pdev {
 	/* The bar info of the physical PCI device. */
 	uint32_t nr_bars; /* 6 for normal device, 2 for bridge, 1 for cardbus */
-	struct pci_bar bar[PCI_BAR_COUNT];
 
 	/* The bus/device/function triple of the physical PCI device. */
 	union pci_bdf bdf;
