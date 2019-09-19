@@ -42,6 +42,9 @@ ARCH_ASFLAGS :=
 ARCH_ARFLAGS :=
 ARCH_LDFLAGS :=
 
+ifneq ($(BOARD_FILE)$(SCENARIO_FILE),)
+endif
+
 .PHONY: default
 default: all
 
@@ -61,7 +64,6 @@ CFLAGS += -m64 -mno-mmx -mno-sse -mno-sse2 -mno-80387 -mno-fp-ret-in-387
 CFLAGS += -mno-red-zone
 CFLAGS += -nostdinc -nostdlib -fno-common
 CFLAGS +=
-CFLAGS += -O2
 ifeq (y, $(CONFIG_RELOC))
 CFLAGS += -fpie
 else
@@ -290,35 +292,35 @@ SOURCE_ACPI_INFO_HEADER := arch/x86/configs/$(CONFIG_BOARD)/$(CONFIG_BOARD)_acpi
 TARGET_ACPI_INFO_HEADER := include/platform_acpi_info.h
 
 $(TARGET_ACPI_INFO_HEADER):
-ifeq (,$(wildcard $(SOURCE_ACPI_INFO_HEADER)))
-	@echo "******* No ACPI info found *******" && \
+ifeq ($(CONFIG_ENFORCE_VALIDATED_ACPI_INFO),y)
+	@if [ ! -f $(SOURCE_ACPI_INFO_HEADER) ]; then	\
+	 echo "******* No ACPI info found *******" && \
 	 echo "Expected ACPI info header at $(SOURCE_ACPI_INFO_HEADER)" && \
 	 echo "" && \
 	 echo "The ACPI info header for this board is not available. Please use" && \
-	 echo "an offline tool on the target board to generate a validated one." && \
-	 echo "More details will be available soon."
-ifdef CONFIG_ENFORCE_VALIDATED_ACPI_INFO
-	@echo "" && \
+	 echo "acrn-config tool for the target board to generate a validated one." \
 	 echo "If you want to build the hypervisor with the template ACPI info," && \
 	 echo "unset ENFORCE_VALIDATED_ACPI_INFO using 'make menuconfig'." && \
-	 false
-else ifeq (,$(wildcard $(BOARDTEMPLATE_ACPI_INFO_HEADER)))
-	@echo "" && \
-	 echo "Using the template at $(TEMPLATE_ACPI_INFO_HEADER) instead" && \
-	 echo "**********************************"
-	@cp $(TEMPLATE_ACPI_INFO_HEADER) $(TARGET_ACPI_INFO_HEADER)
+	 false;	\
+	else	\
+	 echo "Found validated ACPI info file : $(SOURCE_ACPI_INFO_HEADER)";	\
+	 cp $(SOURCE_ACPI_INFO_HEADER) $(TARGET_ACPI_INFO_HEADER);	\
+	fi
 else
-	@echo "" && \
-	 echo "Using the template at $(BOARDTEMPLATE_ACPI_INFO_HEADER) instead" && \
-	 echo "**********************************"
-	@cp $(BOARDTEMPLATE_ACPI_INFO_HEADER) $(TARGET_ACPI_INFO_HEADER)
-endif
-else
-	@cp $(SOURCE_ACPI_INFO_HEADER) $(TARGET_ACPI_INFO_HEADER)
+	@if [ -f $(SOURCE_ACPI_INFO_HEADER) ]; then   \
+	 echo "Found validated ACPI info file : $(SOURCE_ACPI_INFO_HEADER)";	\
+	 cp $(SOURCE_ACPI_INFO_HEADER) $(TARGET_ACPI_INFO_HEADER);	\
+	elif [ -f $(BOARDTEMPLATE_ACPI_INFO_HEADER) ]; then \
+	 echo "No ACPI info found, using the template at $(BOARDTEMPLATE_ACPI_INFO_HEADER) instead"; \
+	 cp $(BOARDTEMPLATE_ACPI_INFO_HEADER) $(TARGET_ACPI_INFO_HEADER);	\
+	else	\
+	 echo "No ACPI info found, using the template at $(TEMPLATE_ACPI_INFO_HEADER) instead"; \
+	 cp $(TEMPLATE_ACPI_INFO_HEADER) $(TARGET_ACPI_INFO_HEADER);	\
+	fi
 endif
 
 .PHONY: all
-all:  $(HV_OBJDIR)/$(HV_FILE).32.out $(HV_OBJDIR)/$(HV_FILE).bin
+all: $(HV_OBJDIR)/$(HV_FILE).32.out $(HV_OBJDIR)/$(HV_FILE).bin
 
 install: $(HV_OBJDIR)/$(HV_FILE).32.out
 	install -D $(HV_OBJDIR)/$(HV_FILE).32.out $(DESTDIR)/usr/lib/acrn/$(HV_FILE).$(BOARD).$(FIRMWARE).$(SCENARIO_NAME).32.out
@@ -326,6 +328,31 @@ install: $(HV_OBJDIR)/$(HV_FILE).32.out
 install-debug: $(HV_OBJDIR)/$(HV_FILE).map $(HV_OBJDIR)/$(HV_FILE).out
 	install -D $(HV_OBJDIR)/$(HV_FILE).out $(DESTDIR)/usr/lib/acrn/$(HV_FILE).$(BOARD).$(FIRMWARE).$(SCENARIO_NAME).out
 	install -D $(HV_OBJDIR)/$(HV_FILE).map $(DESTDIR)/usr/lib/acrn/$(HV_FILE).$(BOARD).$(FIRMWARE).$(SCENARIO_NAME).map
+
+cfg_src: $(VERSION)
+ifneq ($(BOARD_FILE)$(SCENARIO_FILE),)
+	@if [ ! -f $(BOARD_FILE) ]; then \
+		echo "Board xml file $(BOARD_FILE) is not exist!"; exit 1; \
+	fi
+	@if [ ! -f "$(SCENARIO_FILE)" ]; then \
+		echo "Scenario xml file $(SCENARIO_FILE) is not exist!"; exit 1; \
+	fi
+	@if [ "$(BOARD)" != "$(CONFIG_BOARD)" ]; then \
+		echo "Board in xml file <$(BOARD)> does not match Kconfig <$(CONFIG_BOARD)>!"; exit 1; \
+	fi
+	@if [ "$(SCENARIO_IN_XML)" != "$(SCENARIO_NAME)" ]; then \
+		echo "Scenario in xml file <$(SCENARIO_IN_XML)> does not match Kconfig <$(SCENARIO_NAME)>!"; exit 1; \
+	fi
+	@python3 ../misc/acrn-config/board_config/board_cfg_gen.py --board $(BOARD_FILE) --scenario $(SCENARIO_FILE) > $(HV_OBJDIR)/.cfg_src_result
+	@cat $(HV_OBJDIR)/.cfg_src_result
+	@if [ "`sed -n /successfully/p $(HV_OBJDIR)/.cfg_src_result`" = "" ]; then exit 1;	fi
+	@python3 ../misc/acrn-config/scenario_config/scenario_cfg_gen.py --board $(BOARD_FILE) --scenario $(SCENARIO_FILE) > $(HV_OBJDIR)/.cfg_src_result
+	@cat $(HV_OBJDIR)/.cfg_src_result
+	@if [ "`sed -n /successfully/p $(HV_OBJDIR)/.cfg_src_result`" = "" ]; then exit 1;	fi
+	@echo "Import hypervisor configurations from Config-xmls, configurations in source code are ignored!"
+else
+	@echo "Use hypervisor configurations from source code directly."
+endif
 
 .PHONY: pre_build
 pre_build: $(PRE_BUILD_OBJS)
@@ -450,7 +477,7 @@ $(HV_OBJDIR)/%.o: %.S
 GRUBISO := ./grub_iso
 QEMU	:= qemu-system-x86_64
 
-QEMU_CPU := max,level=21
+QEMU_CPU := max,level=21,invtsc
 QEMUOPTS += -machine q35,kernel_irqchip=split,accel=kvm -cpu $(QEMU_CPU)
 QEMUOPTS += -m 4G -smp cpus=8,cores=4,threads=2 -enable-kvm
 QEMUOPTS += -device isa-debug-exit -device intel-iommu,intremap=on,caching-mode=on,device-iotlb=on
