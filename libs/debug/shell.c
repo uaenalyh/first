@@ -96,12 +96,6 @@ static struct shell_cmd shell_cmds[] = {
 		.fcn		= shell_to_vm_console,
 	},
 	{
-		.str		= SHELL_CMD_INTERRUPT,
-		.cmd_param	= SHELL_CMD_INTERRUPT_PARAM,
-		.help_str	= SHELL_CMD_INTERRUPT_HELP,
-		.fcn		= shell_show_cpu_int,
-	},
-	{
 		.str		= SHELL_CMD_PTDEV,
 		.cmd_param	= SHELL_CMD_PTDEV_PARAM,
 		.help_str	= SHELL_CMD_PTDEV_HELP,
@@ -871,74 +865,6 @@ static int32_t shell_to_vm_console(int32_t argc, char **argv)
 
 	shell_puts(temp_str);
 
-	return 0;
-}
-
-/**
- * @brief Get the interrupt statistics
- *
- * It's for debug only.
- *
- * @param[in]	str_max	The max size of the string containing interrupt info
- * @param[inout]	str_arg	Pointer to the output interrupt info
- */
-static void get_cpu_interrupt_info(char *str_arg, size_t str_max)
-{
-	char *str = str_arg;
-	uint16_t pcpu_id;
-	uint32_t irq, vector;
-	size_t len, size = str_max;
-	uint16_t pcpu_nums = get_pcpu_nums();
-
-	len = snprintf(str, size, "\r\nIRQ\tVECTOR");
-	if (len >= size) {
-		goto overflow;
-	}
-	size -= len;
-	str += len;
-
-	for (pcpu_id = 0U; pcpu_id < pcpu_nums; pcpu_id++) {
-		len = snprintf(str, size, "\tCPU%d", pcpu_id);
-		if (len >= size) {
-			goto overflow;
-		}
-		size -= len;
-		str += len;
-	}
-
-	for (irq = 0U; irq < NR_IRQS; irq++) {
-		vector = irq_to_vector(irq);
-		if (bitmap_test((uint16_t)(irq & 0x3FU),
-			irq_alloc_bitmap + (irq >> 6U))
-			&& (vector != VECTOR_INVALID)) {
-			len = snprintf(str, size, "\r\n%d\t0x%X", irq, vector);
-			if (len >= size) {
-				goto overflow;
-			}
-			size -= len;
-			str += len;
-
-			for (pcpu_id = 0U; pcpu_id < pcpu_nums; pcpu_id++) {
-				len = snprintf(str, size, "\t%d", per_cpu(irq_count, pcpu_id)[irq]);
-				if (len >= size) {
-					goto overflow;
-				}
-				size -= len;
-				str += len;
-			}
-		}
-	}
-	snprintf(str, size, "\r\n");
-	return;
-
-overflow:
-	printf("buffer size could not be enough! please check!\n");
-}
-
-static int32_t shell_show_cpu_int(__unused int32_t argc, __unused char **argv)
-{
-	get_cpu_interrupt_info(shell_log_buf, SHELL_LOG_BUF_SIZE);
-	shell_puts(shell_log_buf);
 	return 0;
 }
 

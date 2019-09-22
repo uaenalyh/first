@@ -134,8 +134,6 @@ void init_pcpu_pre(bool is_bsp)
 
 		early_init_lapic();
 
-		init_vboot();
-
 		if (!init_percpu_lapic_id()) {
 			panic("failed to init_percpu_lapic_id!");
 		}

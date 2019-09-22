@@ -66,10 +66,6 @@ struct shell {
 #define SHELL_CMD_VM_CONSOLE_HELP	"Switch to the VM's console. Use [Ctrl+Spacebar] to return to the ACRN shell "\
 					"console"
 
-#define SHELL_CMD_INTERRUPT		"int"
-#define SHELL_CMD_INTERRUPT_PARAM	NULL
-#define SHELL_CMD_INTERRUPT_HELP	"List interrupt information per CPU"
-
 #define SHELL_CMD_PTDEV			"pt"
 #define SHELL_CMD_PTDEV_PARAM		NULL
 #define SHELL_CMD_PTDEV_HELP		"Show pass-through device information"

@@ -186,7 +186,6 @@ HW_C_SRCS += arch/x86/vmx.c
 HW_C_SRCS += arch/x86/trampoline.c
 HW_S_SRCS += arch/x86/sched.S
 HW_C_SRCS += arch/x86/cat.c
-HW_C_SRCS += common/softirq.c
 HW_C_SRCS += common/schedule.c
 HW_C_SRCS += hw/pci.c
 HW_C_SRCS += arch/x86/configs/vm_config.c
@@ -200,8 +199,6 @@ HW_C_SRCS += boot/dmar_info.c
 # This part should be isolated from FuSa Cert
 ifeq ($(CONFIG_ACPI_PARSE_ENABLED),y)
 endif
-HW_C_SRCS += boot/guest/vboot_wrapper.c
-HW_C_SRCS += boot/guest/direct_boot.c
 
 # virtual platform base component
 VP_BASE_C_SRCS += arch/x86/guest/vcpuid.c

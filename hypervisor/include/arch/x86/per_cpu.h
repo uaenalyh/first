@@ -23,9 +23,6 @@ struct per_cpu_region {
 	/* vmxon_region MUST be 4KB-aligned */
 	uint8_t vmxon_region[PAGE_SIZE];
 	void *vmcs_run;
-	uint64_t irq_count[NR_IRQS];
-	uint64_t softirq_pending;
-	uint64_t spurious;
 	struct acrn_vcpu *vcpu;
 	struct acrn_vcpu *ever_run_vcpu;
 #ifdef STACK_PROTECTOR
@@ -43,7 +40,6 @@ struct per_cpu_region {
 	uint8_t stack[CONFIG_STACK_SIZE] __aligned(16);
 	uint32_t lapic_id;
 	uint32_t lapic_ldr;
-	uint32_t softirq_servicing;
 	struct smp_call_info_data smp_call_info;
 	uint16_t shutdown_vm_id;
 } __aligned(PAGE_SIZE); /* per_cpu_region size aligned with PAGE_SIZE */

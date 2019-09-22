@@ -26,8 +26,6 @@ uint64_t irq_alloc_bitmap[IRQ_ALLOC_BITMAP_SIZE];
 struct irq_desc irq_desc_array[NR_IRQS];
 static uint32_t vector_to_irq[NR_MAX_VECTOR + 1];
 
-spurious_handler_t spurious_handler;
-
 struct static_mapping_table {
 	uint32_t irq;
 	uint32_t vector;
@@ -283,80 +281,10 @@ uint32_t irq_to_vector(uint32_t irq)
 	return ret;
 }
 
-static void handle_spurious_interrupt(uint32_t vector)
-{
-	send_lapic_eoi();
-
-	get_cpu_var(spurious)++;
-
-	pr_warn("Spurious vector: 0x%x.", vector);
-
-	if (spurious_handler != NULL) {
-		spurious_handler(vector);
-	}
-}
-
-static inline bool irq_need_mask(const struct irq_desc *desc)
-{
-	/* level triggered gsi should be masked */
-	return (((desc->flags & IRQF_LEVEL) != 0U)
-		&& ioapic_irq_is_gsi(desc->irq));
-}
-
-static inline bool irq_need_unmask(const struct irq_desc *desc)
-{
-	/* level triggered gsi for non-ptdev should be unmasked */
-	return (((desc->flags & IRQF_LEVEL) != 0U)
-		&& ((desc->flags & IRQF_PT) == 0U)
-		&& ioapic_irq_is_gsi(desc->irq));
-}
-
-static inline void handle_irq(const struct irq_desc *desc)
-{
-	irq_action_t action = desc->action;
-
-	if (irq_need_mask(desc))  {
-		ioapic_gsi_mask_irq(desc->irq);
-	}
-
-	/* Send EOI to LAPIC/IOAPIC IRR */
-	send_lapic_eoi();
-
-	if (action != NULL) {
-		action(desc->irq, desc->priv_data);
-	}
-
-	if (irq_need_unmask(desc)) {
-		ioapic_gsi_unmask_irq(desc->irq);
-	}
-}
-
 /* do_IRQ() */
 void dispatch_interrupt(const struct intr_excp_ctx *ctx)
 {
-	uint32_t vr = ctx->vector;
-	uint32_t irq = vector_to_irq[vr];
-	struct irq_desc *desc;
-
-	/* The value from vector_to_irq[] must be:
-	 * IRQ_INVALID, which means the vector is not allocated;
-	 * or
-	 * < NR_IRQS, which is the irq number it bound with;
-	 * Any other value means there is something wrong.
-	 */
-	if (irq < NR_IRQS) {
-		desc = &irq_desc_array[irq];
-		per_cpu(irq_count, get_pcpu_id())[irq]++;
-
-		if ((vr == desc->vector) &&
-			bitmap_test((uint16_t)(irq & 0x3FU), irq_alloc_bitmap + (irq >> 6U))) {
-			handle_irq(desc);
-		}
-	} else {
-		handle_spurious_interrupt(vr);
-	}
-
-	do_softirq();
+	panic("Unexpected external interrupt.");
 }
 
 void dispatch_exception(struct intr_excp_ctx *ctx)
@@ -452,6 +380,4 @@ void init_interrupt(uint16_t pcpu_id)
 	set_idt(idtd);
 	init_lapic(pcpu_id);
 	init_default_irqs(pcpu_id);
-
-	init_vboot_irq();
 }

@@ -12,11 +12,9 @@
 #define ACPI_RSDP_CHECKSUM_LENGTH   20U
 #define ACPI_RSDP_XCHECKSUM_LENGTH  36U
 
-#define ACPI_NAME_SIZE	      4U
 #define ACPI_OEM_ID_SIZE	    6U
 
 #define ACPI_MADT_TYPE_LOCAL_APIC   0U
-#define ACPI_MADT_TYPE_IOAPIC       1U
 #define ACPI_MADT_TYPE_LOCAL_APIC_NMI 4U
 
 #define ACPI_SIG_RSDP	    "RSD PTR " /* Root System Description Ptr */
@@ -65,13 +63,6 @@ struct acpi_table_rsdp {
 	uint8_t		 reserved[3];
 } __packed;
 
-struct acpi_table_rsdt {
-	/* Common ACPI table header */
-	struct acpi_table_header   header;
-	/* Array of pointers to ACPI tables */
-	uint32_t		   table_offset_entry[1];
-} __packed;
-
 struct acpi_table_xsdt {
 	/* Common ACPI table header */
 	struct acpi_table_header    header;
@@ -107,17 +98,6 @@ struct acpi_madt_local_apic_nmi {
 	uint16_t		  flags;
 	uint8_t		   lint;
 } __packed;
-
-struct acpi_madt_ioapic {
-	struct acpi_subtable_header    header;
-	/* IOAPIC id */
-	uint8_t   id;
-	uint8_t   rsvd;
-	uint32_t  addr;
-	uint32_t  gsi_base;
-} __packed;
-
-void *get_acpi_tbl(const char *signature);
 
 struct ioapic_info;
 uint16_t parse_madt(uint32_t lapic_id_array[CONFIG_MAX_PCPU_NUM]);

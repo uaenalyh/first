@@ -82,10 +82,6 @@ struct lapic_regs {			 /*OFFSET(Hex)*/
  * I/O APIC structure
  */
 
-/*
- * Macros for bits in union ioapic_rte
- */
-#define IOAPIC_RTE_MASK_CLR		0x0U	/* Interrupt Mask: Clear */
 #define IOAPIC_RTE_MASK_SET		0x1U	/* Interrupt Mask: Set */
 
 #define IOAPIC_RTE_TRGRMODE_EDGE	0x0U	/* Trigger Mode: Edge */

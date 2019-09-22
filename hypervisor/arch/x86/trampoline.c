@@ -92,7 +92,7 @@ uint64_t prepare_trampoline(void)
 	uint64_t size, dest_pa, i;
 
 	size = (uint64_t)(&ld_trampoline_end - &ld_trampoline_start);
-	dest_pa = get_ap_trampoline_buf();
+	dest_pa = e820_alloc_low_memory(CONFIG_LOW_RAM_SIZE);
 
 	pr_dbg("trampoline code: %llx size %x", dest_pa, size);
 

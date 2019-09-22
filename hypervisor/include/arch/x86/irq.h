@@ -81,9 +81,6 @@ void dispatch_exception(struct intr_excp_ctx *ctx);
 void setup_notification(void);
 void setup_posted_intr_notification(void);
 
-typedef void (*spurious_handler_t)(uint32_t vector);
-extern spurious_handler_t spurious_handler;
-
 uint32_t alloc_irq_num(uint32_t req_irq);
 uint32_t alloc_irq_vector(uint32_t irq);
 

@@ -89,11 +89,6 @@ void init_lapic(uint16_t pcpu_id)
 	clear_lapic_isr();
 }
 
-void send_lapic_eoi(void)
-{
-	msr_write(MSR_IA32_EXT_APIC_EOI, 0U);
-}
-
 uint32_t get_cur_lapic_id(void)
 {
 	uint32_t lapic_id;

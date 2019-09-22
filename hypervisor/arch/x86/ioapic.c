@@ -106,13 +106,6 @@ ioapic_write_reg32(void *ioapic_base, const uint32_t offset, const uint32_t valu
 	spinlock_irqrestore_release(&ioapic_lock, rflags);
 }
 
-void ioapic_get_rte_entry(void *ioapic_addr, uint32_t pin, union ioapic_rte *rte)
-{
-	uint32_t rte_addr = (pin * 2U) + 0x10U;
-	rte->u.lo_32 = ioapic_read_reg32(ioapic_addr, rte_addr);
-	rte->u.hi_32 = ioapic_read_reg32(ioapic_addr, rte_addr + 1U);
-}
-
 static inline void
 ioapic_set_rte_entry(void *ioapic_addr,
 		uint32_t pin, union ioapic_rte rte)
@@ -198,43 +191,6 @@ static void ioapic_set_routing(uint32_t gsi, uint32_t vr)
 bool ioapic_irq_is_gsi(uint32_t irq)
 {
 	return irq < ioapic_nr_gsi;
-}
-
-static void
-ioapic_irq_gsi_mask_unmask(uint32_t irq, bool mask)
-{
-	void *addr = NULL;
-	uint32_t pin;
-	union ioapic_rte rte;
-
-	if (ioapic_irq_is_gsi(irq)) {
-		addr = gsi_table_data[irq].addr;
-		pin = gsi_table_data[irq].pin;
-
-		if (addr != NULL) {
-			ioapic_get_rte_entry(addr, pin, &rte);
-			if (mask) {
-				rte.bits.intr_mask = IOAPIC_RTE_MASK_SET;
-			} else {
-				rte.bits.intr_mask = IOAPIC_RTE_MASK_CLR;
-			}
-			ioapic_set_rte_entry(addr, pin, rte);
-			dev_dbg(ACRN_DBG_PTIRQ, "update: irq:%d pin:%hhu rte:%lx",
-				irq, pin, rte.full);
-		} else {
-			dev_dbg(ACRN_DBG_PTIRQ, "NULL Address returned from gsi_table_data");
-		}
-	}
-}
-
-void ioapic_gsi_mask_irq(uint32_t irq)
-{
-	ioapic_irq_gsi_mask_unmask(irq, true);
-}
-
-void ioapic_gsi_unmask_irq(uint32_t irq)
-{
-	ioapic_irq_gsi_mask_unmask(irq, false);
 }
 
 static uint32_t

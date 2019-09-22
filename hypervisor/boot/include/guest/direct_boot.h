@@ -10,6 +10,4 @@
 
 #include <vboot.h>
 
-struct vboot_operations* get_direct_boot_ops(void);
-
 #endif /* end of include guard: DIRECT_BOOT_H */

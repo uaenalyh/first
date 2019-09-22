@@ -90,7 +90,6 @@ uint32_t get_cur_lapic_id(void);
 /* End of lapic_ext_apis */
 
 void init_lapic(uint16_t pcpu_id);
-void send_lapic_eoi(void);
 
 /**
  * @defgroup ipi_ext_apis IPI External Interfaces
