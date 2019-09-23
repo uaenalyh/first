@@ -486,6 +486,9 @@ static inline void clac(void)
 	asm volatile ("clac" : : : "memory");
 }
 
+/*
+ * @post return <= CONFIG_MAX_PCPU_NUM
+ */
 uint16_t get_pcpu_nums(void);
 bool is_pcpu_active(uint16_t pcpu_id);
 #else /* ASSEMBLER defined */
