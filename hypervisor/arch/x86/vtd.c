@@ -670,13 +670,18 @@ static int32_t add_iommu_device(struct iommu_domain *domain, uint16_t segment, u
 	uint64_t hi_64;
 	uint64_t lo_64 = 0UL;
 	int32_t ret = 0;
+	/* source id */
+	union pci_bdf sid;
+
+	sid.fields.bus = bus;
+	sid.fields.devfun = devfun;
 
 	dmar_unit = &dmar_drhd_units[1];
 	if (dmar_unit == NULL) {
-		pr_err("no dmar unit found for device: %x:%x.%x", bus, pci_slot(devfun), pci_func(devfun));
+		pr_err("no dmar unit found for device: %x:%x.%x", bus, sid.bits.d, sid.bits.f);
 		ret = -EINVAL;
 	} else if (dmar_unit->drhd->ignore) {
-		dev_dbg(ACRN_DBG_IOMMU, "device is ignored :0x%x:%x.%x", bus, pci_slot(devfun), pci_func(devfun));
+		dev_dbg(ACRN_DBG_IOMMU, "device is ignored :0x%x:%x.%x", bus, sid.bits.d, sid.bits.f);
 	} else if ((!dmar_unit_support_aw(dmar_unit, domain->addr_width)) || (dmar_unit->root_table_addr == 0UL)) {
 		pr_err("invalid dmar unit");
 		ret = -EINVAL;
@@ -723,7 +728,7 @@ static int32_t add_iommu_device(struct iommu_domain *domain, uint16_t segment, u
 		} else if (dmar_get_bitslice(context_entry->lo_64, CTX_ENTRY_LOWER_P_MASK, CTX_ENTRY_LOWER_P_POS) != 0UL) {
 			/* the context entry should not be present */
 			pr_err("%s: context entry@0x%llx (Lower:%x) ", __func__, context_entry, context_entry->lo_64);
-			pr_err("already present for %x:%x.%x", bus, pci_slot(devfun), pci_func(devfun));
+			pr_err("already present for %x:%x.%x", bus, sid.bits.d, sid.bits.f);
 			ret = -EBUSY;
 		} else {
 			/* setup context entry for the devfun */
@@ -777,15 +782,20 @@ static int32_t remove_iommu_device(const struct iommu_domain *domain, uint16_t s
 	struct dmar_entry *context;
 	struct dmar_entry *root_entry;
 	struct dmar_entry *context_entry;
+	/* source id */
 	union pci_bdf sid;
 	int32_t ret = 0;
 
 	dmar_unit = &dmar_drhd_units[1];
+
+	sid.fields.bus = bus;
+	sid.fields.devfun = devfun;
+
 	if (dmar_unit == NULL) {
-		pr_err("no dmar unit found for device: %x:%x.%x", bus, pci_slot(devfun), pci_func(devfun));
+		pr_err("no dmar unit found for device: %x:%x.%x", bus, sid.bits.d, sid.bits.f);
 		ret = -EINVAL;
 	} else if (dmar_unit->drhd->ignore) {
-		dev_dbg(ACRN_DBG_IOMMU, "device is ignored :0x%x:%x.%x", bus, pci_slot(devfun), pci_func(devfun));
+		dev_dbg(ACRN_DBG_IOMMU, "device is ignored :0x%x:%x.%x", bus, sid.bits.d, sid.bits.f);
 	} else {
 		root_table = (struct dmar_entry *)hpa2hva(dmar_unit->root_table_addr);
 		root_entry = root_table + bus;
@@ -794,7 +804,8 @@ static int32_t remove_iommu_device(const struct iommu_domain *domain, uint16_t s
 			pr_err("dmar root table entry is invalid\n");
 			ret = -EINVAL;
 		} else {
-			context_table_addr = dmar_get_bitslice(root_entry->lo_64,  ROOT_ENTRY_LOWER_CTP_MASK, ROOT_ENTRY_LOWER_CTP_POS);
+			context_table_addr = dmar_get_bitslice(root_entry->lo_64,  ROOT_ENTRY_LOWER_CTP_MASK,
+								ROOT_ENTRY_LOWER_CTP_POS);
 			context_table_addr = context_table_addr << PAGE_SHIFT;
 			context = (struct dmar_entry *)hpa2hva(context_table_addr);
 
@@ -803,7 +814,8 @@ static int32_t remove_iommu_device(const struct iommu_domain *domain, uint16_t s
 			if ((context == NULL) || (context_entry == NULL)) {
 				pr_err("dmar context entry is invalid");
 				ret = -EINVAL;
-			} else if ((uint16_t)dmar_get_bitslice(context_entry->hi_64, CTX_ENTRY_UPPER_DID_MASK, CTX_ENTRY_UPPER_DID_POS) != vmid_to_domainid(domain->vm_id)) {
+			} else if ((uint16_t)dmar_get_bitslice(context_entry->hi_64, CTX_ENTRY_UPPER_DID_MASK,
+							CTX_ENTRY_UPPER_DID_POS) != vmid_to_domainid(domain->vm_id)) {
 				pr_err("%s: domain id mismatch", __func__);
 				ret = -EPERM;
 			} else {
@@ -812,11 +824,10 @@ static int32_t remove_iommu_device(const struct iommu_domain *domain, uint16_t s
 				context_entry->hi_64 = 0UL;
 				iommu_flush_cache(context_entry, sizeof(struct dmar_entry));
 
-				sid.bits.b = bus;
-				sid.bits.d = pci_slot(devfun);
-				sid.bits.f = pci_func(devfun);
-				dmar_invalid_context_cache(dmar_unit, vmid_to_domainid(domain->vm_id), sid.value, 0U, DMAR_CIRG_DEVICE);
-				dmar_invalid_iotlb(dmar_unit, vmid_to_domainid(domain->vm_id), 0UL, 0U, false, DMAR_IIRG_DOMAIN);
+				dmar_invalid_context_cache(dmar_unit, vmid_to_domainid(domain->vm_id), sid.value, 0U,
+								DMAR_CIRG_DEVICE);
+				dmar_invalid_iotlb(dmar_unit, vmid_to_domainid(domain->vm_id), 0UL, 0U, false,
+								DMAR_IIRG_DOMAIN);
 			}
 		}
 	}
