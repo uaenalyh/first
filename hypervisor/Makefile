@@ -494,7 +494,7 @@ qemu-debug: $(HV_OBJDIR)/$(HV_FILE).iso
 	$(QEMU) $(QEMUOPTS) -s -S -cdrom $(HV_OBJDIR)/$(HV_FILE).iso || true
 
 $(UT_BINARY):
-	make -C $UT_DIR/guest stitched
+	make -C $(UT_DIR)/guest stitched
 
 $(HV_OBJDIR)/$(HV_FILE).iso: all $(UT_BINARY)
 	$(GRUBISO) -t 1 $(HV_OBJDIR)/$(HV_FILE).iso $(HV_OBJDIR)/$(HV_FILE).32.out $(UT_BINARY)
