@@ -16,4 +16,6 @@ void console_init(void);
 
 void console_setup_timer(void);
 
+void console_kick(void);
+
 #endif /* CONSOLE_H */
