@@ -9,17 +9,32 @@
 #include <shell.h>
 #include <timer.h>
 #include <irq.h>
+#include <timer.h>
 #include <logmsg.h>
 #include <acrn_hv_defs.h>
 #include <vm.h>
+#include <vmx.h>
+#include <vmexit.h>
 #include "vuart.h"
 #include "uart16550_priv.h"
 #include "lib.h"
 
 #define CONSOLE_KICK_TIMER_TIMEOUT  40UL /* timeout is 40ms*/
+
+#define MSR_IA32_VMX_MISC_VMX_PREEMPTION_DIVISOR   0x1FUL
+
+#define VMX_PINBASED_CTLS_ACTIVATE_VMX_PREEMPTION_TIMER     (1U << 6)
+
+#define VMX_GUEST_VMX_PREEMPTION_TIMER_VALUE  0x0000482EU
+
+extern struct vm_exit_dispatch dispatch_table[];
+
+#define CONSOLE_CPU_ID    3
 /* Switching key combinations for shell and uart console */
 #define GUEST_CONSOLE_TO_HV_SWITCH_KEY      0       /* CTRL + SPACE */
 uint16_t console_vmid = ACRN_INVALID_VMID;
+
+static uint32_t vmx_preemption_timer_value = 0;
 
 void console_init(void)
 {
@@ -85,50 +100,52 @@ struct acrn_vuart *vuart_console_active(void)
 		vm = get_vm_from_vmid(console_vmid);
 		if (vm->state != VM_POWERED_OFF) {
 			vu = vm_console_vuart(vm);
-		} else {
-			/* Console vm is invalid, switch back to HV-Shell */
-			console_vmid = ACRN_INVALID_VMID;
 		}
 	}
 
 	return ((vu != NULL) && vu->active) ? vu : NULL;
 }
 
-static void console_timer_callback(__unused uint32_t irq, __unused void *data)
+void console_kick(void)
 {
-	struct acrn_vuart *vu;
+	if (get_pcpu_id() == CONSOLE_CPU_ID) {
+		struct acrn_vuart *vu;
 
-	/* Kick HV-Shell and Uart-Console tasks */
-	vu = vuart_console_active();
-	if (vu != NULL) {
-		/* serial Console Rx operation */
-		vuart_console_rx_chars(vu);
-		/* serial Console Tx operation */
-		vuart_console_tx_chars(vu);
-	} else {
-		shell_kick();
+		/* Kick HV-Shell and Uart-Console tasks */
+		vu = vuart_console_active();
+		if (vu != NULL) {
+			/* serial Console Rx operation */
+			vuart_console_rx_chars(vu);
+			/* serial Console Tx operation */
+			vuart_console_tx_chars(vu);
+		} else {
+			shell_kick();
+		}
 	}
-
-	/* Re-arm the timer */
-	msr_write(MSR_IA32_TSC_DEADLINE, rdtsc() + us_to_ticks(10000));
 }
 
-#define LAPIC_TMR_TSC_DEADLINE                  ((uint32_t) 0x2U << 17U)
+int32_t vmx_preemption_timer_expired_handler(struct acrn_vcpu *vcpu)
+{
+	console_kick();
+	exec_vmwrite(VMX_GUEST_VMX_PREEMPTION_TIMER_VALUE, vmx_preemption_timer_value);
+	return 0;
+}
 
 void console_setup_timer(void)
 {
-	int32_t retval;
+	if (get_pcpu_id() == CONSOLE_CPU_ID) {
+		uint64_t ia32_vmx_misc;
+		uint32_t exec_ctrl, vmx_preemption_divisor;
 
-	/* Request for timer irq */
-	retval = request_irq(TIMER_IRQ, (irq_action_t)console_timer_callback, NULL, IRQF_NONE);
-	if (retval >= 0) {
-		/* Enable TSC deadline timer mode */
-		msr_write(MSR_IA32_EXT_APIC_LVT_TIMER, LAPIC_TMR_TSC_DEADLINE | VECTOR_TIMER);
+		ia32_vmx_misc = msr_read(MSR_IA32_VMX_MISC);
+		vmx_preemption_divisor = 1U << (ia32_vmx_misc & MSR_IA32_VMX_MISC_VMX_PREEMPTION_DIVISOR);
+		vmx_preemption_timer_value = us_to_ticks(CONSOLE_KICK_TIMER_TIMEOUT * 1000) / vmx_preemption_divisor;
 
-		/* Arm the timer */
-		msr_write(MSR_IA32_TSC_DEADLINE, rdtsc() + us_to_ticks(50000));
-	} else {
-		pr_err("Timer setup failed. Console is disabled.");
+		exec_ctrl = exec_vmread32(VMX_PIN_VM_EXEC_CONTROLS);
+		exec_vmwrite32(VMX_PIN_VM_EXEC_CONTROLS, exec_ctrl | VMX_PINBASED_CTLS_ACTIVATE_VMX_PREEMPTION_TIMER);
+		exec_vmwrite(VMX_GUEST_VMX_PREEMPTION_TIMER_VALUE, vmx_preemption_timer_value);
+
+		dispatch_table[VMX_EXIT_REASON_VMX_PREEMPTION_TIMER_EXPIRED].handler = vmx_preemption_timer_expired_handler;
 	}
 }
 

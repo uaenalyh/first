@@ -33,7 +33,7 @@ static int32_t undefined_vmexit_handler(struct acrn_vcpu *vcpu);
 static int32_t init_signal_vmexit_handler(__unused struct acrn_vcpu *vcpu);
 
 /* VM Dispatch table for Exit condition handling */
-static const struct vm_exit_dispatch dispatch_table[NR_VMX_EXIT_REASONS] = {
+const struct vm_exit_dispatch dispatch_table[NR_VMX_EXIT_REASONS] = {
 	[VMX_EXIT_REASON_EXCEPTION_OR_NMI] = {
 		.handler = exception_vmexit_handler},
 	[VMX_EXIT_REASON_EXTERNAL_INTERRUPT] = {

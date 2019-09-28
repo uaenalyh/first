@@ -25,6 +25,7 @@ void vcpu_thread(struct sched_object *obj)
 		/* If vcpu is not launched, we need to do init_vmcs first */
 		if (!vcpu->launched) {
 			init_vmcs(vcpu);
+			console_setup_timer();
 		}
 
 		/* Don't open interrupt window between here and vmentry */
@@ -85,6 +86,7 @@ void default_idle(__unused struct sched_object *obj)
 		} else {
 			CPU_IRQ_ENABLE();
 			cpu_do_idle();
+			console_kick();
 			CPU_IRQ_DISABLE();
 		}
 	}

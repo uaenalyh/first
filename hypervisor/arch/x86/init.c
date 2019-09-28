@@ -43,7 +43,6 @@ static void init_debug_post(uint16_t pcpu_id)
 	if (pcpu_id == BOOT_CPU_ID) {
 		/* Initialize the shell */
 		shell_init();
-		console_setup_timer();
 	}
 
 	profiling_setup();
