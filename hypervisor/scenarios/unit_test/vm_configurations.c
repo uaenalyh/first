@@ -27,7 +27,7 @@ struct acrn_vm_config vm_configs[CONFIG_MAX_VM_NUM] = {
 		.os_config = {
 			.name = "ACRN unit test",
 			.kernel_type = KERNEL_BZIMAGE,
-			.kernel_mod_tag = "Linux_bzImage",
+			.kernel_mod_tag = "unit_test_1",
 			.bootargs = "help"
 		},
 		.vuart[0] = {

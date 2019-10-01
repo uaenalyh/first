@@ -11,6 +11,9 @@
 void console_init(void) {}
 void console_setup_timer(void) {}
 
+void console_kick(void) {
+}
+
 bool is_pci_dbg_uart(__unused union pci_bdf bdf_value) { return false; }
 
 void shell_init(void) {}

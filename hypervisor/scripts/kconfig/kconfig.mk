@@ -22,6 +22,12 @@ override RELEASE := n
 endif
 endif
 
+ifdef QEMU
+ifeq ($(QEMU),1)
+BOARD=generic
+endif
+endif
+
 ifeq ($(UT),1)
 SCENARIO_NAME := unit_test
 else
@@ -30,5 +36,6 @@ endif
 
 include include/config.mk
 $(eval $(call override_config,RELEASE,n))
+$(eval $(call override_config,BOARD,generic))
 
 CFLAGS += -include include/config.h -include bsp.h

@@ -27,27 +27,15 @@
  * Version: J83500-204
  */
 
-/* pm sstate data */
-#define PM1A_EVT_ADDRESS        0x1800UL
-#define PM1A_EVT_ACCESS_SIZE    0x2U
-#define PM1A_CNT_ADDRESS        0x1804UL
-
-#define WAKE_VECTOR_32          0x7FA22F8CUL
-#define WAKE_VECTOR_64          0x7FA22F98UL
-
-#define RESET_REGISTER_ADDRESS  0xCF9UL
-#define RESET_REGISTER_SPACE_ID SPACE_SYSTEM_IO
-#define RESET_REGISTER_VALUE    0x6U
-
 /* DRHD of DMAR */
 
-#define DRHD_COUNT              2U
+#define DRHD_COUNT	      2U
 
-#define DRHD0_DEV_CNT           1U
-#define DRHD0_SEGMENT           0U
-#define DRHD0_FLAGS             0U
-#define DRHD0_REG_BASE          0xFED90000UL
-#define DRHD0_IGNORE            false
+#define DRHD0_DEV_CNT	   1U
+#define DRHD0_SEGMENT	   0U
+#define DRHD0_FLAGS	     0U
+#define DRHD0_REG_BASE	  0xFED90000UL
+#define DRHD0_IGNORE	    false
 #define DRHD0_DEVSCOPE0_BUS     0x0U
 #define DRHD0_DEVSCOPE0_PATH    0x10U
 #define DRHD0_DEVSCOPE1_BUS     0x0U
@@ -57,11 +45,11 @@
 #define DRHD0_DEVSCOPE3_BUS     0x0U
 #define DRHD0_DEVSCOPE3_PATH    0x0U
 
-#define DRHD1_DEV_CNT           2U
-#define DRHD1_SEGMENT           0U
-#define DRHD1_FLAGS             1U
-#define DRHD1_REG_BASE          0xFED91000UL
-#define DRHD1_IGNORE            false
+#define DRHD1_DEV_CNT	   2U
+#define DRHD1_SEGMENT	   0U
+#define DRHD1_FLAGS	     1U
+#define DRHD1_REG_BASE	  0xFED91000UL
+#define DRHD1_IGNORE	    false
 #define DRHD1_DEVSCOPE0_BUS     0xf0U
 #define DRHD1_DEVSCOPE0_PATH    0xf8U
 #define DRHD1_DEVSCOPE1_BUS     0x0U
@@ -70,13 +58,13 @@
 #define DRHD1_DEVSCOPE2_PATH    0x0U
 #define DRHD1_DEVSCOPE3_BUS     0x0U
 #define DRHD1_DEVSCOPE3_PATH    0x0U
-#define DRHD1_IOAPIC_ID         2U
+#define DRHD1_IOAPIC_ID	 2U
 
-#define DRHD2_DEV_CNT           0U
-#define DRHD2_SEGMENT           0U
-#define DRHD2_FLAGS             0U
-#define DRHD2_REG_BASE          0x00UL
-#define DRHD2_IGNORE            false
+#define DRHD2_DEV_CNT	   0U
+#define DRHD2_SEGMENT	   0U
+#define DRHD2_FLAGS	     0U
+#define DRHD2_REG_BASE	  0x00UL
+#define DRHD2_IGNORE	    false
 #define DRHD2_DEVSCOPE0_BUS     0x0U
 #define DRHD2_DEVSCOPE0_PATH    0x0U
 #define DRHD2_DEVSCOPE1_BUS     0x0U
@@ -86,11 +74,11 @@
 #define DRHD2_DEVSCOPE3_BUS     0x0U
 #define DRHD2_DEVSCOPE3_PATH    0x0U
 
-#define DRHD3_DEV_CNT           0U
-#define DRHD3_SEGMENT           0U
-#define DRHD3_FLAGS             0U
-#define DRHD3_REG_BASE          0x00UL
-#define DRHD3_IGNORE            false
+#define DRHD3_DEV_CNT	   0U
+#define DRHD3_SEGMENT	   0U
+#define DRHD3_FLAGS	     0U
+#define DRHD3_REG_BASE	  0x00UL
+#define DRHD3_IGNORE	    false
 #define DRHD3_DEVSCOPE0_BUS     0x0U
 #define DRHD3_DEVSCOPE0_PATH    0x0U
 #define DRHD3_DEVSCOPE1_BUS     0x0U
