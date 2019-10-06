@@ -1,31 +1,31 @@
 /*-
-* Copyright (c) 2011 NetApp, Inc.
-* Copyright (c) 2018 Intel Corporation
-* All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions
-* are met:
-* 1. Redistributions of source code must retain the above copyright
-*    notice, this list of conditions and the following disclaimer.
-* 2. Redistributions in binary form must reproduce the above copyright
-*    notice, this list of conditions and the following disclaimer in the
-*    documentation and/or other materials provided with the distribution.
-*
-* THIS SOFTWARE IS PROVIDED BY NETAPP, INC ``AS IS'' AND
-* ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-* ARE DISCLAIMED.  IN NO EVENT SHALL NETAPP, INC OR CONTRIBUTORS BE LIABLE
-* FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-* DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
-* OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-* LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
-* OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
-* SUCH DAMAGE.
-*
-* $FreeBSD$
-*/
+ * Copyright (c) 2011 NetApp, Inc.
+ * Copyright (c) 2018 Intel Corporation
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY NETAPP, INC ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL NETAPP, INC OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ *
+ * $FreeBSD$
+ */
 #include <vm.h>
 #include <errno.h>
 #include <ept.h>
@@ -122,8 +122,7 @@ static void vdev_pt_remap_generic_mem_vbar(struct pci_vdev *vdev, uint32_t idx)
 
 	/* If the old vbar is mapped before, unmap it first */
 	if (vdev->bar_base_mapped[idx] != 0UL) {
-		ept_del_mr(vm, (uint64_t *)(vm->arch_vm.nworld_eptp),
-			vdev->bar_base_mapped[idx], /* GPA (old vbar) */
+		ept_del_mr(vm, (uint64_t *)(vm->arch_vm.nworld_eptp), vdev->bar_base_mapped[idx], /* GPA (old vbar) */
 			vbar->size);
 		vdev->bar_base_mapped[idx] = 0UL;
 	}
@@ -136,17 +135,14 @@ static void vdev_pt_remap_generic_mem_vbar(struct pci_vdev *vdev, uint32_t idx)
 		if (hpa != pbar_base) {
 			/* Unmap the existing mapping for new vbar */
 			if (hpa != INVALID_HPA) {
-				ept_del_mr(vm, (uint64_t *)(vm->arch_vm.nworld_eptp),
-				vbar_base, /* GPA (new vbar) */
-				vbar->size);
+				ept_del_mr(vm, (uint64_t *)(vm->arch_vm.nworld_eptp), vbar_base, /* GPA (new vbar) */
+					vbar->size);
 			}
 
 			/* Map the physical BAR in the guest MMIO space */
-			ept_add_mr(vm, (uint64_t *)(vm->arch_vm.nworld_eptp),
-				pbar_base, /* HPA (pbar) */
+			ept_add_mr(vm, (uint64_t *)(vm->arch_vm.nworld_eptp), pbar_base, /* HPA (pbar) */
 				vbar_base, /* GPA (new vbar) */
-				vbar->size,
-				EPT_WR | EPT_RD | EPT_UNCACHED);
+				vbar->size, EPT_WR | EPT_RD | EPT_UNCACHED);
 
 			/* Remember the previously mapped MMIO vbar */
 			vdev->bar_base_mapped[idx] = vbar_base;

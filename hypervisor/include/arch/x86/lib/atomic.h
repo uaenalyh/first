@@ -31,6 +31,6 @@
 #define ATOMIC_H
 #include <types.h>
 
-#define	BUS_LOCK	"lock ; "
+#define BUS_LOCK "lock ; "
 
 #endif /* ATOMIC_H*/

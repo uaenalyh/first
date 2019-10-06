@@ -97,8 +97,7 @@ uint64_t prepare_trampoline(void)
 	pr_dbg("trampoline code: %llx size %x", dest_pa, size);
 
 	/* Copy segment for AP initialization code below 1MB */
-	(void)memcpy_s(hpa2hva(dest_pa), (size_t)size, &ld_trampoline_load,
-			(size_t)size);
+	(void)memcpy_s(hpa2hva(dest_pa), (size_t)size, &ld_trampoline_load, (size_t)size);
 	update_trampoline_code_refs(dest_pa);
 
 	for (i = 0UL; i < size; i = i + CACHE_LINE_SIZE) {

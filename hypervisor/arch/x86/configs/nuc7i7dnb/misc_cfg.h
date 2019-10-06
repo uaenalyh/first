@@ -7,12 +7,13 @@
 #ifndef MISC_CFG_H
 #define MISC_CFG_H
 
-#define CONFIG_MAX_PCPU_NUM	4U
-#define ROOTFS_0		"root=/dev/sda3 "
+#define CONFIG_MAX_PCPU_NUM 4U
+#define ROOTFS_0            "root=/dev/sda3 "
 
 #ifndef CONFIG_RELEASE
-#define SOS_BOOTARGS_DIFF	"hvlog=2M@0x1FE00000 "	\
-				"memmap=0x200000$0x1fe00000 "
+#define SOS_BOOTARGS_DIFF      \
+	"hvlog=2M@0x1FE00000 " \
+	"memmap=0x200000$0x1fe00000 "
 #else
 #endif
 

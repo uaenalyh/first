@@ -1,31 +1,31 @@
 /*-
-* Copyright (c) 2011 NetApp, Inc.
-* Copyright (c) 2018 Intel Corporation
-* All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions
-* are met:
-* 1. Redistributions of source code must retain the above copyright
-*    notice, this list of conditions and the following disclaimer.
-* 2. Redistributions in binary form must reproduce the above copyright
-*    notice, this list of conditions and the following disclaimer in the
-*    documentation and/or other materials provided with the distribution.
-*
-* THIS SOFTWARE IS PROVIDED BY NETAPP, INC ``AS IS'' AND
-* ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-* ARE DISCLAIMED.  IN NO EVENT SHALL NETAPP, INC OR CONTRIBUTORS BE LIABLE
-* FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-* DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
-* OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-* LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
-* OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
-* SUCH DAMAGE.
-*
-* $FreeBSD$
-*/
+ * Copyright (c) 2011 NetApp, Inc.
+ * Copyright (c) 2018 Intel Corporation
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY NETAPP, INC ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL NETAPP, INC OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ *
+ * $FreeBSD$
+ */
 
 #ifndef VPCI_H_
 #define VPCI_H_
@@ -33,26 +33,26 @@
 #include <pci.h>
 
 struct msix_table_entry {
-	uint64_t	addr;
-	uint32_t	data;
-	uint32_t	vector_control;
+	uint64_t addr;
+	uint32_t data;
+	uint32_t vector_control;
 };
 
 /* MSI capability structure */
 struct pci_msi {
-	uint32_t  capoff;
-	uint32_t  caplen;
+	uint32_t capoff;
+	uint32_t caplen;
 };
 
 /* MSI-X capability structure */
 struct pci_msix {
 	struct msix_table_entry table_entries[CONFIG_MAX_MSIX_TABLE_NUM];
-	uint64_t  mmio_hpa;
-	uint32_t  capoff;
-	uint32_t  caplen;
-	uint32_t  table_bar;
-	uint32_t  table_offset;
-	uint32_t  table_count;
+	uint64_t mmio_hpa;
+	uint32_t capoff;
+	uint32_t caplen;
+	uint32_t table_bar;
+	uint32_t table_offset;
+	uint32_t table_count;
 };
 
 union pci_cfgdata {
@@ -63,10 +63,10 @@ union pci_cfgdata {
 
 struct pci_vdev;
 struct pci_vdev_ops {
-       void    (*init_vdev)(struct pci_vdev *vdev);
-       void    (*deinit_vdev)(struct pci_vdev *vdev);
-       int32_t (*write_vdev_cfg)(struct pci_vdev *vdev, uint32_t offset, uint32_t bytes, uint32_t val);
-       int32_t (*read_vdev_cfg)(const struct pci_vdev *vdev, uint32_t offset, uint32_t bytes, uint32_t *val);
+	void (*init_vdev)(struct pci_vdev *vdev);
+	void (*deinit_vdev)(struct pci_vdev *vdev);
+	int32_t (*write_vdev_cfg)(struct pci_vdev *vdev, uint32_t offset, uint32_t bytes, uint32_t val);
+	int32_t (*read_vdev_cfg)(const struct pci_vdev *vdev, uint32_t offset, uint32_t bytes, uint32_t *val);
 };
 
 struct pci_vdev {

@@ -18,11 +18,9 @@ int32_t rdmsr_vmexit_handler(struct acrn_vcpu *vcpu);
 int32_t wrmsr_vmexit_handler(struct acrn_vcpu *vcpu);
 
 extern void vm_exit(void);
-static inline uint64_t
-vm_exit_qualification_bit_mask(uint64_t exit_qual, uint32_t msb, uint32_t lsb)
+static inline uint64_t vm_exit_qualification_bit_mask(uint64_t exit_qual, uint32_t msb, uint32_t lsb)
 {
-	return (exit_qual &
-			(((1UL << (msb + 1U)) - 1UL) - ((1UL << lsb) - 1UL)));
+	return (exit_qual & (((1UL << (msb + 1U)) - 1UL) - ((1UL << lsb) - 1UL)));
 }
 
 /* access Control-Register Info using exit qualification field */
@@ -47,8 +45,7 @@ static inline uint64_t vm_exit_io_instruction_size(uint64_t exit_qual)
 	return (vm_exit_qualification_bit_mask(exit_qual, 2U, 0U) >> 0U);
 }
 
-static inline uint64_t
-vm_exit_io_instruction_access_direction(uint64_t exit_qual)
+static inline uint64_t vm_exit_io_instruction_access_direction(uint64_t exit_qual)
 {
 	return (vm_exit_qualification_bit_mask(exit_qual, 3U, 3U) >> 3U);
 }

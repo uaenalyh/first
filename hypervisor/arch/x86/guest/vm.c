@@ -108,16 +108,16 @@ static void prepare_prelaunched_vm_memmap(struct acrn_vm *vm, const struct acrn_
 
 		/* Do EPT mapping for GPAs that are backed by physical memory */
 		if (entry->type == E820_TYPE_RAM) {
-			ept_add_mr(vm, (uint64_t *)vm->arch_vm.nworld_eptp, base_hpa, entry->baseaddr,
-				entry->length, EPT_RWX | EPT_WB);
+			ept_add_mr(vm, (uint64_t *)vm->arch_vm.nworld_eptp, base_hpa, entry->baseaddr, entry->length,
+				EPT_RWX | EPT_WB);
 
 			base_hpa += entry->length;
 		}
 
 		/* GPAs under 1MB are always backed by physical memory */
 		if ((entry->type != E820_TYPE_RAM) && (entry->baseaddr < (uint64_t)MEM_1M)) {
-			ept_add_mr(vm, (uint64_t *)vm->arch_vm.nworld_eptp, base_hpa, entry->baseaddr,
-				entry->length, EPT_RWX | EPT_UNCACHED);
+			ept_add_mr(vm, (uint64_t *)vm->arch_vm.nworld_eptp, base_hpa, entry->baseaddr, entry->length,
+				EPT_RWX | EPT_UNCACHED);
 
 			base_hpa += entry->length;
 		}
@@ -127,9 +127,8 @@ static void prepare_prelaunched_vm_memmap(struct acrn_vm *vm, const struct acrn_
 /* Add EPT mapping of EPC reource for the VM */
 static void prepare_epc_vm_memmap(struct acrn_vm *vm)
 {
-	struct epc_map* vm_epc_maps;
+	struct epc_map *vm_epc_maps;
 	uint32_t i;
-
 }
 
 static void register_pm_io_handler(struct acrn_vm *vm)
@@ -166,8 +165,7 @@ int32_t create_vm(uint16_t vm_id, struct acrn_vm_config *vm_config, struct acrn_
 	register_pio_default_emulation_handler(vm);
 	register_mmio_default_emulation_handler(vm);
 
-	(void)memcpy_s(&vm->uuid[0], sizeof(vm->uuid),
-		&vm_config->uuid[0], sizeof(vm_config->uuid));
+	(void)memcpy_s(&vm->uuid[0], sizeof(vm->uuid), &vm_config->uuid[0], sizeof(vm_config->uuid));
 
 	/* For PRE_LAUNCHED_VM and POST_LAUNCHED_VM */
 	if ((vm_config->guest_flags & GUEST_FLAG_SECURE_WORLD_ENABLED) != 0U) {
@@ -177,8 +175,8 @@ int32_t create_vm(uint16_t vm_id, struct acrn_vm_config *vm_config, struct acrn_
 		struct memory_ops *ept_mem_ops = &vm->arch_vm.ept_mem_ops;
 
 		ept_add_mr(vm, (uint64_t *)vm->arch_vm.nworld_eptp,
-			hva2hpa(ept_mem_ops->get_sworld_memory_base(ept_mem_ops->info)),
-			TRUSTY_EPT_REBASE_GPA, TRUSTY_RAM_SIZE, EPT_WB | EPT_RWX);
+			hva2hpa(ept_mem_ops->get_sworld_memory_base(ept_mem_ops->info)), TRUSTY_EPT_REBASE_GPA,
+			TRUSTY_RAM_SIZE, EPT_WB | EPT_RWX);
 	}
 
 	create_prelaunched_vm_e820(vm);
@@ -262,7 +260,7 @@ int32_t shutdown_vm(struct acrn_vm *vm)
 	if (vm->state == VM_PAUSED) {
 		vm->state = VM_POWERED_OFF;
 
-		foreach_vcpu(i, vm, vcpu) {
+		foreach_vcpu (i, vm, vcpu) {
 			reset_vcpu(vcpu);
 			offline_vcpu(vcpu);
 
@@ -331,14 +329,14 @@ void pause_vm(struct acrn_vm *vm)
 			 *  - It is created but doesn't start
 			 */
 			if ((vm->state == VM_POWERING_OFF) || (vm->state == VM_CREATED)) {
-				foreach_vcpu(i, vm, vcpu) {
+				foreach_vcpu (i, vm, vcpu) {
 					pause_vcpu(vcpu, VCPU_ZOMBIE);
 				}
 
 				vm->state = VM_PAUSED;
 			}
 		} else {
-			foreach_vcpu(i, vm, vcpu) {
+			foreach_vcpu (i, vm, vcpu) {
 				pause_vcpu(vcpu, VCPU_ZOMBIE);
 			}
 
@@ -362,7 +360,7 @@ void prepare_vm(uint16_t vm_id, struct acrn_vm_config *vm_config)
 	if (err == 0) {
 		build_vacpi(vm);
 
-		(void )vm_sw_loader(vm);
+		(void)vm_sw_loader(vm);
 
 		/* start vm BSP automatically */
 		start_vm(vm);

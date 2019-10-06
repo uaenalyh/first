@@ -7,4 +7,6 @@
 #include <types.h>
 #include <irq.h>
 
-void dump_exception(__unused struct intr_excp_ctx *ctx, __unused uint16_t pcpu_id) {}
+void dump_exception(__unused struct intr_excp_ctx *ctx, __unused uint16_t pcpu_id)
+{
+}

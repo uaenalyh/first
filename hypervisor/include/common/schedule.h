@@ -8,10 +8,10 @@
 #define SCHEDULE_H
 #include <spinlock.h>
 
-#define	NEED_RESCHEDULE		(1U)
+#define NEED_RESCHEDULE (1U)
 
-#define DEL_MODE_INIT		(1U)
-#define DEL_MODE_IPI		(2U)
+#define DEL_MODE_INIT (1U)
+#define DEL_MODE_IPI  (2U)
 
 struct sched_object;
 typedef void (*run_thread_t)(struct sched_object *obj);
@@ -28,7 +28,7 @@ struct sched_context {
 	struct list_head runqueue;
 	uint64_t flags;
 	struct sched_object *curr_obj;
-	spinlock_t scheduler_lock;	/* to protect sched_context and sched_object */
+	spinlock_t scheduler_lock; /* to protect sched_context and sched_object */
 };
 
 void init_scheduler(void);

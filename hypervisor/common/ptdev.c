@@ -11,7 +11,7 @@
 #include <irq.h>
 #include <logmsg.h>
 
-#define PTIRQ_BITMAP_ARRAY_SIZE	INT_DIV_ROUNDUP(CONFIG_MAX_PT_IRQ_ENTRIES, 64U)
+#define PTIRQ_BITMAP_ARRAY_SIZE INT_DIV_ROUNDUP(CONFIG_MAX_PT_IRQ_ENTRIES, 64U)
 struct ptirq_remapping_info ptirq_entries[CONFIG_MAX_PT_IRQ_ENTRIES];
 static uint64_t ptirq_entry_bitmaps[PTIRQ_BITMAP_ARRAY_SIZE];
 spinlock_t ptdev_lock;
@@ -27,7 +27,7 @@ static inline uint16_t ptirq_alloc_entry_id(void)
 		id = (uint16_t)ffz64_ex(ptirq_entry_bitmaps, CONFIG_MAX_PT_IRQ_ENTRIES);
 	}
 
-	return (id < CONFIG_MAX_PT_IRQ_ENTRIES) ? id: INVALID_PTDEV_ENTRY_ID;
+	return (id < CONFIG_MAX_PT_IRQ_ENTRIES) ? id : INVALID_PTDEV_ENTRY_ID;
 }
 
 struct ptirq_remapping_info *ptirq_alloc_entry(struct acrn_vm *vm, uint32_t intr_type)
@@ -58,8 +58,8 @@ void ptirq_release_entry(struct ptirq_remapping_info *entry)
 	CPU_INT_ALL_DISABLE(&rflags);
 	CPU_INT_ALL_RESTORE(rflags);
 
-	bitmap_clear_nolock((entry->ptdev_entry_id) & 0x3FU,
-		&ptirq_entry_bitmaps[((entry->ptdev_entry_id) & 0x3FU) >> 6U]);
+	bitmap_clear_nolock(
+		(entry->ptdev_entry_id) & 0x3FU, &ptirq_entry_bitmaps[((entry->ptdev_entry_id) & 0x3FU) >> 6U]);
 
 	(void)memset((void *)entry, 0U, sizeof(struct ptirq_remapping_info));
 }
@@ -106,5 +106,4 @@ void ptdev_release_all_entries(const struct acrn_vm *vm)
 			spinlock_release(&ptdev_lock);
 		}
 	}
-
 }

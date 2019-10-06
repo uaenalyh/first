@@ -9,18 +9,18 @@
 #include <types.h>
 
 /* E820 memory types */
-#define E820_TYPE_RAM		1U	/* EFI 1, 2, 3, 4, 5, 6, 7 */
-#define E820_TYPE_RESERVED	2U
+#define E820_TYPE_RAM      1U /* EFI 1, 2, 3, 4, 5, 6, 7 */
+#define E820_TYPE_RESERVED 2U
 
-#define E820_MAX_ENTRIES	32U
+#define E820_MAX_ENTRIES 32U
 
 /** Defines a single entry in an E820 memory map. */
 struct e820_entry {
-   /** The base address of the memory range. */
+	/** The base address of the memory range. */
 	uint64_t baseaddr;
-   /** The length of the memory range. */
+	/** The length of the memory range. */
 	uint64_t length;
-   /** The type of memory region. */
+	/** The type of memory region. */
 	uint32_t type;
 } __packed;
 

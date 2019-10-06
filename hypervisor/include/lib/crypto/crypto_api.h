@@ -15,4 +15,4 @@
 
 #include <types.h>
 
-#endif  /* CRYPTO_API_H */
+#endif /* CRYPTO_API_H */

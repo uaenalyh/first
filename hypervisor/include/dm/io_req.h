@@ -39,19 +39,17 @@ struct io_request {
  * @brief Definition of a IO port range
  */
 struct vm_io_range {
-	uint16_t base;		/**< IO port base */
-	uint16_t len;		/**< IO port range */
+	uint16_t base; /**< IO port base */
+	uint16_t len; /**< IO port range */
 };
 
 struct vm_io_handler_desc;
 struct acrn_vm;
 struct acrn_vcpu;
 
-typedef
-bool (*io_read_fn_t)(struct acrn_vcpu *vcpu, uint16_t port, size_t size);
+typedef bool (*io_read_fn_t)(struct acrn_vcpu *vcpu, uint16_t port, size_t size);
 
-typedef
-bool (*io_write_fn_t)(struct acrn_vcpu *vcpu, uint16_t port, size_t size, uint32_t val);
+typedef bool (*io_write_fn_t)(struct acrn_vcpu *vcpu, uint16_t port, size_t size, uint32_t val);
 
 /**
  * @brief Describes a single IO handler description entry.
@@ -141,8 +139,8 @@ int32_t emulate_io(struct acrn_vcpu *vcpu, struct io_request *io_req);
  * @param io_write_fn_ptr The handler for emulating writes to the given range
  * @pre pio_idx < EMUL_PIO_IDX_MAX
  */
-void   register_pio_emulation_handler(struct acrn_vm *vm, uint32_t pio_idx,
-		const struct vm_io_range *range, io_read_fn_t io_read_fn_ptr, io_write_fn_t io_write_fn_ptr);
+void register_pio_emulation_handler(struct acrn_vm *vm, uint32_t pio_idx, const struct vm_io_range *range,
+	io_read_fn_t io_read_fn_ptr, io_write_fn_t io_write_fn_ptr);
 
 /**
  * @brief Register port I/O default handler

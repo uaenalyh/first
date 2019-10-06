@@ -93,9 +93,8 @@ void build_vacpi(struct acrn_vm *vm)
 	}
 
 	madt = &acpi_table_template[vm->vm_id].madt;
-	madt->header.length = sizeof(struct acpi_table_madt)
-		+ sizeof(struct acpi_madt_local_apic_nmi)
-		+ (sizeof(struct acpi_madt_local_apic) * (size_t)vm->hw.created_vcpus);
+	madt->header.length = sizeof(struct acpi_table_madt) + sizeof(struct acpi_madt_local_apic_nmi) +
+		(sizeof(struct acpi_madt_local_apic) * (size_t)vm->hw.created_vcpus);
 	madt->header.checksum = calculate_checksum8(madt, madt->header.length);
 
 	/* Copy MADT table and its subtables to guest physical memory */

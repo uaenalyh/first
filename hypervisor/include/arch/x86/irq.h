@@ -17,41 +17,41 @@
  * @brief public APIs for virtual IRQ
  */
 
-#define ACRN_DBG_PTIRQ		6U
-#define ACRN_DBG_IRQ		6U
+#define ACRN_DBG_PTIRQ 6U
+#define ACRN_DBG_IRQ   6U
 
 /* vectors range for dynamic allocation, usually for devices */
-#define VECTOR_DYNAMIC_START	0x20U
-#define VECTOR_DYNAMIC_END	0xDFU
+#define VECTOR_DYNAMIC_START 0x20U
+#define VECTOR_DYNAMIC_END   0xDFU
 
 /* vectors range for fixed vectors, usually for HV service */
-#define VECTOR_FIXED_START	0xE0U
+#define VECTOR_FIXED_START 0xE0U
 
-#define VECTOR_TIMER		0xEFU
-#define VECTOR_NOTIFY_VCPU	0xF0U
-#define VECTOR_POSTED_INTR	0xF2U
-#define VECTOR_PMI			0xF4U
+#define VECTOR_TIMER       0xEFU
+#define VECTOR_NOTIFY_VCPU 0xF0U
+#define VECTOR_POSTED_INTR 0xF2U
+#define VECTOR_PMI         0xF4U
 
-#define NR_MAX_VECTOR		0xFFU
-#define VECTOR_INVALID		(NR_MAX_VECTOR + 1U)
-#define NR_IRQS		256U
-#define IRQ_INVALID		0xffffffffU
+#define NR_MAX_VECTOR  0xFFU
+#define VECTOR_INVALID (NR_MAX_VECTOR + 1U)
+#define NR_IRQS        256U
+#define IRQ_INVALID    0xffffffffU
 
 #define NR_STATIC_MAPPINGS     (4U)
-#define TIMER_IRQ		(NR_IRQS - 1U)
-#define NOTIFY_IRQ		(NR_IRQS - 2U)
-#define POSTED_INTR_NOTIFY_IRQ	(NR_IRQS - 3U)
-#define PMI_IRQ			(NR_IRQS - 4U)
+#define TIMER_IRQ              (NR_IRQS - 1U)
+#define NOTIFY_IRQ             (NR_IRQS - 2U)
+#define POSTED_INTR_NOTIFY_IRQ (NR_IRQS - 3U)
+#define PMI_IRQ                (NR_IRQS - 4U)
 
-#define DEFAULT_DEST_MODE	IOAPIC_RTE_DESTMODE_LOGICAL
-#define DEFAULT_DELIVERY_MODE	IOAPIC_RTE_DELMODE_LOPRI
-#define ALL_CPUS_MASK		(uint32_t) (((uint32_t)1U << (uint32_t) get_pcpu_nums()) - (uint32_t)1U)
+#define DEFAULT_DEST_MODE     IOAPIC_RTE_DESTMODE_LOGICAL
+#define DEFAULT_DELIVERY_MODE IOAPIC_RTE_DELMODE_LOPRI
+#define ALL_CPUS_MASK         (uint32_t)(((uint32_t)1U << (uint32_t)get_pcpu_nums()) - (uint32_t)1U)
 
-#define IRQ_ALLOC_BITMAP_SIZE	INT_DIV_ROUNDUP(NR_IRQS, 64U)
+#define IRQ_ALLOC_BITMAP_SIZE INT_DIV_ROUNDUP(NR_IRQS, 64U)
 
-#define IRQF_NONE	(0U)
-#define IRQF_LEVEL	(1U << 1U)	/* 1: level trigger; 0: edge trigger */
-#define IRQF_PT		(1U << 2U)	/* 1: for passthrough dev */
+#define IRQF_NONE  (0U)
+#define IRQF_LEVEL (1U << 1U) /* 1: level trigger; 0: edge trigger */
+#define IRQF_PT    (1U << 2U) /* 1: for passthrough dev */
 
 struct acrn_vcpu;
 
@@ -85,12 +85,12 @@ uint32_t alloc_irq_num(uint32_t req_irq);
 uint32_t alloc_irq_vector(uint32_t irq);
 
 /* RFLAGS */
-#define HV_ARCH_VCPU_RFLAGS_IF	      (1UL<<9U)
-#define HV_ARCH_VCPU_RFLAGS_RF	      (1UL<<16U)
+#define HV_ARCH_VCPU_RFLAGS_IF (1UL << 9U)
+#define HV_ARCH_VCPU_RFLAGS_RF (1UL << 16U)
 
 /* Interruptability State info */
-#define HV_ARCH_VCPU_BLOCKED_BY_MOVSS       (1UL<<1U)
-#define HV_ARCH_VCPU_BLOCKED_BY_STI	 (1UL<<0U)
+#define HV_ARCH_VCPU_BLOCKED_BY_MOVSS (1UL << 1U)
+#define HV_ARCH_VCPU_BLOCKED_BY_STI   (1UL << 0U)
 
 /**
  * @brief virtual IRQ
@@ -159,12 +159,12 @@ typedef void (*irq_action_t)(uint32_t irq, void *priv_data);
  * Any field change in below required lock protection with irqsave
  */
 struct irq_desc {
-	uint32_t irq;		/**< index to irq_desc_base */
-	uint32_t vector;	/**< assigned vector */
+	uint32_t irq; /**< index to irq_desc_base */
+	uint32_t vector; /**< assigned vector */
 
-	irq_action_t action;	/**< callback registered from component */
-	void *priv_data;	/**< irq_action private data */
-	uint32_t flags;		/**< flags for trigger mode/ptdev */
+	irq_action_t action; /**< callback registered from component */
+	void *priv_data; /**< irq_action private data */
+	uint32_t flags; /**< flags for trigger mode/ptdev */
 
 	spinlock_t lock;
 };
@@ -195,8 +195,7 @@ struct irq_desc {
  * @retval >=0 on success
  * @retval IRQ_INVALID on failure
  */
-int32_t request_irq(uint32_t req_irq, irq_action_t action_fn, void *priv_data,
-			uint32_t flags);
+int32_t request_irq(uint32_t req_irq, irq_action_t action_fn, void *priv_data, uint32_t flags);
 
 /**
  * @brief Free an interrupt

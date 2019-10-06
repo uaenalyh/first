@@ -23,7 +23,7 @@
  * According to "SDM APPENDIX C VMX BASIC EXIT REASONS",
  * there are 65 Basic Exit Reasons.
  */
-#define NR_VMX_EXIT_REASONS	65U
+#define NR_VMX_EXIT_REASONS 65U
 
 static int32_t triple_fault_vmexit_handler(struct acrn_vcpu *vcpu);
 static int32_t unhandled_vmexit_handler(struct acrn_vcpu *vcpu);
@@ -237,13 +237,11 @@ int32_t vmexit_handler(struct acrn_vcpu *vcpu)
 
 static int32_t unhandled_vmexit_handler(struct acrn_vcpu *vcpu)
 {
-	pr_fatal("Error: Unhandled VM exit condition from guest at 0x%016llx ",
-			exec_vmread(VMX_GUEST_RIP));
+	pr_fatal("Error: Unhandled VM exit condition from guest at 0x%016llx ", exec_vmread(VMX_GUEST_RIP));
 
 	pr_fatal("Exit Reason: 0x%016llx ", vcpu->arch.exit_reason);
 
-	pr_err("Exit qualification: 0x%016llx ",
-			exec_vmread(VMX_EXIT_QUALIFICATION));
+	pr_err("Exit qualification: 0x%016llx ", exec_vmread(VMX_EXIT_QUALIFICATION));
 
 	TRACE_2L(TRACE_VMEXIT_UNHANDLED, vcpu->arch.exit_reason, 0UL);
 
@@ -252,8 +250,8 @@ static int32_t unhandled_vmexit_handler(struct acrn_vcpu *vcpu)
 
 static int32_t triple_fault_vmexit_handler(struct acrn_vcpu *vcpu)
 {
-	pr_fatal("VM%d: triple fault @ guest RIP 0x%016llx, exit qualification: 0x%016llx",
-		vcpu->vm->vm_id, exec_vmread(VMX_GUEST_RIP), exec_vmread(VMX_EXIT_QUALIFICATION));
+	pr_fatal("VM%d: triple fault @ guest RIP 0x%016llx, exit qualification: 0x%016llx", vcpu->vm->vm_id,
+		exec_vmread(VMX_GUEST_RIP), exec_vmread(VMX_EXIT_QUALIFICATION));
 	triple_fault_shutdown_vm(vcpu);
 
 	return 0;
@@ -267,8 +265,7 @@ int32_t cpuid_vmexit_handler(struct acrn_vcpu *vcpu)
 	rbx = vcpu_get_gpreg(vcpu, CPU_REG_RBX);
 	rcx = vcpu_get_gpreg(vcpu, CPU_REG_RCX);
 	rdx = vcpu_get_gpreg(vcpu, CPU_REG_RDX);
-	guest_cpuid(vcpu, (uint32_t *)&rax, (uint32_t *)&rbx,
-		(uint32_t *)&rcx, (uint32_t *)&rdx);
+	guest_cpuid(vcpu, (uint32_t *)&rax, (uint32_t *)&rbx, (uint32_t *)&rcx, (uint32_t *)&rdx);
 	vcpu_set_gpreg(vcpu, CPU_REG_RAX, rax);
 	vcpu_set_gpreg(vcpu, CPU_REG_RBX, rbx);
 	vcpu_set_gpreg(vcpu, CPU_REG_RCX, rcx);
@@ -310,7 +307,7 @@ static int32_t xsetbv_vmexit_handler(struct acrn_vcpu *vcpu)
 				vcpu_inject_gp(vcpu, 0U);
 			} else {
 				val64 = (vcpu_get_gpreg(vcpu, CPU_REG_RAX) & 0xffffffffUL) |
-						(vcpu_get_gpreg(vcpu, CPU_REG_RDX) << 32U);
+					(vcpu_get_gpreg(vcpu, CPU_REG_RDX) << 32U);
 
 				/* bit 0(x87 state) of XCR0 can't be cleared */
 				if ((val64 & 0x01UL) == 0UL) {

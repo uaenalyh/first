@@ -45,8 +45,8 @@
  * @pre info != NULL
  *
  */
-int32_t ptirq_msix_remap(struct acrn_vm *vm, uint16_t virt_bdf,  uint16_t phys_bdf,
-				uint16_t entry_nr, struct ptirq_msi_info *info);
+int32_t ptirq_msix_remap(
+	struct acrn_vm *vm, uint16_t virt_bdf, uint16_t phys_bdf, uint16_t entry_nr, struct ptirq_msi_info *info);
 
 /**
  * @brief Remove interrupt remapping entry/entries for MSI/MSI-x.
@@ -65,7 +65,7 @@ int32_t ptirq_msix_remap(struct acrn_vm *vm, uint16_t virt_bdf,  uint16_t phys_b
 void ptirq_remove_msix_remapping(const struct acrn_vm *vm, uint16_t virt_bdf, uint32_t vector_count);
 
 /**
-  * @}
-  */
+ * @}
+ */
 
 #endif /* ASSIGN_H */

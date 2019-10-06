@@ -28,7 +28,7 @@
  * $FreeBSD$
  */
 
-#define pr_prefix	"vioapic: "
+#define pr_prefix "vioapic: "
 
 #include <vm.h>
 #include <errno.h>

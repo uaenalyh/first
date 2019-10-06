@@ -20,18 +20,16 @@
  * @{
  */
 
-struct epc_section
-{
-	uint64_t base;	/* EPC section base, must be page aligned */
-	uint64_t size;  /* EPC section size in byte, must be page aligned */
+struct epc_section {
+	uint64_t base; /* EPC section base, must be page aligned */
+	uint64_t size; /* EPC section size in byte, must be page aligned */
 };
 
-struct epc_map
-{
+struct epc_map {
 };
 
 /**
-  * @}
-  */
+ * @}
+ */
 
 #endif

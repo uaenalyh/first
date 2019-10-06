@@ -36,15 +36,15 @@
  *     XSDT  ->   0xf2480    (36 bytes + 8*7 table addrs, 4 used)
  *       MADT  ->   0xf2500  (depends on #CPUs)
  */
-#define ACPI_BASE	 0xf2400U
+#define ACPI_BASE 0xf2400U
 
-#define ACPI_RSDP_ADDR    (ACPI_BASE + 0x0U)
-#define ACPI_XSDT_ADDR    (ACPI_BASE + 0x080U)
-#define ACPI_MADT_ADDR    (ACPI_BASE + 0x100U)
+#define ACPI_RSDP_ADDR (ACPI_BASE + 0x0U)
+#define ACPI_XSDT_ADDR (ACPI_BASE + 0x080U)
+#define ACPI_MADT_ADDR (ACPI_BASE + 0x100U)
 
-#define ACPI_OEM_ID	   "ACRN  "
-#define ACPI_ASL_COMPILER_ID  "INTL"
-#define ACPI_ASL_COMPILER_VERSION  0x20190802U
+#define ACPI_OEM_ID               "ACRN  "
+#define ACPI_ASL_COMPILER_ID      "INTL"
+#define ACPI_ASL_COMPILER_VERSION 0x20190802U
 
 struct acrn_vm;
 struct acpi_table_info {

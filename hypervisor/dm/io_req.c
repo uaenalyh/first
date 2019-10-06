@@ -9,18 +9,17 @@
 #include <ept.h>
 #include <logmsg.h>
 
-#define MMIO_DEFAULT_VALUE_SIZE_1	(0xFFUL)
-#define MMIO_DEFAULT_VALUE_SIZE_2	(0xFFFFUL)
-#define MMIO_DEFAULT_VALUE_SIZE_4	(0xFFFFFFFFUL)
-#define MMIO_DEFAULT_VALUE_SIZE_8	(0xFFFFFFFFFFFFFFFFUL)
+#define MMIO_DEFAULT_VALUE_SIZE_1 (0xFFUL)
+#define MMIO_DEFAULT_VALUE_SIZE_2 (0xFFFFUL)
+#define MMIO_DEFAULT_VALUE_SIZE_4 (0xFFFFFFFFUL)
+#define MMIO_DEFAULT_VALUE_SIZE_8 (0xFFFFFFFFFFFFFFFFUL)
 
 /**
  * @pre width < 8U
  * @pre vcpu != NULL
  * @pre vcpu->vm != NULL
  */
-static bool pio_default_read(struct acrn_vcpu *vcpu,
-	__unused uint16_t addr, size_t width)
+static bool pio_default_read(struct acrn_vcpu *vcpu, __unused uint16_t addr, size_t width)
 {
 	struct pio_request *pio_req = &vcpu->req.reqs.pio;
 
@@ -34,8 +33,8 @@ static bool pio_default_read(struct acrn_vcpu *vcpu,
  * @pre vcpu != NULL
  * @pre vcpu->vm != NULL
  */
-static bool pio_default_write(__unused struct acrn_vcpu *vcpu, __unused uint16_t addr,
-	__unused size_t width, __unused uint32_t v)
+static bool pio_default_write(
+	__unused struct acrn_vcpu *vcpu, __unused uint16_t addr, __unused size_t width, __unused uint32_t v)
 {
 	return true; /* ignore write */
 }
@@ -44,8 +43,7 @@ static bool pio_default_write(__unused struct acrn_vcpu *vcpu, __unused uint16_t
  * @pre (io_req->reqs.mmio.size == 1U) || (io_req->reqs.mmio.size == 2U) ||
  *      (io_req->reqs.mmio.size == 4U) || (io_req->reqs.mmio.size == 8U)
  */
-static int32_t mmio_default_access_handler(struct io_request *io_req,
-	__unused void *handler_private_data)
+static int32_t mmio_default_access_handler(struct io_request *io_req, __unused void *handler_private_data)
 {
 	struct mmio_request *mmio = &io_req->reqs.mmio;
 
@@ -82,8 +80,7 @@ static int32_t mmio_default_access_handler(struct io_request *io_req,
  * @retval -ENODEV No proper handler found.
  * @retval -EIO The request spans multiple devices and cannot be emulated.
  */
-static int32_t
-hv_emulate_pio(struct acrn_vcpu *vcpu, struct io_request *io_req)
+static int32_t hv_emulate_pio(struct acrn_vcpu *vcpu, struct io_request *io_req)
 {
 	int32_t status = -ENODEV;
 	uint16_t port, size;
@@ -125,8 +122,8 @@ hv_emulate_pio(struct acrn_vcpu *vcpu, struct io_request *io_req)
 		/* do nothing */
 	}
 
-	pr_dbg("IO %s on port %04x, data %08x",
-		(pio_req->direction == REQUEST_READ) ? "read" : "write", port, pio_req->value);
+	pr_dbg("IO %s on port %04x, data %08x", (pio_req->direction == REQUEST_READ) ? "read" : "write", port,
+		pio_req->value);
 
 	return status;
 }
@@ -150,8 +147,7 @@ hv_emulate_pio(struct acrn_vcpu *vcpu, struct io_request *io_req)
  * @retval -EINVAL \p io_req has an invalid io_type.
  * @retval <0 on other errors during emulation.
  */
-int32_t
-emulate_io(struct acrn_vcpu *vcpu, struct io_request *io_req)
+int32_t emulate_io(struct acrn_vcpu *vcpu, struct io_request *io_req)
 {
 	int32_t status;
 	struct acrn_vm_config *vm_config;
@@ -184,8 +180,8 @@ emulate_io(struct acrn_vcpu *vcpu, struct io_request *io_req)
  * @param io_write_fn_ptr The handler for emulating writes to the given range
  * @pre pio_idx < EMUL_PIO_IDX_MAX
  */
-void register_pio_emulation_handler(struct acrn_vm *vm, uint32_t pio_idx,
-		const struct vm_io_range *range, io_read_fn_t io_read_fn_ptr, io_write_fn_t io_write_fn_ptr)
+void register_pio_emulation_handler(struct acrn_vm *vm, uint32_t pio_idx, const struct vm_io_range *range,
+	io_read_fn_t io_read_fn_ptr, io_write_fn_t io_write_fn_ptr)
 {
 	vm->emul_pio[pio_idx].port_start = range->base;
 	vm->emul_pio[pio_idx].port_end = range->base + range->len;

@@ -1,31 +1,31 @@
 /*-
-* Copyright (c) 2011 NetApp, Inc.
-* Copyright (c) 2018 Intel Corporation
-* All rights reserved.
-*
-* Redistribution and use in source and binary forms, with or without
-* modification, are permitted provided that the following conditions
-* are met:
-* 1. Redistributions of source code must retain the above copyright
-*    notice, this list of conditions and the following disclaimer.
-* 2. Redistributions in binary form must reproduce the above copyright
-*    notice, this list of conditions and the following disclaimer in the
-*    documentation and/or other materials provided with the distribution.
-*
-* THIS SOFTWARE IS PROVIDED BY NETAPP, INC ``AS IS'' AND
-* ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-* IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
-* ARE DISCLAIMED.  IN NO EVENT SHALL NETAPP, INC OR CONTRIBUTORS BE LIABLE
-* FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
-* DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
-* OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
-* HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-* LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
-* OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
-* SUCH DAMAGE.
-*
-* $FreeBSD$
-*/
+ * Copyright (c) 2011 NetApp, Inc.
+ * Copyright (c) 2018 Intel Corporation
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without
+ * modification, are permitted provided that the following conditions
+ * are met:
+ * 1. Redistributions of source code must retain the above copyright
+ *    notice, this list of conditions and the following disclaimer.
+ * 2. Redistributions in binary form must reproduce the above copyright
+ *    notice, this list of conditions and the following disclaimer in the
+ *    documentation and/or other materials provided with the distribution.
+ *
+ * THIS SOFTWARE IS PROVIDED BY NETAPP, INC ``AS IS'' AND
+ * ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED.  IN NO EVENT SHALL NETAPP, INC OR CONTRIBUTORS BE LIABLE
+ * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+ * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS
+ * OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION)
+ * HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
+ * LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY
+ * OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
+ * SUCH DAMAGE.
+ *
+ * $FreeBSD$
+ */
 
 #include <vm.h>
 #include <vtd.h>
@@ -135,7 +135,9 @@ static bool pci_cfgdata_io_read(struct acrn_vcpu *vcpu, uint16_t addr, size_t by
 				break;
 
 			default:
-				ASSERT(false, "Error, pci_cfgdata_io_read should only be called for PRE_LAUNCHED_VM and SOS_VM");
+				ASSERT(false,
+					"Error, pci_cfgdata_io_read should only be called for PRE_LAUNCHED_VM and "
+					"SOS_VM");
 				break;
 			}
 		}
@@ -172,7 +174,9 @@ static bool pci_cfgdata_io_write(struct acrn_vcpu *vcpu, uint16_t addr, size_t b
 				break;
 
 			default:
-				ASSERT(false, "Error, pci_cfgdata_io_write should only be called for PRE_LAUNCHED_VM and SOS_VM");
+				ASSERT(false,
+					"Error, pci_cfgdata_io_write should only be called for PRE_LAUNCHED_VM and "
+					"SOS_VM");
 				break;
 			}
 		}
@@ -188,15 +192,9 @@ static bool pci_cfgdata_io_write(struct acrn_vcpu *vcpu, uint16_t addr, size_t b
  */
 void vpci_init(struct acrn_vm *vm)
 {
-	struct vm_io_range pci_cfgaddr_range = {
-		.base = PCI_CONFIG_ADDR,
-		.len = 1U
-	};
+	struct vm_io_range pci_cfgaddr_range = { .base = PCI_CONFIG_ADDR, .len = 1U };
 
-	struct vm_io_range pci_cfgdata_range = {
-		.base = PCI_CONFIG_DATA,
-		.len = 4U
-	};
+	struct vm_io_range pci_cfgdata_range = { .base = PCI_CONFIG_DATA, .len = 4U };
 
 	struct acrn_vm_config *vm_config;
 
@@ -213,12 +211,12 @@ void vpci_init(struct acrn_vm *vm)
 		 * UOS or pre-launched VM: register handler for CF8 only and I/O requests to CF9/CFA/CFB are
 		 * not handled by vpci.
 		 */
-		register_pio_emulation_handler(vm, PCI_CFGADDR_PIO_IDX, &pci_cfgaddr_range,
-			pci_cfgaddr_io_read, pci_cfgaddr_io_write);
+		register_pio_emulation_handler(
+			vm, PCI_CFGADDR_PIO_IDX, &pci_cfgaddr_range, pci_cfgaddr_io_read, pci_cfgaddr_io_write);
 
 		/* Intercept and handle I/O ports CFC -- CFF */
-		register_pio_emulation_handler(vm, PCI_CFGDATA_PIO_IDX, &pci_cfgdata_range,
-			pci_cfgdata_io_read, pci_cfgdata_io_write);
+		register_pio_emulation_handler(
+			vm, PCI_CFGDATA_PIO_IDX, &pci_cfgdata_range, pci_cfgdata_io_read, pci_cfgdata_io_write);
 		break;
 
 	default:
@@ -259,8 +257,8 @@ static void assign_vdev_pt_iommu_domain(const struct pci_vdev *vdev)
 	int32_t ret;
 	struct acrn_vm *vm = vdev->vpci->vm;
 
-	ret = move_pt_device(NULL, vm->iommu, (uint8_t)vdev->pdev->bdf.bits.b,
-		(uint8_t)(vdev->pdev->bdf.value & 0xFFU));
+	ret = move_pt_device(
+		NULL, vm->iommu, (uint8_t)vdev->pdev->bdf.bits.b, (uint8_t)(vdev->pdev->bdf.value & 0xFFU));
 	if (ret != 0) {
 		panic("failed to assign iommu device!");
 	}
@@ -277,8 +275,8 @@ static void remove_vdev_pt_iommu_domain(const struct pci_vdev *vdev)
 	int32_t ret;
 	struct acrn_vm *vm = vdev->vpci->vm;
 
-	ret = move_pt_device(vm->iommu, NULL, (uint8_t)vdev->pdev->bdf.bits.b,
-		(uint8_t)(vdev->pdev->bdf.value & 0xFFU));
+	ret = move_pt_device(
+		vm->iommu, NULL, (uint8_t)vdev->pdev->bdf.bits.b, (uint8_t)(vdev->pdev->bdf.value & 0xFFU));
 	if (ret != 0) {
 		/*
 		 *TODO
@@ -327,8 +325,7 @@ static void vpci_deinit_pt_dev(struct pci_vdev *vdev)
 	deinit_vmsi(vdev);
 }
 
-static int32_t vpci_write_pt_dev_cfg(struct pci_vdev *vdev, uint32_t offset,
-		uint32_t bytes, uint32_t val)
+static int32_t vpci_write_pt_dev_cfg(struct pci_vdev *vdev, uint32_t offset, uint32_t bytes, uint32_t val)
 {
 	if (vbar_access(vdev, offset)) {
 		vdev_pt_write_cfg(vdev, offset, bytes, val);
@@ -344,8 +341,7 @@ static int32_t vpci_write_pt_dev_cfg(struct pci_vdev *vdev, uint32_t offset,
 	return 0;
 }
 
-static int32_t vpci_read_pt_dev_cfg(const struct pci_vdev *vdev, uint32_t offset,
-		uint32_t bytes, uint32_t *val)
+static int32_t vpci_read_pt_dev_cfg(const struct pci_vdev *vdev, uint32_t offset, uint32_t bytes, uint32_t *val)
 {
 	if (vbar_access(vdev, offset)) {
 		vdev_pt_read_cfg(vdev, offset, bytes, val);
@@ -362,17 +358,16 @@ static int32_t vpci_read_pt_dev_cfg(const struct pci_vdev *vdev, uint32_t offset
 }
 
 static const struct pci_vdev_ops pci_pt_dev_ops = {
-	.init_vdev	= vpci_init_pt_dev,
-	.deinit_vdev	= vpci_deinit_pt_dev,
-	.write_vdev_cfg	= vpci_write_pt_dev_cfg,
-	.read_vdev_cfg	= vpci_read_pt_dev_cfg,
+	.init_vdev = vpci_init_pt_dev,
+	.deinit_vdev = vpci_deinit_pt_dev,
+	.write_vdev_cfg = vpci_write_pt_dev_cfg,
+	.read_vdev_cfg = vpci_read_pt_dev_cfg,
 };
 
 /**
  * @pre vpci != NULL
  */
-static void read_cfg(const struct acrn_vpci *vpci, union pci_bdf bdf,
-	uint32_t offset, uint32_t bytes, uint32_t *val)
+static void read_cfg(const struct acrn_vpci *vpci, union pci_bdf bdf, uint32_t offset, uint32_t bytes, uint32_t *val)
 {
 	struct pci_vdev *vdev = find_vdev(vpci, bdf);
 
@@ -384,8 +379,7 @@ static void read_cfg(const struct acrn_vpci *vpci, union pci_bdf bdf,
 /**
  * @pre vpci != NULL
  */
-static void write_cfg(const struct acrn_vpci *vpci, union pci_bdf bdf,
-	uint32_t offset, uint32_t bytes, uint32_t val)
+static void write_cfg(const struct acrn_vpci *vpci, union pci_bdf bdf, uint32_t offset, uint32_t bytes, uint32_t val)
 {
 	struct pci_vdev *vdev = find_vdev(vpci, bdf);
 
@@ -445,7 +439,7 @@ static void deinit_prelaunched_vm_vpci(const struct acrn_vm *vm)
 	uint32_t i;
 
 	for (i = 0U; i < vm->vpci.pci_vdev_cnt; i++) {
-		vdev = (struct pci_vdev *) &(vm->vpci.pci_vdevs[i]);
+		vdev = (struct pci_vdev *)&(vm->vpci.pci_vdevs[i]);
 
 		vdev->vdev_ops->deinit_vdev(vdev);
 	}

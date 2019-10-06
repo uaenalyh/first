@@ -8,8 +8,8 @@
 #define VM_H_
 
 /* Defines for VM Launch and Resume */
-#define VM_RESUME		0
-#define VM_LAUNCH		1
+#define VM_RESUME 0
+#define VM_LAUNCH 1
 
 #ifndef ASSEMBLER
 
@@ -30,25 +30,25 @@
 struct vm_hw_info {
 	/* vcpu array of this VM */
 	struct acrn_vcpu vcpu_array[CONFIG_MAX_VCPUS_PER_VM];
-	uint16_t created_vcpus;	/* Number of created vcpus */
+	uint16_t created_vcpus; /* Number of created vcpus */
 } __aligned(PAGE_SIZE);
 
 struct sw_module_info {
 	/* sw modules like ramdisk, bootargs, firmware, etc. */
-	void *src_addr;			/* HVA */
-	void *load_addr;		/* GPA */
+	void *src_addr; /* HVA */
+	void *load_addr; /* GPA */
 	uint32_t size;
 };
 
 struct sw_kernel_info {
-	void *kernel_src_addr;		/* HVA */
-	void *kernel_load_addr;		/* GPA */
-	void *kernel_entry_addr;	/* GPA */
+	void *kernel_src_addr; /* HVA */
+	void *kernel_load_addr; /* GPA */
+	void *kernel_entry_addr; /* GPA */
 	uint32_t kernel_size;
 };
 
 struct vm_sw_info {
-	enum os_kernel_type kernel_type;	/* Guest kernel type */
+	enum os_kernel_type kernel_type; /* Guest kernel type */
 	/* Kernel information (common for all guest types) */
 	struct sw_kernel_info kernel_info;
 	struct sw_module_info bootargs_info;
@@ -60,22 +60,17 @@ struct vm_sw_info {
 /* Enumerated type for VM states */
 enum vm_state {
 	VM_POWERED_OFF = 0,
-	VM_CREATED,	/* VM created / awaiting start (boot) */
-	VM_STARTED,	/* VM started (booted) */
-	VM_POWERING_OFF,     /* RTVM only, it is trying to poweroff by itself */
-	VM_PAUSED,	/* VM paused */
+	VM_CREATED, /* VM created / awaiting start (boot) */
+	VM_STARTED, /* VM started (booted) */
+	VM_POWERING_OFF, /* RTVM only, it is trying to poweroff by itself */
+	VM_PAUSED, /* VM paused */
 };
 
-enum vm_vlapic_state {
-	VM_VLAPIC_DISABLED = 0U,
-	VM_VLAPIC_XAPIC,
-	VM_VLAPIC_X2APIC,
-	VM_VLAPIC_TRANSITION
-};
+enum vm_vlapic_state { VM_VLAPIC_DISABLED = 0U, VM_VLAPIC_XAPIC, VM_VLAPIC_X2APIC, VM_VLAPIC_TRANSITION };
 
 struct vm_arch {
 	/* I/O bitmaps A and B for this VM, MUST be 4-Kbyte aligned */
-	uint8_t io_bitmap[PAGE_SIZE*2];
+	uint8_t io_bitmap[PAGE_SIZE * 2];
 
 	/* EPT hierarchy for Normal World */
 	void *nworld_eptp;
@@ -93,15 +88,15 @@ struct vm_arch {
 
 struct acrn_vm {
 	struct vm_arch arch_vm; /* Reference to this VM's arch information */
-	struct vm_hw_info hw;	/* Reference to this VM's HW information */
-	struct vm_sw_info sw;	/* Reference to SW associated with this VM */
+	struct vm_hw_info hw; /* Reference to this VM's HW information */
+	struct vm_sw_info sw; /* Reference to SW associated with this VM */
 	uint32_t e820_entry_num;
 	const struct e820_entry *e820_entries;
-	uint16_t vm_id;		    /* Virtual machine identifier */
-	enum vm_state state;	/* VM state */
+	uint16_t vm_id; /* Virtual machine identifier */
+	enum vm_state state; /* VM state */
 	enum vpic_wire_mode wire_mode;
-	struct iommu_domain *iommu;	/* iommu domain of this VM */
-	spinlock_t vm_lock;	/* Spin-lock used to protect VM modifications */
+	struct iommu_domain *iommu; /* iommu domain of this VM */
+	spinlock_t vm_lock; /* Spin-lock used to protect VM modifications */
 
 	uint16_t emul_mmio_regions; /* Number of emulated mmio regions */
 	hv_mem_io_handler_t default_read_write;
@@ -131,7 +126,7 @@ static inline uint64_t vm_active_cpus(const struct acrn_vm *vm)
 	uint16_t i;
 	const struct acrn_vcpu *vcpu;
 
-	foreach_vcpu(i, vm, vcpu) {
+	foreach_vcpu (i, vm, vcpu) {
 		bitmap_set_nolock(vcpu->vcpu_id, &dmask);
 	}
 
@@ -152,7 +147,7 @@ static inline struct acrn_vcpu *vcpu_from_pid(struct acrn_vm *vm, uint16_t pcpu_
 	uint16_t i;
 	struct acrn_vcpu *vcpu, *target_vcpu = NULL;
 
-	foreach_vcpu(i, vm, vcpu) {
+	foreach_vcpu (i, vm, vcpu) {
 		if (vcpu->pcpu_id == pcpu_id) {
 			target_vcpu = vcpu;
 			break;

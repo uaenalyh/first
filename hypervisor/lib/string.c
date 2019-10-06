@@ -61,7 +61,7 @@ int32_t strncmp(const char *s1_arg, const char *s2_arg, size_t n_arg)
 			str2++;
 			n--;
 		}
-		ret = (int32_t) (*str1 - *str2);
+		ret = (int32_t)(*str1 - *str2);
 	}
 
 	return ret;

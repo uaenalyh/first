@@ -6,4 +6,6 @@
 
 #include <types.h>
 
-void uart16550_init(__unused bool early_boot) {}
+void uart16550_init(__unused bool early_boot)
+{
+}

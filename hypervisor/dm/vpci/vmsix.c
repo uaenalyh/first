@@ -178,7 +178,6 @@ void init_vmsix(struct pci_vdev *vdev)
 	vdev->msix.table_bar = pdev->msix.table_bar;
 	vdev->msix.table_offset = pdev->msix.table_offset;
 	vdev->msix.table_count = pdev->msix.table_count;
-
 }
 
 /**

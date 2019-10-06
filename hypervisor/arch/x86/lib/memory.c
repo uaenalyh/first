@@ -6,10 +6,7 @@
 
 static inline void memcpy_erms(void *d, const void *s, size_t slen)
 {
-	asm volatile ("rep; movsb"
-		: "=&D"(d), "=&S"(s)
-		: "c"(slen), "0" (d), "1" (s)
-		: "memory");
+	asm volatile("rep; movsb" : "=&D"(d), "=&S"(s) : "c"(slen), "0"(d), "1"(s) : "memory");
 }
 
 /*
@@ -39,9 +36,7 @@ void *memcpy_s(void *d, size_t dmax, const void *s, size_t slen)
 
 static inline void memset_erms(void *base, uint8_t v, size_t n)
 {
-	asm volatile("rep ; stosb"
-			: "+D"(base)
-			: "a" (v), "c"(n));
+	asm volatile("rep ; stosb" : "+D"(base) : "a"(v), "c"(n));
 }
 
 void *memset(void *base, uint8_t v, size_t n)

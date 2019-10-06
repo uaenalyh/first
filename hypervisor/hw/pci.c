@@ -124,9 +124,9 @@ void enable_disable_pci_intx(union pci_bdf bdf, bool enable)
 	}
 }
 
-#define BUS_SCAN_SKIP		0U
-#define BUS_SCAN_PENDING	1U
-#define BUS_SCAN_COMPLETE	2U
+#define BUS_SCAN_SKIP     0U
+#define BUS_SCAN_PENDING  1U
+#define BUS_SCAN_COMPLETE 2U
 void init_pci_pdev_list(void)
 {
 	union pci_bdf pbdf;
@@ -213,7 +213,8 @@ static uint32_t pci_pdev_get_nr_bars(uint8_t hdr_type)
 }
 
 /*
- * @pre ((hdr_type & PCIM_HDRTYPE) == PCIM_HDRTYPE_NORMAL) || ((hdr_type & PCIM_HDRTYPE) == PCIM_HDRTYPE_BRIDGE) || ((hdr_type & PCIM_HDRTYPE) == PCIM_HDRTYPE_CARDBUS)
+ * @pre ((hdr_type & PCIM_HDRTYPE) == PCIM_HDRTYPE_NORMAL) || ((hdr_type & PCIM_HDRTYPE) == PCIM_HDRTYPE_BRIDGE) ||
+ * ((hdr_type & PCIM_HDRTYPE) == PCIM_HDRTYPE_CARDBUS)
  */
 static uint32_t get_offset_of_caplist(uint8_t hdr_type)
 {
@@ -239,7 +240,8 @@ static uint32_t get_offset_of_caplist(uint8_t hdr_type)
 
 /*
  * @pre pdev != NULL
- * @pre ((hdr_type & PCIM_HDRTYPE) == PCIM_HDRTYPE_NORMAL) || ((hdr_type & PCIM_HDRTYPE) == PCIM_HDRTYPE_BRIDGE) || ((hdr_type & PCIM_HDRTYPE) == PCIM_HDRTYPE_CARDBUS)
+ * @pre ((hdr_type & PCIM_HDRTYPE) == PCIM_HDRTYPE_NORMAL) || ((hdr_type & PCIM_HDRTYPE) == PCIM_HDRTYPE_BRIDGE) ||
+ * ((hdr_type & PCIM_HDRTYPE) == PCIM_HDRTYPE_CARDBUS)
  */
 static void pci_read_cap(struct pci_pdev *pdev, uint8_t hdr_type)
 {
@@ -268,7 +270,6 @@ static void pci_read_cap(struct pci_pdev *pdev, uint8_t hdr_type)
 			for (idx = 0U; idx < len; idx++) {
 				pdev->msi.cap[idx] = (uint8_t)pci_pdev_read_cfg(pdev->bdf, offset + idx, 1U);
 			}
-
 		}
 
 		ptr = (uint8_t)pci_pdev_read_cfg(pdev->bdf, ptr + PCICAP_NEXTPTR, 1U);

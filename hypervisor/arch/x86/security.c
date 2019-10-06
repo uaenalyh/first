@@ -60,8 +60,7 @@ bool check_cpu_security_cap(void)
 
 	if (pcpu_has_cap(X86_FEATURE_ARCH_CAP)) {
 		x86_arch_capabilities = msr_read(MSR_IA32_ARCH_CAPABILITIES);
-		skip_l1dfl_vmentry = ((x86_arch_capabilities
-			& IA32_ARCH_CAP_SKIP_L1DFL_VMENTRY) != 0UL);
+		skip_l1dfl_vmentry = ((x86_arch_capabilities & IA32_ARCH_CAP_SKIP_L1DFL_VMENTRY) != 0UL);
 
 		mds_no = ((x86_arch_capabilities & IA32_ARCH_CAP_MDS_NO) != 0UL);
 
@@ -117,7 +116,7 @@ static inline void verw_buffer_overwriting(void)
 {
 	uint16_t ds = HOST_GDT_RING0_DATA_SEL;
 
-	asm volatile ("verw %[ds]" : : [ds] "m" (ds) : "cc");
+	asm volatile("verw %[ds]" : : [ ds ] "m"(ds) : "cc");
 }
 
 /*
@@ -152,12 +151,12 @@ static uint64_t get_random_value(void)
 {
 	uint64_t random = 0UL;
 
-	asm volatile ("1: rdrand %%rax\n"
-			"jnc 1b\n"
-			"mov %%rax, %0\n"
-			: "=r"(random)
-			:
-			:"%rax");
+	asm volatile("1: rdrand %%rax\n"
+		     "jnc 1b\n"
+		     "mov %%rax, %0\n"
+		     : "=r"(random)
+		     :
+		     : "%rax");
 	return random;
 }
 

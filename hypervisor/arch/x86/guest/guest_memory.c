@@ -15,8 +15,8 @@
 #include <ept.h>
 #include <logmsg.h>
 
-static inline uint32_t local_copy_gpa(struct acrn_vm *vm, void *h_ptr, uint64_t gpa,
-	uint32_t size, uint32_t fix_pg_size, bool cp_from_vm)
+static inline uint32_t local_copy_gpa(
+	struct acrn_vm *vm, void *h_ptr, uint64_t gpa, uint32_t size, uint32_t fix_pg_size, bool cp_from_vm)
 {
 	uint64_t hpa;
 	uint32_t offset_in_pg, len, pg_size;
@@ -24,8 +24,7 @@ static inline uint32_t local_copy_gpa(struct acrn_vm *vm, void *h_ptr, uint64_t 
 
 	hpa = local_gpa2hpa(vm, gpa, &pg_size);
 	if (hpa == INVALID_HPA) {
-		pr_err("%s,vm[%hu] gpa 0x%llx,GPA is unmapping",
-			__func__, vm->vm_id, gpa);
+		pr_err("%s,vm[%hu] gpa 0x%llx,GPA is unmapping", __func__, vm->vm_id, gpa);
 		len = 0U;
 	} else {
 
@@ -50,8 +49,8 @@ static inline uint32_t local_copy_gpa(struct acrn_vm *vm, void *h_ptr, uint64_t 
 	return len;
 }
 
-static inline int32_t copy_gpa(struct acrn_vm *vm, void *h_ptr_arg, uint64_t gpa_arg,
-	uint32_t size_arg, bool cp_from_vm)
+static inline int32_t copy_gpa(
+	struct acrn_vm *vm, void *h_ptr_arg, uint64_t gpa_arg, uint32_t size_arg, bool cp_from_vm)
 {
 	void *h_ptr = h_ptr_arg;
 	uint32_t len;

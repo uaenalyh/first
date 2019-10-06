@@ -50,12 +50,12 @@ struct acrn_vlapic {
 	 * IRR, TMR and PIR could be accessed by other vCPUs when deliver
 	 * an interrupt to vLAPIC.
 	 */
-	struct lapic_regs	apic_page;
+	struct lapic_regs apic_page;
 
-	struct acrn_vm		*vm;
-	struct acrn_vcpu	*vcpu;
+	struct acrn_vm *vm;
+	struct acrn_vcpu *vcpu;
 
-	uint64_t	msr_apicbase;
+	uint64_t msr_apicbase;
 
 	const struct acrn_apicv_ops *ops;
 
@@ -92,8 +92,7 @@ void vlapic_create(struct acrn_vcpu *vcpu);
  */
 void vlapic_init(struct acrn_vlapic *vlapic);
 void vlapic_reset(struct acrn_vlapic *vlapic, const struct acrn_apicv_ops *ops);
-void vlapic_calc_dest(struct acrn_vm *vm, uint64_t *dmask, bool is_broadcast,
-		uint32_t dest, bool phys, bool lowprio);
+void vlapic_calc_dest(struct acrn_vm *vm, uint64_t *dmask, bool is_broadcast, uint32_t dest, bool phys, bool lowprio);
 /**
  * @}
  */

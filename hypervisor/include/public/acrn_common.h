@@ -21,23 +21,23 @@
  * Common structures for ACRN/VHM/DM
  */
 
-#define REQ_PORTIO	0U
+#define REQ_PORTIO 0U
 
-#define REQUEST_READ	0U
-#define REQUEST_WRITE	1U
+#define REQUEST_READ  0U
+#define REQUEST_WRITE 1U
 
 /* IOAPIC device model info */
-#define VIOAPIC_RTE_NUM	48U  /* vioapic pins */
+#define VIOAPIC_RTE_NUM 48U /* vioapic pins */
 
 #if VIOAPIC_RTE_NUM < 24U
 #error "VIOAPIC_RTE_NUM must be larger than 23"
 #endif
 
 /* Generic VM flags from guest OS */
-#define GUEST_FLAG_SECURE_WORLD_ENABLED		(1UL << 0U)	/* Whether secure world is enabled */
-#define GUEST_FLAG_LAPIC_PASSTHROUGH		(1UL << 1U)  	/* Whether LAPIC is passed through */
-#define GUEST_FLAG_CLOS_REQUIRED		(1UL << 3U)     /* Whether CLOS is required */
-#define GUEST_FLAG_RT				(1UL << 5U)     /* Whether the vm is RT-VM */
+#define GUEST_FLAG_SECURE_WORLD_ENABLED (1UL << 0U) /* Whether secure world is enabled */
+#define GUEST_FLAG_LAPIC_PASSTHROUGH    (1UL << 1U) /* Whether LAPIC is passed through */
+#define GUEST_FLAG_CLOS_REQUIRED        (1UL << 3U) /* Whether CLOS is required */
+#define GUEST_FLAG_RT                   (1UL << 5U) /* Whether the vm is RT-VM */
 
 /**
  * @brief Hypercall
@@ -129,7 +129,7 @@ struct acrn_gp_regs {
 struct acrn_descriptor_ptr {
 	uint16_t limit;
 	uint64_t base;
-	uint16_t reserved[3];   /* align struct size to 64bit */
+	uint16_t reserved[3]; /* align struct size to 64bit */
 } __packed;
 
 /**
@@ -140,30 +140,30 @@ struct acrn_vcpu_regs {
 	struct acrn_descriptor_ptr gdt;
 	struct acrn_descriptor_ptr idt;
 
-	uint64_t	rip;
-	uint64_t	cs_base;
-	uint64_t	cr0;
-	uint64_t	cr4;
-	uint64_t	cr3;
-	uint64_t	ia32_efer;
-	uint64_t	rflags;
-	uint64_t	reserved_64[4];
+	uint64_t rip;
+	uint64_t cs_base;
+	uint64_t cr0;
+	uint64_t cr4;
+	uint64_t cr3;
+	uint64_t ia32_efer;
+	uint64_t rflags;
+	uint64_t reserved_64[4];
 
-	uint32_t	cs_ar;
-	uint32_t	cs_limit;
-	uint32_t	reserved_32[3];
+	uint32_t cs_ar;
+	uint32_t cs_limit;
+	uint32_t reserved_32[3];
 
 	/* don't change the order of following sel */
-	uint16_t	cs_sel;
-	uint16_t	ss_sel;
-	uint16_t	ds_sel;
-	uint16_t	es_sel;
-	uint16_t	fs_sel;
-	uint16_t	gs_sel;
-	uint16_t	ldt_sel;
-	uint16_t	tr_sel;
+	uint16_t cs_sel;
+	uint16_t ss_sel;
+	uint16_t ds_sel;
+	uint16_t es_sel;
+	uint16_t fs_sel;
+	uint16_t gs_sel;
+	uint16_t ldt_sel;
+	uint16_t tr_sel;
 
-	uint16_t	reserved_16[4];
+	uint16_t reserved_16[4];
 };
 
 /**

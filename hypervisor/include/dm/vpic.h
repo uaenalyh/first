@@ -55,12 +55,7 @@
 
 /* 0x08 must be 0 to select OCW2 vs OCW3 */
 
-enum vpic_wire_mode {
-	VPIC_WIRE_INTR = 0,
-	VPIC_WIRE_LAPIC,
-	VPIC_WIRE_IOAPIC,
-	VPIC_WIRE_NULL
-};
+enum vpic_wire_mode { VPIC_WIRE_INTR = 0, VPIC_WIRE_LAPIC, VPIC_WIRE_IOAPIC, VPIC_WIRE_NULL };
 
 /**
  * @brief virtual PIC

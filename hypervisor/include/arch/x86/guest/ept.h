@@ -15,7 +15,7 @@ typedef void (*pge_handler)(uint64_t *pgentry, uint64_t size);
  * according to SDM vol.3A 4.1.4, the maximum
  * host physical address width is 52
  */
-#define INVALID_HPA	(0x1UL << 52U)
+#define INVALID_HPA (0x1UL << 52U)
 /* External Interfaces */
 /**
  * @brief EPT page tables destroy
@@ -62,8 +62,7 @@ uint64_t local_gpa2hpa(struct acrn_vm *vm, uint64_t gpa, uint32_t *size);
  *
  * @return None
  */
-void ept_add_mr(struct acrn_vm *vm, uint64_t *pml4_page, uint64_t hpa,
-		uint64_t gpa, uint64_t size, uint64_t prot_orig);
+void ept_add_mr(struct acrn_vm *vm, uint64_t *pml4_page, uint64_t hpa, uint64_t gpa, uint64_t size, uint64_t prot_orig);
 /**
  * @brief Guest-physical memory region unmapping
  *
@@ -77,8 +76,7 @@ void ept_add_mr(struct acrn_vm *vm, uint64_t *pml4_page, uint64_t hpa,
  *
  * @pre [gpa,gpa+size) has been mapped into host physical memory region
  */
-void ept_del_mr(struct acrn_vm *vm, uint64_t *pml4_page, uint64_t gpa,
-		uint64_t size);
+void ept_del_mr(struct acrn_vm *vm, uint64_t *pml4_page, uint64_t gpa, uint64_t size);
 
 /**
  * @brief Flush address space from the page entry

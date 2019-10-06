@@ -10,27 +10,27 @@
 #include <types.h>
 #include <apicreg.h>
 
-#define INTR_LAPIC_ICR_INIT       0x5U
-#define INTR_LAPIC_ICR_STARTUP  0x6U
+#define INTR_LAPIC_ICR_INIT    0x5U
+#define INTR_LAPIC_ICR_STARTUP 0x6U
 
 /* intr_lapic_icr_dest_mode */
 #define INTR_LAPIC_ICR_PHYSICAL 0x0U
 
 /* intr_lapic_icr_level */
-#define INTR_LAPIC_ICR_DEASSERT  0x0U
-#define INTR_LAPIC_ICR_ASSERT       0x1U
+#define INTR_LAPIC_ICR_DEASSERT 0x0U
+#define INTR_LAPIC_ICR_ASSERT   0x1U
 
-#define INTR_LAPIC_ICR_LEVEL	0x1U
+#define INTR_LAPIC_ICR_LEVEL 0x1U
 
 /* intr_lapic_icr_shorthand */
-#define INTR_LAPIC_ICR_USE_DEST_ARRAY    0x0U
-#define INTR_LAPIC_ICR_ALL_EX_SELF	    0x3U
+#define INTR_LAPIC_ICR_USE_DEST_ARRAY 0x0U
+#define INTR_LAPIC_ICR_ALL_EX_SELF    0x3U
 
 /* LAPIC register bit and bitmask definitions */
-#define LAPIC_SVR_VECTOR			0x000000FFU
-#define LAPIC_SVR_APIC_ENABLE_MASK		   0x00000100U
+#define LAPIC_SVR_VECTOR           0x000000FFU
+#define LAPIC_SVR_APIC_ENABLE_MASK 0x00000100U
 
-#define LAPIC_LVT_MASK			  0x00010000U
+#define LAPIC_LVT_MASK 0x00010000U
 
 enum intr_cpu_startup_shorthand {
 	INTR_CPU_STARTUP_USE_DEST,
@@ -46,16 +46,16 @@ union apic_icr {
 		uint32_t hi_32;
 	} value_32;
 	struct {
-		uint32_t vector:8;
-		uint32_t delivery_mode:3;
-		uint32_t destination_mode:1;
-		uint32_t rsvd_1:2;
-		uint32_t level:1;
-		uint32_t trigger_mode:1;
-		uint32_t rsvd_2:2;
-		uint32_t shorthand:2;
-		uint32_t rsvd_3:12;
-		uint32_t dest_field:32;
+		uint32_t vector : 8;
+		uint32_t delivery_mode : 3;
+		uint32_t destination_mode : 1;
+		uint32_t rsvd_1 : 2;
+		uint32_t level : 1;
+		uint32_t trigger_mode : 1;
+		uint32_t rsvd_2 : 2;
+		uint32_t shorthand : 2;
+		uint32_t rsvd_3 : 12;
+		uint32_t dest_field : 32;
 	} bits;
 };
 
@@ -110,9 +110,8 @@ void init_lapic(uint16_t pcpu_id);
  *
  * @pre cpu_startup_shorthand < INTR_CPU_STARTUP_UNKNOWN
  */
-void send_startup_ipi(enum intr_cpu_startup_shorthand cpu_startup_shorthand,
-		uint16_t dest_pcpu_id,
-		uint64_t cpu_startup_start_address);
+void send_startup_ipi(enum intr_cpu_startup_shorthand cpu_startup_shorthand, uint16_t dest_pcpu_id,
+	uint64_t cpu_startup_start_address);
 
 /**
  * @brief Send an IPI to a single pCPU

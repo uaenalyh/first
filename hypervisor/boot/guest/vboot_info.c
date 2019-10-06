@@ -21,9 +21,9 @@
 #include <deprivilege_boot.h>
 #include <vboot_info.h>
 
-#define ACRN_DBG_BOOT	6U
+#define ACRN_DBG_BOOT 6U
 
-#define INVALID_MOD_IDX		0xFFFFU
+#define INVALID_MOD_IDX 0xFFFFU
 
 /**
  * @pre vm != NULL && mbi != NULL
@@ -86,12 +86,11 @@ static int32_t init_vm_kernel_info(struct acrn_vm *vm, const struct multiboot_mo
 {
 	struct acrn_vm_config *vm_config = get_vm_config(vm->vm_id);
 
-	dev_dbg(ACRN_DBG_BOOT, "kernel mod start=0x%x, end=0x%x",
-		mod->mm_mod_start, mod->mm_mod_end);
+	dev_dbg(ACRN_DBG_BOOT, "kernel mod start=0x%x, end=0x%x", mod->mm_mod_start, mod->mm_mod_end);
 
 	vm->sw.kernel_type = vm_config->os_config.kernel_type;
 	vm->sw.kernel_info.kernel_src_addr = hpa2hva((uint64_t)mod->mm_mod_start);
-	if ((vm->sw.kernel_info.kernel_src_addr != NULL) && (mod->mm_mod_end > mod->mm_mod_start)){
+	if ((vm->sw.kernel_info.kernel_src_addr != NULL) && (mod->mm_mod_end > mod->mm_mod_start)) {
 		vm->sw.kernel_info.kernel_size = mod->mm_mod_end - mod->mm_mod_start;
 		vm->sw.kernel_info.kernel_load_addr = get_kernel_load_addr(vm);
 	}
@@ -130,10 +129,9 @@ static uint32_t get_mod_idx_by_tag(const struct multiboot_module *mods, uint32_t
 		uint32_t mm_str_len = strnlen_s(mm_string, MAX_MOD_TAG_LEN);
 
 		/* when do file stitch by tool, the tag in mm_string might be followed with 0x0d or 0x0a */
-		if ((mm_str_len >= tag_len) && (strncmp(mm_string, tag, tag_len) == 0)
-				&& ((*(mm_string + tag_len) == 0x0d)
-				|| (*(mm_string + tag_len) == 0x0a)
-				|| (*(mm_string + tag_len) == 0))){
+		if ((mm_str_len >= tag_len) && (strncmp(mm_string, tag, tag_len) == 0) &&
+			((*(mm_string + tag_len) == 0x0d) || (*(mm_string + tag_len) == 0x0a) ||
+				(*(mm_string + tag_len) == 0))) {
 			ret = i;
 			break;
 		}

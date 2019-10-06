@@ -23,12 +23,7 @@ static inline void exec_vmxon(void *addr)
 	 * here no need check RFLAGS since it will generate #GP or #UD
 	 * except VMsuccess. SDM 30.3
 	 */
-	asm volatile (
-			"vmxon (%%rax)\n"
-			:
-			: "a"(addr)
-			: "cc", "memory");
-
+	asm volatile("vmxon (%%rax)\n" : : "a"(addr) : "cc", "memory");
 }
 
 /* Per cpu data to hold the vmxon_region for each pcpu.
@@ -59,8 +54,7 @@ void vmx_on(void)
 	/* Check if feature control is locked */
 	if ((tmp64 & MSR_IA32_FEATURE_CONTROL_LOCK) == 0U) {
 		/* Lock and enable VMX support */
-		tmp64 |= (MSR_IA32_FEATURE_CONTROL_LOCK |
-			  MSR_IA32_FEATURE_CONTROL_VMX_NO_SMX);
+		tmp64 |= (MSR_IA32_FEATURE_CONTROL_LOCK | MSR_IA32_FEATURE_CONTROL_VMX_NO_SMX);
 		msr_write(MSR_IA32_FEATURE_CONTROL, tmp64);
 	}
 
@@ -71,7 +65,7 @@ void vmx_on(void)
 
 static inline void exec_vmxoff(void)
 {
-	asm volatile ("vmxoff" : : : "memory");
+	asm volatile("vmxoff" : : : "memory");
 }
 
 /**
@@ -85,11 +79,7 @@ void exec_vmclear(void *addr)
 	 * here no need check RFLAGS since it will generate #GP or #UD
 	 * except VMsuccess. SDM 30.3
 	 */
-	asm volatile (
-		"vmclear (%%rax)\n"
-		:
-		: "a"(addr)
-		: "cc", "memory");
+	asm volatile("vmclear (%%rax)\n" : : "a"(addr) : "cc", "memory");
 }
 
 /**
@@ -102,11 +92,7 @@ void exec_vmptrld(void *addr)
 	 * here no need check RFLAGS since it will generate #GP or #UD
 	 * except VMsuccess. SDM 30.3
 	 */
-	asm volatile (
-		"vmptrld (%%rax)\n"
-		:
-		: "a"(addr)
-		: "cc", "memory");
+	asm volatile("vmptrld (%%rax)\n" : : "a"(addr) : "cc", "memory");
 }
 
 /**
@@ -131,11 +117,7 @@ uint64_t exec_vmread64(uint32_t field_full)
 {
 	uint64_t value;
 
-	asm volatile (
-		"vmread %%rdx, %%rax "
-		: "=a" (value)
-		: "d"(field_full)
-		: "cc");
+	asm volatile("vmread %%rdx, %%rax " : "=a"(value) : "d"(field_full) : "cc");
 
 	return value;
 }
@@ -151,10 +133,7 @@ uint32_t exec_vmread32(uint32_t field)
 
 void exec_vmwrite64(uint32_t field_full, uint64_t value)
 {
-	asm volatile (
-		"vmwrite %%rax, %%rdx "
-		: : "a" (value), "d"(field_full)
-		: "cc");
+	asm volatile("vmwrite %%rax, %%rdx " : : "a"(value), "d"(field_full) : "cc");
 }
 
 void exec_vmwrite32(uint32_t field, uint32_t value)

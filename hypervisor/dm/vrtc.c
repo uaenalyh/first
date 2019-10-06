@@ -7,11 +7,11 @@
 #include <vm.h>
 #include <io.h>
 
-#define CMOS_ADDR_PORT		0x70U
-#define CMOS_DATA_PORT		0x71U
+#define CMOS_ADDR_PORT 0x70U
+#define CMOS_DATA_PORT 0x71U
 
-#define RTC_STATUSA		0x0AU   /* status register A */
-#define RTCSA_TUP		0x80U   /* time update, don't look now */
+#define RTC_STATUSA 0x0AU /* status register A */
+#define RTCSA_TUP   0x80U /* time update, don't look now */
 
 static spinlock_t cmos_lock = { .head = 0U, .tail = 0U };
 
@@ -23,7 +23,7 @@ static uint8_t cmos_read(uint8_t addr)
 
 static bool cmos_update_in_progress(void)
 {
-	return (cmos_read(RTC_STATUSA) & RTCSA_TUP)?1:0;
+	return (cmos_read(RTC_STATUSA) & RTCSA_TUP) ? 1 : 0;
 }
 
 static uint8_t cmos_get_reg_val(uint8_t addr)
@@ -69,8 +69,7 @@ static bool vrtc_read(struct acrn_vcpu *vcpu, uint16_t addr, __unused size_t wid
  * @pre vcpu != NULL
  * @pre vcpu->vm != NULL
  */
-static bool vrtc_write(struct acrn_vcpu *vcpu, uint16_t addr, size_t width,
-			uint32_t value)
+static bool vrtc_write(struct acrn_vcpu *vcpu, uint16_t addr, size_t width, uint32_t value)
 {
 	if ((width == 1U) && (addr == CMOS_ADDR_PORT)) {
 		vcpu->vm->vrtc_offset = (uint8_t)value & 0x7FU;
@@ -81,8 +80,7 @@ static bool vrtc_write(struct acrn_vcpu *vcpu, uint16_t addr, size_t width,
 
 void vrtc_init(struct acrn_vm *vm)
 {
-	struct vm_io_range range = {
-	.base = CMOS_ADDR_PORT, .len = 2U};
+	struct vm_io_range range = { .base = CMOS_ADDR_PORT, .len = 2U };
 
 	/* Initializing the CMOS RAM offset to 0U */
 	vm->vrtc_offset = 0U;

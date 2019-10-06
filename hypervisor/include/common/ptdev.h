@@ -10,18 +10,17 @@
 #include <spinlock.h>
 #include <timer.h>
 
-#define PTDEV_INTR_MSI		(1U << 0U)
+#define PTDEV_INTR_MSI (1U << 0U)
 
 #define INVALID_PTDEV_ENTRY_ID 0xffffU
 
-#define DEFINE_MSI_SID(name, a, b)	\
-union source_id (name) = {.msi_id = {.bdf = (a), .entry_nr = (b)} }
+#define DEFINE_MSI_SID(name, a, b) union source_id(name) = { .msi_id = { .bdf = (a), .entry_nr = (b) } }
 
 union irte_index {
 	uint16_t index;
 	struct {
-		uint16_t index_low:15;
-		uint16_t index_high:1;
+		uint16_t index_low : 15;
+		uint16_t index_high : 1;
 	} bits __packed;
 };
 
@@ -42,49 +41,48 @@ union source_id {
  * Macros for bits in union msi_addr_reg
  */
 
-#define	MSI_ADDR_RH			0x1U	/* Redirection Hint */
-#define	MSI_ADDR_DESTMODE_LOGICAL	0x1U	/* Destination Mode: Logical*/
-#define	MSI_ADDR_DESTMODE_PHYS		0x0U	/* Destination Mode: Physical*/
+#define MSI_ADDR_RH               0x1U /* Redirection Hint */
+#define MSI_ADDR_DESTMODE_LOGICAL 0x1U /* Destination Mode: Logical*/
+#define MSI_ADDR_DESTMODE_PHYS    0x0U /* Destination Mode: Physical*/
 
 union msi_addr_reg {
 	uint64_t full;
 	struct {
-		uint32_t rsvd_1:2;
-		uint32_t dest_mode:1;
-		uint32_t rh:1;
-		uint32_t rsvd_2:8;
-		uint32_t dest_field:8;
-		uint32_t addr_base:12;
+		uint32_t rsvd_1 : 2;
+		uint32_t dest_mode : 1;
+		uint32_t rh : 1;
+		uint32_t rsvd_2 : 8;
+		uint32_t dest_field : 8;
+		uint32_t addr_base : 12;
 		uint32_t hi_32;
 	} bits __packed;
 	struct {
-		uint32_t rsvd_1:2;
-		uint32_t intr_index_high:1;
-		uint32_t shv:1;
-		uint32_t intr_format:1;
-		uint32_t intr_index_low:15;
-		uint32_t constant:12;
+		uint32_t rsvd_1 : 2;
+		uint32_t intr_index_high : 1;
+		uint32_t shv : 1;
+		uint32_t intr_format : 1;
+		uint32_t intr_index_low : 15;
+		uint32_t constant : 12;
 		uint32_t hi_32;
 	} ir_bits __packed;
-
 };
 
 /*
  * Macros for bits in union msi_data_reg
  */
 
-#define MSI_DATA_DELMODE_FIXED		0x0U	/* Delivery Mode: Fixed */
-#define MSI_DATA_DELMODE_LOPRI		0x1U	/* Delivery Mode: Low Priority */
+#define MSI_DATA_DELMODE_FIXED 0x0U /* Delivery Mode: Fixed */
+#define MSI_DATA_DELMODE_LOPRI 0x1U /* Delivery Mode: Low Priority */
 
 union msi_data_reg {
 	uint32_t full;
 	struct {
-		uint32_t vector:8;
-		uint32_t delivery_mode:3;
-		uint32_t rsvd_1:3;
-		uint32_t level:1;
-		uint32_t trigger_mode:1;
-		uint32_t rsvd_2:16;
+		uint32_t vector : 8;
+		uint32_t delivery_mode : 3;
+		uint32_t rsvd_1 : 3;
+		uint32_t level : 1;
+		uint32_t trigger_mode : 1;
+		uint32_t rsvd_2 : 16;
 	} bits __packed;
 };
 
@@ -110,7 +108,7 @@ struct ptirq_remapping_info {
 	union source_id phys_sid;
 	union source_id virt_sid;
 	struct acrn_vm *vm;
-	bool active;	/* true=active, false=inactive*/
+	bool active; /* true=active, false=inactive*/
 	uint32_t allocated_pirq;
 	struct ptirq_msi_info msi;
 

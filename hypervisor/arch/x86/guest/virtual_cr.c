@@ -22,20 +22,18 @@
 
 /* CR0 bits hv want to trap to track status change */
 #define CR0_TRAP_MASK (CR0_PE | CR0_PG | CR0_WP | CR0_CD | CR0_NW)
-#define CR0_RESERVED_MASK ~(CR0_PG | CR0_CD | CR0_NW | CR0_AM | CR0_WP | \
-			   CR0_NE |  CR0_ET | CR0_TS | CR0_EM | CR0_MP | CR0_PE)
+#define CR0_RESERVED_MASK \
+	~(CR0_PG | CR0_CD | CR0_NW | CR0_AM | CR0_WP | CR0_NE | CR0_ET | CR0_TS | CR0_EM | CR0_MP | CR0_PE)
 
 /* CR4 bits hv want to trap to track status change */
 #define CR4_TRAP_MASK (CR4_PSE | CR4_PAE | CR4_VMXE | CR4_PCIDE | CR4_SMEP | CR4_SMAP | CR4_PKE)
-#define	CR4_RESERVED_MASK ~(CR4_VME | CR4_PVI | CR4_TSD | CR4_DE | CR4_PSE | \
-				CR4_PAE | CR4_MCE | CR4_PGE | CR4_PCE |     \
-				CR4_OSFXSR | CR4_PCIDE | CR4_OSXSAVE |       \
-				CR4_SMEP | CR4_FSGSBASE | CR4_VMXE |	 \
-				CR4_OSXMMEXCPT | CR4_SMAP | CR4_PKE |	\
-				CR4_SMXE | CR4_UMIP)
+#define CR4_RESERVED_MASK                                                                                            \
+	~(CR4_VME | CR4_PVI | CR4_TSD | CR4_DE | CR4_PSE | CR4_PAE | CR4_MCE | CR4_PGE | CR4_PCE | CR4_OSFXSR |      \
+		CR4_PCIDE | CR4_OSXSAVE | CR4_SMEP | CR4_FSGSBASE | CR4_VMXE | CR4_OSXMMEXCPT | CR4_SMAP | CR4_PKE | \
+		CR4_SMXE | CR4_UMIP)
 
 /* PAE PDPTE bits 1 ~ 2, 5 ~ 8 are always reserved */
-#define PAE_PDPTE_FIXED_RESVD_BITS	0x00000000000001E6UL
+#define PAE_PDPTE_FIXED_RESVD_BITS 0x00000000000001E6UL
 
 static uint64_t cr0_always_on_mask;
 static uint64_t cr0_always_off_mask;
@@ -50,7 +48,7 @@ static int32_t load_pdptrs(const struct acrn_vcpu *vcpu)
 	uint64_t pdpte[4]; /* Total four PDPTE */
 	uint64_t rsvd_bits_mask;
 	uint8_t maxphyaddr;
-	int32_t	i;
+	int32_t i;
 
 	/* check whether the address area pointed by the guest cr3
 	 * can be accessed or not
@@ -402,8 +400,7 @@ uint64_t vcpu_get_cr0(struct acrn_vcpu *vcpu)
 
 	if (bitmap_test_and_set_lock(CPU_REG_CR0, &vcpu->reg_cached) == 0) {
 		mask = exec_vmread(VMX_CR0_GUEST_HOST_MASK);
-		ctx->cr0 = (exec_vmread(VMX_CR0_READ_SHADOW) & mask) |
-			(exec_vmread(VMX_GUEST_CR0) & (~mask));
+		ctx->cr0 = (exec_vmread(VMX_CR0_READ_SHADOW) & mask) | (exec_vmread(VMX_GUEST_CR0) & (~mask));
 	}
 	return ctx->cr0;
 }
@@ -420,8 +417,7 @@ uint64_t vcpu_get_cr4(struct acrn_vcpu *vcpu)
 
 	if (bitmap_test_and_set_lock(CPU_REG_CR4, &vcpu->reg_cached) == 0) {
 		mask = exec_vmread(VMX_CR4_GUEST_HOST_MASK);
-		ctx->cr4 = (exec_vmread(VMX_CR4_READ_SHADOW) & mask) |
-			(exec_vmread(VMX_GUEST_CR4) & (~mask));
+		ctx->cr4 = (exec_vmread(VMX_CR4_READ_SHADOW) & mask) | (exec_vmread(VMX_GUEST_CR4) & (~mask));
 	}
 	return ctx->cr4;
 }
@@ -459,8 +455,7 @@ int32_t cr_access_vmexit_handler(struct acrn_vcpu *vcpu)
 		break;
 	}
 
-	TRACE_2L(TRACE_VMEXIT_CR_ACCESS, vm_exit_cr_access_type(exit_qual),
-			vm_exit_cr_access_cr_num(exit_qual));
+	TRACE_2L(TRACE_VMEXIT_CR_ACCESS, vm_exit_cr_access_type(exit_qual), vm_exit_cr_access_cr_num(exit_qual));
 
 	return ret;
 }

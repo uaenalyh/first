@@ -27,7 +27,7 @@
  * $FreeBSD$
  */
 
-#define pr_prefix		"vlapic: "
+#define pr_prefix "vlapic: "
 
 #include <types.h>
 #include <errno.h>
@@ -46,16 +46,15 @@
 #include <logmsg.h>
 #include "vlapic_priv.h"
 
-#define	APICBASE_BSP		0x00000100UL
-#define	APICBASE_X2APIC		0x00000400U
-#define	APICBASE_ENABLED	0x00000800UL
-#define LOGICAL_ID_MASK		0xFU
-#define CLUSTER_ID_MASK		0xFFFF0U
+#define APICBASE_BSP     0x00000100UL
+#define APICBASE_X2APIC  0x00000400U
+#define APICBASE_ENABLED 0x00000800UL
+#define LOGICAL_ID_MASK  0xFU
+#define CLUSTER_ID_MASK  0xFFFF0U
 
-#define ACRN_DBG_LAPIC		6U
+#define ACRN_DBG_LAPIC 6U
 
-static struct acrn_vlapic *
-vm_lapic_from_vcpu_id(struct acrn_vm *vm, uint16_t vcpu_id)
+static struct acrn_vlapic *vm_lapic_from_vcpu_id(struct acrn_vm *vm, uint16_t vcpu_id)
 {
 	struct acrn_vcpu *vcpu;
 
@@ -70,7 +69,7 @@ static uint16_t vm_apicid2vcpu_id(struct acrn_vm *vm, uint32_t lapicid)
 	struct acrn_vcpu *vcpu;
 	uint16_t cpu_id = INVALID_CPU_ID;
 
-	foreach_vcpu(i, vm, vcpu) {
+	foreach_vcpu (i, vm, vcpu) {
 		const struct acrn_vlapic *vlapic = vcpu_vlapic(vcpu);
 		if (vlapic_get_apicid(vlapic) == lapicid) {
 			cpu_id = vcpu->vcpu_id;
@@ -83,14 +82,12 @@ static uint16_t vm_apicid2vcpu_id(struct acrn_vm *vm, uint32_t lapicid)
 	}
 
 	return cpu_id;
-
 }
 
 /*
  * @pre vlapic != NULL
  */
-uint32_t
-vlapic_get_apicid(const struct acrn_vlapic *vlapic)
+uint32_t vlapic_get_apicid(const struct acrn_vlapic *vlapic)
 {
 	uint32_t apicid;
 	apicid = vlapic->apic_page.id.v;
@@ -98,8 +95,7 @@ vlapic_get_apicid(const struct acrn_vlapic *vlapic)
 	return apicid;
 }
 
-static inline uint32_t
-vlapic_build_id(const struct acrn_vlapic *vlapic)
+static inline uint32_t vlapic_build_id(const struct acrn_vlapic *vlapic)
 {
 	const struct acrn_vcpu *vcpu = vlapic->vcpu;
 	uint32_t vlapic_id, lapic_regs_id;
@@ -162,9 +158,7 @@ static inline bool is_dest_field_matched(const struct acrn_vlapic *vlapic, uint3
  * This function populates 'dmask' with the set of vcpus that match the
  * addressing specified by the (dest, phys, lowprio) tuple.
  */
-void
-vlapic_calc_dest(struct acrn_vm *vm, uint64_t *dmask, bool is_broadcast,
-		uint32_t dest, bool phys, bool lowprio)
+void vlapic_calc_dest(struct acrn_vm *vm, uint64_t *dmask, bool is_broadcast, uint32_t dest, bool phys, bool lowprio)
 {
 	struct acrn_vlapic *vlapic, *lowprio_dest = NULL;
 	struct acrn_vcpu *vcpu;
@@ -182,7 +176,7 @@ vlapic_calc_dest(struct acrn_vm *vm, uint64_t *dmask, bool is_broadcast,
 		 * Logical mode: "dest" is message destination addr
 		 * to be compared with the logical APIC ID in LDR.
 		 */
-		foreach_vcpu(vcpu_id, vm, vcpu) {
+		foreach_vcpu (vcpu_id, vm, vcpu) {
 			vlapic = vm_lapic_from_vcpu_id(vm, vcpu_id);
 			if (!is_dest_field_matched(vlapic, dest)) {
 				continue;
@@ -211,15 +205,12 @@ vlapic_calc_dest(struct acrn_vm *vm, uint64_t *dmask, bool is_broadcast,
 	}
 }
 
-static void
-vlapic_process_init_sipi(struct acrn_vcpu* target_vcpu, uint32_t mode, uint32_t icr_low)
+static void vlapic_process_init_sipi(struct acrn_vcpu *target_vcpu, uint32_t mode, uint32_t icr_low)
 {
 	if (mode == APIC_DELMODE_INIT) {
 		if ((icr_low & APIC_LEVEL_MASK) != APIC_LEVEL_DEASSERT) {
 
-			dev_dbg(ACRN_DBG_LAPIC,
-				"Sending INIT to %hu",
-				target_vcpu->vcpu_id);
+			dev_dbg(ACRN_DBG_LAPIC, "Sending INIT to %hu", target_vcpu->vcpu_id);
 
 			/* put target vcpu to INIT state and wait for SIPI */
 			pause_vcpu(target_vcpu, VCPU_PAUSED);
@@ -227,24 +218,20 @@ vlapic_process_init_sipi(struct acrn_vcpu* target_vcpu, uint32_t mode, uint32_t 
 			/* new cpu model only need one SIPI to kick AP run,
 			 * the second SIPI will be ignored as it move out of
 			 * wait-for-SIPI state.
-			*/
+			 */
 			target_vcpu->arch.nr_sipi = 1U;
 		}
 	} else if (mode == APIC_DELMODE_STARTUP) {
 		/* Ignore SIPIs in any state other than wait-for-SIPI */
-		if ((target_vcpu->state == VCPU_INIT) &&
-			(target_vcpu->arch.nr_sipi != 0U)) {
+		if ((target_vcpu->state == VCPU_INIT) && (target_vcpu->arch.nr_sipi != 0U)) {
 
-			dev_dbg(ACRN_DBG_LAPIC,
-				"Sending SIPI to %hu with vector %u",
-				 target_vcpu->vcpu_id,
+			dev_dbg(ACRN_DBG_LAPIC, "Sending SIPI to %hu with vector %u", target_vcpu->vcpu_id,
 				(icr_low & APIC_VECTOR_MASK));
 
 			target_vcpu->arch.nr_sipi--;
 			if (target_vcpu->arch.nr_sipi <= 0U) {
 
-				pr_err("Start Secondary VCPU%hu for VM[%d]...",
-					target_vcpu->vcpu_id,
+				pr_err("Start Secondary VCPU%hu for VM[%d]...", target_vcpu->vcpu_id,
 					target_vcpu->vm->vm_id);
 				set_vcpu_startup_entry(target_vcpu, (icr_low & APIC_VECTOR_MASK) << 12U);
 				schedule_vcpu(target_vcpu);
@@ -289,8 +276,7 @@ static int32_t vlapic_read(struct acrn_vlapic *vlapic, uint32_t offset_arg, uint
 /*
  * @pre vlapic != NULL && ops != NULL
  */
-void
-vlapic_reset(struct acrn_vlapic *vlapic, const struct acrn_apicv_ops *ops)
+void vlapic_reset(struct acrn_vlapic *vlapic, const struct acrn_apicv_ops *ops)
 {
 	uint32_t i;
 	struct lapic_regs *lapic;
@@ -316,8 +302,7 @@ vlapic_reset(struct acrn_vlapic *vlapic, const struct acrn_apicv_ops *ops)
  * @pre vlapic->vm != NULL
  * @pre vlapic->vcpu->vcpu_id < CONFIG_MAX_VCPUS_PER_VM
  */
-void
-vlapic_init(struct acrn_vlapic *vlapic)
+void vlapic_init(struct acrn_vlapic *vlapic)
 {
 
 	vlapic_reset(vlapic, &ptapic_ops);
@@ -330,12 +315,10 @@ uint64_t vlapic_get_apicbase(const struct acrn_vlapic *vlapic)
 
 static void ptapic_accept_intr(struct acrn_vlapic *vlapic, uint32_t vector, __unused bool level)
 {
-	pr_err("Invalid op %s, VM%u, vCPU%u, vector %u", __func__,
-			vlapic->vm->vm_id, vlapic->vcpu->vcpu_id, vector);
+	pr_err("Invalid op %s, VM%u, vCPU%u, vector %u", __func__, vlapic->vm->vm_id, vlapic->vcpu->vcpu_id, vector);
 }
 
-static bool ptapic_inject_intr(struct acrn_vlapic *vlapic,
-				__unused bool guest_irq_enabled, __unused bool injected)
+static bool ptapic_inject_intr(struct acrn_vlapic *vlapic, __unused bool guest_irq_enabled, __unused bool injected)
 {
 	pr_err("Invalid op %s, VM%u, vCPU%u", __func__, vlapic->vm->vm_id, vlapic->vcpu->vcpu_id);
 	return injected;
@@ -355,13 +338,13 @@ const struct acrn_apicv_ops ptapic_ops = {
 	.accept_intr = ptapic_accept_intr,
 	.inject_intr = ptapic_inject_intr,
 	.has_pending_delivery_intr = ptapic_has_pending_delivery_intr,
-	.apic_read_access_may_valid  = ptapic_invalid,
-	.apic_write_access_may_valid  = ptapic_invalid,
-	.x2apic_read_msr_may_valid  = ptapic_invalid,
-	.x2apic_write_msr_may_valid  = ptapic_invalid,
+	.apic_read_access_may_valid = ptapic_invalid,
+	.apic_write_access_may_valid = ptapic_invalid,
+	.x2apic_read_msr_may_valid = ptapic_invalid,
+	.x2apic_write_msr_may_valid = ptapic_invalid,
 };
 
-static inline  uint32_t x2apic_msr_to_regoff(uint32_t msr)
+static inline uint32_t x2apic_msr_to_regoff(uint32_t msr)
 {
 
 	return (((msr - 0x800U) & 0x3FFU) << 4U);
@@ -375,8 +358,7 @@ static inline  uint32_t x2apic_msr_to_regoff(uint32_t msr)
  * No shorthand and Physical destination mode are only supported.
  */
 
-static int32_t
-vlapic_x2apic_pt_icr_access(struct acrn_vm *vm, uint64_t val)
+static int32_t vlapic_x2apic_pt_icr_access(struct acrn_vm *vm, uint64_t val)
 {
 	uint32_t papic_id, vapic_id = (uint32_t)(val >> 32U);
 	uint32_t icr_low = (uint32_t)val;
@@ -390,7 +372,7 @@ vlapic_x2apic_pt_icr_access(struct acrn_vm *vm, uint64_t val)
 	phys = ((icr_low & APIC_DESTMODE_LOG) == 0UL);
 	shorthand = icr_low & APIC_DEST_MASK;
 
-	if ((phys == false) || (shorthand  != APIC_DEST_DESTFLD)) {
+	if ((phys == false) || (shorthand != APIC_DEST_DESTFLD)) {
 		pr_err("Logical destination mode or shorthands \
 				not supported in ICR forpartition mode\n");
 		/*
@@ -404,17 +386,16 @@ vlapic_x2apic_pt_icr_access(struct acrn_vm *vm, uint64_t val)
 			switch (mode) {
 			case APIC_DELMODE_INIT:
 				vlapic_process_init_sipi(target_vcpu, mode, icr_low);
-			break;
+				break;
 			case APIC_DELMODE_STARTUP:
 				vlapic_process_init_sipi(target_vcpu, mode, icr_low);
-			break;
+				break;
 			default:
 				papic_id = per_cpu(lapic_id, target_vcpu->pcpu_id);
-				dev_dbg(ACRN_DBG_LAPICPT,
-					"%s vapic_id: 0x%08lx papic_id: 0x%08lx icr_low:0x%08lx",
-					 __func__, vapic_id, papic_id, icr_low);
+				dev_dbg(ACRN_DBG_LAPICPT, "%s vapic_id: 0x%08lx papic_id: 0x%08lx icr_low:0x%08lx",
+					__func__, vapic_id, papic_id, icr_low);
 				msr_write(MSR_IA32_EXT_APIC_ICR, (((uint64_t)papic_id) << 32U) | icr_low);
-			break;
+				break;
 			}
 			ret = 0;
 		}

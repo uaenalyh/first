@@ -27,7 +27,7 @@
  * bytes.
  * Task State Segment (TSS) selectors are 16 bytes on x86-64 instead of 8 bytes.
  */
-#define X64_SEG_DESC_SIZE (0x8U)	/* In long mode SEG Descriptors are 8 bytes */
+#define X64_SEG_DESC_SIZE (0x8U) /* In long mode SEG Descriptors are 8 bytes */
 
 /*****************************************************************************
  *
@@ -39,8 +39,8 @@
  *
  *****************************************************************************/
 /* Number of global 8 byte segments descriptor(s) */
-#define    HOST_GDT_RING0_SEG_SELECTORS   (0x3U)	/* rsvd, code, data */
-#define    HOST_GDT_RING0_DATA_SEL	(0x0010U)
+#define HOST_GDT_RING0_SEG_SELECTORS (0x3U) /* rsvd, code, data */
+#define HOST_GDT_RING0_DATA_SEL      (0x0010U)
 /* One for each CPU in the hypervisor. */
 
 /*****************************************************************************
@@ -50,8 +50,7 @@
  *****************************************************************************/
 
 /* Offset to start of LDT Descriptors */
-#define HOST_GDT_RING0_LDT_SEL		\
-	(HOST_GDT_RING0_SEG_SELECTORS * X64_SEG_DESC_SIZE)
+#define HOST_GDT_RING0_LDT_SEL (HOST_GDT_RING0_SEG_SELECTORS * X64_SEG_DESC_SIZE)
 /* Offset to start of LDT Descriptors */
 #define HOST_GDT_RING0_CPU_TSS_SEL (HOST_GDT_RING0_LDT_SEL)
 
@@ -60,15 +59,15 @@
 #include <types.h>
 #include <cpu.h>
 
-#define TSS_AVAIL  (9U)
+#define TSS_AVAIL (9U)
 
 /*
  * Definition of 16 byte TSS and LDT selectors.
  */
 struct tss_64_descriptor {
-		uint32_t low32_value;
-		uint32_t high32_value;
-		uint32_t base_addr_63_32;
+	uint32_t low32_value;
+	uint32_t high32_value;
+	uint32_t base_addr_63_32;
 } __aligned(8);
 
 /*****************************************************************************

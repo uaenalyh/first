@@ -41,88 +41,88 @@
 #include <acrn_common.h>
 
 /* Define CPU stack alignment */
-#define CPU_STACK_ALIGN	 16UL
+#define CPU_STACK_ALIGN 16UL
 
 /* CR0 register definitions */
-#define CR0_PG		  (1UL<<31U)	/* paging enable */
-#define CR0_CD		  (1UL<<30U)	/* cache disable */
-#define CR0_NW		  (1UL<<29U)	/* not write through */
-#define CR0_AM		  (1UL<<18U)	/* alignment mask */
-#define CR0_WP		  (1UL<<16U)	/* write protect */
-#define CR0_NE		  (1UL<<5U)	/* numeric error */
-#define CR0_ET		  (1UL<<4U)	/* extension type */
-#define CR0_TS		  (1UL<<3U)	/* task switched */
-#define CR0_EM		  (1UL<<2U)	/* emulation */
-#define CR0_MP		  (1UL<<1U)	/* monitor coprocessor */
-#define CR0_PE		  (1UL<<0U)	/* protected mode enabled */
+#define CR0_PG (1UL << 31U) /* paging enable */
+#define CR0_CD (1UL << 30U) /* cache disable */
+#define CR0_NW (1UL << 29U) /* not write through */
+#define CR0_AM (1UL << 18U) /* alignment mask */
+#define CR0_WP (1UL << 16U) /* write protect */
+#define CR0_NE (1UL << 5U) /* numeric error */
+#define CR0_ET (1UL << 4U) /* extension type */
+#define CR0_TS (1UL << 3U) /* task switched */
+#define CR0_EM (1UL << 2U) /* emulation */
+#define CR0_MP (1UL << 1U) /* monitor coprocessor */
+#define CR0_PE (1UL << 0U) /* protected mode enabled */
 
 /* CR4 register definitions */
-#define CR4_VME		 (1UL<<0U)	/* virtual 8086 mode extensions */
-#define CR4_PVI		 (1UL<<1U)	/* protected mode virtual interrupts */
-#define CR4_TSD		 (1UL<<2U)	/* time stamp disable */
-#define CR4_DE		  (1UL<<3U)	/* debugging extensions */
-#define CR4_PSE		 (1UL<<4U)	/* page size extensions */
-#define CR4_PAE		 (1UL<<5U)	/* physical address extensions */
-#define CR4_MCE		 (1UL<<6U)	/* machine check enable */
-#define CR4_PGE		 (1UL<<7U)	/* page global enable */
-#define CR4_PCE		 (1UL<<8U)
+#define CR4_VME (1UL << 0U) /* virtual 8086 mode extensions */
+#define CR4_PVI (1UL << 1U) /* protected mode virtual interrupts */
+#define CR4_TSD (1UL << 2U) /* time stamp disable */
+#define CR4_DE  (1UL << 3U) /* debugging extensions */
+#define CR4_PSE (1UL << 4U) /* page size extensions */
+#define CR4_PAE (1UL << 5U) /* physical address extensions */
+#define CR4_MCE (1UL << 6U) /* machine check enable */
+#define CR4_PGE (1UL << 7U) /* page global enable */
+#define CR4_PCE (1UL << 8U)
 /* performance monitoring counter enable */
-#define CR4_OSFXSR	      (1UL<<9U)	/* OS support for FXSAVE/FXRSTOR */
-#define CR4_OSXMMEXCPT	  (1UL<<10U)
+#define CR4_OSFXSR     (1UL << 9U) /* OS support for FXSAVE/FXRSTOR */
+#define CR4_OSXMMEXCPT (1UL << 10U)
 /* OS support for unmasked SIMD floating point exceptions */
-#define CR4_UMIP		(1UL<<11U)	/* User-Mode Inst prevention */
-#define CR4_VMXE		(1UL<<13U)	/* VMX enable */
-#define CR4_SMXE		(1UL<<14U)	/* SMX enable */
-#define CR4_FSGSBASE	    (1UL<<16U)	/* RD(FS|GS|FS)BASE inst */
-#define CR4_PCIDE	       (1UL<<17U)	/* PCID enable */
-#define CR4_OSXSAVE	     (1UL<<18U)
+#define CR4_UMIP     (1UL << 11U) /* User-Mode Inst prevention */
+#define CR4_VMXE     (1UL << 13U) /* VMX enable */
+#define CR4_SMXE     (1UL << 14U) /* SMX enable */
+#define CR4_FSGSBASE (1UL << 16U) /* RD(FS|GS|FS)BASE inst */
+#define CR4_PCIDE    (1UL << 17U) /* PCID enable */
+#define CR4_OSXSAVE  (1UL << 18U)
 /* XSAVE and Processor Extended States enable bit */
-#define CR4_SMEP		(1UL<<20U)
-#define CR4_SMAP		(1UL<<21U)
-#define CR4_PKE		 (1UL<<22U)	/* Protect-key-enable */
+#define CR4_SMEP (1UL << 20U)
+#define CR4_SMAP (1UL << 21U)
+#define CR4_PKE  (1UL << 22U) /* Protect-key-enable */
 
 /* XCR0_SSE */
-#define XCR0_SSE		(1UL<<1U)
+#define XCR0_SSE (1UL << 1U)
 /* XCR0_AVX */
-#define XCR0_AVX		(1UL<<2U)
+#define XCR0_AVX (1UL << 2U)
 /* XCR0_BNDREGS */
-#define XCR0_BNDREGS		(1UL<<3U)
+#define XCR0_BNDREGS (1UL << 3U)
 /* XCR0_BNDCSR */
-#define XCR0_BNDCSR		(1UL<<4U)
+#define XCR0_BNDCSR (1UL << 4U)
 /* According to SDM Vol1 13.3:
  *   XCR0[63:10] and XCR0[8] are reserved. Executing the XSETBV instruction causes
  *   a general-protection fault if ECX = 0 and any corresponding bit in EDX:EAX
  *   is not 0.
  */
-#define	XCR0_RESERVED_BITS	((~((1UL << 10U) - 1UL)) | (1UL << 8U))
+#define XCR0_RESERVED_BITS ((~((1UL << 10U) - 1UL)) | (1UL << 8U))
 
 /*
  * Entries in the Interrupt Descriptor Table (IDT)
  */
-#define IDT_DE      0U   /* #DE: Divide Error */
-#define IDT_DB      1U   /* #DB: Debug */
-#define IDT_NMI     2U   /* Nonmaskable External Interrupt */
-#define IDT_BP      3U   /* #BP: Breakpoint */
-#define IDT_OF      4U   /* #OF: Overflow */
-#define IDT_UD      6U   /* #UD: Undefined/Invalid Opcode */
-#define IDT_DF      8U   /* #DF: Double Fault */
-#define IDT_TS      10U  /* #TS: Invalid TSS */
-#define IDT_NP      11U  /* #NP: Segment Not Present */
-#define IDT_SS      12U  /* #SS: Stack Segment Fault */
-#define IDT_GP      13U  /* #GP: General Protection Fault */
-#define IDT_PF      14U  /* #PF: Page Fault */
-#define IDT_MC      18U  /* #MC: Machine Check */
-#define IDT_VE      20U  /* #VE: Virtualization Exception */
+#define IDT_DE  0U /* #DE: Divide Error */
+#define IDT_DB  1U /* #DB: Debug */
+#define IDT_NMI 2U /* Nonmaskable External Interrupt */
+#define IDT_BP  3U /* #BP: Breakpoint */
+#define IDT_OF  4U /* #OF: Overflow */
+#define IDT_UD  6U /* #UD: Undefined/Invalid Opcode */
+#define IDT_DF  8U /* #DF: Double Fault */
+#define IDT_TS  10U /* #TS: Invalid TSS */
+#define IDT_NP  11U /* #NP: Segment Not Present */
+#define IDT_SS  12U /* #SS: Stack Segment Fault */
+#define IDT_GP  13U /* #GP: General Protection Fault */
+#define IDT_PF  14U /* #PF: Page Fault */
+#define IDT_MC  18U /* #MC: Machine Check */
+#define IDT_VE  20U /* #VE: Virtualization Exception */
 
 /* Boot CPU ID */
-#define BOOT_CPU_ID	     0U
+#define BOOT_CPU_ID 0U
 
 /* Number of GPRs saved / restored for guest in VCPU structure */
-#define NUM_GPRS			    16U
+#define NUM_GPRS 16U
 
 #ifndef ASSEMBLER
 
-#define AP_MASK			(((1UL << get_pcpu_nums()) - 1UL) & ~(1UL << 0U))
+#define AP_MASK (((1UL << get_pcpu_nums()) - 1UL) & ~(1UL << 0U))
 
 /**
  *
@@ -188,8 +188,8 @@ enum cpu_reg_name {
 /**********************************/
 
 /* In trampoline range, hold the jump target which trampline will jump to */
-extern uint64_t	       main_entry[1];
-extern uint64_t	       secondary_cpu_stack[1];
+extern uint64_t main_entry[1];
+extern uint64_t secondary_cpu_stack[1];
 
 /*
  * To support per_cpu access, we use a special struct "per_cpu_region" to hold
@@ -231,8 +231,8 @@ enum pcpu_boot_state {
 	PCPU_STATE_DEAD,
 };
 
-#define	NEED_OFFLINE		(1U)
-#define	NEED_SHUTDOWN_VM	(2U)
+#define NEED_OFFLINE     (1U)
+#define NEED_SHUTDOWN_VM (2U)
 void make_pcpu_offline(uint16_t pcpu_id);
 bool need_offline(uint16_t pcpu_id);
 
@@ -247,10 +247,10 @@ struct segment_sel {
  * @brief registers info saved for vcpu running context
  */
 struct run_context {
-/* Contains the guest register set.
- * NOTE: This must be the first element in the structure, so that the offsets
- * in vmx_asm.S match
- */
+	/* Contains the guest register set.
+	 * NOTE: This must be the first element in the structure, so that the offsets
+	 * in vmx_asm.S match
+	 */
 	union cpu_regs_t {
 		struct acrn_gp_regs regs;
 		uint64_t longs[NUM_GPRS];
@@ -293,7 +293,6 @@ struct ext_context {
 	struct segment_sel es;
 	struct segment_sel fs;
 	struct segment_sel gs;
-
 };
 
 /* Function prototypes */
@@ -308,105 +307,104 @@ bool start_pcpus(uint64_t mask);
 void wait_pcpus_offline(uint64_t mask);
 void wait_sync_change(volatile const uint64_t *sync, uint64_t wake_sync);
 
-#define CPU_SEG_READ(seg, result_ptr)						\
-{										\
-	asm volatile ("mov %%" STRINGIFY(seg) ", %0": "=r" (*(result_ptr)));	\
-}
+#define CPU_SEG_READ(seg, result_ptr)                                               \
+	{                                                                           \
+		asm volatile("mov %%" STRINGIFY(seg) ", %0" : "=r"(*(result_ptr))); \
+	}
 
 /* Read control register */
-#define CPU_CR_READ(cr, result_ptr)				\
-{								\
-	asm volatile ("mov %%" STRINGIFY(cr) ", %0"		\
-			: "=r"(*(result_ptr)));			\
-}
+#define CPU_CR_READ(cr, result_ptr)                                                \
+	{                                                                          \
+		asm volatile("mov %%" STRINGIFY(cr) ", %0" : "=r"(*(result_ptr))); \
+	}
 
 /* Write control register */
-#define CPU_CR_WRITE(cr, value)					\
-{								\
-	asm volatile ("mov %0, %%" STRINGIFY(cr)		\
-			: /* No output */			\
-			: "r"(value));				\
-}
+#define CPU_CR_WRITE(cr, value)                         \
+	{                                               \
+		asm volatile("mov %0, %%" STRINGIFY(cr) \
+			     : /* No output */          \
+			     : "r"(value));             \
+	}
 
 static inline uint64_t sgdt(void)
 {
-	struct descriptor_table gdtb = {0U, 0UL};
-	asm volatile ("sgdt %0":"=m"(gdtb)::"memory");
+	struct descriptor_table gdtb = { 0U, 0UL };
+	asm volatile("sgdt %0" : "=m"(gdtb)::"memory");
 	return gdtb.base;
 }
 
 static inline uint64_t sidt(void)
 {
-	struct descriptor_table idtb = {0U, 0UL};
-	asm volatile ("sidt %0":"=m"(idtb)::"memory");
+	struct descriptor_table idtb = { 0U, 0UL };
+	asm volatile("sidt %0" : "=m"(idtb)::"memory");
 	return idtb.base;
 }
 
 /* Read MSR */
 static inline uint64_t cpu_msr_read(uint32_t reg)
 {
-	uint32_t  msrl, msrh;
+	uint32_t msrl, msrh;
 
-	asm volatile (" rdmsr ":"=a"(msrl), "=d"(msrh) : "c" (reg));
+	asm volatile(" rdmsr " : "=a"(msrl), "=d"(msrh) : "c"(reg));
 	return (((uint64_t)msrh << 32U) | msrl);
 }
 
 /* Write MSR */
 static inline void cpu_msr_write(uint32_t reg, uint64_t msr_val)
 {
-	asm volatile (" wrmsr " : : "c" (reg), "a" ((uint32_t)msr_val), "d" ((uint32_t)(msr_val >> 32U)));
+	asm volatile(" wrmsr " : : "c"(reg), "a"((uint32_t)msr_val), "d"((uint32_t)(msr_val >> 32U)));
 }
 
 static inline void asm_pause(void)
 {
-	asm volatile ("pause" ::: "memory");
+	asm volatile("pause" ::: "memory");
 }
 
 static inline void asm_hlt(void)
 {
-	asm volatile ("hlt");
+	asm volatile("hlt");
 }
 
 /* Disables interrupts on the current CPU */
-#define CPU_IRQ_DISABLE()				   \
-{							   \
-	asm volatile ("cli\n" : : : "cc");		  \
-}
+#define CPU_IRQ_DISABLE()                         \
+	{                                         \
+		asm volatile("cli\n" : : : "cc"); \
+	}
 
 /* Enables interrupts on the current CPU */
-#define CPU_IRQ_ENABLE()				    \
-{							   \
-	asm volatile ("sti\n" : : : "cc");		  \
-}
+#define CPU_IRQ_ENABLE()                          \
+	{                                         \
+		asm volatile("sti\n" : : : "cc"); \
+	}
 
 /* Synchronizes all write accesses to memory */
 static inline void cpu_write_memory_barrier(void)
 {
-	asm volatile ("sfence\n" : : : "memory");
+	asm volatile("sfence\n" : : : "memory");
 }
 
 /* Write the task register */
-#define CPU_LTR_EXECUTE(ltr_ptr)			    \
-{							   \
-	asm volatile ("ltr %%ax\n" : : "a"(ltr_ptr));       \
-}
+#define CPU_LTR_EXECUTE(ltr_ptr)                             \
+	{                                                    \
+		asm volatile("ltr %%ax\n" : : "a"(ltr_ptr)); \
+	}
 
 /* Macro to save rflags register */
-#define CPU_RFLAGS_SAVE(rflags_ptr)		     \
-{						       \
-	asm volatile (" pushf");			\
-	asm volatile (" pop %0"			 \
-			: "=r" (*(rflags_ptr))	  \
-			: /* No inputs */);	     \
-}
+#define CPU_RFLAGS_SAVE(rflags_ptr)                                              \
+	{                                                                        \
+		asm volatile(" pushf");                                          \
+		asm volatile(" pop %0" : "=r"(*(rflags_ptr)) : /* No inputs */); \
+	}
 
 /* Macro to restore rflags register */
-#define CPU_RFLAGS_RESTORE(rflags)		      \
-{						       \
-	asm volatile (" push %0\n\t"			\
-			"popf	\n\t": : "r" (rflags)	\
-			:"cc");				\
-}
+#define CPU_RFLAGS_RESTORE(rflags)          \
+	{                                   \
+		asm volatile(" push %0\n\t" \
+			     "popf	\n\t"    \
+			     :              \
+			     : "r"(rflags)  \
+			     : "cc");       \
+	}
 
 /* This macro locks out interrupts and saves the current architecture status
  * register / state register to the specified address.  This function does not
@@ -416,11 +414,11 @@ static inline void cpu_write_memory_barrier(void)
  *	defined below and CPU_INT_CONTROL_VARS defined above.
  */
 
-#define CPU_INT_ALL_DISABLE(p_rflags)	       \
-{						   \
-	CPU_RFLAGS_SAVE(p_rflags);		     \
-	CPU_IRQ_DISABLE();			  \
-}
+#define CPU_INT_ALL_DISABLE(p_rflags)      \
+	{                                  \
+		CPU_RFLAGS_SAVE(p_rflags); \
+		CPU_IRQ_DISABLE();         \
+	}
 
 /* This macro restores the architecture status / state register used to lockout
  * interrupts to the value provided.  The intent of this function is to be a
@@ -429,10 +427,10 @@ static inline void cpu_write_memory_barrier(void)
  * NOTE:  This macro is used in conjunction with CPU_INT_ALL_DISABLE
  *	and CPU_INT_CONTROL_VARS defined above.
  */
-#define CPU_INT_ALL_RESTORE(rflags)		 \
-{						   \
-	CPU_RFLAGS_RESTORE(rflags);		 \
-}
+#define CPU_INT_ALL_RESTORE(rflags)         \
+	{                                   \
+		CPU_RFLAGS_RESTORE(rflags); \
+	}
 
 /*
  * Macro to get CPU ID
@@ -442,7 +440,7 @@ static inline uint16_t get_pcpu_id(void)
 {
 	uint32_t tsl, tsh, cpu_id;
 
-	asm volatile ("rdtscp":"=a" (tsl), "=d"(tsh), "=c"(cpu_id)::);
+	asm volatile("rdtscp" : "=a"(tsl), "=d"(tsh), "=c"(cpu_id)::);
 	return (uint16_t)cpu_id;
 }
 
@@ -458,7 +456,7 @@ static inline void msr_write(uint32_t reg_num, uint64_t value64)
 
 static inline void write_xcr(int32_t reg, uint64_t val)
 {
-	asm volatile("xsetbv" : : "c" (reg), "a" ((uint32_t)val), "d" ((uint32_t)(val >> 32U)));
+	asm volatile("xsetbv" : : "c"(reg), "a"((uint32_t)val), "d"((uint32_t)(val >> 32U)));
 }
 
 /*
@@ -478,12 +476,12 @@ static inline void write_xcr(int32_t reg, uint64_t val)
  */
 static inline void stac(void)
 {
-	asm volatile ("stac" : : : "memory");
+	asm volatile("stac" : : : "memory");
 }
 
 static inline void clac(void)
 {
-	asm volatile ("clac" : : : "memory");
+	asm volatile("clac" : : : "memory");
 }
 
 /*

@@ -28,8 +28,8 @@
  * @{
  */
 
-#define MR_DEL		2U
-#define MR_MODIFY	3U
+#define MR_DEL    2U
+#define MR_MODIFY 3U
 
 /**
  * @}

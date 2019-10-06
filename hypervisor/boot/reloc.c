@@ -9,12 +9,12 @@
 #include <ld_sym.h>
 
 #ifdef CONFIG_RELOC
-#define DT_NULL		0U	/* end of .dynamic section */
-#define DT_RELA		7U	/* relocation table */
-#define DT_RELASZ	8U	/* size of reloc table */
-#define DT_RELAENT	9U	/* size of one entry */
+#define DT_NULL    0U /* end of .dynamic section */
+#define DT_RELA    7U /* relocation table */
+#define DT_RELASZ  8U /* size of reloc table */
+#define DT_RELAENT 9U /* size of one entry */
 
-#define R_X86_64_RELATIVE	8UL
+#define R_X86_64_RELATIVE 8UL
 
 struct Elf64_Dyn {
 	uint64_t d_tag;
@@ -33,13 +33,13 @@ uint64_t get_hv_image_delta(void)
 {
 	uint64_t addr;
 
-	asm volatile (" call 0f\n"
-		"0: pop %%rax\n"
-		"	sub $0b, %%rax\n"
-		"	mov %%rax, %0\n"
-		: "=m" (addr)
-		:
-		: "%rax");
+	asm volatile(" call 0f\n"
+		     "0: pop %%rax\n"
+		     "	sub $0b, %%rax\n"
+		     "	mov %%rax, %0\n"
+		     : "=m"(addr)
+		     :
+		     : "%rax");
 
 	return addr;
 }
@@ -77,7 +77,8 @@ void relocate(void)
 				size = dyn->d_ptr;
 				break;
 			default:
-				/* if no RELA/RELASZ found, both start and end will be initialized to NULL, and later while loop won't be executed */
+				/* if no RELA/RELASZ found, both start and end will be initialized to NULL, and later
+				 * while loop won't be executed */
 				break;
 			}
 		}
@@ -109,8 +110,7 @@ void relocate(void)
 				 *   explicitly in the assembly code to avoid confusion.
 				 */
 				if ((start->r_offset > trampoline_end) &&
-						((start->r_offset < primary_32_start) ||
-						(start->r_offset > primary_32_end))) {
+					((start->r_offset < primary_32_start) || (start->r_offset > primary_32_end))) {
 					*addr += delta;
 				}
 			}

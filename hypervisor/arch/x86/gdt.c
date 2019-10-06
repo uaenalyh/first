@@ -8,8 +8,7 @@
 #include <gdt.h>
 #include <per_cpu.h>
 
-static void set_tss_desc(struct tss_64_descriptor *desc,
-		uint64_t tss, size_t tss_limit, uint32_t type)
+static void set_tss_desc(struct tss_64_descriptor *desc, uint64_t tss, size_t tss_limit, uint32_t type)
 {
 	uint32_t u1, u2, u3;
 	uint32_t tss_hi_32 = (uint32_t)(tss >> 32U);
@@ -26,7 +25,7 @@ static void set_tss_desc(struct tss_64_descriptor *desc,
 
 static inline void load_gdt(struct host_gdt_descriptor *gdtr)
 {
-	asm volatile ("lgdt %0" ::"m"(*gdtr));
+	asm volatile("lgdt %0" ::"m"(*gdtr));
 }
 
 void load_gdtr_and_tr(void)
@@ -48,8 +47,7 @@ void load_gdtr_and_tr(void)
 	tss->ist4 = 0UL;
 
 	/* tss descriptor */
-	set_tss_desc(&gdt->host_gdt_tss_descriptors,
-		(uint64_t)tss, sizeof(struct tss_64), TSS_AVAIL);
+	set_tss_desc(&gdt->host_gdt_tss_descriptors, (uint64_t)tss, sizeof(struct tss_64), TSS_AVAIL);
 
 	gdtr.len = sizeof(struct host_gdt) - 1U;
 	gdtr.gdt = gdt;

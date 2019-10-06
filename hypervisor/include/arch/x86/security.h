@@ -12,9 +12,9 @@
  * 1 - raw IBRS + IBPB support
  * 2 - with STIBP optimization support
  */
-#define IBRS_NONE	0
-#define IBRS_RAW	1
-#define IBRS_OPT	2
+#define IBRS_NONE 0
+#define IBRS_RAW  1
+#define IBRS_OPT  2
 
 #ifndef ASSEMBLER
 int32_t get_ibrs_type(void);

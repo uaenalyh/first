@@ -21,7 +21,7 @@ static uint32_t e820_entries_count;
 static struct e820_entry e820[E820_MAX_ENTRIES];
 static struct e820_mem_params e820_mem;
 
-#define ACRN_DBG_E820	6U
+#define ACRN_DBG_E820 6U
 
 static void obtain_e820_mem_info(void)
 {
@@ -130,8 +130,8 @@ void init_e820(void)
 				e820_entries_count = E820_MAX_ENTRIES;
 			}
 
-			dev_dbg(ACRN_DBG_E820, "mmap length 0x%x addr 0x%x entries %d\n",
-				mbi->mi_mmap_length, mbi->mi_mmap_addr, e820_entries_count);
+			dev_dbg(ACRN_DBG_E820, "mmap length 0x%x addr 0x%x entries %d\n", mbi->mi_mmap_length,
+				mbi->mi_mmap_addr, e820_entries_count);
 
 			for (i = 0U; i < e820_entries_count; i++) {
 				e820[i].baseaddr = mmap[i].baseaddr;
@@ -139,8 +139,8 @@ void init_e820(void)
 				e820[i].type = mmap[i].type;
 
 				dev_dbg(ACRN_DBG_E820, "mmap table: %d type: 0x%x\n", i, mmap[i].type);
-				dev_dbg(ACRN_DBG_E820, "Base: 0x%016llx length: 0x%016llx",
-					mmap[i].baseaddr, mmap[i].length);
+				dev_dbg(ACRN_DBG_E820, "Base: 0x%016llx length: 0x%016llx", mmap[i].baseaddr,
+					mmap[i].length);
 			}
 		}
 

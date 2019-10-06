@@ -8,9 +8,9 @@
 #define TYPES_H
 
 #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
-#define __aligned(x)		__attribute__((aligned(x)))
-#define __packed	__attribute__((packed))
-#define	__unused	__attribute__((unused))
+#define __aligned(x)    __attribute__((aligned(x)))
+#define __packed        __attribute__((packed))
+#define __unused        __attribute__((unused))
 
 #ifndef ASSEMBLER
 
@@ -24,16 +24,16 @@ typedef unsigned int size_t;
 typedef _Bool bool;
 
 #ifndef NULL
-#define	 NULL				((void *) 0)
+#define NULL ((void *)0)
 #endif
 
 #ifndef true
-#define true		((_Bool) 1)
-#define false		((_Bool) 0)
+#define true ((_Bool)1)
+#define false ((_Bool)0)
 #endif
 
 #ifndef UINT64_MAX
-#define UINT64_MAX	(0xffffffffffffffffUL)
+#define UINT64_MAX (0xffffffffffffffffUL)
 #endif
 
 #endif /* ASSEMBLER */

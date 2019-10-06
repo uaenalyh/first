@@ -68,6 +68,6 @@ int32_t copy_to_gpa(struct acrn_vm *vm, void *h_ptr, uint64_t gpa, uint32_t size
 /**
  * @}
  */
-#endif	/* !ASSEMBLER */
+#endif /* !ASSEMBLER */
 
 #endif /* GUEST_H*/

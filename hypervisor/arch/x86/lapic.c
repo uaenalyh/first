@@ -15,13 +15,13 @@
 union lapic_base_msr {
 	uint64_t value;
 	struct {
-		uint32_t rsvd_1:8;
-		uint32_t bsp:1;
-		uint32_t rsvd_2:1;
-		uint32_t x2APIC_enable:1;
-		uint32_t xAPIC_enable:1;
-		uint32_t lapic_paddr:24;
-		uint32_t rsvd_3:28;
+		uint32_t rsvd_1 : 8;
+		uint32_t bsp : 1;
+		uint32_t rsvd_2 : 1;
+		uint32_t x2APIC_enable : 1;
+		uint32_t xAPIC_enable : 1;
+		uint32_t lapic_paddr : 24;
+		uint32_t rsvd_3 : 28;
 	} fields;
 };
 
@@ -71,7 +71,7 @@ void early_init_lapic(void)
  */
 void init_lapic(uint16_t pcpu_id)
 {
-	per_cpu(lapic_ldr, pcpu_id) = (uint32_t) msr_read(MSR_IA32_EXT_APIC_LDR);
+	per_cpu(lapic_ldr, pcpu_id) = (uint32_t)msr_read(MSR_IA32_EXT_APIC_LDR);
 	/* Mask all LAPIC LVT entries before enabling the local APIC */
 	msr_write(MSR_IA32_EXT_APIC_LVT_CMCI, LAPIC_LVT_MASK);
 	msr_write(MSR_IA32_EXT_APIC_LVT_TIMER, LAPIC_LVT_MASK);
@@ -93,7 +93,7 @@ uint32_t get_cur_lapic_id(void)
 {
 	uint32_t lapic_id;
 
-	lapic_id = (uint32_t) msr_read(MSR_IA32_EXT_XAPICID);
+	lapic_id = (uint32_t)msr_read(MSR_IA32_EXT_XAPICID);
 
 	return lapic_id;
 }
@@ -101,9 +101,8 @@ uint32_t get_cur_lapic_id(void)
 /**
  * @pre cpu_startup_shorthand < INTR_CPU_STARTUP_UNKNOWN
  */
-void
-send_startup_ipi(enum intr_cpu_startup_shorthand cpu_startup_shorthand,
-	uint16_t dest_pcpu_id, uint64_t cpu_startup_start_address)
+void send_startup_ipi(enum intr_cpu_startup_shorthand cpu_startup_shorthand, uint16_t dest_pcpu_id,
+	uint64_t cpu_startup_start_address)
 {
 	union apic_icr icr;
 	uint8_t shorthand;
@@ -115,7 +114,7 @@ send_startup_ipi(enum intr_cpu_startup_shorthand cpu_startup_shorthand,
 	if (cpu_startup_shorthand == INTR_CPU_STARTUP_USE_DEST) {
 		shorthand = INTR_LAPIC_ICR_USE_DEST_ARRAY;
 		icr.value_32.hi_32 = per_cpu(lapic_id, dest_pcpu_id);
-	} else {		/* Use destination shorthand */
+	} else { /* Use destination shorthand */
 		shorthand = INTR_LAPIC_ICR_ALL_EX_SELF;
 		icr.value_32.hi_32 = 0U;
 	}

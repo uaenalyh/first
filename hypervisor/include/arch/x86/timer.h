@@ -18,7 +18,7 @@
 
 /* External Interfaces */
 
-#define CYCLES_PER_MS	us_to_ticks(1000U)
+#define CYCLES_PER_MS us_to_ticks(1000U)
 
 void udelay(uint32_t us);
 

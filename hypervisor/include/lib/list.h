@@ -33,11 +33,13 @@ struct list_head {
 	struct list_head *next, *prev;
 };
 
-#define INIT_LIST_HEAD(ptr) do { (ptr)->next = (ptr); (ptr)->prev = (ptr); } \
-	while (0)
+#define INIT_LIST_HEAD(ptr)          \
+	do {                         \
+		(ptr)->next = (ptr); \
+		(ptr)->prev = (ptr); \
+	} while (0)
 
-static inline void list_add_node(struct list_head *new_node, struct list_head *prev,
-	struct list_head *next)
+static inline void list_add_node(struct list_head *new_node, struct list_head *prev, struct list_head *next)
 {
 	next->prev = new_node;
 	new_node->next = next;
@@ -45,8 +47,7 @@ static inline void list_add_node(struct list_head *new_node, struct list_head *p
 	prev->next = new_node;
 }
 
-static inline void list_add_tail(struct list_head *new_node,
-	struct list_head *head)
+static inline void list_add_tail(struct list_head *new_node, struct list_head *head)
 {
 	list_add_node(new_node, head->prev, head);
 }
@@ -68,10 +69,8 @@ static inline _Bool list_empty(const struct list_head *head)
 	return head->next == head;
 }
 
-#define list_entry(ptr, type, member) \
-	((type *)((char *)(ptr)-(uint64_t)(&((type *)0)->member)))
+#define list_entry(ptr, type, member) ((type *)((char *)(ptr) - (uint64_t)(&((type *)0)->member)))
 
-#define get_first_item(attached, type, member) \
-	((type *)((char *)((attached)->next)-(uint64_t)(&((type *)0)->member)))
+#define get_first_item(attached, type, member) ((type *)((char *)((attached)->next) - (uint64_t)(&((type *)0)->member)))
 
 #endif /* LIST_H_ */

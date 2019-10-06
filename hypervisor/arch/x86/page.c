@@ -17,20 +17,18 @@ static struct page ppt_pdpt_pages[PDPT_PAGE_NUM(CONFIG_PLATFORM_RAM_SIZE + PLATF
 static struct page ppt_pd_pages[PD_PAGE_NUM(CONFIG_PLATFORM_RAM_SIZE + PLATFORM_LO_MMIO_SIZE)];
 
 /* ppt: pripary page table */
-static union pgtable_pages_info ppt_pages_info = {
-	.ppt = {
-		.pml4_base = ppt_pml4_pages,
-		.pdpt_base = ppt_pdpt_pages,
-		.pd_base = ppt_pd_pages,
-	}
-};
+static union pgtable_pages_info ppt_pages_info = { .ppt = {
+							   .pml4_base = ppt_pml4_pages,
+							   .pdpt_base = ppt_pdpt_pages,
+							   .pd_base = ppt_pd_pages,
+						   } };
 
 static inline uint64_t ppt_get_default_access_right(void)
 {
 	return (PAGE_PRESENT | PAGE_RW | PAGE_USER);
 }
 
-static inline void ppt_clflush_pagewalk(const void* etry __attribute__((unused)))
+static inline void ppt_clflush_pagewalk(const void *etry __attribute__((unused)))
 {
 }
 
@@ -113,7 +111,7 @@ static inline uint64_t ept_pgentry_present(uint64_t pte)
 	return pte & EPT_RWX;
 }
 
-static inline void ept_clflush_pagewalk(const void* etry)
+static inline void ept_clflush_pagewalk(const void *etry)
 {
 	iommu_flush_cache(etry, sizeof(uint64_t));
 }

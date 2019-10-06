@@ -29,8 +29,8 @@
 #include <sgx.h>
 #include <uart16550.h>
 
-#define CPU_UP_TIMEOUT		100U /* millisecond */
-#define CPU_DOWN_TIMEOUT	100U /* millisecond */
+#define CPU_UP_TIMEOUT   100U /* millisecond */
+#define CPU_DOWN_TIMEOUT 100U /* millisecond */
 
 struct per_cpu_region per_cpu_data[CONFIG_MAX_PCPU_NUM] __aligned(PAGE_SIZE);
 static uint16_t phys_cpu_num = 0U;
@@ -188,14 +188,11 @@ void init_pcpu_post(uint16_t pcpu_id)
 		/* Calibrate TSC Frequency */
 		calibrate_tsc();
 
-		pr_acrnlog("HV version %s-%s-%s %s (daily tag:%s) build by %s%s, start time %lluus",
-				HV_FULL_VERSION,
-				HV_BUILD_TIME, HV_BUILD_VERSION, HV_BUILD_TYPE,
-				HV_DAILY_TAG,
-				HV_BUILD_USER, HV_CONFIG_TOOL, ticks_to_us(start_tsc));
+		pr_acrnlog("HV version %s-%s-%s %s (daily tag:%s) build by %s%s, start time %lluus", HV_FULL_VERSION,
+			HV_BUILD_TIME, HV_BUILD_VERSION, HV_BUILD_TYPE, HV_DAILY_TAG, HV_BUILD_USER, HV_CONFIG_TOOL,
+			ticks_to_us(start_tsc));
 
-		pr_acrnlog("API version %u.%u",
-				HV_API_MAJOR_VERSION, HV_API_MINOR_VERSION);
+		pr_acrnlog("API version %u.%u", HV_API_MAJOR_VERSION, HV_API_MINOR_VERSION);
 
 		pr_acrnlog("Detect processor: %s", (get_pcpu_info())->model_name);
 
@@ -388,7 +385,7 @@ void cpu_dead(void)
 static void set_current_pcpu_id(uint16_t pcpu_id)
 {
 	/* Write TSC AUX register */
-	msr_write(MSR_IA32_TSC_AUX, (uint64_t) pcpu_id);
+	msr_write(MSR_IA32_TSC_AUX, (uint64_t)pcpu_id);
 }
 
 static void print_hv_banner(void)
@@ -399,16 +396,14 @@ static void print_hv_banner(void)
 	printf(boot_msg);
 }
 
-static
-inline void asm_monitor(volatile const uint64_t *addr, uint64_t ecx, uint64_t edx)
+static inline void asm_monitor(volatile const uint64_t *addr, uint64_t ecx, uint64_t edx)
 {
-	asm volatile("monitor\n" : : "a" (addr), "c" (ecx), "d" (edx));
+	asm volatile("monitor\n" : : "a"(addr), "c"(ecx), "d"(edx));
 }
 
-static
-inline void asm_mwait(uint64_t eax, uint64_t ecx)
+static inline void asm_mwait(uint64_t eax, uint64_t ecx)
 {
-	asm volatile("mwait\n" : : "a" (eax), "c" (ecx));
+	asm volatile("mwait\n" : : "a"(eax), "c"(ecx));
 }
 
 /* wait until *sync == wake_sync */

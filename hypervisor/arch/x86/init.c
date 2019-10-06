@@ -18,14 +18,14 @@
 #include <seed.h>
 
 /* Push sp magic to top of stack for call trace */
-#define SWITCH_TO(rsp, to)					      \
-{								       \
-	asm volatile ("movq %0, %%rsp\n"				\
-			"pushq %1\n"				    \
-			"jmpq *%2\n"				    \
-			 :					      \
-			 : "r"(rsp), "rm"(SP_BOTTOM_MAGIC), "a"(to));   \
-}
+#define SWITCH_TO(rsp, to)                                                \
+	{                                                                 \
+		asm volatile("movq %0, %%rsp\n"                           \
+			     "pushq %1\n"                                 \
+			     "jmpq *%2\n"                                 \
+			     :                                            \
+			     : "r"(rsp), "rm"(SP_BOTTOM_MAGIC), "a"(to)); \
+	}
 
 /*TODO: move into debug module */
 static void init_debug_pre(void)

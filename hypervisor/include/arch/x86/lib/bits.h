@@ -38,7 +38,7 @@
  * the invalid bit index directly.
  *
  **/
-#define INVALID_BIT_INDEX  0xffffU
+#define INVALID_BIT_INDEX 0xffffU
 
 /*
  *
@@ -67,10 +67,11 @@ static inline uint16_t fls32(uint32_t value)
 {
 	uint32_t ret;
 	asm volatile("bsrl %1,%0\n\t"
-			"jnz 1f\n\t"
-			"mov %2,%0\n"
-			"1:" : "=r" (ret)
-			: "rm" (value), "i" (INVALID_BIT_INDEX));
+		     "jnz 1f\n\t"
+		     "mov %2,%0\n"
+		     "1:"
+		     : "=r"(ret)
+		     : "rm"(value), "i"(INVALID_BIT_INDEX));
 	return (uint16_t)ret;
 }
 
@@ -103,10 +104,11 @@ static inline uint16_t ffs64(uint64_t value)
 {
 	uint64_t ret;
 	asm volatile("bsfq %1,%0\n\t"
-			"jnz 1f\n\t"
-			"mov %2,%0\n"
-			"1:" : "=r" (ret)
-			: "rm" (value), "i" (INVALID_BIT_INDEX));
+		     "jnz 1f\n\t"
+		     "mov %2,%0\n"
+		     "1:"
+		     : "=r"(ret)
+		     : "rm"(value), "i"(INVALID_BIT_INDEX));
 	return (uint16_t)ret;
 }
 
@@ -137,37 +139,34 @@ static inline uint64_t ffz64_ex(const uint64_t *addr, uint64_t size)
 
 /*
  * (*addr) |= (1UL<<nr);
- * Note:Input parameter nr shall be less than 64. 
+ * Note:Input parameter nr shall be less than 64.
  * If nr>=64, it will be truncated.
  */
-#define build_bitmap_set(name, op_len, op_type, lock)			\
-static inline void name(uint16_t nr_arg, volatile op_type *addr)	\
-{									\
-	uint16_t nr;							\
-	nr = nr_arg & ((8U * sizeof(op_type)) - 1U);			\
-	asm volatile(lock "or" op_len " %1,%0"				\
-			:  "+m" (*addr)					\
-			:  "r" ((op_type)(1UL<<nr))			\
-			:  "cc", "memory");				\
-}
+#define build_bitmap_set(name, op_len, op_type, lock)                                                               \
+	static inline void name(uint16_t nr_arg, volatile op_type *addr)                                            \
+	{                                                                                                           \
+		uint16_t nr;                                                                                        \
+		nr = nr_arg & ((8U * sizeof(op_type)) - 1U);                                                        \
+		asm volatile(lock "or" op_len " %1,%0" : "+m"(*addr) : "r"((op_type)(1UL << nr)) : "cc", "memory"); \
+	}
 build_bitmap_set(bitmap_set_nolock, "q", uint64_t, "")
 build_bitmap_set(bitmap_set_lock, "q", uint64_t, BUS_LOCK)
 
 /*
  * (*addr) &= ~(1UL<<nr);
- * Note:Input parameter nr shall be less than 64. 
+ * Note:Input parameter nr shall be less than 64.
  * If nr>=64, it will be truncated.
  */
-#define build_bitmap_clear(name, op_len, op_type, lock)			\
-static inline void name(uint16_t nr_arg, volatile op_type *addr)	\
-{									\
-	uint16_t nr;							\
-	nr = nr_arg & ((8U * sizeof(op_type)) - 1U);			\
-	asm volatile(lock "and" op_len " %1,%0"				\
-			:  "+m" (*addr)					\
-			:  "r" ((op_type)(~(1UL<<(nr))))		\
-			:  "cc", "memory");				\
-}
+#define build_bitmap_clear(name, op_len, op_type, lock)                  \
+	static inline void name(uint16_t nr_arg, volatile op_type *addr) \
+	{                                                                \
+		uint16_t nr;                                             \
+		nr = nr_arg & ((8U * sizeof(op_type)) - 1U);             \
+		asm volatile(lock "and" op_len " %1,%0"                  \
+			     : "+m"(*addr)                               \
+			     : "r"((op_type)(~(1UL << (nr))))            \
+			     : "cc", "memory");                          \
+	}
 build_bitmap_clear(bitmap_clear_nolock, "q", uint64_t, "")
 build_bitmap_clear(bitmap_clear_lock, "q", uint64_t, BUS_LOCK)
 
@@ -180,9 +179,9 @@ static inline bool bitmap_test(uint16_t nr, const volatile uint64_t *addr)
 {
 	int32_t ret = 0;
 	asm volatile("btq %q2,%1\n\tsbbl %0, %0"
-			: "=r" (ret)
-			: "m" (*addr), "r" ((uint64_t)(nr & 0x3fU))
-			: "cc", "memory");
+		     : "=r"(ret)
+		     : "m"(*addr), "r"((uint64_t)(nr & 0x3fU))
+		     : "cc", "memory");
 	return (ret != 0);
 }
 
@@ -193,18 +192,18 @@ static inline bool bitmap_test(uint16_t nr, const volatile uint64_t *addr)
  * Note:Input parameter nr shall be less than 64. If nr>=64, it
  * will be truncated.
  */
-#define build_bitmap_testandset(name, op_len, op_type, lock)		\
-static inline bool name(uint16_t nr_arg, volatile op_type *addr)	\
-{									\
-	uint16_t nr;							\
-	int32_t ret=0;							\
-	nr = nr_arg & ((8U * sizeof(op_type)) - 1U);			\
-	asm volatile(lock "bts" op_len " %2,%1\n\tsbbl %0,%0"		\
-			: "=r" (ret), "=m" (*addr)			\
-			: "r" ((op_type)nr)				\
-			: "cc", "memory");				\
-	return (ret != 0);						\
-}
+#define build_bitmap_testandset(name, op_len, op_type, lock)             \
+	static inline bool name(uint16_t nr_arg, volatile op_type *addr) \
+	{                                                                \
+		uint16_t nr;                                             \
+		int32_t ret = 0;                                         \
+		nr = nr_arg & ((8U * sizeof(op_type)) - 1U);             \
+		asm volatile(lock "bts" op_len " %2,%1\n\tsbbl %0,%0"    \
+			     : "=r"(ret), "=m"(*addr)                    \
+			     : "r"((op_type)nr)                          \
+			     : "cc", "memory");                          \
+		return (ret != 0);                                       \
+	}
 build_bitmap_testandset(bitmap_test_and_set_lock, "q", uint64_t, BUS_LOCK)
 
 /*
@@ -214,24 +213,19 @@ build_bitmap_testandset(bitmap_test_and_set_lock, "q", uint64_t, BUS_LOCK)
  * Note:Input parameter nr shall be less than 64. If nr>=64,
  * it will be truncated.
  */
-#define build_bitmap_testandclear(name, op_len, op_type, lock)		\
-static inline bool name(uint16_t nr_arg, volatile op_type *addr)	\
-{									\
-	uint16_t nr;							\
-	int32_t ret=0;							\
-	nr = nr_arg & ((8U * sizeof(op_type)) - 1U);			\
-	asm volatile(lock "btr" op_len " %2,%1\n\tsbbl %0,%0"		\
-			: "=r" (ret), "=m" (*addr)			\
-			: "r" ((op_type)nr)				\
-			: "cc", "memory");				\
-	return (ret != 0);						\
-}
+#define build_bitmap_testandclear(name, op_len, op_type, lock)           \
+	static inline bool name(uint16_t nr_arg, volatile op_type *addr) \
+	{                                                                \
+		uint16_t nr;                                             \
+		int32_t ret = 0;                                         \
+		nr = nr_arg & ((8U * sizeof(op_type)) - 1U);             \
+		asm volatile(lock "btr" op_len " %2,%1\n\tsbbl %0,%0"    \
+			     : "=r"(ret), "=m"(*addr)                    \
+			     : "r"((op_type)nr)                          \
+			     : "cc", "memory");                          \
+		return (ret != 0);                                       \
+	}
 build_bitmap_testandclear(bitmap_test_and_clear_nolock, "q", uint64_t, "")
 build_bitmap_testandclear(bitmap_test_and_clear_lock, "q", uint64_t, BUS_LOCK)
-
-static inline uint16_t bitmap_weight(uint64_t bits)
-{
-	return __builtin_popcountl(bits);
-}
 
 #endif /* BITS_H*/

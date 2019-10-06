@@ -46,8 +46,8 @@ static uint32_t create_zeropage_e820(struct zero_page *zp, const struct acrn_vm 
 		pr_err("e820 create error");
 		entry_num = 0U;
 	} else {
-		(void)memcpy_s((void *)zp_e820, entry_num * sizeof(struct e820_entry),
-			(void *)vm_e820, entry_num * sizeof(struct e820_entry));
+		(void)memcpy_s((void *)zp_e820, entry_num * sizeof(struct e820_entry), (void *)vm_e820,
+			entry_num * sizeof(struct e820_entry));
 	}
 	return entry_num;
 }
@@ -75,8 +75,7 @@ static uint64_t create_zero_page(struct acrn_vm *vm)
 
 	/* copy part of the header into the zero page */
 	hva = (struct zero_page *)gpa2hva(vm, (uint64_t)sw_kernel->kernel_load_addr);
-	(void)memcpy_s(&(zeropage->hdr), sizeof(zeropage->hdr),
-				&(hva->hdr), sizeof(hva->hdr));
+	(void)memcpy_s(&(zeropage->hdr), sizeof(zeropage->hdr), &(hva->hdr), sizeof(hva->hdr));
 
 	/* See if kernel has a RAM disk */
 	if (ramdisk_info->src_addr != NULL) {
@@ -93,7 +92,7 @@ static uint64_t create_zero_page(struct acrn_vm *vm)
 
 	/* set constant arguments in zero page */
 	zeropage->hdr.loader_type = 0xffU;
-	zeropage->hdr.load_flags |= (1U << 5U);	/* quiet */
+	zeropage->hdr.load_flags |= (1U << 5U); /* quiet */
 
 	/* Create/add e820 table entries in zeropage */
 	zeropage->e820_nentries = (uint8_t)create_zeropage_e820(zeropage, vm);
@@ -109,7 +108,7 @@ static uint64_t create_zero_page(struct acrn_vm *vm)
 static void prepare_loading_bzimage(struct acrn_vm *vm, struct acrn_vcpu *vcpu)
 {
 	uint32_t i;
-	char  dyn_bootargs[100] = {0};
+	char dyn_bootargs[100] = { 0 };
 	uint32_t kernel_entry_offset;
 	struct zero_page *zeropage;
 	struct sw_kernel_info *sw_kernel = &(vm->sw.kernel_info);
@@ -139,8 +138,8 @@ static void prepare_loading_bzimage(struct acrn_vm *vm, struct acrn_vcpu *vcpu)
 	 * in RSI
 	 */
 	vcpu_set_gpreg(vcpu, CPU_REG_RSI, create_zero_page(vm));
-	pr_info("%s, RSI pointing to zero page for VM %d at GPA %X",
-			__func__, vm->vm_id, vcpu_get_gpreg(vcpu, CPU_REG_RSI));
+	pr_info("%s, RSI pointing to zero page for VM %d at GPA %X", __func__, vm->vm_id,
+		vcpu_get_gpreg(vcpu, CPU_REG_RSI));
 }
 
 /**
@@ -176,20 +175,17 @@ int32_t direct_boot_sw_loader(struct acrn_vm *vm)
 	init_vcpu_protect_mode_regs(vcpu, get_guest_gdt_base_gpa(vcpu->vm));
 
 	/* Copy the guest kernel image to its run-time location */
-	(void)copy_to_gpa(vm, sw_kernel->kernel_src_addr,
-		(uint64_t)sw_kernel->kernel_load_addr, sw_kernel->kernel_size);
+	(void)copy_to_gpa(
+		vm, sw_kernel->kernel_src_addr, (uint64_t)sw_kernel->kernel_load_addr, sw_kernel->kernel_size);
 
 	/* Check if a RAM disk is present */
 	if (ramdisk_info->size != 0U) {
 		/* Copy RAM disk to its load location */
-		(void)copy_to_gpa(vm, ramdisk_info->src_addr,
-			(uint64_t)ramdisk_info->load_addr,
-			ramdisk_info->size);
+		(void)copy_to_gpa(vm, ramdisk_info->src_addr, (uint64_t)ramdisk_info->load_addr, ramdisk_info->size);
 	}
 	/* Copy Guest OS bootargs to its load location */
 	if (bootargs_info->size != 0U) {
-		(void)copy_to_gpa(vm, bootargs_info->src_addr,
-			(uint64_t)bootargs_info->load_addr,
+		(void)copy_to_gpa(vm, bootargs_info->src_addr, (uint64_t)bootargs_info->load_addr,
 			(strnlen_s((char *)bootargs_info->src_addr, MAX_BOOTARGS_SIZE) + 1U));
 	}
 	switch (vm->sw.kernel_type) {

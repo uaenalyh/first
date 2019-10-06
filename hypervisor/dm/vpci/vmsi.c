@@ -80,8 +80,8 @@ static int32_t vmsi_remap(const struct pci_vdev *vdev, bool enable)
 		/* Update MSI Capability structure to physical device */
 		pci_pdev_write_cfg(pbdf, capoff + PCIR_MSI_ADDR, 0x4U, (uint32_t)info.pmsi_addr.full);
 		if ((msgctrl & PCIM_MSICTRL_64BIT) != 0U) {
-			pci_pdev_write_cfg(pbdf, capoff + PCIR_MSI_ADDR_HIGH, 0x4U,
-				(uint32_t)(info.pmsi_addr.full >> 32U));
+			pci_pdev_write_cfg(
+				pbdf, capoff + PCIR_MSI_ADDR_HIGH, 0x4U, (uint32_t)(info.pmsi_addr.full >> 32U));
 			pci_pdev_write_cfg(pbdf, capoff + PCIR_MSI_DATA_64BIT, 0x2U, (uint16_t)info.pmsi_data.full);
 		} else {
 			pci_pdev_write_cfg(pbdf, capoff + PCIR_MSI_DATA, 0x2U, (uint16_t)info.pmsi_data.full);
@@ -129,8 +129,7 @@ void vmsi_write_cfg(struct pci_vdev *vdev, uint32_t offset, uint32_t bytes, uint
 	pci_vdev_write_cfg(vdev, offset, bytes, val);
 
 	/* Do remap if MSI Enable bit is being changed */
-	if (((offset - vdev->msi.capoff) == PCIR_MSI_CTRL) &&
-		(((msgctrl ^ val) & PCIM_MSICTRL_MSI_ENABLE) != 0U)) {
+	if (((offset - vdev->msi.capoff) == PCIR_MSI_CTRL) && (((msgctrl ^ val) & PCIM_MSICTRL_MSI_ENABLE) != 0U)) {
 		enable = ((val & PCIM_MSICTRL_MSI_ENABLE) != 0U);
 		(void)vmsi_remap(vdev, enable);
 	} else {
@@ -162,7 +161,7 @@ static uint32_t buf_read32(const uint8_t buf[])
 static void buf_write32(uint8_t buf[], uint32_t val)
 {
 	buf[0] = (uint8_t)(val & 0xFFU);
-	buf[1] = (uint8_t)((val >> 8U)  & 0xFFU);
+	buf[1] = (uint8_t)((val >> 8U) & 0xFFU);
 	buf[2] = (uint8_t)((val >> 16U) & 0xFFU);
 	buf[3] = (uint8_t)((val >> 24U) & 0xFFU);
 }

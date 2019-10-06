@@ -12,4 +12,4 @@
 #ifndef DEFAULT_ACPI_INFO_H
 #define DEFAULT_ACPI_INFO_H
 
-#endif	/* DEFAULT_ACPI_INFO_H */
+#endif /* DEFAULT_ACPI_INFO_H */

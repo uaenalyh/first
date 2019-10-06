@@ -8,16 +8,16 @@
 #define CPUINFO_H
 
 /* CPUID feature words */
-#define	FEAT_1_ECX		0U     /* CPUID[1].ECX */
-#define	FEAT_1_EDX		1U     /* CPUID[1].EDX */
-#define	FEAT_7_0_EBX		2U     /* CPUID[EAX=7,ECX=0].EBX */
-#define	FEAT_7_0_ECX		3U     /* CPUID[EAX=7,ECX=0].ECX */
-#define	FEAT_7_0_EDX		4U     /* CPUID[EAX=7,ECX=0].EDX */
-#define	FEAT_8000_0001_ECX	5U     /* CPUID[8000_0001].ECX */
-#define	FEAT_8000_0001_EDX	6U     /* CPUID[8000_0001].EDX */
-#define	FEAT_8000_0007_EDX	7U     /* CPUID[8000_0007].EDX */
-#define	FEAT_8000_0008_EBX	8U     /* CPUID[8000_0008].EBX */
-#define	FEATURE_WORDS		9U
+#define FEAT_1_ECX         0U /* CPUID[1].ECX */
+#define FEAT_1_EDX         1U /* CPUID[1].EDX */
+#define FEAT_7_0_EBX       2U /* CPUID[EAX=7,ECX=0].EBX */
+#define FEAT_7_0_ECX       3U /* CPUID[EAX=7,ECX=0].ECX */
+#define FEAT_7_0_EDX       4U /* CPUID[EAX=7,ECX=0].EDX */
+#define FEAT_8000_0001_ECX 5U /* CPUID[8000_0001].ECX */
+#define FEAT_8000_0001_EDX 6U /* CPUID[8000_0001].EDX */
+#define FEAT_8000_0007_EDX 7U /* CPUID[8000_0007].EDX */
+#define FEAT_8000_0008_EBX 8U /* CPUID[8000_0008].EBX */
+#define FEATURE_WORDS      9U
 
 struct cpuinfo_x86 {
 	uint8_t family, model;

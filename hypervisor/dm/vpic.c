@@ -25,7 +25,7 @@
  * SUCH DAMAGE.
  */
 
-#define pr_prefix	"vpic: "
+#define pr_prefix "vpic: "
 
 #include <vm.h>
 #include <irq.h>

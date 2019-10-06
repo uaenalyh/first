@@ -15,8 +15,8 @@
 #include <sgx.h>
 #include <logmsg.h>
 
-static inline const struct vcpuid_entry *local_find_vcpuid_entry(const struct acrn_vcpu *vcpu,
-					uint32_t leaf, uint32_t subleaf)
+static inline const struct vcpuid_entry *local_find_vcpuid_entry(
+	const struct acrn_vcpu *vcpu, uint32_t leaf, uint32_t subleaf)
 {
 	uint32_t i = 0U, nr, half;
 	const struct vcpuid_entry *found_entry = NULL;
@@ -48,8 +48,8 @@ static inline const struct vcpuid_entry *local_find_vcpuid_entry(const struct ac
 	return found_entry;
 }
 
-static inline const struct vcpuid_entry *find_vcpuid_entry(const struct acrn_vcpu *vcpu,
-					uint32_t leaf_arg, uint32_t subleaf)
+static inline const struct vcpuid_entry *find_vcpuid_entry(
+	const struct acrn_vcpu *vcpu, uint32_t leaf_arg, uint32_t subleaf)
 {
 	const struct vcpuid_entry *entry;
 	uint32_t leaf = leaf_arg;
@@ -61,8 +61,7 @@ static inline const struct vcpuid_entry *find_vcpuid_entry(const struct acrn_vcp
 
 		if ((leaf & 0x80000000U) != 0U) {
 			limit = vm->vcpuid_xlevel;
-		}
-		else {
+		} else {
 			limit = vm->vcpuid_level;
 		}
 
@@ -75,14 +74,12 @@ static inline const struct vcpuid_entry *find_vcpuid_entry(const struct acrn_vcp
 			leaf = vm->vcpuid_level;
 			entry = local_find_vcpuid_entry(vcpu, leaf, subleaf);
 		}
-
 	}
 
 	return entry;
 }
 
-static inline int32_t set_vcpuid_entry(struct acrn_vm *vm,
-				const struct vcpuid_entry *entry)
+static inline int32_t set_vcpuid_entry(struct acrn_vm *vm, const struct vcpuid_entry *entry)
 {
 	struct vcpuid_entry *tmp;
 	size_t entry_size = sizeof(struct vcpuid_entry);
@@ -103,8 +100,7 @@ static inline int32_t set_vcpuid_entry(struct acrn_vm *vm,
 /**
  * initialization of virtual CPUID leaf
  */
-static void init_vcpuid_entry(uint32_t leaf, uint32_t subleaf,
-			uint32_t flags, struct vcpuid_entry *entry)
+static void init_vcpuid_entry(uint32_t leaf, uint32_t subleaf, uint32_t flags, struct vcpuid_entry *entry)
 {
 	struct cpuinfo_x86 *cpu_info;
 
@@ -143,7 +139,7 @@ static void init_vcpuid_entry(uint32_t leaf, uint32_t subleaf,
 			cpuid_subleaf(leaf, subleaf, &entry->eax, &entry->ebx, &entry->ecx, &entry->edx);
 		} else {
 			/* Use the tsc to derive the emulated 0x16U cpuid. */
-			entry->eax = (uint32_t) (get_tsc_khz() / 1000U);
+			entry->eax = (uint32_t)(get_tsc_khz() / 1000U);
 			entry->ebx = entry->eax;
 			/* Bus frequency: hard coded to 100M */
 			entry->ecx = 100U;
@@ -160,8 +156,7 @@ static void init_vcpuid_entry(uint32_t leaf, uint32_t subleaf,
 	 *	hypervisor.
 	 * EBX, ECX, EDX: Hypervisor vendor ID signature.
 	 */
-	case 0x40000000U:
-	{
+	case 0x40000000U: {
 		static const char sig[12] = "ACRNACRNACRN";
 		const uint32_t *sigptr = (const uint32_t *)sig;
 
@@ -279,7 +274,7 @@ int32_t set_vcpuid_entries(struct acrn_vm *vm)
 
 			switch (i) {
 			case 0x04U:
-				for (j = 0U; ; j++) {
+				for (j = 0U;; j++) {
 					init_vcpuid_entry(i, j, CPUID_CHECK_SUBLEAF, &entry);
 					if (entry.eax == 0U) {
 						break;
@@ -345,7 +340,7 @@ static void guest_cpuid_01h(struct acrn_vcpu *vcpu, uint32_t *eax, uint32_t *ebx
 	cpuid(0x1U, eax, ebx, ecx, edx);
 	/* Patching initial APIC ID */
 	*ebx &= ~APIC_ID_MASK;
-	*ebx |= (apicid <<  APIC_ID_SHIFT);
+	*ebx |= (apicid << APIC_ID_SHIFT);
 
 	/* mask mtrr */
 	*edx &= ~CPUID_EDX_MTRR;
@@ -407,7 +402,7 @@ static void guest_cpuid_0bh(struct acrn_vcpu *vcpu, uint32_t *eax, uint32_t *ebx
 		*eax = 0U;
 		*ebx = 1U;
 		*ecx |= (1U << 8U);
-	break;
+		break;
 	case 1U:
 		if (vcpu->vm->hw.created_vcpus == 1U) {
 			*eax = 0U;
@@ -416,12 +411,12 @@ static void guest_cpuid_0bh(struct acrn_vcpu *vcpu, uint32_t *eax, uint32_t *ebx
 		}
 		*ebx = vcpu->vm->hw.created_vcpus;
 		*ecx |= (2U << 8U);
-	break;
+		break;
 	default:
 		*eax = 0U;
 		*ebx = 0U;
 		*ecx |= (0U << 8U);
-	break;
+		break;
 	}
 	*edx = vlapic_get_apicid(vcpu_vlapic(vcpu));
 }
@@ -431,24 +426,24 @@ static void guest_cpuid_0dh(__unused struct acrn_vcpu *vcpu, uint32_t *eax, uint
 	uint32_t subleaf = *ecx;
 
 	if (!pcpu_has_cap(X86_FEATURE_OSXSAVE)) {
-				*eax = 0U;
-				*ebx = 0U;
-				*ecx = 0U;
-				*edx = 0U;
+		*eax = 0U;
+		*ebx = 0U;
+		*ecx = 0U;
+		*edx = 0U;
 	} else {
 		cpuid_subleaf(0x0dU, subleaf, eax, ebx, ecx, edx);
 		if (subleaf == 0U) {
 			/* SDM Vol.1 17-2, On processors that do not support Intel MPX,
 			 * CPUID.(EAX=0DH,ECX=0):EAX[3] and
 			 * CPUID.(EAX=0DH,ECX=0):EAX[4] will both be 0 */
-			*eax &= ~ CPUID_EAX_XCR0_BNDREGS;
-			*eax &= ~ CPUID_EAX_XCR0_BNDCSR;
+			*eax &= ~CPUID_EAX_XCR0_BNDREGS;
+			*eax &= ~CPUID_EAX_XCR0_BNDCSR;
 		}
 	}
 }
 
-static void guest_cpuid_80000001h(const struct acrn_vcpu *vcpu,
-	uint32_t *eax, uint32_t *ebx, uint32_t *ecx, uint32_t *edx)
+static void guest_cpuid_80000001h(
+	const struct acrn_vcpu *vcpu, uint32_t *eax, uint32_t *ebx, uint32_t *ecx, uint32_t *edx)
 {
 	const struct vcpuid_entry *entry_check = find_vcpuid_entry(vcpu, 0x80000000U, 0);
 	uint64_t guest_ia32_misc_enable = vcpu_get_guest_msr(vcpu, MSR_IA32_MISC_ENABLE);
@@ -471,8 +466,8 @@ static void guest_cpuid_80000001h(const struct acrn_vcpu *vcpu,
 	}
 }
 
-static void guest_limit_cpuid(const struct acrn_vcpu *vcpu, uint32_t leaf,
-	uint32_t *eax, uint32_t *ebx, uint32_t *ecx, uint32_t *edx)
+static void guest_limit_cpuid(
+	const struct acrn_vcpu *vcpu, uint32_t leaf, uint32_t *eax, uint32_t *ebx, uint32_t *ecx, uint32_t *edx)
 {
 	uint64_t guest_ia32_misc_enable = vcpu_get_guest_msr(vcpu, MSR_IA32_MISC_ENABLE);
 

@@ -48,62 +48,61 @@
 /**
  * @brief Request for exception injection
  */
-#define ACRN_REQUEST_EXCP			0U
+#define ACRN_REQUEST_EXCP 0U
 
 /**
  * @brief Request for non-maskable interrupt
  */
-#define ACRN_REQUEST_NMI			3U
+#define ACRN_REQUEST_NMI 3U
 
 /**
  * @brief Request for EOI exit bitmap update
  */
-#define ACRN_REQUEST_EOI_EXIT_BITMAP_UPDATE	4U
+#define ACRN_REQUEST_EOI_EXIT_BITMAP_UPDATE 4U
 
 /**
  * @brief Request for EPT flush
  */
-#define ACRN_REQUEST_EPT_FLUSH			5U
+#define ACRN_REQUEST_EPT_FLUSH 5U
 
 /**
  * @brief Request for triple fault
  */
-#define ACRN_REQUEST_TRP_FAULT			6U
+#define ACRN_REQUEST_TRP_FAULT 6U
 
 /**
  * @brief Request for VPID TLB flush
  */
-#define ACRN_REQUEST_VPID_FLUSH			7U
+#define ACRN_REQUEST_VPID_FLUSH 7U
 
 /**
  * @}
  */
 /* End of virt_int_injection */
 
-#define load_segment(seg, SEG_NAME)				\
-{								\
-	exec_vmwrite16(SEG_NAME##_SEL, (seg).selector);		\
-	exec_vmwrite(SEG_NAME##_BASE, (seg).base);		\
-	exec_vmwrite32(SEG_NAME##_LIMIT, (seg).limit);		\
-	exec_vmwrite32(SEG_NAME##_ATTR, (seg).attr);		\
-}
+#define load_segment(seg, SEG_NAME)                             \
+	{                                                       \
+		exec_vmwrite16(SEG_NAME##_SEL, (seg).selector); \
+		exec_vmwrite(SEG_NAME##_BASE, (seg).base);      \
+		exec_vmwrite32(SEG_NAME##_LIMIT, (seg).limit);  \
+		exec_vmwrite32(SEG_NAME##_ATTR, (seg).attr);    \
+	}
 
 /* Define segments constants for guest */
-#define REAL_MODE_BSP_INIT_CODE_SEL     (0xf000U)
-#define REAL_MODE_DATA_SEG_AR	   (0x0093U)
-#define REAL_MODE_CODE_SEG_AR	   (0x009fU)
-#define PROTECTED_MODE_DATA_SEG_AR      (0xc093U)
-#define PROTECTED_MODE_CODE_SEG_AR      (0xc09bU)
-#define REAL_MODE_SEG_LIMIT	     (0xffffU)
-#define PROTECTED_MODE_SEG_LIMIT	(0xffffffffU)
-#define DR7_INIT_VALUE		  (0x400UL)
-#define LDTR_AR			 (0x0082U) /* LDT, type must be 2, refer to SDM Vol3 26.3.1.2 */
-#define TR_AR			   (0x008bU) /* TSS (busy), refer to SDM Vol3 26.3.1.2 */
+#define REAL_MODE_BSP_INIT_CODE_SEL (0xf000U)
+#define REAL_MODE_DATA_SEG_AR       (0x0093U)
+#define REAL_MODE_CODE_SEG_AR       (0x009fU)
+#define PROTECTED_MODE_DATA_SEG_AR  (0xc093U)
+#define PROTECTED_MODE_CODE_SEG_AR  (0xc09bU)
+#define REAL_MODE_SEG_LIMIT         (0xffffU)
+#define PROTECTED_MODE_SEG_LIMIT    (0xffffffffU)
+#define DR7_INIT_VALUE              (0x400UL)
+#define LDTR_AR                     (0x0082U) /* LDT, type must be 2, refer to SDM Vol3 26.3.1.2 */
+#define TR_AR                       (0x008bU) /* TSS (busy), refer to SDM Vol3 26.3.1.2 */
 
-#define foreach_vcpu(idx, vm, vcpu)				\
-	for ((idx) = 0U, (vcpu) = &((vm)->hw.vcpu_array[(idx)]);	\
-		(idx) < (vm)->hw.created_vcpus;			\
-		(idx)++, (vcpu) = &((vm)->hw.vcpu_array[(idx)])) \
+#define foreach_vcpu(idx, vm, vcpu)                                                              \
+	for ((idx) = 0U, (vcpu) = &((vm)->hw.vcpu_array[(idx)]); (idx) < (vm)->hw.created_vcpus; \
+		(idx)++, (vcpu) = &((vm)->hw.vcpu_array[(idx)]))                                 \
 		if (vcpu->state != VCPU_OFFLINE)
 
 enum vcpu_state {
@@ -118,23 +117,22 @@ enum vcpu_state {
 enum vm_cpu_mode {
 	CPU_MODE_REAL,
 	CPU_MODE_PROTECTED,
-	CPU_MODE_COMPATIBILITY,		/* IA-32E mode (CS.L = 0) */
-	CPU_MODE_64BIT,			/* IA-32E mode (CS.L = 1) */
+	CPU_MODE_COMPATIBILITY, /* IA-32E mode (CS.L = 0) */
+	CPU_MODE_64BIT, /* IA-32E mode (CS.L = 1) */
 };
 
 /* 2 worlds: 0 for Normal World, 1 for Secure World */
-#define NR_WORLD	2
-#define NORMAL_WORLD	0
-#define SECURE_WORLD	1
+#define NR_WORLD     2
+#define NORMAL_WORLD 0
+#define SECURE_WORLD 1
 
-#define NUM_WORLD_MSRS		2U
-#define NUM_COMMON_MSRS		15U
-#define NUM_GUEST_MSRS		(NUM_WORLD_MSRS + NUM_COMMON_MSRS)
+#define NUM_WORLD_MSRS  2U
+#define NUM_COMMON_MSRS 15U
+#define NUM_GUEST_MSRS  (NUM_WORLD_MSRS + NUM_COMMON_MSRS)
 
 struct guest_cpu_context {
 	struct run_context run_ctx;
 	struct ext_context ext_ctx;
-
 };
 
 /* Intel SDM 24.8.2, the address must be 16-byte aligned */
@@ -143,8 +141,7 @@ struct msr_store_entry {
 	uint64_t value;
 } __aligned(16);
 
-enum {
-	MSR_AREA_TSC_AUX = 0,
+enum { MSR_AREA_TSC_AUX = 0,
 	MSR_AREA_IA32_PQR_ASSOC,
 	MSR_AREA_COUNT,
 };
@@ -152,7 +149,7 @@ enum {
 struct msr_store_area {
 	struct msr_store_entry guest[MSR_AREA_COUNT];
 	struct msr_store_entry host[MSR_AREA_COUNT];
-	uint32_t count;	/* actual count of entries to be loaded/restored during VMEntry/VMExit */
+	uint32_t count; /* actual count of entries to be loaded/restored during VMEntry/VMExit */
 };
 
 struct acrn_vcpu_arch {
@@ -209,13 +206,13 @@ struct acrn_vcpu {
 
 	/* Architecture specific definitions for this VCPU */
 	struct acrn_vcpu_arch arch;
-	uint16_t pcpu_id;	/* Physical CPU ID of this VCPU */
-	uint16_t vcpu_id;	/* virtual identifier for VCPU */
-	struct acrn_vm *vm;		/* Reference to the VM this VCPU belongs to */
+	uint16_t pcpu_id; /* Physical CPU ID of this VCPU */
+	uint16_t vcpu_id; /* virtual identifier for VCPU */
+	struct acrn_vm *vm; /* Reference to the VM this VCPU belongs to */
 
 	/* State of this VCPU before suspend */
 	volatile enum vcpu_state prev_state;
-	volatile enum vcpu_state state;	/* State of this VCPU */
+	volatile enum vcpu_state state; /* State of this VCPU */
 
 	struct sched_object sched_obj;
 	bool launched; /* Whether the vcpu is launched on target pcpu */
@@ -243,8 +240,7 @@ static inline void vcpu_retain_rip(struct acrn_vcpu *vcpu)
 	(vcpu)->arch.inst_len = 0U;
 }
 
-static inline struct acrn_vlapic *
-vcpu_vlapic(struct acrn_vcpu *vcpu)
+static inline struct acrn_vlapic *vcpu_vlapic(struct acrn_vcpu *vcpu)
 {
 	return &(vcpu->arch.vlapic);
 }

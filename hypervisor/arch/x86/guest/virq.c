@@ -16,20 +16,19 @@
 #include <trace.h>
 #include <logmsg.h>
 
-#define EXCEPTION_ERROR_CODE_VALID  8U
+#define EXCEPTION_ERROR_CODE_VALID 8U
 
-#define EXCEPTION_CLASS_BENIGN	1
-#define EXCEPTION_CLASS_CONT	2
-#define EXCEPTION_CLASS_PF	3
+#define EXCEPTION_CLASS_BENIGN 1
+#define EXCEPTION_CLASS_CONT   2
+#define EXCEPTION_CLASS_PF     3
 
 /* Exception types */
-#define EXCEPTION_FAULT		0U
-#define EXCEPTION_TRAP		1U
-#define EXCEPTION_ABORT		2U
-#define EXCEPTION_INTERRUPT	3U
+#define EXCEPTION_FAULT     0U
+#define EXCEPTION_TRAP      1U
+#define EXCEPTION_ABORT     2U
+#define EXCEPTION_INTERRUPT 3U
 
-static const uint16_t exception_type[32] = {
-	[0] = VMX_INT_TYPE_HW_EXP,
+static const uint16_t exception_type[32] = { [0] = VMX_INT_TYPE_HW_EXP,
 	[1] = VMX_INT_TYPE_HW_EXP,
 	[2] = VMX_INT_TYPE_HW_EXP,
 	[3] = VMX_INT_TYPE_HW_EXP,
@@ -60,8 +59,7 @@ static const uint16_t exception_type[32] = {
 	[28] = VMX_INT_TYPE_HW_EXP,
 	[29] = VMX_INT_TYPE_HW_EXP,
 	[30] = VMX_INT_TYPE_HW_EXP,
-	[31] = VMX_INT_TYPE_HW_EXP
-};
+	[31] = VMX_INT_TYPE_HW_EXP };
 
 static uint8_t get_exception_type(uint32_t vector)
 {
@@ -70,7 +68,7 @@ static uint8_t get_exception_type(uint32_t vector)
 	/* Treat #DB as trap until decide to support Debug Registers */
 	if ((vector > 31U) || (vector == IDT_NMI)) {
 		type = EXCEPTION_INTERRUPT;
-	} else if ((vector == IDT_DB) || (vector == IDT_BP) || (vector ==  IDT_OF)) {
+	} else if ((vector == IDT_DB) || (vector == IDT_BP) || (vector == IDT_OF)) {
 		type = EXCEPTION_TRAP;
 	} else if ((vector == IDT_DF) || (vector == IDT_MC)) {
 		type = EXCEPTION_ABORT;
@@ -94,8 +92,7 @@ static bool is_guest_irq_enabled(struct acrn_vcpu *vcpu)
 		/* Check for temporarily disabled interrupts */
 		guest_state = exec_vmread32(VMX_GUEST_INTERRUPTIBILITY_INFO);
 
-		if ((guest_state & (HV_ARCH_VCPU_BLOCKED_BY_STI |
-				    HV_ARCH_VCPU_BLOCKED_BY_MOVSS)) == 0UL) {
+		if ((guest_state & (HV_ARCH_VCPU_BLOCKED_BY_STI | HV_ARCH_VCPU_BLOCKED_BY_MOVSS)) == 0UL) {
 			status = true;
 		}
 	}
@@ -124,8 +121,8 @@ static int32_t get_excep_class(uint32_t vector)
 {
 	int32_t ret;
 
-	if ((vector == IDT_DE) || (vector == IDT_TS) || (vector == IDT_NP) ||
-		(vector == IDT_SS) || (vector == IDT_GP)) {
+	if ((vector == IDT_DE) || (vector == IDT_TS) || (vector == IDT_NP) || (vector == IDT_SS) ||
+		(vector == IDT_GP)) {
 		ret = EXCEPTION_CLASS_CONT;
 	} else if ((vector == IDT_PF) || (vector == IDT_VE)) {
 		ret = EXCEPTION_CLASS_PF;
@@ -189,12 +186,11 @@ static void vcpu_inject_exception(struct acrn_vcpu *vcpu, uint32_t vector)
 	if (bitmap_test_and_clear_lock(ACRN_REQUEST_EXCP, &vcpu->arch.pending_req)) {
 
 		if ((exception_type[vector] & EXCEPTION_ERROR_CODE_VALID) != 0U) {
-			exec_vmwrite32(VMX_ENTRY_EXCEPTION_ERROR_CODE,
-					vcpu->arch.exception_info.error);
+			exec_vmwrite32(VMX_ENTRY_EXCEPTION_ERROR_CODE, vcpu->arch.exception_info.error);
 		}
 
-		exec_vmwrite32(VMX_ENTRY_INT_INFO_FIELD, VMX_INT_INFO_VALID |
-				(exception_type[vector] << 8U) | (vector & 0xFFU));
+		exec_vmwrite32(VMX_ENTRY_INT_INFO_FIELD,
+			VMX_INT_INFO_VALID | (exception_type[vector] << 8U) | (vector & 0xFFU));
 
 		vcpu->arch.exception_info.exception = VECTOR_INVALID;
 
@@ -218,7 +214,7 @@ static bool vcpu_inject_hi_exception(struct acrn_vcpu *vcpu)
 
 	if ((vector == IDT_MC) || (vector == IDT_BP) || (vector == IDT_DB)) {
 		vcpu_inject_exception(vcpu, vector);
-		 injected = true;
+		injected = true;
 	}
 
 	return injected;
@@ -276,16 +272,15 @@ int32_t external_interrupt_vmexit_handler(struct acrn_vcpu *vcpu)
 
 	intr_info = exec_vmread32(VMX_EXIT_INT_INFO);
 	if (((intr_info & VMX_INT_INFO_VALID) == 0U) ||
-		(((intr_info & VMX_INT_TYPE_MASK) >> 8U)
-		!= VMX_INT_TYPE_EXT_INT)) {
+		(((intr_info & VMX_INT_TYPE_MASK) >> 8U) != VMX_INT_TYPE_EXT_INT)) {
 		pr_err("Invalid VM exit interrupt info:%x", intr_info);
 		vcpu_retain_rip(vcpu);
 		ret = -EINVAL;
 	} else {
 		ctx.vector = intr_info & 0xFFU;
-		ctx.rip    = vcpu_get_rip(vcpu);
+		ctx.rip = vcpu_get_rip(vcpu);
 		ctx.rflags = vcpu_get_rflags(vcpu);
-		ctx.cs     = exec_vmread32(VMX_GUEST_CS_SEL);
+		ctx.cs = exec_vmread32(VMX_GUEST_CS_SEL);
 
 		dispatch_interrupt(&ctx);
 		vcpu_retain_rip(vcpu);
@@ -297,8 +292,7 @@ int32_t external_interrupt_vmexit_handler(struct acrn_vcpu *vcpu)
 	return ret;
 }
 
-static inline bool acrn_inject_pending_intr(struct acrn_vcpu *vcpu,
-		uint64_t *pending_req_bits, bool injected);
+static inline bool acrn_inject_pending_intr(struct acrn_vcpu *vcpu, uint64_t *pending_req_bits, bool injected);
 
 int32_t acrn_handle_pending_request(struct acrn_vcpu *vcpu)
 {
@@ -317,7 +311,7 @@ int32_t acrn_handle_pending_request(struct acrn_vcpu *vcpu)
 			invept(vcpu->vm->arch_vm.nworld_eptp);
 		}
 
-		if (bitmap_test_and_clear_lock(ACRN_REQUEST_VPID_FLUSH,	pending_req_bits)) {
+		if (bitmap_test_and_clear_lock(ACRN_REQUEST_VPID_FLUSH, pending_req_bits)) {
 			flush_vpid_single(arch->vpid);
 		}
 
@@ -333,7 +327,7 @@ int32_t acrn_handle_pending_request(struct acrn_vcpu *vcpu)
 			if (bitmap_test_and_clear_lock(ACRN_REQUEST_NMI, pending_req_bits)) {
 				/* Inject NMI vector = 2 */
 				exec_vmwrite32(VMX_ENTRY_INT_INFO_FIELD,
-						VMX_INT_INFO_VALID | (VMX_INT_TYPE_NMI << 8U) | IDT_NMI);
+					VMX_INT_INFO_VALID | (VMX_INT_TYPE_NMI << 8U) | IDT_NMI);
 				injected = true;
 			} else {
 				/* handling pending vector injection:
@@ -381,8 +375,7 @@ int32_t acrn_handle_pending_request(struct acrn_vcpu *vcpu)
  * @retval true 1 when INT is injected to guest.
  * @retval false when there is no eligible pending vector.
  */
-static inline bool acrn_inject_pending_intr(struct acrn_vcpu *vcpu,
-		uint64_t *pending_req_bits, bool injected)
+static inline bool acrn_inject_pending_intr(struct acrn_vcpu *vcpu, uint64_t *pending_req_bits, bool injected)
 {
 	bool ret = injected;
 	bool guest_irq_enabled = is_guest_irq_enabled(vcpu);
@@ -439,8 +432,7 @@ int32_t exception_vmexit_handler(struct acrn_vcpu *vcpu)
 		pr_fatal("Exception #MC got from guest!");
 	}
 
-	TRACE_4I(TRACE_VMEXIT_EXCEPTION_OR_NMI,
-			exception_vector, int_err_code, 2U, 0U);
+	TRACE_4I(TRACE_VMEXIT_EXCEPTION_OR_NMI, exception_vector, int_err_code, 2U, 0U);
 
 	return status;
 }

@@ -33,11 +33,11 @@
 #include <spinlock.h>
 #include <vm_config.h>
 
-#define COM1_BASE		0x3F8U
-#define COM2_BASE		0x2F8U
+#define COM1_BASE 0x3F8U
+#define COM2_BASE 0x2F8U
 
-#define COM1_IRQ		4U
-#define COM2_IRQ		3U
+#define COM1_IRQ 4U
+#define COM2_IRQ 3U
 
 void vuart_init(struct acrn_vm *vm, const struct vuart_config *vu_config);
 void vuart_deinit(struct acrn_vm *vm);

@@ -26,8 +26,7 @@ static void kick_notification(__unused uint32_t irq, __unused void *data)
 	uint16_t pcpu_id = get_pcpu_id();
 
 	if (bitmap_test(pcpu_id, &smp_call_mask)) {
-		struct smp_call_info_data *smp_call =
-			&per_cpu(smp_call_info, pcpu_id);
+		struct smp_call_info_data *smp_call = &per_cpu(smp_call_info, pcpu_id);
 
 		if (smp_call->func != NULL) {
 			smp_call->func(smp_call->data);
@@ -67,8 +66,7 @@ void setup_notification(void)
 		pr_err("Failed to setup notification");
 	}
 
-	dev_dbg(ACRN_DBG_PTIRQ, "NOTIFY: irq[%d] setup vector %x",
-		notification_irq, irq_to_vector(notification_irq));
+	dev_dbg(ACRN_DBG_PTIRQ, "NOTIFY: irq[%d] setup vector %x", notification_irq, irq_to_vector(notification_irq));
 }
 
 static void posted_intr_notification(__unused uint32_t irq, __unused void *data)
@@ -82,9 +80,7 @@ static void posted_intr_notification(__unused uint32_t irq, __unused void *data)
 /*pre-conditon: be called only by BSP initialization proccess*/
 void setup_posted_intr_notification(void)
 {
-	if (request_irq(POSTED_INTR_NOTIFY_IRQ,
-			posted_intr_notification,
-			NULL, IRQF_NONE) < 0) {
+	if (request_irq(POSTED_INTR_NOTIFY_IRQ, posted_intr_notification, NULL, IRQF_NONE) < 0) {
 		pr_err("Failed to setup posted-intr notification");
 	}
 }

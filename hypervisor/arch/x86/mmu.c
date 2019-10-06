@@ -42,16 +42,16 @@
 static void *ppt_mmu_pml4_addr;
 static uint8_t sanitized_page[PAGE_SIZE] __aligned(PAGE_SIZE);
 
-#define INVEPT_TYPE_SINGLE_CONTEXT      1UL
-#define INVEPT_TYPE_ALL_CONTEXTS	2UL
-#define VMFAIL_INVALID_EPT_VPID				\
-	"       jnc 1f\n"				\
-	"       mov $1, %0\n"    /* CF: error = 1 */	\
-	"       jmp 3f\n"				\
-	"1:     jnz 2f\n"				\
-	"       mov $2, %0\n"    /* ZF: error = 2 */	\
-	"       jmp 3f\n"				\
-	"2:     mov $0, %0\n"				\
+#define INVEPT_TYPE_SINGLE_CONTEXT 1UL
+#define INVEPT_TYPE_ALL_CONTEXTS   2UL
+#define VMFAIL_INVALID_EPT_VPID                   \
+	"       jnc 1f\n"                         \
+	"       mov $1, %0\n" /* CF: error = 1 */ \
+	"       jmp 3f\n"                         \
+	"1:     jnz 2f\n"                         \
+	"       mov $2, %0\n" /* ZF: error = 2 */ \
+	"       jmp 3f\n"                         \
+	"2:     mov $0, %0\n"                     \
 	"3:"
 
 struct invvpid_operand {
@@ -69,11 +69,7 @@ struct invept_desc {
 static inline int32_t asm_invvpid(const struct invvpid_operand operand, uint64_t type)
 {
 	int32_t error;
-	asm volatile ("invvpid %1, %2\n"
-			VMFAIL_INVALID_EPT_VPID
-			: "=r" (error)
-			: "m" (operand), "r" (type)
-			: "memory");
+	asm volatile("invvpid %1, %2\n" VMFAIL_INVALID_EPT_VPID : "=r"(error) : "m"(operand), "r"(type) : "memory");
 	return error;
 }
 
@@ -92,11 +88,7 @@ static inline void local_invvpid(uint64_t type, uint16_t vpid, uint64_t gva)
 static inline int32_t asm_invept(uint64_t type, struct invept_desc desc)
 {
 	int32_t error;
-	asm volatile ("invept %1, %2\n"
-			VMFAIL_INVALID_EPT_VPID
-			: "=r" (error)
-			: "m" (desc), "r" (type)
-			: "memory");
+	asm volatile("invept %1, %2\n" VMFAIL_INVALID_EPT_VPID : "=r"(error) : "m"(desc), "r"(type) : "memory");
 	return error;
 }
 
@@ -124,7 +116,7 @@ void flush_vpid_global(void)
 
 void invept(const void *eptp)
 {
-	struct invept_desc desc = {0};
+	struct invept_desc desc = { 0 };
 
 	if (pcpu_has_vmx_ept_cap(VMX_EPT_INVEPT_SINGLE_CONTEXT)) {
 		desc.eptp = hva2hpa(eptp) | (3UL << 3U) | 6UL;
@@ -205,8 +197,8 @@ void hv_access_memory_region_update(uint64_t base, uint64_t size)
 	base_aligned = round_pde_down(base);
 	size_aligned = region_end - base_aligned;
 
-	mmu_modify_or_del((uint64_t *)ppt_mmu_pml4_addr, base_aligned,
-		round_pde_up(size_aligned), 0UL, PAGE_USER, &ppt_mem_ops, MR_MODIFY);
+	mmu_modify_or_del((uint64_t *)ppt_mmu_pml4_addr, base_aligned, round_pde_up(size_aligned), 0UL, PAGE_USER,
+		&ppt_mem_ops, MR_MODIFY);
 }
 
 void init_paging(void)
@@ -226,10 +218,9 @@ void init_paging(void)
 
 	/* align to 2MB */
 	high64_max_ram = round_pde_up(p_e820_mem_info->mem_top);
-	if ((high64_max_ram > (CONFIG_PLATFORM_RAM_SIZE + PLATFORM_LO_MMIO_SIZE)) ||
-			(high64_max_ram < (1UL << 32U))) {
-		printf("ERROR!!! high64_max_ram: 0x%llx, top address space: 0x%llx\n",
-			high64_max_ram, CONFIG_PLATFORM_RAM_SIZE + PLATFORM_LO_MMIO_SIZE);
+	if ((high64_max_ram > (CONFIG_PLATFORM_RAM_SIZE + PLATFORM_LO_MMIO_SIZE)) || (high64_max_ram < (1UL << 32U))) {
+		printf("ERROR!!! high64_max_ram: 0x%llx, top address space: 0x%llx\n", high64_max_ram,
+			CONFIG_PLATFORM_RAM_SIZE + PLATFORM_LO_MMIO_SIZE);
 		panic("Please configure HV_ADDRESS_SPACE correctly!\n");
 	}
 
@@ -252,11 +243,11 @@ void init_paging(void)
 		}
 	}
 
-	mmu_modify_or_del((uint64_t *)ppt_mmu_pml4_addr, 0UL, round_pde_up(low32_max_ram),
-			PAGE_CACHE_WB, PAGE_CACHE_MASK, &ppt_mem_ops, MR_MODIFY);
+	mmu_modify_or_del((uint64_t *)ppt_mmu_pml4_addr, 0UL, round_pde_up(low32_max_ram), PAGE_CACHE_WB,
+		PAGE_CACHE_MASK, &ppt_mem_ops, MR_MODIFY);
 
-	mmu_modify_or_del((uint64_t *)ppt_mmu_pml4_addr, (1UL << 32U), high64_max_ram - (1UL << 32U),
-			PAGE_CACHE_WB, PAGE_CACHE_MASK, &ppt_mem_ops, MR_MODIFY);
+	mmu_modify_or_del((uint64_t *)ppt_mmu_pml4_addr, (1UL << 32U), high64_max_ram - (1UL << 32U), PAGE_CACHE_WB,
+		PAGE_CACHE_MASK, &ppt_mem_ops, MR_MODIFY);
 
 	/*
 	 * set the paging-structure entries' U/S flag to supervisor-mode for hypervisor owned memroy.
@@ -267,8 +258,8 @@ void init_paging(void)
 	 */
 	hv_hpa = get_hv_image_base();
 	mmu_modify_or_del((uint64_t *)ppt_mmu_pml4_addr, hv_hpa & PDE_MASK,
-			CONFIG_HV_RAM_SIZE + (((hv_hpa & (PDE_SIZE - 1UL)) != 0UL) ? PDE_SIZE : 0UL),
-			PAGE_CACHE_WB, PAGE_CACHE_MASK | PAGE_USER, &ppt_mem_ops, MR_MODIFY);
+		CONFIG_HV_RAM_SIZE + (((hv_hpa & (PDE_SIZE - 1UL)) != 0UL) ? PDE_SIZE : 0UL), PAGE_CACHE_WB,
+		PAGE_CACHE_MASK | PAGE_USER, &ppt_mem_ops, MR_MODIFY);
 
 	size = ((uint64_t)&ld_text_end - hv_hpa);
 	text_end = hv_hpa + size;
@@ -277,11 +268,10 @@ void init_paging(void)
 	 * all pages, including pages for guests.
 	 */
 	mmu_modify_or_del((uint64_t *)ppt_mmu_pml4_addr, round_pde_down(hv_hpa),
-			round_pde_up(text_end) - round_pde_down(hv_hpa), 0UL,
-			PAGE_NX, &ppt_mem_ops, MR_MODIFY);
+		round_pde_up(text_end) - round_pde_down(hv_hpa), 0UL, PAGE_NX, &ppt_mem_ops, MR_MODIFY);
 
 	mmu_modify_or_del((uint64_t *)ppt_mmu_pml4_addr, (uint64_t)get_reserve_sworld_memory_base(),
-			TRUSTY_RAM_SIZE * (CONFIG_MAX_VM_NUM - 1U), PAGE_USER, 0UL, &ppt_mem_ops, MR_MODIFY);
+		TRUSTY_RAM_SIZE * (CONFIG_MAX_VM_NUM - 1U), PAGE_USER, 0UL, &ppt_mem_ops, MR_MODIFY);
 
 	/* Enable paging */
 	enable_paging();

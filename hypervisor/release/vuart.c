@@ -38,10 +38,8 @@
 
 void vuart_init(struct acrn_vm *vm, const struct vuart_config *vu_config)
 {
-
 }
 
 void vuart_deinit(struct acrn_vm *vm)
 {
-
 }

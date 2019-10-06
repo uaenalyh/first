@@ -21,8 +21,7 @@
 #include <logmsg.h>
 
 /* rip, rsp, ia32_efer and rflags are written to VMCS in start_vcpu */
-static void init_guest_vmx(struct acrn_vcpu *vcpu, uint64_t cr0, uint64_t cr3,
-	uint64_t cr4)
+static void init_guest_vmx(struct acrn_vcpu *vcpu, uint64_t cr0, uint64_t cr3, uint64_t cr4)
 {
 	struct guest_cpu_context *ctx = &vcpu->arch.contexts[vcpu->arch.cur_context];
 	struct ext_context *ectx = &ctx->ext_ctx;
@@ -72,8 +71,7 @@ static void init_guest_state(struct acrn_vcpu *vcpu)
 {
 	struct guest_cpu_context *ctx = &vcpu->arch.contexts[vcpu->arch.cur_context];
 
-	init_guest_vmx(vcpu, ctx->run_ctx.cr0, ctx->ext_ctx.cr3,
-			ctx->run_ctx.cr4 & ~(CR4_VMXE | CR4_SMXE | CR4_MCE));
+	init_guest_vmx(vcpu, ctx->run_ctx.cr0, ctx->ext_ctx.cr3, ctx->run_ctx.cr4 & ~(CR4_VMXE | CR4_SMXE | CR4_MCE));
 }
 
 static void init_host_state(void)
@@ -166,8 +164,7 @@ static void init_host_state(void)
 
 	value64 = msr_read(MSR_IA32_EFER);
 	exec_vmwrite64(VMX_HOST_IA32_EFER_FULL, value64);
-	pr_dbg("VMX_HOST_IA32_EFER: 0x%016llx ",
-			value64);
+	pr_dbg("VMX_HOST_IA32_EFER: 0x%016llx ", value64);
 
 	/**************************************************/
 	/* Natural width fields */
@@ -214,10 +211,9 @@ static uint32_t check_vmx_ctrl(uint32_t msr, uint32_t ctrl_req)
 	uint32_t ctrl = ctrl_req;
 
 	vmx_msr = msr_read(msr);
-	vmx_msr_low  = (uint32_t)vmx_msr;
+	vmx_msr_low = (uint32_t)vmx_msr;
 	vmx_msr_high = (uint32_t)(vmx_msr >> 32U);
-	pr_dbg("VMX_PIN_VM_EXEC_CONTROLS:low=0x%x, high=0x%x\n",
-			vmx_msr_low, vmx_msr_high);
+	pr_dbg("VMX_PIN_VM_EXEC_CONTROLS:low=0x%x, high=0x%x\n", vmx_msr_low, vmx_msr_high);
 
 	/* high 32b: must 0 setting
 	 * low 32b:  must 1 setting
@@ -227,12 +223,11 @@ static uint32_t check_vmx_ctrl(uint32_t msr, uint32_t ctrl_req)
 
 	if ((ctrl_req & ~ctrl) != 0U) {
 		pr_err("VMX ctrl 0x%x not fully enabled: "
-			"request 0x%x but get 0x%x\n",
+		       "request 0x%x but get 0x%x\n",
 			msr, ctrl_req, ctrl);
 	}
 
 	return ctrl;
-
 }
 
 static void init_exec_ctrl(struct acrn_vcpu *vcpu)
@@ -267,9 +262,8 @@ static void init_exec_ctrl(struct acrn_vcpu *vcpu)
 	 * the IA32_VMX_PROCBASED_CTRLS MSR are always read as 1 --- A.3.2
 	 */
 	value32 = check_vmx_ctrl(MSR_IA32_VMX_PROCBASED_CTLS,
-			 VMX_PROCBASED_CTLS_TSC_OFF | VMX_PROCBASED_CTLS_TPR_SHADOW |
-			 VMX_PROCBASED_CTLS_IO_BITMAP | VMX_PROCBASED_CTLS_MSR_BITMAP |
-			 VMX_PROCBASED_CTLS_SECONDARY);
+		VMX_PROCBASED_CTLS_TSC_OFF | VMX_PROCBASED_CTLS_TPR_SHADOW | VMX_PROCBASED_CTLS_IO_BITMAP |
+			VMX_PROCBASED_CTLS_MSR_BITMAP | VMX_PROCBASED_CTLS_SECONDARY);
 
 	/*Disable VM_EXIT for CR3 access*/
 	value32 &= ~(VMX_PROCBASED_CTLS_CR3_LOAD | VMX_PROCBASED_CTLS_CR3_STORE);
@@ -288,8 +282,8 @@ static void init_exec_ctrl(struct acrn_vcpu *vcpu)
 	 * guest (optional)
 	 */
 	value32 = check_vmx_ctrl(MSR_IA32_VMX_PROCBASED_CTLS2,
-			VMX_PROCBASED_CTLS2_VAPIC | VMX_PROCBASED_CTLS2_EPT |
-			VMX_PROCBASED_CTLS2_RDTSCP | VMX_PROCBASED_CTLS2_UNRESTRICT);
+		VMX_PROCBASED_CTLS2_VAPIC | VMX_PROCBASED_CTLS2_EPT | VMX_PROCBASED_CTLS2_RDTSCP |
+			VMX_PROCBASED_CTLS2_UNRESTRICT);
 
 	if (vcpu->arch.vpid != 0U) {
 		value32 |= VMX_PROCBASED_CTLS2_VPID;
@@ -402,8 +396,7 @@ static void init_entry_ctrl(const struct acrn_vcpu *vcpu)
 	 * on VM entry processor is in IA32e 64 bitmode * Start guest with host
 	 * IA32_PAT and IA32_EFER
 	 */
-	value32 = (VMX_ENTRY_CTLS_LOAD_EFER |
-		   VMX_ENTRY_CTLS_LOAD_PAT);
+	value32 = (VMX_ENTRY_CTLS_LOAD_EFER | VMX_ENTRY_CTLS_LOAD_PAT);
 
 	if (get_vcpu_mode(vcpu) == CPU_MODE_64BIT) {
 		value32 |= (VMX_ENTRY_CTLS_IA32E_MODE);
@@ -448,9 +441,8 @@ static void init_exit_ctrl(const struct acrn_vcpu *vcpu)
 	 * saving of pre-emption timer on VMEXIT
 	 */
 	value32 = check_vmx_ctrl(MSR_IA32_VMX_EXIT_CTLS,
-			 VMX_EXIT_CTLS_ACK_IRQ | VMX_EXIT_CTLS_SAVE_PAT |
-			 VMX_EXIT_CTLS_LOAD_PAT | VMX_EXIT_CTLS_LOAD_EFER |
-			 VMX_EXIT_CTLS_SAVE_EFER | VMX_EXIT_CTLS_HOST_ADDR64);
+		VMX_EXIT_CTLS_ACK_IRQ | VMX_EXIT_CTLS_SAVE_PAT | VMX_EXIT_CTLS_LOAD_PAT | VMX_EXIT_CTLS_LOAD_EFER |
+			VMX_EXIT_CTLS_SAVE_EFER | VMX_EXIT_CTLS_HOST_ADDR64);
 
 	exec_vmwrite32(VMX_EXIT_CONTROLS, value32);
 	pr_dbg("VMX_EXIT_CONTROL: 0x%x ", value32);

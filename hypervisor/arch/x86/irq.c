@@ -19,8 +19,14 @@
 #include <dump.h>
 #include <logmsg.h>
 
-static spinlock_t exception_spinlock = { .head = 0U, .tail = 0U, };
-static spinlock_t irq_alloc_spinlock = { .head = 0U, .tail = 0U, };
+static spinlock_t exception_spinlock = {
+	.head = 0U,
+	.tail = 0U,
+};
+static spinlock_t irq_alloc_spinlock = {
+	.head = 0U,
+	.tail = 0U,
+};
 
 uint64_t irq_alloc_bitmap[IRQ_ALLOC_BITMAP_SIZE];
 struct irq_desc irq_desc_array[NR_IRQS];
@@ -32,10 +38,10 @@ struct static_mapping_table {
 };
 
 static struct static_mapping_table irq_static_mappings[NR_STATIC_MAPPINGS] = {
-	{TIMER_IRQ, VECTOR_TIMER},
-	{NOTIFY_IRQ, VECTOR_NOTIFY_VCPU},
-	{POSTED_INTR_NOTIFY_IRQ, VECTOR_POSTED_INTR},
-	{PMI_IRQ, VECTOR_PMI},
+	{ TIMER_IRQ, VECTOR_TIMER },
+	{ NOTIFY_IRQ, VECTOR_NOTIFY_VCPU },
+	{ POSTED_INTR_NOTIFY_IRQ, VECTOR_POSTED_INTR },
+	{ PMI_IRQ, VECTOR_PMI },
 };
 
 /*
@@ -61,8 +67,7 @@ uint32_t alloc_irq_num(uint32_t req_irq)
 		if (irq >= NR_IRQS) {
 			irq = IRQ_INVALID;
 		} else {
-			bitmap_set_nolock((uint16_t)(irq & 0x3FU),
-					irq_alloc_bitmap + (irq >> 6U));
+			bitmap_set_nolock((uint16_t)(irq & 0x3FU), irq_alloc_bitmap + (irq >> 6U));
 		}
 		spinlock_irqrestore_release(&irq_alloc_spinlock, rflags);
 		ret = irq;
@@ -81,8 +86,7 @@ static void free_irq_num(uint32_t irq)
 	if (irq < NR_IRQS) {
 		if (!ioapic_irq_is_gsi(irq)) {
 			spinlock_irqsave_obtain(&irq_alloc_spinlock, &rflags);
-			(void)bitmap_test_and_clear_nolock((uint16_t)(irq & 0x3FU),
-						     irq_alloc_bitmap + (irq >> 6U));
+			(void)bitmap_test_and_clear_nolock((uint16_t)(irq & 0x3FU), irq_alloc_bitmap + (irq >> 6U));
 			spinlock_irqrestore_release(&irq_alloc_spinlock, rflags);
 		}
 	}
@@ -109,8 +113,7 @@ uint32_t alloc_irq_vector(uint32_t irq)
 				/* statically binded */
 				vr = desc->vector;
 			} else {
-				pr_err("[%s] irq[%u]:vector[%u] mismatch",
-					__func__, irq, desc->vector);
+				pr_err("[%s] irq[%u]:vector[%u] mismatch", __func__, irq, desc->vector);
 				vr = VECTOR_INVALID;
 			}
 		} else {
@@ -119,8 +122,7 @@ uint32_t alloc_irq_vector(uint32_t irq)
 			 */
 			spinlock_irqsave_obtain(&irq_alloc_spinlock, &rflags);
 
-			for (vr = VECTOR_DYNAMIC_START;
-				vr <= VECTOR_DYNAMIC_END; vr++) {
+			for (vr = VECTOR_DYNAMIC_START; vr <= VECTOR_DYNAMIC_END; vr++) {
 				if (vector_to_irq[vr] == IRQ_INVALID) {
 					desc->vector = vr;
 					vector_to_irq[vr] = irq;
@@ -187,8 +189,7 @@ static void free_irq_vector(uint32_t irq)
  *
  * return value: valid irq (>=0) on success, otherwise errno (< 0).
  */
-int32_t request_irq(uint32_t req_irq, irq_action_t action_fn, void *priv_data,
-			uint32_t flags)
+int32_t request_irq(uint32_t req_irq, irq_action_t action_fn, void *priv_data, uint32_t flags)
 {
 	struct irq_desc *desc;
 	uint32_t irq, vector;
@@ -203,8 +204,7 @@ int32_t request_irq(uint32_t req_irq, irq_action_t action_fn, void *priv_data,
 		vector = alloc_irq_vector(irq);
 
 		if (vector == VECTOR_INVALID) {
-			pr_err("[%s] failed to alloc vector for irq %u",
-				__func__, irq);
+			pr_err("[%s] failed to alloc vector for irq %u", __func__, irq);
 			free_irq_num(irq);
 			ret = -EINVAL;
 		} else {
@@ -222,8 +222,8 @@ int32_t request_irq(uint32_t req_irq, irq_action_t action_fn, void *priv_data,
 				spinlock_irqrestore_release(&desc->lock, rflags);
 
 				ret = -EBUSY;
-				pr_err("%s: request irq(%u) vr(%u) failed, already requested", __func__,
-						irq, irq_to_vector(irq));
+				pr_err("%s: request irq(%u) vr(%u) failed, already requested", __func__, irq,
+					irq_to_vector(irq));
 			}
 		}
 	}
@@ -238,8 +238,7 @@ void free_irq(uint32_t irq)
 
 	if (irq < NR_IRQS) {
 		desc = &irq_desc_array[irq];
-		dev_dbg(ACRN_DBG_IRQ, "[%s] irq%d vr:0x%x",
-			__func__, irq, irq_to_vector(irq));
+		dev_dbg(ACRN_DBG_IRQ, "[%s] irq%d vr:0x%x", __func__, irq, irq_to_vector(irq));
 
 		free_irq_vector(irq);
 		free_irq_num(irq);
@@ -325,8 +324,7 @@ static void init_irq_descs(void)
 
 		irq_desc_array[irq].vector = vr;
 		vector_to_irq[vr] = irq;
-		bitmap_set_nolock((uint16_t)(irq & 0x3FU),
-			      irq_alloc_bitmap + (irq >> 6U));
+		bitmap_set_nolock((uint16_t)(irq & 0x3FU), irq_alloc_bitmap + (irq >> 6U));
 	}
 }
 
@@ -365,9 +363,10 @@ static inline void fixup_idt(const struct host_idt_descriptor *idtd)
 
 static inline void set_idt(struct host_idt_descriptor *idtd)
 {
-	asm volatile ("   lidtq %[idtd]\n" :	/* no output parameters */
-		      :		/* input parameters */
-		      [idtd] "m"(*idtd));
+	asm volatile("   lidtq %[idtd]\n"
+		     : /* no output parameters */
+		     : /* input parameters */
+		     [ idtd ] "m"(*idtd));
 }
 
 void init_interrupt(uint16_t pcpu_id)

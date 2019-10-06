@@ -8,20 +8,20 @@
 #define ERRNO_H
 
 /** Indicates that operation not permitted. */
-#define EPERM		1
+#define EPERM 1
 /** Indicates that not enough memory. */
-#define ENOMEM		12
+#define ENOMEM 12
 /** Indicates Permission denied */
-#define EACCES		13
+#define EACCES 13
 /** Indicates there is fault. */
-#define EFAULT		14
+#define EFAULT 14
 /** Indicates that target is busy. */
-#define EBUSY		16
+#define EBUSY 16
 /** Indicates that no such dev. */
-#define ENODEV		19
+#define ENODEV 19
 /** Indicates that argument is not valid. */
-#define EINVAL		22
+#define EINVAL 22
 /** Indicates that timeout occurs. */
-#define ETIMEDOUT	110
+#define ETIMEDOUT 110
 
 #endif /* ERRNO_H */

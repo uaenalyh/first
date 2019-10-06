@@ -26,8 +26,7 @@
  * either a previous call to emulate_io() returning 0 or the corresponding VHM
  * request having transferred to the COMPLETE state.
  */
-void
-emulate_pio_complete(struct acrn_vcpu *vcpu, const struct io_request *io_req)
+void emulate_pio_complete(struct acrn_vcpu *vcpu, const struct io_request *io_req)
 {
 	const struct pio_request *pio_req = &io_req->reqs.pio;
 	uint64_t mask = 0xFFFFFFFFUL >> (32UL - (8UL * pio_req->size));
@@ -68,11 +67,8 @@ int32_t pio_instr_vmexit_handler(struct acrn_vcpu *vcpu)
 		pio_req->direction = REQUEST_READ;
 	}
 
-	TRACE_4I(TRACE_VMEXIT_IO_INSTRUCTION,
-		(uint32_t)pio_req->address,
-		(uint32_t)pio_req->direction,
-		(uint32_t)pio_req->size,
-		(uint32_t)cur_context_idx);
+	TRACE_4I(TRACE_VMEXIT_IO_INSTRUCTION, (uint32_t)pio_req->address, (uint32_t)pio_req->direction,
+		(uint32_t)pio_req->size, (uint32_t)cur_context_idx);
 
 	status = emulate_io(vcpu, io_req);
 

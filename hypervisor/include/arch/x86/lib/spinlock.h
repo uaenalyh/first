@@ -33,71 +33,56 @@ static inline void spinlock_obtain(spinlock_t *lock)
 	 * tail, we have locked the spinlock. Otherwise we have to wait.
 	 */
 
-	asm volatile ("   movl $0x1,%%eax\n"
-		      "   lock xaddl %%eax,%[head]\n"
-		      "   cmpl %%eax,%[tail]\n"
-		      "   jz 1f\n"
-		      "2: pause\n"
-		      "   cmpl %%eax,%[tail]\n"
-		      "   jnz 2b\n"
-		      "1:\n"
-		      :
-		      :
-		      [head] "m"(lock->head),
-		      [tail] "m"(lock->tail)
-		      : "cc", "memory", "eax");
+	asm volatile("   movl $0x1,%%eax\n"
+		     "   lock xaddl %%eax,%[head]\n"
+		     "   cmpl %%eax,%[tail]\n"
+		     "   jz 1f\n"
+		     "2: pause\n"
+		     "   cmpl %%eax,%[tail]\n"
+		     "   jnz 2b\n"
+		     "1:\n"
+		     :
+		     : [ head ] "m"(lock->head), [ tail ] "m"(lock->tail)
+		     : "cc", "memory", "eax");
 }
 
 static inline void spinlock_release(spinlock_t *lock)
 {
 	/* Increment tail of queue */
-	asm volatile ("   lock incl %[tail]\n"
-				:
-				: [tail] "m" (lock->tail)
-				: "cc", "memory");
+	asm volatile("   lock incl %[tail]\n" : : [ tail ] "m"(lock->tail) : "cc", "memory");
 }
 
 #else /* ASSEMBLER */
 
 /** The offset of the head element. */
-#define SYNC_SPINLOCK_HEAD_OFFSET       0
+#define SYNC_SPINLOCK_HEAD_OFFSET 0
 
 /** The offset of the tail element. */
-#define SYNC_SPINLOCK_TAIL_OFFSET       4
+#define SYNC_SPINLOCK_TAIL_OFFSET 4
 
-.macro spinlock_obtain lock
-	movl $1, % eax
-	lea \lock, % rbx
-	lock xaddl % eax, SYNC_SPINLOCK_HEAD_OFFSET(%rbx)
-	cmpl % eax, SYNC_SPINLOCK_TAIL_OFFSET(%rbx)
-	jz 1f
-2 :
-	pause
-	cmpl % eax, SYNC_SPINLOCK_TAIL_OFFSET(%rbx)
-	jnz 2b
-1 :
-.endm
+.macro spinlock_obtain lock movl $1, % eax lea \lock, % rbx lock xaddl % eax,
+	SYNC_SPINLOCK_HEAD_OFFSET(% rbx) cmpl % eax, SYNC_SPINLOCK_TAIL_OFFSET(% rbx) jz 1f 2 : pause cmpl % eax,
+	SYNC_SPINLOCK_TAIL_OFFSET(% rbx) jnz 2b 1
+	:.endm
 
 #define spinlock_obtain(x) spinlock_obtain lock = (x)
 
-.macro spinlock_release lock
-	lea \lock, % rbx
-	lock incl SYNC_SPINLOCK_TAIL_OFFSET(%rbx)
-.endm
+		 .macro spinlock_release lock lea \lock,
+	% rbx lock incl SYNC_SPINLOCK_TAIL_OFFSET(% rbx).endm
 
 #define spinlock_release(x) spinlock_release lock = (x)
 
-#endif	/* ASSEMBLER */
+#endif /* ASSEMBLER */
 
-#define spinlock_irqsave_obtain(lock, p_rflags)		\
-	do {						\
-		CPU_INT_ALL_DISABLE(p_rflags);		\
-		spinlock_obtain(lock);			\
+#define spinlock_irqsave_obtain(lock, p_rflags) \
+	do {                                    \
+		CPU_INT_ALL_DISABLE(p_rflags);  \
+		spinlock_obtain(lock);          \
 	} while (0)
 
-#define spinlock_irqrestore_release(lock, rflags)	\
-	do {						\
-		spinlock_release(lock);			\
-		CPU_INT_ALL_RESTORE(rflags);		\
+#define spinlock_irqrestore_release(lock, rflags) \
+	do {                                      \
+		spinlock_release(lock);           \
+		CPU_INT_ALL_RESTORE(rflags);      \
 	} while (0)
 #endif /* SPINLOCK_H */

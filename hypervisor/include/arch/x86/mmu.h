@@ -18,11 +18,11 @@
  */
 
 /* Defines used for common memory sizes */
-#define MEM_1K		1024U
-#define MEM_2K		(MEM_1K * 2U)
-#define MEM_4K		(MEM_1K * 4U)
-#define MEM_1M		(MEM_1K * 1024U)
-#define MEM_2M		(MEM_1M * 2U)
+#define MEM_1K 1024U
+#define MEM_2K (MEM_1K * 2U)
+#define MEM_4K (MEM_1K * 4U)
+#define MEM_1M (MEM_1K * 1024U)
+#define MEM_2M (MEM_1M * 2U)
 
 #ifndef ASSEMBLER
 
@@ -32,7 +32,7 @@
 #include <cpu_caps.h>
 
 /* Define cache line size (in bytes) */
-#define CACHE_LINE_SIZE		64U
+#define CACHE_LINE_SIZE 64U
 
 struct acrn_vcpu;
 static inline uint64_t round_page_up(uint64_t addr)
@@ -105,10 +105,10 @@ void enable_smap(void);
  * @return None
  */
 void init_paging(void);
-void mmu_add(uint64_t *pml4_page, uint64_t paddr_base, uint64_t vaddr_base,
-		uint64_t size, uint64_t prot, const struct memory_ops *mem_ops);
-void mmu_modify_or_del(uint64_t *pml4_page, uint64_t vaddr_base, uint64_t size,
-		uint64_t prot_set, uint64_t prot_clr, const struct memory_ops *mem_ops, uint32_t type);
+void mmu_add(uint64_t *pml4_page, uint64_t paddr_base, uint64_t vaddr_base, uint64_t size, uint64_t prot,
+	const struct memory_ops *mem_ops);
+void mmu_modify_or_del(uint64_t *pml4_page, uint64_t vaddr_base, uint64_t size, uint64_t prot_set, uint64_t prot_clr,
+	const struct memory_ops *mem_ops, uint32_t type);
 void hv_access_memory_region_update(uint64_t base, uint64_t size);
 
 /**
@@ -148,17 +148,17 @@ void invept(const void *eptp);
 
 static inline void cache_flush_invalidate_all(void)
 {
-	asm volatile ("   wbinvd\n" : : : "memory");
+	asm volatile("   wbinvd\n" : : : "memory");
 }
 
 static inline void clflush(const volatile void *p)
 {
-	asm volatile ("clflush (%0)" :: "r"(p));
+	asm volatile("clflush (%0)" ::"r"(p));
 }
 
 static inline void clflushopt(const volatile void *p)
 {
-	asm volatile ("clflushopt (%0)" :: "r"(p));
+	asm volatile("clflushopt (%0)" ::"r"(p));
 }
 
 /* get PDPT address from CR3 vaule in PAE mode */
