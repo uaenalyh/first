@@ -240,6 +240,13 @@ void vcpu_inject_gp(struct acrn_vcpu *vcpu, uint32_t err_code)
 	(void)vcpu_queue_exception(vcpu, IDT_GP, err_code);
 }
 
+/* Inject page fault exception(#PF) to guest */
+void vcpu_inject_pf(struct acrn_vcpu *vcpu, uint64_t addr, uint32_t err_code)
+{
+	vcpu_set_cr2(vcpu, addr);
+	(void)vcpu_queue_exception(vcpu, IDT_PF, err_code);
+}
+
 /* Inject invalid opcode exception(#UD) to guest */
 void vcpu_inject_ud(struct acrn_vcpu *vcpu)
 {

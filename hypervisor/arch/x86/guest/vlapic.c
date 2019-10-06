@@ -304,7 +304,6 @@ void vlapic_reset(struct acrn_vlapic *vlapic, const struct acrn_apicv_ops *ops)
  */
 void vlapic_init(struct acrn_vlapic *vlapic)
 {
-
 	vlapic_reset(vlapic, &ptapic_ops);
 }
 
@@ -391,6 +390,7 @@ static int32_t vlapic_x2apic_pt_icr_access(struct acrn_vm *vm, uint64_t val)
 				vlapic_process_init_sipi(target_vcpu, mode, icr_low);
 				break;
 			default:
+				/* convert the dest from virtual apic_id to physical apic_id */
 				papic_id = per_cpu(lapic_id, target_vcpu->pcpu_id);
 				dev_dbg(ACRN_DBG_LAPICPT, "%s vapic_id: 0x%08lx papic_id: 0x%08lx icr_low:0x%08lx",
 					__func__, vapic_id, papic_id, icr_low);

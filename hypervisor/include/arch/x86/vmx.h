@@ -239,17 +239,11 @@
 #define VMX_PROCBASED_CTLS2_UNRESTRICT (1U << 7U)
 #define VMX_PROCBASED_CTLS2_XSVE_XRSTR (1U << 20U)
 
-#define VMX_EPT_1GB_PAGE              (1U << 17U)
-#define VMX_EPT_INVEPT                (1U << 20U)
 #define VMX_EPT_INVEPT_SINGLE_CONTEXT (1U << 25U)
 #define VMX_EPT_INVEPT_GLOBAL_CONTEXT (1U << 26U)
 
 #define VMX_VPID_TYPE_SINGLE_CONTEXT 1UL
 #define VMX_VPID_TYPE_ALL_CONTEXT    2UL
-
-#define VMX_VPID_INVVPID                (1U << 0U) /* (32 - 32) */
-#define VMX_VPID_INVVPID_SINGLE_CONTEXT (1U << 9U) /* (41 - 32) */
-#define VMX_VPID_INVVPID_GLOBAL_CONTEXT (1U << 10U) /* (42 - 32) */
 
 #define VMX_EXIT_CTLS_HOST_ADDR64 (1U << 9U)
 #define VMX_EXIT_CTLS_ACK_IRQ     (1U << 15U)

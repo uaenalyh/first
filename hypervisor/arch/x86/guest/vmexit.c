@@ -71,7 +71,8 @@ const struct vm_exit_dispatch dispatch_table[NR_VMX_EXIT_REASONS] = {
 	[VMX_EXIT_REASON_RSM] = {
 		.handler = unhandled_vmexit_handler},
 	[VMX_EXIT_REASON_VMCALL] = {
-		.handler = undefined_vmexit_handler},
+		.handler = undefined_vmexit_handler
+		},
 	[VMX_EXIT_REASON_VMCLEAR] = {
 		.handler = undefined_vmexit_handler},
 	[VMX_EXIT_REASON_VMLAUNCH] = {
@@ -118,19 +119,20 @@ const struct vm_exit_dispatch dispatch_table[NR_VMX_EXIT_REASONS] = {
 	[VMX_EXIT_REASON_ENTRY_FAILURE_MACHINE_CHECK] = {
 		.handler = unhandled_vmexit_handler},
 	[VMX_EXIT_REASON_TPR_BELOW_THRESHOLD] = {
-		.handler = undefined_vmexit_handler},
+		.handler = unhandled_vmexit_handler
+		},
 	[VMX_EXIT_REASON_APIC_ACCESS] = {
-		.handler = undefined_vmexit_handler,
-		.need_exit_qualification = 1},
+		.handler = unhandled_vmexit_handler
+		},
 	[VMX_EXIT_REASON_VIRTUALIZED_EOI] = {
-		.handler = undefined_vmexit_handler,
-		.need_exit_qualification = 1},
+		.handler = unhandled_vmexit_handler
+		},
 	[VMX_EXIT_REASON_GDTR_IDTR_ACCESS] = {
 		.handler = unhandled_vmexit_handler},
 	[VMX_EXIT_REASON_LDTR_TR_ACCESS] = {
 		.handler = unhandled_vmexit_handler},
 	[VMX_EXIT_REASON_EPT_VIOLATION] = {
-		.handler = undefined_vmexit_handler,
+		.handler = ept_violation_vmexit_handler,
 		.need_exit_qualification = 1},
 	[VMX_EXIT_REASON_EPT_MISCONFIGURATION] = {
 		.handler = ept_misconfig_vmexit_handler,
@@ -148,8 +150,8 @@ const struct vm_exit_dispatch dispatch_table[NR_VMX_EXIT_REASONS] = {
 	[VMX_EXIT_REASON_XSETBV] = {
 		.handler = xsetbv_vmexit_handler},
 	[VMX_EXIT_REASON_APIC_WRITE] = {
-		.handler = undefined_vmexit_handler,
-		.need_exit_qualification = 1},
+		.handler = unhandled_vmexit_handler
+		},
 	[VMX_EXIT_REASON_RDRAND] = {
 		.handler = unhandled_vmexit_handler},
 	[VMX_EXIT_REASON_INVPCID] = {
@@ -225,7 +227,6 @@ int32_t vmexit_handler(struct acrn_vcpu *vcpu)
 			if (basic_exit_reason == VMX_EXIT_REASON_EXTERNAL_INTERRUPT) {
 
 				ret = dispatch->handler(vcpu);
-
 			} else {
 				ret = dispatch->handler(vcpu);
 			}

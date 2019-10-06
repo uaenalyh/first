@@ -290,7 +290,6 @@ static void init_exec_ctrl(struct acrn_vcpu *vcpu)
 	} else {
 		value32 &= ~VMX_PROCBASED_CTLS2_VPID;
 	}
-
 	/*
 	 * This field exists only on processors that support
 	 * the 1-setting  of the "use TPR shadow"

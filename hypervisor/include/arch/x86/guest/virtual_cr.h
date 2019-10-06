@@ -44,6 +44,16 @@ uint64_t vcpu_get_cr0(struct acrn_vcpu *vcpu);
 void vcpu_set_cr0(struct acrn_vcpu *vcpu, uint64_t val);
 
 /**
+ * @brief set vcpu CR2 value
+ *
+ * Update target vCPU's CR2 in run_context.
+ *
+ * @param[inout] vcpu pointer to vcpu data structure
+ * @param[in] val the value set CR2
+ */
+void vcpu_set_cr2(struct acrn_vcpu *vcpu, uint64_t val);
+
+/**
  * @brief get vcpu CR4 value
  *
  * Get & cache target vCPU's CR4 in run_context.

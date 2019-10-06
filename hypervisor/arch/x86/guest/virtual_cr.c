@@ -410,6 +410,11 @@ void vcpu_set_cr0(struct acrn_vcpu *vcpu, uint64_t val)
 	vmx_write_cr0(vcpu, val);
 }
 
+void vcpu_set_cr2(struct acrn_vcpu *vcpu, uint64_t val)
+{
+	vcpu->arch.contexts[vcpu->arch.cur_context].run_ctx.cr2 = val;
+}
+
 uint64_t vcpu_get_cr4(struct acrn_vcpu *vcpu)
 {
 	uint64_t mask;

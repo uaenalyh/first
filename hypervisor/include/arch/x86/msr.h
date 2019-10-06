@@ -174,14 +174,9 @@
 #define PAT_MEM_TYPE_WB  0x06UL /* writeback */
 #define PAT_MEM_TYPE_UCM 0x07UL /* uncached minus */
 
-/* MISC_ENABLE bits: architectural */
-#define MSR_IA32_MISC_ENABLE_FAST_STRING (1UL << 0U)
 #define MSR_IA32_MISC_ENABLE_MONITOR_ENA (1UL << 18U)
 #define MSR_IA32_MISC_ENABLE_LIMIT_CPUID (1UL << 22U)
 #define MSR_IA32_MISC_ENABLE_XD_DISABLE  (1UL << 34U)
-
-/* Miscellaneous data */
-#define MSR_IA32_MISC_UNRESTRICTED_GUEST (1U << 5U)
 
 #ifndef ASSEMBLER
 static inline bool pat_mem_type_invalid(uint64_t x)

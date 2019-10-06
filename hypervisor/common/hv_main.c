@@ -58,7 +58,6 @@ void vcpu_thread(struct sched_object *obj)
 		vcpu->arch.nrexits++;
 
 		profiling_pre_vmexit_handler(vcpu);
-
 		/* Dispatch handler */
 		ret = vmexit_handler(vcpu);
 		if (ret < 0) {

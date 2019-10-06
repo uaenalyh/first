@@ -220,6 +220,7 @@ static int32_t set_vcpuid_extended_function(struct acrn_vm *vm)
 	result = set_vcpuid_entry(vm, &entry);
 	if (result == 0) {
 		init_vcpuid_entry(0x40000001U, 0U, 0U, &entry);
+		/* EAX: Guest capability flags (e.g. whether it is a privilege VM) */
 		result = set_vcpuid_entry(vm, &entry);
 	}
 
@@ -341,7 +342,6 @@ static void guest_cpuid_01h(struct acrn_vcpu *vcpu, uint32_t *eax, uint32_t *ebx
 	/* Patching initial APIC ID */
 	*ebx &= ~APIC_ID_MASK;
 	*ebx |= (apicid << APIC_ID_SHIFT);
-
 	/* mask mtrr */
 	*edx &= ~CPUID_EDX_MTRR;
 
@@ -395,6 +395,7 @@ static void guest_cpuid_0bh(struct acrn_vcpu *vcpu, uint32_t *eax, uint32_t *ebx
 	uint32_t leaf = 0x0bU;
 	uint32_t subleaf = *ecx;
 
+	/* Patching X2APIC */
 	*ecx = subleaf & 0xFFU;
 	/* No HT emulation for UOS */
 	switch (subleaf) {

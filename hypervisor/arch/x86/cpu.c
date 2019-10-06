@@ -105,7 +105,6 @@ void init_pcpu_pre(bool is_bsp)
 
 		/* Clear BSS */
 		(void)memset(&ld_bss_start, 0U, (size_t)(&ld_bss_end - &ld_bss_start));
-
 		/*
 		 * Enable UART as early as possible.
 		 * Then we could use printf for debugging on early boot stage.
@@ -118,10 +117,6 @@ void init_pcpu_pre(bool is_bsp)
 		 * limit which is required for initializing paging.
 		 */
 		init_pcpu_capabilities();
-
-		if (detect_hardware_support() != 0) {
-			panic("hardware not support!");
-		}
 
 		init_pcpu_model_name();
 
@@ -144,10 +139,6 @@ void init_pcpu_pre(bool is_bsp)
 		ret = init_ioapic_id_info();
 		if (ret != 0) {
 			panic("System IOAPIC info is incorrect!");
-		}
-
-		if (ret != 0) {
-			panic("Platform CAT info is incorrect!");
 		}
 
 	} else {
@@ -197,10 +188,6 @@ void init_pcpu_post(uint16_t pcpu_id)
 		pr_acrnlog("Detect processor: %s", (get_pcpu_info())->model_name);
 
 		pr_dbg("Core %hu is up", BOOT_CPU_ID);
-
-		if (!sanitize_vm_config()) {
-			panic("VM Configuration Error!");
-		}
 
 		/* Warn for security feature not ready */
 		if (!check_cpu_security_cap()) {

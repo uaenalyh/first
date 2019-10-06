@@ -92,8 +92,7 @@
 #define PCICAP_NEXTPTR 0x1U
 
 /* Capability Identification Numbers */
-#define PCIY_MSI  0x05U
-#define PCIY_MSIX 0x11U
+#define PCIY_MSI 0x05U
 
 /* PCI Message Signalled Interrupts (MSI) */
 #define PCIR_MSI_CTRL           0x02U

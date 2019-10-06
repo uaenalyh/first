@@ -71,24 +71,6 @@ bool has_monitor_cap(void)
 	return ret;
 }
 
-static inline bool is_fast_string_erms_supported_and_enabled(void)
-{
-	bool ret = false;
-	uint64_t misc_enable = msr_read(MSR_IA32_MISC_ENABLE);
-
-	if ((misc_enable & MSR_IA32_MISC_ENABLE_FAST_STRING) == 0UL) {
-		pr_fatal("%s, fast string is not enabled\n", __func__);
-	} else {
-		if (!pcpu_has_cap(X86_FEATURE_ERMS)) {
-			pr_fatal("%s, enhanced rep movsb/stosb not supported\n", __func__);
-		} else {
-			ret = true;
-		}
-	}
-
-	return ret;
-}
-
 /*check allowed ONEs setting in vmx control*/
 static bool is_ctrl_setting_allowed(uint64_t msr_val, uint32_t ctrl)
 {
@@ -203,19 +185,9 @@ void init_pcpu_capabilities(void)
 	detect_pcpu_cap();
 }
 
-static bool is_ept_supported(void)
-{
-	return (cpu_caps.ept_features != 0U);
-}
-
 bool pcpu_has_vmx_ept_cap(uint32_t bit_mask)
 {
 	return ((cpu_caps.vmx_ept & bit_mask) != 0U);
-}
-
-bool pcpu_has_vmx_vpid_cap(uint32_t bit_mask)
-{
-	return ((cpu_caps.vmx_vpid & bit_mask) != 0U);
 }
 
 void init_pcpu_model_name(void)
@@ -231,125 +203,6 @@ void init_pcpu_model_name(void)
 		(uint32_t *)(&boot_cpu_data.model_name[44]));
 
 	boot_cpu_data.model_name[48] = '\0';
-}
-
-static inline bool is_vmx_disabled(void)
-{
-	uint64_t msr_val;
-	bool ret = false;
-
-	/* Read Feature ControL MSR */
-	msr_val = msr_read(MSR_IA32_FEATURE_CONTROL);
-
-	/* Check if feature control is locked and vmx cannot be enabled */
-	if (((msr_val & MSR_IA32_FEATURE_CONTROL_LOCK) != 0U) &&
-		((msr_val & MSR_IA32_FEATURE_CONTROL_VMX_NO_SMX) == 0U)) {
-		ret = true;
-	}
-
-	return ret;
-}
-
-static inline bool pcpu_has_vmx_unrestricted_guest_cap(void)
-{
-	return ((msr_read(MSR_IA32_VMX_MISC) & MSR_IA32_MISC_UNRESTRICTED_GUEST) != 0UL);
-}
-
-static int32_t check_vmx_mmu_cap(void)
-{
-	int32_t ret = 0;
-
-	if (!pcpu_has_vmx_ept_cap(VMX_EPT_INVEPT)) {
-		printf("%s, invept not supported\n", __func__);
-		ret = -ENODEV;
-	} else if (!pcpu_has_vmx_vpid_cap(VMX_VPID_INVVPID) ||
-		!pcpu_has_vmx_vpid_cap(VMX_VPID_INVVPID_SINGLE_CONTEXT) ||
-		!pcpu_has_vmx_vpid_cap(VMX_VPID_INVVPID_GLOBAL_CONTEXT)) {
-		printf("%s, invvpid not supported\n", __func__);
-		ret = -ENODEV;
-	} else if (!pcpu_has_vmx_ept_cap(VMX_EPT_1GB_PAGE)) {
-		printf("%s, ept not support 1GB large page\n", __func__);
-		ret = -ENODEV;
-	} else {
-		/* No other state currently, do nothing */
-	}
-
-	return ret;
-}
-
-/*
- * basic hardware capability check
- * we should supplement which feature/capability we must support
- * here later.
- */
-int32_t detect_hardware_support(void)
-{
-	int32_t ret;
-
-	/* Long Mode (x86-64, 64-bit support) */
-	if (!pcpu_has_cap(X86_FEATURE_LM)) {
-		printf("%s, LM not supported\n", __func__);
-		ret = -ENODEV;
-	} else if ((boot_cpu_data.phys_bits == 0U) || (boot_cpu_data.virt_bits == 0U)) {
-		printf("%s, can't detect Linear/Physical Address size\n", __func__);
-		ret = -ENODEV;
-	} else if (!pcpu_has_cap(X86_FEATURE_INVA_TSC)) {
-		/* check invariant TSC */
-		printf("%s, invariant TSC not supported\n", __func__);
-		ret = -ENODEV;
-	} else if (!pcpu_has_cap(X86_FEATURE_TSC_DEADLINE)) {
-		/* lapic TSC deadline timer */
-		printf("%s, TSC deadline not supported\n", __func__);
-		ret = -ENODEV;
-	} else if (!pcpu_has_cap(X86_FEATURE_NX)) {
-		/* Execute Disable */
-		printf("%s, NX not supported\n", __func__);
-		ret = -ENODEV;
-	} else if (!pcpu_has_cap(X86_FEATURE_SMEP)) {
-		/* Supervisor-Mode Execution Prevention */
-		printf("%s, SMEP not supported\n", __func__);
-		ret = -ENODEV;
-	} else if (!pcpu_has_cap(X86_FEATURE_SMAP)) {
-		/* Supervisor-Mode Access Prevention */
-		printf("%s, SMAP not supported\n", __func__);
-		ret = -ENODEV;
-	} else if (!pcpu_has_cap(X86_FEATURE_MTRR)) {
-		printf("%s, MTRR not supported\n", __func__);
-		ret = -ENODEV;
-	} else if (!pcpu_has_cap(X86_FEATURE_CLFLUSHOPT)) {
-		printf("%s, CLFLUSHOPT not supported\n", __func__);
-		ret = -ENODEV;
-	} else if (!pcpu_has_cap(X86_FEATURE_PAGE1GB)) {
-		printf("%s, not support 1GB page\n", __func__);
-		ret = -ENODEV;
-	} else if (!pcpu_has_cap(X86_FEATURE_VMX)) {
-		printf("%s, vmx not supported\n", __func__);
-		ret = -ENODEV;
-	} else if (!is_fast_string_erms_supported_and_enabled()) {
-		ret = -ENODEV;
-	} else if (!pcpu_has_vmx_unrestricted_guest_cap()) {
-		printf("%s, unrestricted guest not supported\n", __func__);
-		ret = -ENODEV;
-	} else if (!is_ept_supported()) {
-		printf("%s, EPT not supported\n", __func__);
-		ret = -ENODEV;
-	} else if (boot_cpu_data.cpuid_level < 0x15U) {
-		printf("%s, required CPU feature not supported\n", __func__);
-		ret = -ENODEV;
-	} else if (is_vmx_disabled()) {
-		printf("%s, VMX can not be enabled\n", __func__);
-		ret = -ENODEV;
-	} else if (!pcpu_has_cap(X86_FEATURE_X2APIC)) {
-		printf("%s, x2APIC not supported\n", __func__);
-		ret = -ENODEV;
-	} else if (!pcpu_has_cap(X86_FEATURE_POPCNT)) {
-		printf("%s, popcnt instruction not supported\n", __func__);
-		ret = -ENODEV;
-	} else {
-		ret = check_vmx_mmu_cap();
-	}
-
-	return ret;
 }
 
 struct cpuinfo_x86 *get_pcpu_info(void)

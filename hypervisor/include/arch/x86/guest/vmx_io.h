@@ -37,6 +37,16 @@
 int32_t pio_instr_vmexit_handler(struct acrn_vcpu *vcpu);
 
 /**
+ * @brief EPT violation handling
+ *
+ * @param[in] vcpu the pointer that points to vcpu data structure
+ *
+ * @retval -EINVAL fail to handle the EPT violation
+ * @retval 0 Success to handle the EPT violation
+ */
+int32_t ept_violation_vmexit_handler(struct acrn_vcpu *vcpu);
+
+/**
  * @brief General complete-work for port I/O emulation
  *
  * @pre io_req->io_type == REQ_PORTIO

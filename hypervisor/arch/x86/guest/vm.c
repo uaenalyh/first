@@ -64,7 +64,6 @@ bool is_rt_vm(const struct acrn_vm *vm)
  */
 static void setup_io_bitmap(struct acrn_vm *vm)
 {
-	/* block all IO port access from Guest */
 	(void)memset(vm->arch_vm.io_bitmap, 0xFFU, PAGE_SIZE * 2U);
 }
 
@@ -133,8 +132,6 @@ static void prepare_epc_vm_memmap(struct acrn_vm *vm)
 
 static void register_pm_io_handler(struct acrn_vm *vm)
 {
-
-	/* Intercept the virtual pm port for RTVM */
 	if (is_rt_vm(vm)) {
 	}
 }
@@ -162,21 +159,14 @@ int32_t create_vm(uint16_t vm_id, struct acrn_vm_config *vm_config, struct acrn_
 	vm->arch_vm.nworld_eptp = vm->arch_vm.ept_mem_ops.get_pml4_page(vm->arch_vm.ept_mem_ops.info);
 	sanitize_pte((uint64_t *)vm->arch_vm.nworld_eptp, &vm->arch_vm.ept_mem_ops);
 
+	/* Register default handlers for PIO & MMIO if it is, SOS VM or Pre-launched VM */
 	register_pio_default_emulation_handler(vm);
 	register_mmio_default_emulation_handler(vm);
 
 	(void)memcpy_s(&vm->uuid[0], sizeof(vm->uuid), &vm_config->uuid[0], sizeof(vm_config->uuid));
-
 	/* For PRE_LAUNCHED_VM and POST_LAUNCHED_VM */
 	if ((vm_config->guest_flags & GUEST_FLAG_SECURE_WORLD_ENABLED) != 0U) {
 		vm->sworld_control.flag.supported = 1U;
-	}
-	if (vm->sworld_control.flag.supported != 0UL) {
-		struct memory_ops *ept_mem_ops = &vm->arch_vm.ept_mem_ops;
-
-		ept_add_mr(vm, (uint64_t *)vm->arch_vm.nworld_eptp,
-			hva2hpa(ept_mem_ops->get_sworld_memory_base(ept_mem_ops->info)), TRUSTY_EPT_REBASE_GPA,
-			TRUSTY_RAM_SIZE, EPT_WB | EPT_RWX);
 	}
 
 	create_prelaunched_vm_e820(vm);

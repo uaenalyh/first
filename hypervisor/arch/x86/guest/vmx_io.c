@@ -74,3 +74,11 @@ int32_t pio_instr_vmexit_handler(struct acrn_vcpu *vcpu)
 
 	return status;
 }
+
+int32_t ept_violation_vmexit_handler(struct acrn_vcpu *vcpu)
+{
+
+	vcpu_inject_pf(vcpu, exec_vmread64(VMX_GUEST_PHYSICAL_ADDR_FULL), 0);
+
+	return 0;
+}

@@ -185,7 +185,6 @@ HW_C_SRCS += arch/x86/timer.c
 HW_C_SRCS += arch/x86/vmx.c
 HW_C_SRCS += arch/x86/trampoline.c
 HW_S_SRCS += arch/x86/sched.S
-HW_C_SRCS += arch/x86/cat.c
 HW_C_SRCS += common/schedule.c
 HW_C_SRCS += hw/pci.c
 HW_C_SRCS += arch/x86/configs/vm_config.c
@@ -484,7 +483,7 @@ LINUX_ROOTFS := fedora.img
 UT_CASE ?= xsave
 UT_CASE_2 ?= tsc_adjust
 
-ZEPHYR_BINARY := $(ZEPHYR_DIR)/zephyr/
+ZEPHYR_BINARY := $(ZEPHYR_DIR)/zephyr/samples/$(ZEPHYR_SAMPLE)/build/zephyr/zephyr.bin
 LINUX_BZIMAGE_BINARY := $(LINUX_DIR)/build/arch/x86/boot/bzImage
 LINUX_ROOTFS_IMAGE := $(LINUX_DIR)/$(LINUX_ROOTFS)
 UT_BINARY := $(UT_DIR)/guest/x86/$(UT_CASE).bzimage

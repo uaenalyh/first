@@ -241,6 +241,7 @@ int32_t ptirq_msix_remap(
 	spinlock_obtain(&ptdev_lock);
 	entry = ptirq_lookup_entry_by_sid(PTDEV_INTR_MSI, &virt_sid, vm);
 	if (entry == NULL) {
+		/* SOS_VM we add mapping dynamically */
 		entry = add_msix_remapping(vm, virt_bdf, phys_bdf, entry_nr);
 		if (entry == NULL) {
 			pr_err("dev-assign: msi entry exist in others");
@@ -254,6 +255,7 @@ int32_t ptirq_msix_remap(
 			/* handle destroy case */
 			info->pmsi_data.full = 0U;
 		} else {
+			/* build physical config MSI, update to info->pmsi_xxx */
 			enum vm_vlapic_state vlapic_state = check_vm_vlapic_state(vm);
 			if (vlapic_state == VM_VLAPIC_X2APIC) {
 				/*
