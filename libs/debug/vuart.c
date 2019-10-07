@@ -560,9 +560,11 @@ void vuart_init(struct acrn_vm *vm, const struct vuart_config *vu_config)
 			vuart_setup_connection(vm, &vu_config[i], i);
 		}
 
+#if 0
 		if (console_vmid == ACRN_INVALID_VMID) {
 			console_vmid = vm->vm_id;
 		}
+#endif
 	}
 
 	/* Take this opportunity to register the testdev */
