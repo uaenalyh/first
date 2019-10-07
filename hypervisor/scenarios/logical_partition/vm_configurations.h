@@ -13,7 +13,7 @@
 /* Bits mask of guest flags that can be programmed by device model. Other bits are set by hypervisor only */
 #define DM_OWNED_GUEST_FLAG_MASK 0UL
 
-#define CONFIG_MAX_VM_NUM 1U
+#define CONFIG_MAX_VM_NUM 2U
 
 /* The VM CONFIGs like:
  *	VMX_CONFIG_VCPU_AFFINITY
@@ -25,9 +25,9 @@
  * might be different on your board, please modify them per your needs.
  */
 
-#define VM0_CONFIG_VCPU_AFFINITY                   \
-	{                                          \
-		AFFINITY_CPU(0U), AFFINITY_CPU(2U) \
+#define VM0_CONFIG_VCPU_AFFINITY \
+	{                        \
+		AFFINITY_CPU(0U) \
 	}
 #define VM0_CONFIG_MEM_START_HPA      0x100000000UL
 #define VM0_CONFIG_MEM_SIZE           0x20000000UL
@@ -35,14 +35,14 @@
 #define VM0_CONFIG_OS_BOOTARG_MAXCPUS "maxcpus=2 "
 #define VM0_CONFIG_OS_BOOTARG_CONSOLE "console=ttyS0 "
 
-#define VM1_CONFIG_VCPU_AFFINITY                   \
-	{                                          \
-		AFFINITY_CPU(1U), AFFINITY_CPU(3U) \
+#define VM1_CONFIG_VCPU_AFFINITY                                     \
+	{                                                            \
+		AFFINITY_CPU(1U), AFFINITY_CPU(2U), AFFINITY_CPU(3U) \
 	}
 #define VM1_CONFIG_MEM_START_HPA      0x120000000UL
 #define VM1_CONFIG_MEM_SIZE           0x20000000UL
 #define VM1_CONFIG_OS_BOOTARG_ROOT    ROOTFS_0
-#define VM1_CONFIG_OS_BOOTARG_MAXCPUS "maxcpus=2 "
+#define VM1_CONFIG_OS_BOOTARG_MAXCPUS "maxcpus=3 "
 #define VM1_CONFIG_OS_BOOTARG_CONSOLE "console=ttyS0 "
 
 /* VM pass-through devices assign policy:
@@ -62,6 +62,6 @@
 #define VM1_NETWORK_CONTROLLER NETWORK_CONTROLLER_0
 #endif
 
-#define VM1_CONFIG_PCI_DEV_NUM 2U
+#define VM1_CONFIG_PCI_DEV_NUM 1U
 
 #endif /* VM_CONFIGURATIONS_H */

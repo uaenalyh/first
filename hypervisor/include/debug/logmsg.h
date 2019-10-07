@@ -17,7 +17,7 @@
 #define LOG_INFO    5U
 #define LOG_DEBUG   6U
 
-#define ACRN_DBG_LAPICPT 5U
+#define ACRN_DBG_LAPICPT 6U
 
 #define ASSERT(x, ...) \
 	do {           \

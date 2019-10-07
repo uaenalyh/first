@@ -37,6 +37,7 @@
 #define GUEST_FLAG_SECURE_WORLD_ENABLED (1UL << 0U) /* Whether secure world is enabled */
 #define GUEST_FLAG_LAPIC_PASSTHROUGH    (1UL << 1U) /* Whether LAPIC is passed through */
 #define GUEST_FLAG_RT                   (1UL << 5U) /* Whether the vm is RT-VM */
+#define GUEST_FLAG_HIGHEST_SEVERITY     (1UL << 6U) /* Whether has the highest severity */
 
 /**
  * @brief Hypercall

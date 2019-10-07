@@ -157,19 +157,7 @@ void send_startup_ipi(enum intr_cpu_startup_shorthand cpu_startup_shorthand, uin
 
 void send_single_ipi(uint16_t pcpu_id, uint32_t vector)
 {
-	union apic_icr icr;
-
-	if (is_pcpu_active(pcpu_id)) {
-		/* Set the destination field to the target processor. */
-		icr.value_32.hi_32 = per_cpu(lapic_id, pcpu_id);
-
-		/* Write the vector ID to ICR. */
-		icr.value_32.lo_32 = vector | (INTR_LAPIC_ICR_PHYSICAL << 11U);
-
-		msr_write(MSR_IA32_EXT_APIC_ICR, icr.value);
-	} else {
-		pr_err("pcpu_id %d not in active!", pcpu_id);
-	}
+	send_single_init(pcpu_id);
 }
 
 /**

@@ -4,7 +4,7 @@
 #define CONFIG_LOGICAL_PARTITION         1
 #define CONFIG_BOARD                     "nuc7i7dnb"
 #define CONFIG_RELEASE                   1
-#define CONFIG_MAX_VCPUS_PER_VM          2U
+#define CONFIG_MAX_VCPUS_PER_VM          3U
 #define CONFIG_MAX_EMULATED_MMIO_REGIONS 16U
 #define CONFIG_MAX_PT_IRQ_ENTRIES        64U
 #define CONFIG_MAX_IOMMU_NUM             2U
