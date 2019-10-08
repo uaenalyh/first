@@ -41,11 +41,13 @@ void write_trampoline_stack_sym(uint16_t pcpu_id)
 	clflush(hva);
 }
 
+/*
+ * @pre pcpu_has_cap(X86_FEATURE_PAGE1GB) == true
+ */
 static void update_trampoline_code_refs(uint64_t dest_pa)
 {
 	void *ptr;
 	uint64_t val;
-	int32_t i;
 
 	/*
 	 * calculate the fixup CS:IP according to fixup target address
@@ -68,11 +70,6 @@ static void update_trampoline_code_refs(uint64_t dest_pa)
 
 	ptr = hpa2hva(dest_pa + trampoline_relo_addr(&cpu_boot_page_tables_start));
 	*(uint64_t *)(ptr) += dest_pa;
-
-	ptr = hpa2hva(dest_pa + trampoline_relo_addr(&trampoline_pdpt_addr));
-	for (i = 0; i < 4; i++) {
-		*(uint64_t *)(ptr + sizeof(uint64_t) * i) += dest_pa;
-	}
 
 	/* update the gdt base pointer with relocated offset */
 	ptr = hpa2hva(dest_pa + trampoline_relo_addr(&trampoline_gdt_ptr));
