@@ -6,7 +6,7 @@ LINUX_DIR := ../../linux
 UT_DIR := ../../acrn-unit-test
 
 ZEPHYR_SAMPLE ?= hello_world
-LINUX_ROOTFS := fedora.img
+LINUX_ROOTFS ?= clear-31090-kvm.img
 UT_CASE ?= xsave
 UT_CASE_2 ?= tsc_adjust
 
