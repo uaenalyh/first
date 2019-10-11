@@ -71,7 +71,6 @@
 #define PCIM_HDRTYPE              0x7FU
 #define PCIM_HDRTYPE_NORMAL       0x00U
 #define PCIM_HDRTYPE_BRIDGE       0x01U
-#define PCIM_HDRTYPE_CARDBUS      0x02U
 #define PCIM_MFDEV                0x80U
 #define PCIR_BARS                 0x10U
 #define PCIM_BAR_SPACE            0x01U
@@ -81,7 +80,6 @@
 #define PCIM_BAR_MEM_1MB          0x02U
 #define PCIM_BAR_MEM_64           0x04U
 #define PCIR_CAP_PTR              0x34U
-#define PCIR_CAP_PTR_CARDBUS      0x14U
 #define PCI_BASE_ADDRESS_MEM_MASK (~0x0fUL)
 #define PCI_BASE_ADDRESS_IO_MASK  (~0x03UL)
 
