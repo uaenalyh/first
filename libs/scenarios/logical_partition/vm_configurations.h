@@ -49,19 +49,10 @@
  * VM0: one Mass Storage controller, one Network controller;
  * VM1: one Mass Storage controller, one Network controller(if a secondary Network controller class device exist);
  */
-#define VM0_STORAGE_CONTROLLER SATA_CONTROLLER_0
-#define VM0_NETWORK_CONTROLLER ETHERNET_CONTROLLER_0
+#define VM0_NETWORK_CONTROLLER ETHERNET_CONTROLLER
 #define VM0_CONFIG_PCI_DEV_NUM 1U
 
-#define VM1_STORAGE_CONTROLLER USB_CONTROLLER_0
-#if defined(ETHERNET_CONTROLLER_1)
-/* if a secondary Ethernet controller subclass exist, assign to VM1 */
-#define VM1_NETWORK_CONTROLLER ETHERNET_CONTROLLER_1
-#elif defined(NETWORK_CONTROLLER_0)
-/* if a Network controller subclass exist(usually it is a wireless network card), assign to VM1 */
-#define VM1_NETWORK_CONTROLLER NETWORK_CONTROLLER_0
-#endif
-
+#define VM1_STORAGE_CONTROLLER USB_CONTROLLER
 #define VM1_CONFIG_PCI_DEV_NUM 1U
 
 #endif /* VM_CONFIGURATIONS_H */
