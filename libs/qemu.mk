@@ -40,7 +40,7 @@ $(HV_OBJDIR)/$(HV_FILE).iso: all $(ZEPHYR_BINARY) $(LINUX_BZIMAGE_BINARY)
 
 .PHONY: qemu_linux
 qemu_linux: $(LINUX_BZIMAGE_BINARY) $(LINUX_ROOTFS_IMAGE)
-	$(QEMUEXE) $(QEMUOPTS) -kernel $(LINUX_BZIMAGE_BINARY) -append "rw root=/dev/sda1 rootwait console=ttyS0 ignore_loglevel tsc=reliable intel_iommu=off noxsave" || true
+	$(QEMUEXE) $(QEMUOPTS) -kernel $(LINUX_BZIMAGE_BINARY) -append "rw root=/dev/sda3 rootwait console=ttyS0 ignore_loglevel tsc=reliable intel_iommu=off noxsave" || true
 
 else
 $(UT_DIR)/guest/x86/%.bzimage:
