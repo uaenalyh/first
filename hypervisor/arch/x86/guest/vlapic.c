@@ -406,7 +406,7 @@ static int32_t vlapic_x2apic_pt_icr_access(struct acrn_vm *vm, uint64_t val)
 				break;
 			default:
 				/* convert the dest from virtual apic_id to physical apic_id */
-				papic_id = per_cpu(lapic_id, target_vcpu->pcpu_id);
+				papic_id = per_cpu(lapic_id, pcpuid_from_vcpu(target_vcpu));
 				dev_dbg(ACRN_DBG_LAPICPT, "%s vapic_id: 0x%08lx papic_id: 0x%08lx icr_low:0x%08lx",
 					__func__, vapic_id, papic_id, icr_low);
 				msr_write(MSR_IA32_EXT_APIC_ICR, (((uint64_t)papic_id) << 32U) | icr_low);
