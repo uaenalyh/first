@@ -39,19 +39,6 @@ struct list_head {
 		(ptr)->prev = (ptr); \
 	} while (0)
 
-static inline void list_add_node(struct list_head *new_node, struct list_head *prev, struct list_head *next)
-{
-	next->prev = new_node;
-	new_node->next = next;
-	new_node->prev = prev;
-	prev->next = new_node;
-}
-
-static inline void list_add_tail(struct list_head *new_node, struct list_head *head)
-{
-	list_add_node(new_node, head->prev, head);
-}
-
 static inline void list_del_node(struct list_head *prev, struct list_head *next)
 {
 	next->prev = prev;
@@ -64,13 +51,6 @@ static inline void list_del_init(struct list_head *entry)
 	INIT_LIST_HEAD(entry);
 }
 
-static inline _Bool list_empty(const struct list_head *head)
-{
-	return head->next == head;
-}
-
 #define list_entry(ptr, type, member) ((type *)((char *)(ptr) - (uint64_t)(&((type *)0)->member)))
-
-#define get_first_item(attached, type, member) ((type *)((char *)((attached)->next) - (uint64_t)(&((type *)0)->member)))
 
 #endif /* LIST_H_ */
