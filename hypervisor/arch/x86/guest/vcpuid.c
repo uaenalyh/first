@@ -220,7 +220,6 @@ static int32_t set_vcpuid_extended_function(struct acrn_vm *vm)
 	result = set_vcpuid_entry(vm, &entry);
 	if (result == 0) {
 		init_vcpuid_entry(0x40000001U, 0U, 0U, &entry);
-		/* EAX: Guest capability flags (e.g. whether it is a privilege VM) */
 		result = set_vcpuid_entry(vm, &entry);
 	}
 
