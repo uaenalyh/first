@@ -119,13 +119,6 @@ static void prepare_epc_vm_memmap(struct acrn_vm *vm)
 {
 }
 
-static void register_pm_io_handler(struct acrn_vm *vm)
-{
-	/* Intercept the virtual pm port for RTVM */
-	if (is_rt_vm(vm)) {
-	}
-}
-
 /**
  * @brief get bitmap of pCPUs whose vCPUs have LAPIC PT enabled
  *
@@ -196,8 +189,6 @@ int32_t create_vm(uint16_t vm_id, struct acrn_vm_config *vm_config, struct acrn_
 		 * selected IO ranges
 		 */
 		setup_io_bitmap(vm);
-
-		register_pm_io_handler(vm);
 
 		/* Create virtual uart;*/
 		vuart_init(vm, vm_config->vuart);
