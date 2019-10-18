@@ -47,28 +47,6 @@
  */
 
 /**
- * @brief Representation of a MMIO request
- */
-struct mmio_request {
-	/**
-	 * @brief Direction of the access
-	 *
-	 * Either \p REQUEST_READ or \p REQUEST_WRITE.
-	 */
-	uint32_t direction;
-
-	/**
-	 * @brief Width of the I/O access in byte
-	 */
-	uint64_t size;
-
-	/**
-	 * @brief The value read for I/O reads or to be written for I/O writes
-	 */
-	uint64_t value;
-} __aligned(8);
-
-/**
  * @brief Representation of a port I/O request
  */
 struct pio_request {
@@ -97,7 +75,6 @@ struct pio_request {
 
 union vhm_io_request {
 	struct pio_request pio;
-	struct mmio_request mmio;
 };
 
 /* General-purpose register layout aligned with the general-purpose register idx

@@ -102,10 +102,6 @@ struct vm_io_handler_desc {
 	io_write_fn_t io_write;
 };
 
-/* Typedef for MMIO handler and range check routine */
-struct mmio_request;
-typedef int32_t (*hv_mem_io_handler_t)(struct io_request *io_req, void *handler_private_data);
-
 /* External Interfaces */
 
 /**
@@ -141,20 +137,6 @@ int32_t emulate_io(struct acrn_vcpu *vcpu, struct io_request *io_req);
  */
 void register_pio_emulation_handler(struct acrn_vm *vm, uint32_t pio_idx, const struct vm_io_range *range,
 	io_read_fn_t io_read_fn_ptr, io_write_fn_t io_write_fn_ptr);
-
-/**
- * @brief Register port I/O default handler
- *
- * @param vm      The VM to which the port I/O handlers are registered
- */
-void register_pio_default_emulation_handler(struct acrn_vm *vm);
-
-/**
- * @brief Register MMIO default handler
- *
- * @param vm The VM to which the MMIO handler is registered
- */
-void register_mmio_default_emulation_handler(struct acrn_vm *vm);
 
 /**
  * @}

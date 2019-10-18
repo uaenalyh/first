@@ -163,10 +163,6 @@ int32_t create_vm(uint16_t vm_id, struct acrn_vm_config *vm_config, struct acrn_
 	vm->arch_vm.nworld_eptp = vm->arch_vm.ept_mem_ops.get_pml4_page(vm->arch_vm.ept_mem_ops.info);
 	sanitize_pte((uint64_t *)vm->arch_vm.nworld_eptp, &vm->arch_vm.ept_mem_ops);
 
-	/* Register default handlers for PIO & MMIO if it is, SOS VM or Pre-launched VM */
-	register_pio_default_emulation_handler(vm);
-	register_mmio_default_emulation_handler(vm);
-
 	(void)memcpy_s(&vm->uuid[0], sizeof(vm->uuid), &vm_config->uuid[0], sizeof(vm_config->uuid));
 	/* For PRE_LAUNCHED_VM and POST_LAUNCHED_VM */
 	if ((vm_config->guest_flags & GUEST_FLAG_SECURE_WORLD_ENABLED) != 0U) {

@@ -9,11 +9,6 @@
 #include <ept.h>
 #include <logmsg.h>
 
-#define MMIO_DEFAULT_VALUE_SIZE_1 (0xFFUL)
-#define MMIO_DEFAULT_VALUE_SIZE_2 (0xFFFFUL)
-#define MMIO_DEFAULT_VALUE_SIZE_4 (0xFFFFFFFFUL)
-#define MMIO_DEFAULT_VALUE_SIZE_8 (0xFFFFFFFFFFFFFFFFUL)
-
 /**
  * @pre width < 8U
  * @pre vcpu != NULL
@@ -40,37 +35,6 @@ static bool pio_default_write(
 }
 
 /**
- * @pre (io_req->reqs.mmio.size == 1U) || (io_req->reqs.mmio.size == 2U) ||
- *      (io_req->reqs.mmio.size == 4U) || (io_req->reqs.mmio.size == 8U)
- */
-static int32_t mmio_default_access_handler(struct io_request *io_req, __unused void *handler_private_data)
-{
-	struct mmio_request *mmio = &io_req->reqs.mmio;
-
-	if (mmio->direction == REQUEST_READ) {
-		switch (mmio->size) {
-		case 1U:
-			mmio->value = MMIO_DEFAULT_VALUE_SIZE_1;
-			break;
-		case 2U:
-			mmio->value = MMIO_DEFAULT_VALUE_SIZE_2;
-			break;
-		case 4U:
-			mmio->value = MMIO_DEFAULT_VALUE_SIZE_4;
-			break;
-		case 8U:
-			mmio->value = MMIO_DEFAULT_VALUE_SIZE_8;
-			break;
-		default:
-			/* This case is unreachable, this is guaranteed by the design. */
-			break;
-		}
-	}
-
-	return 0;
-}
-
-/**
  * Try handling the given request by any port I/O handler registered in the
  * hypervisor.
  *
@@ -88,8 +52,11 @@ static int32_t hv_emulate_pio(struct acrn_vcpu *vcpu, struct io_request *io_req)
 	struct acrn_vm *vm = vcpu->vm;
 	struct pio_request *pio_req = &io_req->reqs.pio;
 	struct vm_io_handler_desc *handler;
-	io_read_fn_t io_read = vm->default_io_read;
-	io_write_fn_t io_write = vm->default_io_write;
+	io_read_fn_t io_read = NULL;
+	io_write_fn_t io_write = NULL;
+
+	io_read = pio_default_read;
+	io_write = pio_default_write;
 
 	port = (uint16_t)pio_req->address;
 	size = (uint16_t)pio_req->size;
@@ -187,25 +154,4 @@ void register_pio_emulation_handler(struct acrn_vm *vm, uint32_t pio_idx, const 
 	vm->emul_pio[pio_idx].port_end = range->base + range->len;
 	vm->emul_pio[pio_idx].io_read = io_read_fn_ptr;
 	vm->emul_pio[pio_idx].io_write = io_write_fn_ptr;
-}
-
-/**
- * @brief Register port I/O default handler
- *
- * @param vm      The VM to which the port I/O handlers are registered
- */
-void register_pio_default_emulation_handler(struct acrn_vm *vm)
-{
-	vm->default_io_read = pio_default_read;
-	vm->default_io_write = pio_default_write;
-}
-
-/**
- * @brief Register MMIO default handler
- *
- * @param vm The VM to which the MMIO handler is registered
- */
-void register_mmio_default_emulation_handler(struct acrn_vm *vm)
-{
-	vm->default_read_write = mmio_default_access_handler;
 }
