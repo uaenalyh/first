@@ -50,9 +50,9 @@
  * VM1: one Mass Storage controller, one Network controller(if a secondary Network controller class device exist);
  */
 #define VM0_NETWORK_CONTROLLER ETHERNET_CONTROLLER
-#define VM0_CONFIG_PCI_DEV_NUM 1U
+#define VM0_CONFIG_PCI_DEV_NUM 2U
 
 #define VM1_STORAGE_CONTROLLER USB_CONTROLLER
-#define VM1_CONFIG_PCI_DEV_NUM 1U
+#define VM1_CONFIG_PCI_DEV_NUM 2U
 
 #endif /* VM_CONFIGURATIONS_H */

@@ -61,7 +61,7 @@ struct acrn_vm_config vm_configs[CONFIG_MAX_VM_NUM] = {
 				VM1_CONFIG_OS_BOOTARG_ROOT		\
 				"rw rootwait noxsave nohpet console=hvc0 \
 				no_timer_check ignore_loglevel log_buf_len=16M \
-				consoleblank=0 tsc=reliable xapic_phys"
+				consoleblank=0 tsc=reliable xapic_phys intel_iommu=off panic=0"
 		},
 		.vuart[0] = {
 			.type = VUART_LEGACY_PIO,

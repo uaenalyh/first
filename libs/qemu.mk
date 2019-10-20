@@ -23,13 +23,13 @@ QEMUEXE	:= qemu-system-x86_64
 QEMU_CPU := max,level=21,invtsc
 QEMUOPTS += -machine q35,kernel_irqchip=split,accel=kvm -cpu $(QEMU_CPU)
 QEMUOPTS += -m 4G -smp cpus=8,cores=4,threads=2 -enable-kvm
-QEMUOPTS += -device isa-debug-exit -device intel-iommu,intremap=on,caching-mode=on,device-iotlb=on
+QEMUOPTS += -device isa-debug-exit -device intel-iommu,intremap=on,aw-bits=48,caching-mode=on,device-iotlb=on
 QEMUOPTS += -debugcon file:/dev/stdout
 QEMUOPTS += -serial mon:stdio -display none
 
 ifndef UT
 QEMUOPTS += -drive file=$(LINUX_ROOTFS_IMAGE),index=0,format=raw,id=rootfs,if=none
-QEMUOPTS += -device nec-usb-xhci,id=xhci
+QEMUOPTS += -device nec-usb-xhci,id=xhci,msi=on,msix=off
 QEMUOPTS += -device usb-storage,bus=xhci.0,drive=rootfs
 QEMUOPTS += -nic tap,model=e1000,script=no,downscript=no,ifname=zeth
 
@@ -40,7 +40,7 @@ $(HV_OBJDIR)/$(HV_FILE).iso: all $(ZEPHYR_BINARY) $(LINUX_BZIMAGE_BINARY)
 
 .PHONY: qemu_linux
 qemu_linux: $(LINUX_BZIMAGE_BINARY) $(LINUX_ROOTFS_IMAGE)
-	$(QEMUEXE) $(QEMUOPTS) -kernel $(LINUX_BZIMAGE_BINARY) -append "rw root=/dev/sda3 rootwait console=ttyS0 ignore_loglevel tsc=reliable intel_iommu=off noxsave" || true
+	$(QEMUEXE) $(QEMUOPTS) -kernel $(LINUX_BZIMAGE_BINARY) -append "rw root=/dev/sda3 rootwait console=ttyS0 ignore_loglevel tsc=reliable noxsave" || true
 
 else
 $(UT_DIR)/guest/x86/%.bzimage:
