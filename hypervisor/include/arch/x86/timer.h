@@ -16,6 +16,12 @@
  * @{
  */
 
+/**
+ * @brief Definition of timer
+ */
+struct hv_timer {
+};
+
 /* External Interfaces */
 
 #define CYCLES_PER_MS us_to_ticks(1000U)

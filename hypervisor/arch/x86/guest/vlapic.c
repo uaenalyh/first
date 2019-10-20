@@ -121,6 +121,24 @@ static inline void vlapic_build_x2apic_id(struct acrn_vlapic *vlapic)
 	lapic->ldr.v = (cluster_id << 16U) | (1U << logical_id);
 }
 
+uint64_t vlapic_get_tsc_deadline_msr(const struct acrn_vlapic *vlapic)
+{
+	uint64_t ret;
+	ret = msr_read(MSR_IA32_TSC_DEADLINE) + exec_vmread64(VMX_TSC_OFFSET_FULL);
+
+	return ret;
+}
+
+void vlapic_set_tsc_deadline_msr(struct acrn_vlapic *vlapic, uint64_t val_arg)
+{
+	struct hv_timer *timer;
+	uint64_t val = val_arg;
+
+	vcpu_set_guest_msr(vlapic->vcpu, MSR_IA32_TSC_DEADLINE, val);
+	val -= exec_vmread64(VMX_TSC_OFFSET_FULL);
+	msr_write(MSR_IA32_TSC_DEADLINE, val);
+}
+
 static inline void set_dest_mask_phys(struct acrn_vm *vm, uint64_t *dmask, uint32_t dest)
 {
 	uint16_t vcpu_id;

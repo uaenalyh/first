@@ -301,6 +301,14 @@ int32_t rdmsr_vmexit_handler(struct acrn_vcpu *vcpu)
 
 	/* Do the required processing for each msr case */
 	switch (msr) {
+	case MSR_IA32_TSC_DEADLINE: {
+		v = vlapic_get_tsc_deadline_msr(vcpu_vlapic(vcpu));
+		break;
+	}
+	case MSR_IA32_TSC_ADJUST: {
+		v = vcpu_get_guest_msr(vcpu, MSR_IA32_TSC_ADJUST);
+		break;
+	}
 	case MSR_IA32_MTRR_CAP:
 	case MSR_IA32_MTRR_DEF_TYPE:
 	case MSR_IA32_MTRR_FIX64K_00000:
@@ -315,6 +323,10 @@ int32_t rdmsr_vmexit_handler(struct acrn_vcpu *vcpu)
 	case MSR_IA32_MTRR_FIX4K_F0000:
 	case MSR_IA32_MTRR_FIX4K_F8000: {
 		err = -EACCES;
+		break;
+	}
+	case MSR_IA32_BIOS_SIGN_ID: {
+		v = get_microcode_version();
 		break;
 	}
 	case MSR_IA32_PAT: {
@@ -456,6 +468,26 @@ static void set_guest_tsc(struct acrn_vcpu *vcpu, uint64_t guest_tsc)
 /**
  * @pre vcpu != NULL
  */
+static void set_guest_tsc_adjust(struct acrn_vcpu *vcpu, uint64_t tsc_adjust)
+{
+	uint64_t tsc_offset, tsc_adjust_delta;
+
+	/* delta of the new and existing IA32_TSC_ADJUST */
+	tsc_adjust_delta = tsc_adjust - vcpu_get_guest_msr(vcpu, MSR_IA32_TSC_ADJUST);
+
+	/* apply this delta to existing TSC_OFFSET */
+	tsc_offset = exec_vmread64(VMX_TSC_OFFSET_FULL);
+	exec_vmwrite64(VMX_TSC_OFFSET_FULL, tsc_offset + tsc_adjust_delta);
+
+	/* IA32_TSC_ADJUST is supposed to carry the value it's written to */
+	vcpu_set_guest_msr(vcpu, MSR_IA32_TSC_ADJUST, tsc_adjust);
+
+	set_tsc_msr_intercept(vcpu, (tsc_offset + tsc_adjust_delta) != 0UL);
+}
+
+/**
+ * @pre vcpu != NULL
+ */
 static void set_guest_ia32_misc_enalbe(struct acrn_vcpu *vcpu, uint64_t v)
 {
 	uint32_t eax, ebx = 0U, ecx = 0U, edx = 0U;
@@ -520,6 +552,14 @@ int32_t wrmsr_vmexit_handler(struct acrn_vcpu *vcpu)
 
 	/* Do the required processing for each msr case */
 	switch (msr) {
+	case MSR_IA32_TSC_DEADLINE: {
+		vlapic_set_tsc_deadline_msr(vcpu_vlapic(vcpu), v);
+		break;
+	}
+	case MSR_IA32_TSC_ADJUST: {
+		set_guest_tsc_adjust(vcpu, v);
+		break;
+	}
 	case MSR_IA32_TIME_STAMP_COUNTER: {
 		set_guest_tsc(vcpu, v);
 		break;
@@ -537,6 +577,9 @@ int32_t wrmsr_vmexit_handler(struct acrn_vcpu *vcpu)
 	case MSR_IA32_MTRR_FIX4K_F0000:
 	case MSR_IA32_MTRR_FIX4K_F8000: {
 		err = -EACCES;
+		break;
+	}
+	case MSR_IA32_BIOS_SIGN_ID: {
 		break;
 	}
 	case MSR_IA32_BIOS_UPDT_TRIG: {

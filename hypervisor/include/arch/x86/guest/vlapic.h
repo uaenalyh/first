@@ -80,6 +80,8 @@ extern const struct acrn_apicv_ops ptapic_ops;
  * @{
  */
 
+uint64_t vlapic_get_tsc_deadline_msr(const struct acrn_vlapic *vlapic);
+void vlapic_set_tsc_deadline_msr(struct acrn_vlapic *vlapic, uint64_t val_arg);
 uint64_t vlapic_get_apicbase(const struct acrn_vlapic *vlapic);
 int32_t vlapic_x2apic_read(struct acrn_vcpu *vcpu, uint32_t msr, uint64_t *val);
 int32_t vlapic_x2apic_write(struct acrn_vcpu *vcpu, uint32_t msr, uint64_t val);

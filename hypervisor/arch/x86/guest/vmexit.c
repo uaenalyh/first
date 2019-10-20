@@ -380,5 +380,6 @@ static int32_t init_signal_vmexit_handler(__unused struct acrn_vcpu *vcpu)
 	 *
 	 * So, it is safe to ignore the signal and reture here.
 	 */
+	vcpu_retain_rip(vcpu);
 	return 0;
 }
