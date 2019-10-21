@@ -30,8 +30,8 @@
 
 #include <types.h>
 #include <pci.h>
-#include <console.h>
 #include <vm.h>
+#include <console.h>
 #include <logmsg.h>
 #include "lib.h"
 #include "vuart.h"
