@@ -122,6 +122,7 @@ StatementMacros:
   - build_bitmap_clear
   - build_bitmap_testandset
   - build_bitmap_testandclear
+  - build_atomic_swap
 TabWidth:        8
 UseTab:          ForContinuationAndIndentation
 ...

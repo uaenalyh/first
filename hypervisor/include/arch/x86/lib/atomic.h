@@ -33,4 +33,21 @@
 
 #define BUS_LOCK "lock ; "
 
+#define build_atomic_swap(name, size, type)                                                           \
+	static inline type name(type *ptr, type v)                                                    \
+	{                                                                                             \
+		asm volatile(BUS_LOCK "xchg" size " %1,%0" : "+m"(*ptr), "+r"(v) : : "cc", "memory"); \
+		return v;                                                                             \
+	}
+build_atomic_swap(atomic_swap32, "l", uint32_t)
+
+/*
+ * #define atomic_readandclear32(P) \
+ * (return (*(uint32_t *)(P)); *(uint32_t *)(P) = 0U;)
+ */
+static inline uint32_t atomic_readandclear32(uint32_t *p)
+{
+	return atomic_swap32(p, 0U);
+}
+
 #endif /* ATOMIC_H*/
