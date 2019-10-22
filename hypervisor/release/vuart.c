@@ -29,17 +29,13 @@
  */
 
 #include <types.h>
-#include <pci.h>
-#include <uart16550.h>
-#include <console.h>
-#include <vuart.h>
 #include <vm.h>
-#include <logmsg.h>
+#include <vuart.h>
 
-void vuart_init(struct acrn_vm *vm, const struct vuart_config *vu_config)
+void vuart_init(__unused struct acrn_vm *vm, __unused const struct vuart_config *vu_config)
 {
 }
 
-void vuart_deinit(struct acrn_vm *vm)
+void vuart_deinit(__unused struct acrn_vm *vm)
 {
 }
