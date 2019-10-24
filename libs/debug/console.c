@@ -25,6 +25,8 @@
 
 #define VMX_PINBASED_CTLS_ACTIVATE_VMX_PREEMPTION_TIMER     (1U << 6)
 
+#define VMX_EXIT_CTLS_SAVE_PTMR   (1U << 22U)
+
 #define VMX_GUEST_VMX_PREEMPTION_TIMER_VALUE  0x0000482EU
 
 extern struct vm_exit_dispatch dispatch_table[];
@@ -128,6 +130,7 @@ int32_t vmx_preemption_timer_expired_handler(struct acrn_vcpu *vcpu)
 {
 	console_kick();
 	exec_vmwrite(VMX_GUEST_VMX_PREEMPTION_TIMER_VALUE, vmx_preemption_timer_value);
+	vcpu_retain_rip(vcpu);
 	return 0;
 }
 
@@ -135,7 +138,7 @@ void console_setup_timer(void)
 {
 	if (get_pcpu_id() == CONSOLE_CPU_ID) {
 		uint64_t ia32_vmx_misc;
-		uint32_t exec_ctrl, vmx_preemption_divisor;
+		uint32_t exec_ctrl, exit_ctrl, vmx_preemption_divisor;
 
 		ia32_vmx_misc = msr_read(MSR_IA32_VMX_MISC);
 		vmx_preemption_divisor = 1U << (ia32_vmx_misc & MSR_IA32_VMX_MISC_VMX_PREEMPTION_DIVISOR);
@@ -143,6 +146,8 @@ void console_setup_timer(void)
 
 		exec_ctrl = exec_vmread32(VMX_PIN_VM_EXEC_CONTROLS);
 		exec_vmwrite32(VMX_PIN_VM_EXEC_CONTROLS, exec_ctrl | VMX_PINBASED_CTLS_ACTIVATE_VMX_PREEMPTION_TIMER);
+		exit_ctrl = exec_vmread32(VMX_EXIT_CONTROLS);
+		exec_vmwrite32(VMX_EXIT_CONTROLS, exit_ctrl | VMX_EXIT_CTLS_SAVE_PTMR);
 		exec_vmwrite(VMX_GUEST_VMX_PREEMPTION_TIMER_VALUE, vmx_preemption_timer_value);
 
 		dispatch_table[VMX_EXIT_REASON_VMX_PREEMPTION_TIMER_EXPIRED].handler = vmx_preemption_timer_expired_handler;
