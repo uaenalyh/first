@@ -22,12 +22,6 @@ void vcpu_thread(struct thread_object *obj)
 	int32_t ret = 0;
 
 	do {
-		/* If vcpu is not launched, we need to do init_vmcs first */
-		if (!vcpu->launched) {
-			init_vmcs(vcpu);
-			console_setup_timer();
-		}
-
 		/* Don't open interrupt window between here and vmentry */
 		if (need_reschedule(pcpuid_from_vcpu(vcpu))) {
 			schedule();
@@ -39,7 +33,7 @@ void vcpu_thread(struct thread_object *obj)
 			pr_fatal("vcpu handling pending request fail");
 			pause_vcpu(vcpu, VCPU_ZOMBIE);
 			/* Fatal error happened (triple fault). Stop the vcpu running. */
-			schedule();
+			continue;
 		}
 
 		profiling_vmenter_handler(vcpu);
@@ -50,7 +44,7 @@ void vcpu_thread(struct thread_object *obj)
 			pr_fatal("vcpu resume failed");
 			pause_vcpu(vcpu, VCPU_ZOMBIE);
 			/* Fatal error happened (resume vcpu failed). Stop the vcpu running. */
-			schedule();
+			continue;
 		}
 		basic_exit_reason = vcpu->arch.exit_reason & 0xFFFFU;
 		TRACE_2L(TRACE_VM_EXIT, basic_exit_reason, vcpu_get_rip(vcpu));
