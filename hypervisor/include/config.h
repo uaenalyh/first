@@ -7,7 +7,6 @@
 #define CONFIG_MAX_VCPUS_PER_VM          3U
 #define CONFIG_MAX_EMULATED_MMIO_REGIONS 16U
 #define CONFIG_MAX_PT_IRQ_ENTRIES        64U
-#define CONFIG_MAX_IOMMU_NUM             2U
 #define CONFIG_STACK_SIZE                0x2000U
 #define CONFIG_LOG_BUF_SIZE              0x40000U
 #define CONFIG_LOG_DESTINATION           7U
