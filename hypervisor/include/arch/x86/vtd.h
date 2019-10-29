@@ -169,8 +169,7 @@ static inline uint64_t dma_iec_index(uint16_t index, uint8_t index_mask)
 
 #define DMA_IOTLB_INVL_ADDR_IH_UNMODIFIED (((uint64_t)1UL) << 6U)
 
-#define MAX_DRHDS          DRHD_COUNT
-#define MAX_DRHD_DEVSCOPES 4
+#define MAX_DRHDS DRHD_COUNT
 
 struct dmar_dev_scope {
 	enum acpi_dmar_scope_type type;
@@ -220,8 +219,6 @@ union dmar_ir_entry {
 		uint64_t rsvd_3 : 44;
 	} bits __packed;
 };
-
-extern struct dmar_info *get_dmar_info(void);
 
 /**
  * @file vtd.h

@@ -12,6 +12,8 @@
 /* forward declarations */
 struct acrn_vm;
 
+extern struct dmar_info plat_dmar_info;
+
 /* board specific functions */
 void create_prelaunched_vm_e820(struct acrn_vm *vm);
 

@@ -19,6 +19,7 @@
 #include <vtd.h>
 #include <timer.h>
 #include <logmsg.h>
+#include <board.h>
 #include <vm_configurations.h>
 
 #define ACRN_DBG_IOMMU 6U
@@ -920,6 +921,15 @@ int32_t move_pt_device(
 void enable_iommu(void)
 {
 	do_action_for_iommus(dmar_enable);
+}
+
+/**
+ * @post return != NULL
+ * @post return->drhd_count > 0U
+ */
+static struct dmar_info *get_dmar_info(void)
+{
+	return &plat_dmar_info;
 }
 
 int32_t init_iommu(void)
