@@ -1,0 +1,32 @@
+stages:
+- build
+- test
+
+
+build_job:
+  stage: build
+  script:
+    - echo "start to build ..."
+    - pwd
+    - cd hypervisor
+    - make clean
+    - make RELEASE=0
+  artifacts:
+    paths:
+      - hypervisor/build/
+  only:
+    - merge_requests
+    - scheudles
+    
+    
+test_job:
+  stage: test
+  script:
+    - echo "start to test launch ..."
+    - pwd
+    - /opt/fusa_ci.sh $BUILD_TYPE
+  dependencies:
+    - build_job
+  only:
+    - merge_requests
+    - scheudles
