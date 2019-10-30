@@ -103,62 +103,55 @@ void vdev_pt_read_cfg(const struct pci_vdev *vdev, uint32_t offset, uint32_t byt
 }
 
 /**
- * @brief Remaps guest MMIO BARs other than MSI-x Table BAR
- * This API is invoked upon guest re-programming PCI BAR with MMIO region
- * after a new vbar is set.
  * @pre vdev != NULL
  * @pre vdev->vpci != NULL
  * @pre vdev->vpci->vm != NULL
  */
-static void vdev_pt_remap_generic_mem_vbar(struct pci_vdev *vdev, uint32_t idx)
+static void vdev_pt_unmap_mem_vbar(struct pci_vdev *vdev, uint32_t idx)
 {
-	struct acrn_vm *vm = vdev->vpci->vm;
 	struct pci_bar *vbar;
-	uint64_t vbar_base = get_vbar_base(vdev, idx); /* vbar (gpa) */
+	struct acrn_vm *vm = vdev->vpci->vm;
 
 	vbar = &vdev->bar[idx];
 
-	/* If the old vbar is mapped before, unmap it first */
 	if (vdev->bar_base_mapped[idx] != 0UL) {
 		ept_del_mr(vm, (uint64_t *)(vm->arch_vm.nworld_eptp), vdev->bar_base_mapped[idx], /* GPA (old vbar) */
 			vbar->size);
 		vdev->bar_base_mapped[idx] = 0UL;
 	}
-
-	/* If a new vbar is set (nonzero), set the EPT mapping accordingly */
-	if (vbar_base != 0UL) {
-		uint64_t hpa = gpa2hpa(vdev->vpci->vm, vbar_base);
-		uint64_t pbar_base = vbar->base_hpa; /* pbar (hpa) */
-
-		if (hpa != pbar_base) {
-			/* Unmap the existing mapping for new vbar */
-			if (hpa != INVALID_HPA) {
-				ept_del_mr(vm, (uint64_t *)(vm->arch_vm.nworld_eptp), vbar_base, /* GPA (new vbar) */
-					vbar->size);
-			}
-
-			if (ept_is_mr_valid(vm, vbar_base, vbar->size)) {
-				/* Map the physical BAR in the guest MMIO space */
-				ept_add_mr(vm, (uint64_t *)(vm->arch_vm.nworld_eptp), pbar_base, /* HPA (pbar) */
-					vbar_base, /* GPA (new vbar) */
-					vbar->size, EPT_WR | EPT_RD | EPT_UNCACHED);
-
-				/* Remember the previously mapped MMIO vbar */
-				vdev->bar_base_mapped[idx] = vbar_base;
-			} else {
-				pr_fatal("%s, %x:%x.%x set invalid bar[%d] address: 0x%llx\n", __func__,
-					vdev->bdf.bits.b, vdev->bdf.bits.d, vdev->bdf.bits.f, idx, vbar_base);
-			}
-		}
-	}
 }
 
 /**
  * @pre vdev != NULL
+ * @pre vdev->vpci != NULL
+ * @pre vdev->vpci->vm != NULL
  */
-static void vdev_pt_remap_mem_vbar(struct pci_vdev *vdev, uint32_t idx)
+static void vdev_pt_map_mem_vbar(struct pci_vdev *vdev, uint32_t idx)
 {
-	vdev_pt_remap_generic_mem_vbar(vdev, idx);
+	struct pci_bar *vbar;
+	uint64_t vbar_base;
+	struct acrn_vm *vm = vdev->vpci->vm;
+
+	vbar = &vdev->bar[idx];
+
+	vbar_base = get_vbar_base(vdev, idx);
+	if (vbar_base != 0UL) {
+		if (ept_is_mr_valid(vm, vbar_base, vbar->size)) {
+			uint64_t hpa = gpa2hpa(vdev->vpci->vm, vbar_base);
+			uint64_t pbar_base = vbar->base_hpa; /* pbar (hpa) */
+
+			if (hpa != pbar_base) {
+				ept_add_mr(vm, (uint64_t *)(vm->arch_vm.nworld_eptp), pbar_base, /* HPA (pbar) */
+					vbar_base, /* GPA (new vbar) */
+					vbar->size, EPT_WR | EPT_RD | EPT_UNCACHED);
+			}
+			/* Remember the previously mapped MMIO vbar */
+			vdev->bar_base_mapped[idx] = vbar_base;
+		} else {
+			pr_fatal("%s, %x:%x.%x set invalid bar[%d] address: 0x%llx\n", __func__, vdev->bdf.bits.b,
+				vdev->bdf.bits.d, vdev->bdf.bits.f, idx, vbar_base);
+		}
+	}
 }
 
 /**
@@ -204,11 +197,12 @@ static void vdev_pt_write_vbar(struct pci_vdev *vdev, uint32_t offset, uint32_t 
 		if (idx > 0U) {
 			uint32_t prev_idx = idx - 1U;
 
+			vdev_pt_unmap_mem_vbar(vdev, prev_idx);
 			base = git_size_masked_bar_base(vdev->bar[prev_idx].size, ((uint64_t)val) << 32U) >> 32U;
 			set_vbar_base(vbar, (uint32_t)base);
 
 			if (bar_update_normal) {
-				vdev_pt_remap_mem_vbar(vdev, prev_idx);
+				vdev_pt_map_mem_vbar(vdev, prev_idx);
 			}
 		} else {
 			ASSERT(false, "idx for upper 32-bit of the 64-bit bar should be greater than 0!");
@@ -219,15 +213,17 @@ static void vdev_pt_write_vbar(struct pci_vdev *vdev, uint32_t offset, uint32_t 
 		switch (type) {
 
 		case PCIBAR_MEM32:
+			vdev_pt_unmap_mem_vbar(vdev, idx);
 			base = git_size_masked_bar_base(vbar->size, (uint64_t)val);
 			set_vbar_base(vbar, (uint32_t)base);
 
 			if (bar_update_normal) {
-				vdev_pt_remap_mem_vbar(vdev, idx);
+				vdev_pt_map_mem_vbar(vdev, idx);
 			}
 			break;
 
 		case PCIBAR_MEM64:
+			vdev_pt_unmap_mem_vbar(vdev, idx);
 			base = git_size_masked_bar_base(vbar->size, (uint64_t)val);
 			set_vbar_base(vbar, (uint32_t)base);
 			break;
