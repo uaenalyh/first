@@ -35,9 +35,9 @@
 #include "pci_dev.h"
 
 static void vpci_init_vdevs(struct acrn_vm *vm);
-static void deinit_prelaunched_vm_vpci(const struct acrn_vm *vm);
-static void read_cfg(const struct acrn_vpci *vpci, union pci_bdf bdf, uint32_t offset, uint32_t bytes, uint32_t *val);
-static void write_cfg(const struct acrn_vpci *vpci, union pci_bdf bdf, uint32_t offset, uint32_t bytes, uint32_t val);
+static void deinit_prelaunched_vm_vpci(struct acrn_vm *vm);
+static void read_cfg(struct acrn_vpci *vpci, union pci_bdf bdf, uint32_t offset, uint32_t bytes, uint32_t *val);
+static void write_cfg(struct acrn_vpci *vpci, union pci_bdf bdf, uint32_t offset, uint32_t bytes, uint32_t val);
 
 /**
  * @pre vcpu != NULL
@@ -210,13 +210,15 @@ void vpci_init(struct acrn_vm *vm)
 		/* Nothing to do for other vm types */
 		break;
 	}
+
+	spinlock_init(&vm->vpci.lock);
 }
 
 /**
  * @pre vm != NULL
  * @pre vm->vm_id < CONFIG_MAX_VM_NUM
  */
-void vpci_cleanup(const struct acrn_vm *vm)
+void vpci_cleanup(struct acrn_vm *vm)
 {
 	struct acrn_vm_config *vm_config;
 
@@ -278,7 +280,7 @@ static void remove_vdev_pt_iommu_domain(const struct pci_vdev *vdev)
  * @pre vpci != NULL
  * @pre vpci->vm != NULL
  */
-static struct pci_vdev *find_vdev(const struct acrn_vpci *vpci, union pci_bdf bdf)
+static struct pci_vdev *find_vdev(struct acrn_vpci *vpci, union pci_bdf bdf)
 {
 	struct pci_vdev *vdev = pci_find_vdev(vpci, bdf);
 
@@ -346,25 +348,31 @@ static const struct pci_vdev_ops pci_pt_dev_ops = {
 /**
  * @pre vpci != NULL
  */
-static void read_cfg(const struct acrn_vpci *vpci, union pci_bdf bdf, uint32_t offset, uint32_t bytes, uint32_t *val)
+static void read_cfg(struct acrn_vpci *vpci, union pci_bdf bdf, uint32_t offset, uint32_t bytes, uint32_t *val)
 {
-	struct pci_vdev *vdev = find_vdev(vpci, bdf);
+	struct pci_vdev *vdev;
 
+	spinlock_obtain(&vpci->lock);
+	vdev = find_vdev(vpci, bdf);
 	if (vdev != NULL) {
 		vdev->vdev_ops->read_vdev_cfg(vdev, offset, bytes, val);
 	}
+	spinlock_release(&vpci->lock);
 }
 
 /**
  * @pre vpci != NULL
  */
-static void write_cfg(const struct acrn_vpci *vpci, union pci_bdf bdf, uint32_t offset, uint32_t bytes, uint32_t val)
+static void write_cfg(struct acrn_vpci *vpci, union pci_bdf bdf, uint32_t offset, uint32_t bytes, uint32_t val)
 {
-	struct pci_vdev *vdev = find_vdev(vpci, bdf);
+	struct pci_vdev *vdev;
 
+	spinlock_obtain(&vpci->lock);
+	vdev = find_vdev(vpci, bdf);
 	if (vdev != NULL) {
 		vdev->vdev_ops->write_vdev_cfg(vdev, offset, bytes, val);
 	}
+	spinlock_release(&vpci->lock);
 }
 
 /**
@@ -412,7 +420,7 @@ static void vpci_init_vdevs(struct acrn_vm *vm)
  * @pre vm->vpci.pci_vdev_cnt <= CONFIG_MAX_PCI_DEV_NUM
  * @pre is_sos_vm(vm) || is_prelaunched_vm(vm)
  */
-static void deinit_prelaunched_vm_vpci(const struct acrn_vm *vm)
+static void deinit_prelaunched_vm_vpci(struct acrn_vm *vm)
 {
 	struct pci_vdev *vdev;
 	uint32_t i;
