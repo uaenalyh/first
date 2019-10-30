@@ -183,7 +183,11 @@ HW_C_SRCS += arch/x86/vmx.c
 HW_C_SRCS += arch/x86/trampoline.c
 HW_S_SRCS += arch/x86/sched.S
 HW_C_SRCS += common/schedule.c
+ifeq ($(CONFIG_SCHED_NOOP),y)
 HW_C_SRCS += common/sched_noop.c
+endif
+ifeq ($(CONFIG_SCHED_IORR),y)
+endif
 HW_C_SRCS += hw/pci.c
 HW_C_SRCS += arch/x86/configs/vm_config.c
 HW_C_SRCS += arch/x86/configs/$(CONFIG_BOARD)/board.c
