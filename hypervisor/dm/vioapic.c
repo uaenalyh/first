@@ -33,5 +33,6 @@
 #include <vm.h>
 #include <errno.h>
 #include <irq.h>
+#include <ept.h>
 #include <assign.h>
 #include <logmsg.h>

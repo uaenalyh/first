@@ -6,7 +6,6 @@
 #include <vm.h>
 #include <irq.h>
 #include <errno.h>
-#include <ept.h>
 #include <logmsg.h>
 
 /**
