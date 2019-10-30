@@ -16,7 +16,7 @@ build_job:
       - hypervisor/build/
   only:
     - merge_requests
-    - scheudles
+    - schedules
     
     
 test_job:
@@ -29,4 +29,4 @@ test_job:
     - build_job
   only:
     - merge_requests
-    - scheudles
+    - schedules
