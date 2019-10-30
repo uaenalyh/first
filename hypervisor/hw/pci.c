@@ -217,9 +217,7 @@ static inline uint32_t pci_pdev_get_nr_bars(uint8_t hdr_type)
 static void pci_read_cap(struct pci_pdev *pdev)
 {
 	uint8_t ptr, cap;
-	uint32_t msgctrl;
-	uint32_t len, offset, idx;
-	uint32_t table_info;
+	uint32_t offset;
 
 	ptr = (uint8_t)pci_pdev_read_cfg(pdev->bdf, PCIR_CAP_PTR, 1U);
 
@@ -255,8 +253,6 @@ static void init_pdev(uint16_t pbdf)
 			if ((pci_pdev_read_cfg(bdf, PCIR_STATUS, 2U) & PCIM_STATUS_CAPPRESENT) != 0U) {
 				pci_read_cap(pdev);
 			}
-
-			fill_pci_dev_config(pdev);
 
 			num_pci_pdev++;
 		} else {

@@ -10,6 +10,5 @@
 #include <vm_config.h>
 
 struct pci_pdev;
-void fill_pci_dev_config(struct pci_pdev *pdev);
 
 #endif /* PCI_DEV_H_ */

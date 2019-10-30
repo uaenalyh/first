@@ -137,7 +137,6 @@ void switch_to_idle(thread_entry_t idle_thread)
 {
 	uint16_t pcpu_id = get_pcpu_id();
 	struct thread_object *idle = &per_cpu(idle, pcpu_id);
-	char idle_name[16];
 
 	idle->thread_entry = idle_thread;
 	idle->switch_out = NULL;

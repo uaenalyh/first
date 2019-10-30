@@ -116,8 +116,6 @@ static void prepare_prelaunched_vm_memmap(struct acrn_vm *vm, const struct acrn_
 /* Add EPT mapping of EPC reource for the VM */
 static void prepare_epc_vm_memmap(struct acrn_vm *vm)
 {
-	struct epc_map *vm_epc_maps;
-	uint32_t i;
 }
 
 static void register_pm_io_handler(struct acrn_vm *vm)

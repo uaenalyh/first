@@ -392,7 +392,6 @@ static void guest_cpuid_01h(struct acrn_vcpu *vcpu, uint32_t *eax, uint32_t *ebx
 
 static void guest_cpuid_0bh(struct acrn_vcpu *vcpu, uint32_t *eax, uint32_t *ebx, uint32_t *ecx, uint32_t *edx)
 {
-	uint32_t leaf = 0x0bU;
 	uint32_t subleaf = *ecx;
 
 	/* Patching X2APIC */

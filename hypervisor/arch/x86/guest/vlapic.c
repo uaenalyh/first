@@ -131,7 +131,6 @@ uint64_t vlapic_get_tsc_deadline_msr(const struct acrn_vlapic *vlapic)
 
 void vlapic_set_tsc_deadline_msr(struct acrn_vlapic *vlapic, uint64_t val_arg)
 {
-	struct hv_timer *timer;
 	uint64_t val = val_arg;
 
 	vcpu_set_guest_msr(vlapic->vcpu, MSR_IA32_TSC_DEADLINE, val);
@@ -265,7 +264,6 @@ static int32_t vlapic_read(struct acrn_vlapic *vlapic, uint32_t offset_arg, uint
 {
 	int32_t ret = 0;
 	struct lapic_regs *lapic = &(vlapic->apic_page);
-	uint32_t i;
 	uint32_t offset = offset_arg;
 	*data = 0ULL;
 
@@ -296,7 +294,6 @@ static int32_t vlapic_read(struct acrn_vlapic *vlapic, uint32_t offset_arg, uint
  */
 void vlapic_reset(struct acrn_vlapic *vlapic, const struct acrn_apicv_ops *ops)
 {
-	uint32_t i;
 	struct lapic_regs *lapic;
 
 	/*
@@ -449,7 +446,6 @@ int32_t vlapic_x2apic_read(struct acrn_vcpu *vcpu, uint32_t msr, uint64_t *val)
 int32_t vlapic_x2apic_write(struct acrn_vcpu *vcpu, uint32_t msr, uint64_t val)
 {
 	struct acrn_vlapic *vlapic;
-	uint32_t offset;
 	int32_t error = -1;
 
 	/*

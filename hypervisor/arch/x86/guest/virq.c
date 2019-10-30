@@ -305,7 +305,6 @@ int32_t acrn_handle_pending_request(struct acrn_vcpu *vcpu)
 {
 	bool injected = false;
 	int32_t ret = 0;
-	uint32_t tmp;
 	struct acrn_vcpu_arch *arch = &vcpu->arch;
 	uint64_t *pending_req_bits = &arch->pending_req;
 

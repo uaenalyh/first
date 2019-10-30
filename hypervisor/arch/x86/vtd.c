@@ -978,7 +978,6 @@ void dmar_free_irte(struct intr_source intr_src, uint16_t index)
 {
 	struct dmar_drhd_rt *dmar_unit;
 	union dmar_ir_entry *ir_table, *ir_entry;
-	union pci_bdf sid;
 
 	dmar_unit = &dmar_drhd_units[1];
 

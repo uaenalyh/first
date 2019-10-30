@@ -153,8 +153,6 @@ static void vdev_pt_remap_generic_mem_vbar(struct pci_vdev *vdev, uint32_t idx)
  */
 static void vdev_pt_remap_mem_vbar(struct pci_vdev *vdev, uint32_t idx)
 {
-	bool is_msix_table_bar;
-
 	vdev_pt_remap_generic_mem_vbar(vdev, idx);
 }
 
