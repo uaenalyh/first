@@ -96,7 +96,9 @@ struct acrn_vm {
 	enum vm_state state; /* VM state */
 	enum vpic_wire_mode wire_mode;
 	struct iommu_domain *iommu; /* iommu domain of this VM */
-	spinlock_t vm_lock; /* Spin-lock used to protect VM modifications */
+	spinlock_t vm_lock; /* Spin-lock used to protect vlapic_state modifications for a VM */
+
+	spinlock_t emul_mmio_lock; /* Used to protect emulation mmio_node concurrent access for a VM */
 
 	struct vm_io_handler_desc emul_pio[EMUL_PIO_IDX_MAX];
 
