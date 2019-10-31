@@ -88,22 +88,6 @@ static inline void pci_vdev_write_cfg_u32(struct pci_vdev *vdev, uint32_t offset
 /**
  * @pre vdev != NULL
  */
-static inline bool has_msix_cap(const struct pci_vdev *vdev)
-{
-	return (vdev->msix.capoff != 0U);
-}
-
-/**
- * @pre vdev != NULL
- */
-static inline bool msixcap_access(const struct pci_vdev *vdev, uint32_t offset)
-{
-	return (has_msix_cap(vdev) && in_range(offset, vdev->msix.capoff, vdev->msix.caplen));
-}
-
-/**
- * @pre vdev != NULL
- */
 static inline bool vbar_access(const struct pci_vdev *vdev, uint32_t offset)
 {
 	return is_bar_offset(vdev->nr_bars, offset);
@@ -133,11 +117,6 @@ void init_vmsi(struct pci_vdev *vdev);
 void vmsi_read_cfg(const struct pci_vdev *vdev, uint32_t offset, uint32_t bytes, uint32_t *val);
 void vmsi_write_cfg(struct pci_vdev *vdev, uint32_t offset, uint32_t bytes, uint32_t val);
 void deinit_vmsi(const struct pci_vdev *vdev);
-
-void init_vmsix(struct pci_vdev *vdev);
-void vmsix_read_cfg(const struct pci_vdev *vdev, uint32_t offset, uint32_t bytes, uint32_t *val);
-void vmsix_write_cfg(struct pci_vdev *vdev, uint32_t offset, uint32_t bytes, uint32_t val);
-void deinit_vmsix(const struct pci_vdev *vdev);
 
 uint32_t pci_vdev_read_cfg(const struct pci_vdev *vdev, uint32_t offset, uint32_t bytes);
 void pci_vdev_write_cfg(struct pci_vdev *vdev, uint32_t offset, uint32_t bytes, uint32_t val);

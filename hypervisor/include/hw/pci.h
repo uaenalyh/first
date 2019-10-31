@@ -43,10 +43,6 @@
  * PCIZ_xxx: extended capability identification number
  */
 
-/* some PCI bus constants */
-#define PCI_BUSMAX    0xFFU
-#define PCI_SLOTMAX   0x1FU
-#define PCI_FUNCMAX   0x7U
 #define PCI_BAR_COUNT 0x6U
 #define PCI_REGMAX    0xFFU
 #define PCI_REGMASK   0xFCU
@@ -62,15 +58,11 @@
 #define PCIR_DEVICE               0x02U
 #define PCIR_COMMAND              0x04U
 #define PCIM_CMD_INTxDIS          0x400U
-#define PCIR_STATUS               0x06U
-#define PCIM_STATUS_CAPPRESENT    0x0010U
 #define PCIR_REVID                0x08U
 #define PCIR_SUBCLASS             0x0AU
 #define PCIR_CLASS                0x0BU
 #define PCIR_HDRTYPE              0x0EU
-#define PCIM_HDRTYPE              0x7FU
 #define PCIM_HDRTYPE_NORMAL       0x00U
-#define PCIM_HDRTYPE_BRIDGE       0x01U
 #define PCIM_MFDEV                0x80U
 #define PCIR_BARS                 0x10U
 #define PCIM_BAR_SPACE            0x01U
@@ -82,8 +74,6 @@
 #define PCIR_CAP_PTR              0x34U
 #define PCI_BASE_ADDRESS_MEM_MASK (~0x0fUL)
 #define PCI_BASE_ADDRESS_IO_MASK  (~0x03UL)
-
-#define PCIR_SECBUS_1 0x19U
 
 /* Capability Register Offsets */
 #define PCICAP_ID      0x0U
@@ -106,12 +96,6 @@
 /* PCI device class */
 #define PCIC_BRIDGE      0x06U
 #define PCIS_BRIDGE_HOST 0x00U
-
-/* MSI-X definitions */
-#define PCIR_MSIX_CTRL 0x2U
-
-#define PCIM_MSIXCTRL_MSIX_ENABLE   0x8000U
-#define PCIM_MSIXCTRL_FUNCTION_MASK 0x4000U
 
 union pci_bdf {
 	uint16_t value;
@@ -174,25 +158,7 @@ struct pci_bar {
 	bool is_64bit_high; /* true if this is the upper 32-bit of a 64-bit bar */
 };
 
-/* Basic MSIX capability info */
-struct pci_msix_cap {
-	uint32_t capoff;
-	uint32_t caplen;
-	uint8_t table_bar;
-	uint32_t table_offset;
-	uint32_t table_count;
-};
-
 struct pci_pdev {
-	/* The bar info of the physical PCI device. */
-	uint32_t nr_bars; /* 6 for normal device, 2 for bridge, 1 for cardbus */
-
-	/* The bus/device/function triple of the physical PCI device. */
-	union pci_bdf bdf;
-
-	uint32_t msi_capoff;
-
-	struct pci_msix_cap msix;
 };
 
 static inline uint32_t pci_bar_offset(uint32_t idx)
@@ -258,7 +224,5 @@ static inline bool bdf_is_equal(union pci_bdf a, union pci_bdf b)
 uint32_t pci_pdev_read_cfg(union pci_bdf bdf, uint32_t offset, uint32_t bytes);
 void pci_pdev_write_cfg(union pci_bdf bdf, uint32_t offset, uint32_t bytes, uint32_t val);
 void enable_disable_pci_intx(union pci_bdf bdf, bool enable);
-
-void init_pci_pdev_list(void);
 
 #endif /* PCI_H_ */

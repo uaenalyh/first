@@ -284,8 +284,8 @@ void init_vdev_pt(struct pci_vdev *vdev)
 	union pci_bdf pbdf;
 	uint64_t mask;
 
-	vdev->nr_bars = vdev->pdev->nr_bars;
-	pbdf.value = vdev->pdev->bdf.value;
+	vdev->nr_bars = PCI_BAR_COUNT;
+	pbdf.value = vdev->pbdf.value;
 
 	for (idx = 0U; idx < vdev->nr_bars; idx++) {
 		vbar = &vdev->bar[idx];
@@ -342,9 +342,9 @@ void init_vdev_pt(struct pci_vdev *vdev)
 		}
 	}
 
-	pci_command = (uint16_t)pci_pdev_read_cfg(vdev->pdev->bdf, PCIR_COMMAND, 2U);
+	pci_command = (uint16_t)pci_pdev_read_cfg(vdev->pbdf, PCIR_COMMAND, 2U);
 
 	/* Disable INTX */
 	pci_command |= 0x400U;
-	pci_pdev_write_cfg(vdev->pdev->bdf, PCIR_COMMAND, 2U, pci_command);
+	pci_pdev_write_cfg(vdev->pbdf, PCIR_COMMAND, 2U, pci_command);
 }

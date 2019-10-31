@@ -256,8 +256,7 @@ static void assign_vdev_pt_iommu_domain(const struct pci_vdev *vdev)
 	int32_t ret;
 	struct acrn_vm *vm = vdev->vpci->vm;
 
-	ret = move_pt_device(
-		NULL, vm->iommu, (uint8_t)vdev->pdev->bdf.bits.b, (uint8_t)(vdev->pdev->bdf.value & 0xFFU));
+	ret = move_pt_device(NULL, vm->iommu, (uint8_t)vdev->pbdf.bits.b, (uint8_t)(vdev->pbdf.value & 0xFFU));
 	if (ret != 0) {
 		panic("failed to assign iommu device!");
 	}
@@ -274,8 +273,7 @@ static void remove_vdev_pt_iommu_domain(const struct pci_vdev *vdev)
 	int32_t ret;
 	struct acrn_vm *vm = vdev->vpci->vm;
 
-	ret = move_pt_device(
-		vm->iommu, NULL, (uint8_t)vdev->pdev->bdf.bits.b, (uint8_t)(vdev->pdev->bdf.value & 0xFFU));
+	ret = move_pt_device(vm->iommu, NULL, (uint8_t)vdev->pbdf.bits.b, (uint8_t)(vdev->pbdf.value & 0xFFU));
 	if (ret != 0) {
 		/*
 		 *TODO
@@ -311,7 +309,6 @@ static void vpci_init_pt_dev(struct pci_vdev *vdev)
 	 * requires init_vmsix() to be called first.
 	 */
 	init_vmsi(vdev);
-	init_vmsix(vdev);
 	init_vdev_pt(vdev);
 
 	assign_vdev_pt_iommu_domain(vdev);
@@ -320,7 +317,6 @@ static void vpci_init_pt_dev(struct pci_vdev *vdev)
 static void vpci_deinit_pt_dev(struct pci_vdev *vdev)
 {
 	remove_vdev_pt_iommu_domain(vdev);
-	deinit_vmsix(vdev);
 	deinit_vmsi(vdev);
 }
 
@@ -330,11 +326,9 @@ static int32_t vpci_write_pt_dev_cfg(struct pci_vdev *vdev, uint32_t offset, uin
 		vdev_pt_write_cfg(vdev, offset, bytes, val);
 	} else if (msicap_access(vdev, offset)) {
 		vmsi_write_cfg(vdev, offset, bytes, val);
-	} else if (msixcap_access(vdev, offset)) {
-		vmsix_write_cfg(vdev, offset, bytes, val);
 	} else {
 		/* passthru to physical device */
-		pci_pdev_write_cfg(vdev->pdev->bdf, offset, bytes, val);
+		pci_pdev_write_cfg(vdev->pbdf, offset, bytes, val);
 	}
 
 	return 0;
@@ -346,11 +340,9 @@ static int32_t vpci_read_pt_dev_cfg(const struct pci_vdev *vdev, uint32_t offset
 		vdev_pt_read_cfg(vdev, offset, bytes, val);
 	} else if (msicap_access(vdev, offset)) {
 		vmsi_read_cfg(vdev, offset, bytes, val);
-	} else if (msixcap_access(vdev, offset)) {
-		vmsix_read_cfg(vdev, offset, bytes, val);
 	} else {
 		/* passthru to physical device */
-		*val = pci_pdev_read_cfg(vdev->pdev->bdf, offset, bytes);
+		*val = pci_pdev_read_cfg(vdev->pbdf, offset, bytes);
 	}
 
 	return 0;
@@ -398,7 +390,7 @@ static void vpci_init_vdev(struct acrn_vpci *vpci, struct acrn_vm_pci_dev_config
 	vpci->pci_vdev_cnt++;
 	vdev->vpci = vpci;
 	vdev->bdf.value = dev_config->vbdf.value;
-	vdev->pdev = dev_config->pdev;
+	vdev->pbdf = dev_config->pbdf;
 	vdev->pci_dev_config = dev_config;
 
 	if (dev_config->vdev_ops != NULL) {

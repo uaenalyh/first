@@ -32,27 +32,10 @@
 
 #include <pci.h>
 
-struct msix_table_entry {
-	uint64_t addr;
-	uint32_t data;
-	uint32_t vector_control;
-};
-
 /* MSI capability structure */
 struct pci_msi {
 	uint32_t capoff;
 	uint32_t caplen;
-};
-
-/* MSI-X capability structure */
-struct pci_msix {
-	struct msix_table_entry table_entries[CONFIG_MAX_MSIX_TABLE_NUM];
-	uint64_t mmio_hpa;
-	uint32_t capoff;
-	uint32_t caplen;
-	uint32_t table_bar;
-	uint32_t table_offset;
-	uint32_t table_count;
 };
 
 union pci_cfgdata {
@@ -73,6 +56,7 @@ struct pci_vdev {
 	const struct acrn_vpci *vpci;
 	/* The bus/device/function triple of the virtual PCI device. */
 	union pci_bdf bdf;
+	union pci_bdf pbdf;
 
 	struct pci_pdev *pdev;
 
@@ -86,7 +70,6 @@ struct pci_vdev {
 	uint64_t bar_base_mapped[PCI_BAR_COUNT];
 
 	struct pci_msi msi;
-	struct pci_msix msix;
 
 	/* Pointer to corresponding PCI device's vm_config */
 	struct acrn_vm_pci_dev_config *pci_dev_config;

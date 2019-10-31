@@ -42,7 +42,7 @@
 static int32_t vmsi_remap(const struct pci_vdev *vdev, bool enable)
 {
 	struct ptirq_msi_info info;
-	union pci_bdf pbdf = vdev->pdev->bdf;
+	union pci_bdf pbdf = vdev->pbdf;
 	struct acrn_vm *vm = vdev->vpci->vm;
 	uint32_t capoff = vdev->msi.capoff;
 	uint32_t msgctrl, msgdata;
@@ -159,10 +159,18 @@ void init_vmsi(struct pci_vdev *vdev)
 	struct pci_pdev *pdev = vdev->pdev;
 	uint32_t val;
 
-	vdev->msi.capoff = pdev->msi_capoff;
+	val = pci_pdev_read_cfg(vdev->pbdf, PCIR_CAP_PTR, 1U);
+	while ((val != 0U) && (val != 0xFFU)) {
+		uint8_t cap = pci_pdev_read_cfg(vdev->pbdf, val + PCICAP_ID, 1U);
+		if (cap == PCIY_MSI) {
+			vdev->msi.capoff = val;
+			break;
+		}
+		val = pci_pdev_read_cfg(vdev->pbdf, val + PCICAP_NEXTPTR, 1U);
+	}
 
 	if (has_msi_cap(vdev)) {
-		val = pci_pdev_read_cfg(pdev->bdf, vdev->msi.capoff, 4U);
+		val = pci_pdev_read_cfg(vdev->pbdf, vdev->msi.capoff, 4U);
 		vdev->msi.caplen = ((val & (PCIM_MSICTRL_64BIT << 16U)) != 0U) ? 14U : 10U;
 
 		val &= ~((uint32_t)PCIM_MSICTRL_MMC_MASK << 16U);

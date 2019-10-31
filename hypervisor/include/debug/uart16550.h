@@ -14,6 +14,5 @@
 /* bit definitions for LSR */
 
 void uart16550_init(bool early_boot);
-bool is_pci_dbg_uart(union pci_bdf bdf_value);
 
 #endif /* !UART16550_H */
