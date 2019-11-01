@@ -21,6 +21,7 @@
 #include <logmsg.h>
 #include <board.h>
 #include <vm_configurations.h>
+#include <pci.h>
 
 #define ACRN_DBG_IOMMU 6U
 #define LEVEL_WIDTH    9U
