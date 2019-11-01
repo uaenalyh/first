@@ -39,12 +39,14 @@
 #include <logmsg.h>
 #include <pci_dev.h>
 #include <vtd.h>
+#include <bits.h>
+#include <board.h>
 
 static spinlock_t pci_device_lock;
 
 /* @brief: Find the DRHD index corresponding to a PCI device
  * Runs through the pci_pdev_array and returns the value in drhd_idx
- * member from pdev strucutre that matches matches B:D.F
+ * member from pdev structure that matches matches B:D.F
  *
  * @pbdf[in]	B:D.F of a PCI device
  *
