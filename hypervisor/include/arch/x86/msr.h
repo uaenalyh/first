@@ -153,7 +153,7 @@
 #define MSR_IA32_QM_EVTSEL            0x00000C8DU
 #define MSR_IA32_QM_CTR               0x00000C8EU
 #define MSR_IA32_PQR_ASSOC            0x00000C8FU
-#define MSR_IA32_L3_MASK_0            0x00000C90U
+#define MSR_IA32_L3_MASK_BASE         0x00000C90U
 #define MSR_IA32_BNDCFGS              0x00000D90U
 #define MSR_IA32_EFER                 0xC0000080U
 #define MSR_IA32_STAR                 0xC0000081U
