@@ -25,6 +25,7 @@
 #include <mmu.h>
 #include <logmsg.h>
 #include <vboot_info.h>
+#include <vboot.h>
 #include <board.h>
 #include <sgx.h>
 #include <sbuf.h>
