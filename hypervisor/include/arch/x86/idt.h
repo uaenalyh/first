@@ -20,6 +20,7 @@
  * Definition of an 16 byte IDT selector.
  */
 union idt_64_descriptor {
+	uint64_t value;
 	struct {
 		union {
 			uint32_t value;

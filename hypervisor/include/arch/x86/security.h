@@ -23,6 +23,8 @@ void cpu_internal_buffers_clear(void);
 
 #ifdef STACK_PROTECTOR
 struct stack_canary {
+	/* Gcc generates extra code, using [fs:40] to access canary */
+	uint8_t reserved[40];
 	uint64_t canary;
 };
 void set_fs_base(void);
