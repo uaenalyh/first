@@ -33,6 +33,15 @@
 #include <spinlock.h>
 #include <pci.h>
 
+struct pci_bar {
+	enum pci_bar_type type;
+	uint64_t size; /* BAR size */
+	uint64_t base; /* BAR guest physical address */
+	uint64_t base_hpa; /* BAR host physical address */
+	uint32_t fixed; /* BAR fix memory type encoding */
+	uint32_t mask; /* BAR size mask */
+};
+
 /* MSI capability structure */
 struct pci_msi {
 	uint32_t capoff;
@@ -41,8 +50,8 @@ struct pci_msi {
 
 union pci_cfgdata {
 	uint8_t data_8[PCI_REGMAX + 1U];
-	uint16_t data_16[(PCI_REGMAX + 1U) >> 2U];
-	uint32_t data_32[(PCI_REGMAX + 1U) >> 4U];
+	uint16_t data_16[(PCI_REGMAX + 1U) >> 1U];
+	uint32_t data_32[(PCI_REGMAX + 1U) >> 2U];
 };
 
 struct pci_vdev;
@@ -66,9 +75,6 @@ struct pci_vdev {
 	/* The bar info of the virtual PCI device. */
 	uint32_t nr_bars; /* 6 for normal device, 2 for bridge, 1 for cardbus */
 	struct pci_bar bar[PCI_BAR_COUNT];
-
-	/* Remember the previously mapped/registered vbar base for undo purpose */
-	uint64_t bar_base_mapped[PCI_BAR_COUNT];
 
 	struct pci_msi msi;
 
