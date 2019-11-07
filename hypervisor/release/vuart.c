@@ -32,10 +32,10 @@
 #include <vm.h>
 #include <vuart.h>
 
-void vuart_init(__unused struct acrn_vm *vm, __unused const struct vuart_config *vu_config)
+void init_vuart(__unused struct acrn_vm *vm, __unused const struct vuart_config *vu_config)
 {
 }
 
-void vuart_deinit(__unused struct acrn_vm *vm)
+void deinit_vuart(__unused struct acrn_vm *vm)
 {
 }

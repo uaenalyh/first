@@ -188,7 +188,7 @@ int32_t create_vm(uint16_t vm_id, struct acrn_vm_config *vm_config, struct acrn_
 		setup_io_bitmap(vm);
 
 		/* Create virtual uart;*/
-		vuart_init(vm, vm_config->vuart);
+		init_vuart(vm, vm_config->vuart);
 
 		vrtc_init(vm);
 
@@ -283,7 +283,7 @@ int32_t shutdown_vm(struct acrn_vm *vm)
 
 		vpci_cleanup(vm);
 
-		vuart_deinit(vm);
+		deinit_vuart(vm);
 
 		ptdev_release_all_entries(vm);
 
