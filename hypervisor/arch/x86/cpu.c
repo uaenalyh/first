@@ -179,7 +179,7 @@ void init_pcpu_post(uint16_t pcpu_id)
 		/* Calibrate TSC Frequency */
 		calibrate_tsc();
 
-		pr_acrnlog("HV version %s-%s-%s %s (daily tag:%s) build by %s%s, start time %lluus", HV_FULL_VERSION,
+		pr_acrnlog("HV version %s-%s-%s %s (daily tag:%s) build by %s%s, start time %luus", HV_FULL_VERSION,
 			HV_BUILD_TIME, HV_BUILD_VERSION, HV_BUILD_TYPE, HV_DAILY_TAG, HV_BUILD_USER, HV_CONFIG_TOOL,
 			ticks_to_us(start_tsc));
 

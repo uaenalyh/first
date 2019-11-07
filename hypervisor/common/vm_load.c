@@ -203,7 +203,7 @@ int32_t direct_boot_sw_loader(struct acrn_vm *vm)
 	if (ret == 0) {
 		/* Set VCPU entry point to kernel entry */
 		vcpu_set_rip(vcpu, (uint64_t)sw_kernel->kernel_entry_addr);
-		pr_info("%s, VM %hu VCPU %hu Entry: 0x%016llx ", __func__, vm->vm_id, vcpu->vcpu_id,
+		pr_info("%s, VM %hu VCPU %hu Entry: 0x%016lx ", __func__, vm->vm_id, vcpu->vcpu_id,
 			sw_kernel->kernel_entry_addr);
 	}
 
