@@ -23,4 +23,5 @@
 #define CONFIG_MAX_PCI_DEV_NUM           96U
 #define CONFIG_MAX_MSIX_TABLE_NUM        16U
 #define CONFIG_MAX_KATA_VM_NUM           0U
+#define CONFIG_UEFI_OS_LOADER_NAME       "\\EFI\\org.clearlinux\\bootloaderx64.efi"
 #endif
