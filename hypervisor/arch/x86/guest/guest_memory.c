@@ -24,7 +24,7 @@ static inline uint32_t local_copy_gpa(
 
 	hpa = local_gpa2hpa(vm, gpa, &pg_size);
 	if (hpa == INVALID_HPA) {
-		pr_err("%s,vm[%hu] gpa 0x%llx,GPA is unmapping", __func__, vm->vm_id, gpa);
+		pr_err("%s,vm[%hu] gpa 0x%lx,GPA is unmapping", __func__, vm->vm_id, gpa);
 		len = 0U;
 	} else {
 

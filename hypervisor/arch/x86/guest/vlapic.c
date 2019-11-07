@@ -285,7 +285,7 @@ static int32_t vlapic_read(struct acrn_vlapic *vlapic, uint32_t offset_arg, uint
 		}
 	}
 
-	dev_dbg(ACRN_DBG_LAPIC, "vlapic read offset %#x, data %#llx", offset, *data);
+	dev_dbg(ACRN_DBG_LAPIC, "vlapic read offset %x, data %lx", offset, *data);
 	return ret;
 }
 

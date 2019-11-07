@@ -207,11 +207,11 @@ int32_t vmexit_handler(struct acrn_vcpu *vcpu)
 		basic_exit_reason = (uint16_t)(vcpu->arch.exit_reason & 0xFFFFU);
 
 		/* Log details for exit */
-		pr_dbg("Exit Reason: 0x%016llx ", vcpu->arch.exit_reason);
+		pr_dbg("Exit Reason: 0x%016lx ", vcpu->arch.exit_reason);
 
 		/* Ensure exit reason is within dispatch table */
 		if (basic_exit_reason >= ARRAY_SIZE(dispatch_table)) {
-			pr_err("Invalid Exit Reason: 0x%016llx ", vcpu->arch.exit_reason);
+			pr_err("Invalid Exit Reason: 0x%016lx ", vcpu->arch.exit_reason);
 			ret = -EINVAL;
 		} else {
 			/* Calculate dispatch table entry */
@@ -238,11 +238,11 @@ int32_t vmexit_handler(struct acrn_vcpu *vcpu)
 
 static int32_t unhandled_vmexit_handler(struct acrn_vcpu *vcpu)
 {
-	pr_fatal("Error: Unhandled VM exit condition from guest at 0x%016llx ", exec_vmread(VMX_GUEST_RIP));
+	pr_fatal("Error: Unhandled VM exit condition from guest at 0x%016lx ", exec_vmread(VMX_GUEST_RIP));
 
-	pr_fatal("Exit Reason: 0x%016llx ", vcpu->arch.exit_reason);
+	pr_fatal("Exit Reason: 0x%016lx ", vcpu->arch.exit_reason);
 
-	pr_err("Exit qualification: 0x%016llx ", exec_vmread(VMX_EXIT_QUALIFICATION));
+	pr_err("Exit qualification: 0x%016lx ", exec_vmread(VMX_EXIT_QUALIFICATION));
 
 	TRACE_2L(TRACE_VMEXIT_UNHANDLED, vcpu->arch.exit_reason, 0UL);
 
@@ -251,7 +251,7 @@ static int32_t unhandled_vmexit_handler(struct acrn_vcpu *vcpu)
 
 static int32_t triple_fault_vmexit_handler(struct acrn_vcpu *vcpu)
 {
-	pr_fatal("VM%d: triple fault @ guest RIP 0x%016llx, exit qualification: 0x%016llx", vcpu->vm->vm_id,
+	pr_fatal("VM%d: triple fault @ guest RIP 0x%016lx, exit qualification: 0x%016lx", vcpu->vm->vm_id,
 		exec_vmread(VMX_GUEST_RIP), exec_vmread(VMX_EXIT_QUALIFICATION));
 	triple_fault_shutdown_vm(vcpu);
 

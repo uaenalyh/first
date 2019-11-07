@@ -91,7 +91,7 @@ uint64_t prepare_trampoline(void)
 	size = (uint64_t)(&ld_trampoline_end - &ld_trampoline_start);
 	dest_pa = e820_alloc_low_memory(CONFIG_LOW_RAM_SIZE);
 
-	pr_dbg("trampoline code: %llx size %x", dest_pa, size);
+	pr_dbg("trampoline code: %lx size %x", dest_pa, size);
 
 	/* Copy segment for AP initialization code below 1MB */
 	(void)memcpy_s(hpa2hva(dest_pa), (size_t)size, &ld_trampoline_load, (size_t)size);

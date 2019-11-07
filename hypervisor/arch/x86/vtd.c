@@ -351,7 +351,7 @@ static int32_t dmar_register_hrhd(struct dmar_drhd_rt *dmar_unit)
 {
 	int32_t ret = 0;
 
-	dev_dbg(ACRN_DBG_IOMMU, "Register dmar uint [%d] @0x%llx", dmar_unit->index, dmar_unit->drhd->reg_base_addr);
+	dev_dbg(ACRN_DBG_IOMMU, "Register dmar uint [%d] @0x%lx", dmar_unit->index, dmar_unit->drhd->reg_base_addr);
 
 	spinlock_init(&dmar_unit->lock);
 
@@ -719,7 +719,7 @@ static int32_t add_iommu_device(struct iommu_domain *domain, uint16_t segment, u
 		} else if (dmar_get_bitslice(context_entry->lo_64, CTX_ENTRY_LOWER_P_MASK, CTX_ENTRY_LOWER_P_POS) !=
 			0UL) {
 			/* the context entry should not be present */
-			pr_err("%s: context entry@0x%llx (Lower:%x) ", __func__, context_entry, context_entry->lo_64);
+			pr_err("%s: context entry@0x%lx (Lower:%x) ", __func__, context_entry, context_entry->lo_64);
 			pr_err("already present for %x:%x.%x", bus, sid.bits.d, sid.bits.f);
 			ret = -EBUSY;
 		} else {

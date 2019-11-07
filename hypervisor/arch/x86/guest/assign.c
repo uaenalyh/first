@@ -139,7 +139,7 @@ static void ptirq_build_physical_msi(
 		info->pmsi_addr.bits.rh = MSI_ADDR_RH;
 		info->pmsi_addr.bits.dest_mode = MSI_ADDR_DESTMODE_LOGICAL;
 	}
-	dev_dbg(ACRN_DBG_IRQ, "MSI %s addr:data = 0x%llx:%x(V) -> 0x%llx:%x(P)",
+	dev_dbg(ACRN_DBG_IRQ, "MSI %s addr:data = 0x%lx:%x(V) -> 0x%lx:%x(P)",
 		(info->pmsi_addr.ir_bits.intr_format != 0U) ? " Remappable Format" : "Compatibility Format",
 		info->vmsi_addr.full, info->vmsi_data.full, info->pmsi_addr.full, info->pmsi_data.full);
 }
