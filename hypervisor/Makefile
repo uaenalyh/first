@@ -42,9 +42,6 @@ ARCH_ASFLAGS :=
 ARCH_ARFLAGS :=
 ARCH_LDFLAGS :=
 
-ifneq ($(BOARD_FILE)$(SCENARIO_FILE),)
-endif
-
 .PHONY: default
 default: all
 
@@ -327,32 +324,6 @@ install-debug: $(HV_OBJDIR)/$(HV_FILE).map $(HV_OBJDIR)/$(HV_FILE).out
 	install -D $(HV_OBJDIR)/$(HV_FILE).out $(DESTDIR)/usr/lib/acrn/$(HV_FILE).$(BOARD).$(FIRMWARE).$(SCENARIO_NAME).out
 	install -D $(HV_OBJDIR)/$(HV_FILE).map $(DESTDIR)/usr/lib/acrn/$(HV_FILE).$(BOARD).$(FIRMWARE).$(SCENARIO_NAME).map
 
-cfg_src: $(VERSION)
-ifneq ($(BOARD_FILE)$(SCENARIO_FILE),)
-	@if [ ! -f $(BOARD_FILE) ]; then \
-		echo "Board xml file $(BOARD_FILE) is not exist!"; exit 1; \
-	fi
-	@if [ ! -f "$(SCENARIO_FILE)" ]; then \
-		echo "Scenario xml file $(SCENARIO_FILE) is not exist!"; exit 1; \
-	fi
-	@if [ "$(BOARD)" != "$(CONFIG_BOARD)" ]; then \
-		echo "Board in xml file <$(BOARD)> does not match Kconfig <$(CONFIG_BOARD)>!"; exit 1; \
-	fi
-	@if [ "$(SCENARIO_IN_XML)" != "$(SCENARIO_NAME)" ]; then \
-		echo "Scenario in xml file <$(SCENARIO_IN_XML)> does not match Kconfig <$(SCENARIO_NAME)>!"; exit 1; \
-	fi
-	@python3 ../misc/acrn-config/board_config/board_cfg_gen.py --board $(BOARD_FILE) --scenario $(SCENARIO_FILE) > $(HV_OBJDIR)/.cfg_src_result
-	@cat $(HV_OBJDIR)/.cfg_src_result
-	@if [ "`sed -n /successfully/p $(HV_OBJDIR)/.cfg_src_result`" = "" ]; then exit 1;	fi
-	@python3 ../misc/acrn-config/scenario_config/scenario_cfg_gen.py --board $(BOARD_FILE) --scenario $(SCENARIO_FILE) > $(HV_OBJDIR)/.cfg_src_result
-	@cat $(HV_OBJDIR)/.cfg_src_result
-	@if [ "`sed -n /successfully/p $(HV_OBJDIR)/.cfg_src_result`" = "" ]; then exit 1;	fi
-	@echo "Import hypervisor configurations from Config-xmls, configurations in source code are ignored!"
-	@sed -i 's/#define HV_CONFIG_TOOL ""/#define HV_CONFIG_TOOL " with acrn-config"/g' $(VERSION)
-else
-	@echo "Use hypervisor configurations from source code directly."
-endif
-
 .PHONY: pre_build
 pre_build: $(PRE_BUILD_OBJS)
 
@@ -419,6 +390,7 @@ $(HV_OBJDIR)/$(HV_FILE).32.out: $(HV_OBJDIR)/$(HV_FILE).out
 
 $(HV_OBJDIR)/$(HV_FILE).bin: $(HV_OBJDIR)/$(HV_FILE).out
 	$(OBJCOPY) -O binary $< $(HV_OBJDIR)/$(HV_FILE).bin
+	rm -f $(UPDATE_RESULT)
 
 $(HV_OBJDIR)/$(HV_FILE).out: $(MODULES)
 	$(CC) -Wl,-Map=$(HV_OBJDIR)/$(HV_FILE).map -o $@ $(LDFLAGS) $(ARCH_LDFLAGS) -T$(ARCH_LDSCRIPT) \
@@ -438,6 +410,10 @@ distclean:
 
 PHONY: (VERSION)
 $(VERSION):
+	@echo "SCENARIO <$(SCENARIO_NAME)> for BOARD <$(BOARD)> is specified."
+	@if [ "$(CONFIG_XML_ENABLED)" = "true" ] && [ "$(SCENARIO_NAME)" != "$(SCENARIO_IN_XML)" ]; then \
+		echo "SCENARIO in XML <$(SCENARIO_IN_XML)> does not match SCENARIO in Kconfig <$(SCENARIO_NAME)> !" ; exit 1; \
+	fi
 	@mkdir -p $(dir $(VERSION)) && touch $(VERSION)
 	@COMMIT=`git rev-parse --verify --short HEAD 2>/dev/null`;\
 	DIRTY=`git diff-index --name-only HEAD`;\
@@ -460,7 +436,11 @@ $(VERSION):
 	echo "#define HV_BUILD_TYPE "\""$$BUILD_TYPE"\""" >> $(VERSION);\
 	echo "#define HV_BUILD_TIME "\""$$TIME"\""" >> $(VERSION);\
 	echo "#define HV_BUILD_USER "\""$$USER"\""" >> $(VERSION);\
-	echo "#define HV_CONFIG_TOOL \"\"" >> $(VERSION);\
+	if [ "$(CONFIG_XML_ENABLED)" = "true" ]; then \
+		echo "#define HV_CONFIG_TOOL \" with acrn-config\"" >> $(VERSION);\
+	else	\
+		echo "#define HV_CONFIG_TOOL \"\"" >> $(VERSION);\
+	fi;\
 	echo "#endif" >> $(VERSION)
 
 -include $(C_OBJS:.o=.d)
