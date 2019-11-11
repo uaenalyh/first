@@ -1,6 +1,7 @@
 stages:
 - build
 - test
+- deploy
 
 
 build_job:
@@ -14,19 +15,45 @@ build_job:
   artifacts:
     paths:
       - hypervisor/build/
+    expire_in: 3 weeks
   only:
     - merge_requests
     - schedules
     
     
-test_job:
+test_launch_cl_zephyr_job:
   stage: test
   script:
-    - echo "start to test launch ..."
+    - echo "start to test lauching clearlinux and zehpyr ..."
     - pwd
-    - /opt/fusa_ci.sh $BUILD_TYPE
+    - /opt/fusa_ci.sh launch_2_vms
   dependencies:
     - build_job
   only:
     - merge_requests
     - schedules
+    
+    
+test_launch_acrn_unit_test_job:
+  stage: test
+  script:
+    - echo "start to test lauching acrn unit test ..."
+    - pwd
+    - /opt/fusa_ci.sh launch_acrn_unit_test
+  dependencies:
+    - build_job
+  only:
+    - merge_requests
+    - schedules
+    
+    
+deploy_build_job:
+  stage: deploy
+  script:
+    - echo "start to deploy and run tests ..."
+    - /opt/fusa_ci.sh $BUILD_TYPE
+  dependencies:
+    - build_job
+  only:
+    - schedules
+
