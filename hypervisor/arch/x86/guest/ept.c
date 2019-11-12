@@ -115,6 +115,25 @@ void ept_add_mr(struct acrn_vm *vm, uint64_t *pml4_page, uint64_t hpa, uint64_t 
 	}
 }
 
+void ept_modify_mr(
+	struct acrn_vm *vm, uint64_t *pml4_page, uint64_t gpa, uint64_t size, uint64_t prot_set, uint64_t prot_clr)
+{
+	struct acrn_vcpu *vcpu;
+	uint16_t i;
+	uint64_t local_prot = prot_set;
+
+	dev_dbg(ACRN_DBG_EPT, "%s,vm[%d] gpa 0x%lx size 0x%lx\n", __func__, vm->vm_id, gpa, size);
+
+	if (((local_prot & EPT_MT_MASK) != EPT_UNCACHED) && iommu_snoop_supported(vm->iommu)) {
+		local_prot |= EPT_SNOOP_CTRL;
+	}
+
+	mmu_modify_or_del(pml4_page, gpa, size, local_prot, prot_clr, &(vm->arch_vm.ept_mem_ops), MR_MODIFY);
+
+	foreach_vcpu (i, vm, vcpu) {
+		vcpu_make_request(vcpu, ACRN_REQUEST_EPT_FLUSH);
+	}
+}
 /**
  * @pre [gpa,gpa+size) has been mapped into host physical memory region
  */

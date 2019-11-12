@@ -14,6 +14,7 @@
 #include <vmexit.h>
 #include <vmx.h>
 #include <ept.h>
+#include <pgtable.h>
 #include <trace.h>
 #include <logmsg.h>
 
@@ -77,8 +78,30 @@ int32_t pio_instr_vmexit_handler(struct acrn_vcpu *vcpu)
 
 int32_t ept_violation_vmexit_handler(struct acrn_vcpu *vcpu)
 {
+	uint64_t exit_qual;
+	uint64_t gpa;
 
-	vcpu_inject_pf(vcpu, exec_vmread64(VMX_GUEST_PHYSICAL_ADDR_FULL), 0);
+	/* Handle page fault from guest */
+	exit_qual = vcpu->arch.exit_qualification;
+	/* Get the guest physical address */
+	gpa = exec_vmread64(VMX_GUEST_PHYSICAL_ADDR_FULL);
+
+	TRACE_2L(TRACE_VMEXIT_EPT_VIOLATION, exit_qual, gpa);
+
+	/*caused by instruction fetch */
+	if ((exit_qual & 0x4UL) != 0UL) {
+		if (vcpu->arch.cur_context == NORMAL_WORLD) {
+			ept_modify_mr(vcpu->vm, (uint64_t *)vcpu->vm->arch_vm.nworld_eptp, gpa & PAGE_MASK, PAGE_SIZE,
+				EPT_EXE, 0UL);
+		} else {
+			ept_modify_mr(vcpu->vm, (uint64_t *)vcpu->vm->arch_vm.sworld_eptp, gpa & PAGE_MASK, PAGE_SIZE,
+				EPT_EXE, 0UL);
+		}
+		vcpu_retain_rip(vcpu);
+	} else {
+
+		vcpu_inject_pf(vcpu, exec_vmread64(VMX_GUEST_PHYSICAL_ADDR_FULL), 0);
+	}
 
 	return 0;
 }

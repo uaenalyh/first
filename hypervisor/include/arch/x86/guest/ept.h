@@ -75,6 +75,23 @@ uint64_t local_gpa2hpa(struct acrn_vm *vm, uint64_t gpa, uint32_t *size);
  */
 void ept_add_mr(struct acrn_vm *vm, uint64_t *pml4_page, uint64_t hpa, uint64_t gpa, uint64_t size, uint64_t prot_orig);
 /**
+ * @brief Guest-physical memory page access right or memory type updating
+ *
+ * @param[in] vm the pointer that points to VM data structure
+ * @param[in] pml4_page The physical address of The EPTP
+ * @param[in] gpa The specified start guest physical address of guest
+ *	    physical memory region whoes mapping needs to be updated
+ * @param[in] size The size of guest physical memory region
+ * @param[in] prot_set The specified memory access right and memory type
+ *		     that will be set
+ * @param[in] prot_clr The specified memory access right and memory type
+ *		     that will be cleared
+ *
+ * @return None
+ */
+void ept_modify_mr(
+	struct acrn_vm *vm, uint64_t *pml4_page, uint64_t gpa, uint64_t size, uint64_t prot_set, uint64_t prot_clr);
+/**
  * @brief Guest-physical memory region unmapping
  *
  * @param[in] vm the pointer that points to VM data structure
