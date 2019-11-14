@@ -54,6 +54,7 @@ bool is_rt_vm(const struct acrn_vm *vm)
  */
 static void setup_io_bitmap(struct acrn_vm *vm)
 {
+	/* block all IO port access from Guest */
 	(void)memset(vm->arch_vm.io_bitmap, 0xFFU, PAGE_SIZE * 2U);
 }
 
@@ -120,6 +121,7 @@ static void prepare_epc_vm_memmap(struct acrn_vm *vm)
 
 static void register_pm_io_handler(struct acrn_vm *vm)
 {
+	/* Intercept the virtual pm port for RTVM */
 	if (is_rt_vm(vm)) {
 	}
 }
