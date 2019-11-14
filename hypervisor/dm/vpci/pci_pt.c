@@ -47,7 +47,6 @@ static void vdev_pt_unmap_mem_vbar(struct pci_vdev *vdev, uint32_t idx)
 	if (vbar->base != 0UL) {
 		ept_del_mr(vm, (uint64_t *)(vm->arch_vm.nworld_eptp), vbar->base, /* GPA (old vbar) */
 			vbar->size);
-		vbar->base = 0UL;
 	}
 }
 
@@ -59,28 +58,14 @@ static void vdev_pt_unmap_mem_vbar(struct pci_vdev *vdev, uint32_t idx)
 static void vdev_pt_map_mem_vbar(struct pci_vdev *vdev, uint32_t idx)
 {
 	struct pci_bar *vbar;
-	uint64_t vbar_base;
 	struct acrn_vm *vm = vdev->vpci->vm;
 
 	vbar = &vdev->bar[idx];
 
-	vbar_base = pci_vdev_get_bar_base(vdev, idx);
-	if (vbar_base != 0UL) {
-		if (ept_is_mr_valid(vm, vbar_base, vbar->size)) {
-			uint64_t hpa = gpa2hpa(vdev->vpci->vm, vbar_base);
-			uint64_t pbar_base = vbar->base_hpa; /* pbar (hpa) */
-
-			if (hpa != pbar_base) {
-				ept_add_mr(vm, (uint64_t *)(vm->arch_vm.nworld_eptp), pbar_base, /* HPA (pbar) */
-					vbar_base, /* GPA (new vbar) */
-					vbar->size, EPT_WR | EPT_RD | EPT_UNCACHED);
-			}
-			/* Remember the previously mapped MMIO vbar */
-			vbar->base = vbar_base;
-		} else {
-			pr_fatal("%s, %x:%x.%x set invalid bar[%d] address: 0x%lx\n", __func__, vdev->bdf.bits.b,
-				vdev->bdf.bits.d, vdev->bdf.bits.f, idx, vbar_base);
-		}
+	if (vbar->base != 0UL) {
+		ept_add_mr(vm, (uint64_t *)(vm->arch_vm.nworld_eptp), vbar->base_hpa, /* HPA (pbar) */
+			vbar->base, /* GPA (new vbar) */
+			vbar->size, EPT_WR | EPT_RD | EPT_UNCACHED);
 	}
 }
 
@@ -101,7 +86,7 @@ void vdev_pt_write_vbar(struct pci_vdev *vdev, uint32_t idx, uint32_t val)
 
 	default:
 		if (vbar->type == PCIBAR_MEM64HI) {
-			update_idx = idx - 1U;
+			update_idx -= 1U;
 		}
 		vdev_pt_unmap_mem_vbar(vdev, update_idx);
 		if (val != ~0U) {
@@ -109,6 +94,7 @@ void vdev_pt_write_vbar(struct pci_vdev *vdev, uint32_t idx, uint32_t val)
 			vdev_pt_map_mem_vbar(vdev, update_idx);
 		} else {
 			pci_vdev_write_cfg_u32(vdev, offset, val);
+			vdev->bar[update_idx].base = 0UL;
 		}
 		break;
 	}
@@ -180,7 +166,6 @@ void init_vdev_pt(struct pci_vdev *vdev)
 			vbar->size = (uint64_t)size32 & mask;
 
 			lo = (uint32_t)vdev->pci_dev_config->vbar_base[idx];
-			pci_vdev_write_bar(vdev, idx, lo);
 
 			if (type == PCIBAR_MEM64) {
 				idx++;
@@ -198,12 +183,14 @@ void init_vdev_pt(struct pci_vdev *vdev)
 				vbar->type = PCIBAR_MEM64HI;
 
 				hi = (uint32_t)(vdev->pci_dev_config->vbar_base[idx - 1U] >> 32U);
+				pci_vdev_write_bar(vdev, idx - 1U, lo);
 				pci_vdev_write_bar(vdev, idx, hi);
 			} else {
 				vbar->size = vbar->size & ~(vbar->size - 1UL);
 				if (type == PCIBAR_MEM32) {
 					vbar->size = round_page_up(vbar->size);
 				}
+				pci_vdev_write_bar(vdev, idx, lo);
 			}
 		}
 	}
