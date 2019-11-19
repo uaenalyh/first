@@ -651,7 +651,7 @@ static void dmar_enable(struct dmar_drhd_rt *dmar_unit)
 	dmar_enable_translation(dmar_unit);
 }
 
-static int32_t add_iommu_device(struct iommu_domain *domain, uint16_t segment, uint8_t bus, uint8_t devfun)
+static int32_t add_iommu_device(struct iommu_domain *domain, uint8_t bus, uint8_t devfun)
 {
 	struct dmar_drhd_rt *dmar_unit;
 	struct dmar_entry *root_table;
@@ -766,7 +766,7 @@ static int32_t add_iommu_device(struct iommu_domain *domain, uint16_t segment, u
 	return ret;
 }
 
-static int32_t remove_iommu_device(const struct iommu_domain *domain, uint16_t segment, uint8_t bus, uint8_t devfun)
+static int32_t remove_iommu_device(const struct iommu_domain *domain, uint8_t bus, uint8_t devfun)
 {
 	struct dmar_drhd_rt *dmar_unit;
 	struct dmar_entry *root_table;
@@ -905,11 +905,11 @@ int32_t move_pt_device(
 
 	if (bus_local < CONFIG_IOMMU_BUS_NUM) {
 		if (from_domain != NULL) {
-			status = remove_iommu_device(from_domain, 0U, bus, devfun);
+			status = remove_iommu_device(from_domain, bus, devfun);
 		}
 
 		if ((status == 0) && (to_domain != NULL)) {
-			status = add_iommu_device(to_domain, 0U, bus, devfun);
+			status = add_iommu_device(to_domain, bus, devfun);
 		}
 	} else {
 		status = -EINVAL;
