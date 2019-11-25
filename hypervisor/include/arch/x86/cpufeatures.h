@@ -8,7 +8,6 @@
 #define CPUFEATURES_H
 
 #define X86_FEATURE_MONITOR ((FEAT_1_ECX << 5U) + 3U)
-#define X86_FEATURE_XSAVE   ((FEAT_1_ECX << 5U) + 26U)
 #define X86_FEATURE_OSXSAVE ((FEAT_1_ECX << 5U) + 27U)
 
 /* Intel-defined CPU features, CPUID level 0x00000007 (EDX)*/
