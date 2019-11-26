@@ -124,7 +124,16 @@ static inline void vlapic_build_x2apic_id(struct acrn_vlapic *vlapic)
 uint64_t vlapic_get_tsc_deadline_msr(const struct acrn_vlapic *vlapic)
 {
 	uint64_t ret;
-	ret = msr_read(MSR_IA32_TSC_DEADLINE) + exec_vmread64(VMX_TSC_OFFSET_FULL);
+	/* If physical TSC_DEADLINE is zero which means it's not armed (automatically disarmed
+	 * after timer triggered), return 0 and reset the virtual TSC_DEADLINE;
+	 * If physical TSC_DEADLINE is not zero, return the virtual TSC_DEADLINE value.
+	 */
+	if (msr_read(MSR_IA32_TSC_DEADLINE) == 0UL) {
+		vcpu_set_guest_msr(vlapic->vcpu, MSR_IA32_TSC_DEADLINE, 0UL);
+		ret = 0UL;
+	} else {
+		ret = vcpu_get_guest_msr(vlapic->vcpu, MSR_IA32_TSC_DEADLINE);
+	}
 
 	return ret;
 }
@@ -134,8 +143,21 @@ void vlapic_set_tsc_deadline_msr(struct acrn_vlapic *vlapic, uint64_t val_arg)
 	uint64_t val = val_arg;
 
 	vcpu_set_guest_msr(vlapic->vcpu, MSR_IA32_TSC_DEADLINE, val);
-	val -= exec_vmread64(VMX_TSC_OFFSET_FULL);
-	msr_write(MSR_IA32_TSC_DEADLINE, val);
+	/* If val is not zero, which mean guest intends to arm the tsc_deadline timer,
+	 * if the calculated value to write to the physical TSC_DEADLINE msr is zero,
+	 * we plus 1 to not disarm the physcial timer falsely;
+	 * If val is zero, which means guest intends to disarm the tsc_deadline timer,
+	 * we disarm the physical timer.
+	 */
+	if (val != 0UL) {
+		val -= exec_vmread64(VMX_TSC_OFFSET_FULL);
+		if (val == 0UL) {
+			val += 1UL;
+		}
+		msr_write(MSR_IA32_TSC_DEADLINE, val);
+	} else {
+		msr_write(MSR_IA32_TSC_DEADLINE, 0);
+	}
 }
 
 static inline void set_dest_mask_phys(struct acrn_vm *vm, uint64_t *dmask, uint32_t dest)
