@@ -41,6 +41,7 @@
 #include <vtd.h>
 #include <bits.h>
 #include <board.h>
+#include <platform_acpi_info.h>
 
 static spinlock_t pci_device_lock;
 
