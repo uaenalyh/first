@@ -44,6 +44,7 @@ struct pci_bar {
 
 /* MSI capability structure */
 struct pci_msi {
+	bool is_64bit;
 	uint32_t capoff;
 	uint32_t caplen;
 };
