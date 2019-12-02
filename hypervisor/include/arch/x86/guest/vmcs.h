@@ -17,7 +17,7 @@
 #define VMX_VMENTRY_FAIL 0x80000000U
 
 void init_vmcs(struct acrn_vcpu *vcpu);
-void switch_vmcs(const struct acrn_vcpu *vcpu);
+void load_vmcs(const struct acrn_vcpu *vcpu);
 
 void switch_apicv_mode_x2apic(struct acrn_vcpu *vcpu);
 #endif /* ASSEMBLER */
