@@ -260,8 +260,8 @@ static bool is_cr4_write_valid(struct acrn_vcpu *vcpu, uint64_t cr4)
 	if ((cr4 & cr4_always_off_mask) != 0U) {
 		ret = false;
 	} else {
-		/* Do NOT support nested guest, nor SMX */
-		if (((cr4 & CR4_VMXE) != 0UL) || ((cr4 & CR4_SMXE) != 0UL)) {
+		/* Do NOT support nested guest, nor SMX, nor PKE */
+		if (((cr4 & CR4_VMXE) != 0UL) || ((cr4 & CR4_SMXE) != 0UL) || ((cr4 & CR4_PKE) != 0UL)) {
 			ret = false;
 		} else {
 			/* Do NOT support PCID in guest */
@@ -326,7 +326,7 @@ static void vmx_write_cr4(struct acrn_vcpu *vcpu, uint64_t cr4)
 		uint64_t cr4_vmx, cr4_shadow;
 		uint64_t old_cr4 = vcpu_get_cr4(vcpu);
 
-		if (((cr4 ^ old_cr4) & (CR4_PGE | CR4_PSE | CR4_PAE | CR4_SMEP | CR4_SMAP | CR4_PKE)) != 0UL) {
+		if (((cr4 ^ old_cr4) & (CR4_PGE | CR4_PSE | CR4_PAE | CR4_SMEP | CR4_SMAP)) != 0UL) {
 			if (((cr4 & CR4_PAE) != 0UL) && (is_paging_enabled(vcpu)) && (!is_long_mode(vcpu))) {
 				if (load_pdptrs(vcpu) != 0) {
 					err_found = true;
