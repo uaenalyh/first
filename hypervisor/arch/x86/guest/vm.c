@@ -162,7 +162,6 @@ int32_t create_vm(uint16_t vm_id, struct acrn_vm_config *vm_config, struct acrn_
 {
 	struct acrn_vm *vm = NULL;
 	int32_t status = 0;
-	bool need_cleanup = false;
 	uint32_t i;
 	uint16_t pcpu_id;
 
@@ -217,14 +216,6 @@ int32_t create_vm(uint16_t vm_id, struct acrn_vm_config *vm_config, struct acrn_
 		status = set_vcpuid_entries(vm);
 		if (status == 0) {
 			vm->state = VM_CREATED;
-		} else {
-			need_cleanup = true;
-		}
-	}
-
-	if (need_cleanup) {
-		if (vm->arch_vm.nworld_eptp != NULL) {
-			(void)memset(vm->arch_vm.nworld_eptp, 0U, PAGE_SIZE);
 		}
 	}
 
@@ -240,6 +231,10 @@ int32_t create_vm(uint16_t vm_id, struct acrn_vm_config *vm_config, struct acrn_
 				break;
 			}
 		}
+	}
+
+	if ((status != 0) && (vm->arch_vm.nworld_eptp != NULL)) {
+		(void)memset(vm->arch_vm.nworld_eptp, 0U, PAGE_SIZE);
 	}
 
 	return status;
