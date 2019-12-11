@@ -37,7 +37,7 @@
 #include <util.h>
 
 /* The lapic_id info gotten from madt will be returned in lapic_id_array */
-uint16_t parse_madt(uint32_t lapic_id_array[CONFIG_MAX_PCPU_NUM])
+uint16_t parse_madt(uint32_t lapic_id_array[MAX_PCPU_NUM])
 {
 
 	lapic_id_array[0] = 0U;

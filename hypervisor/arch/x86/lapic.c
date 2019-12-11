@@ -161,7 +161,7 @@ void send_single_ipi(uint16_t pcpu_id, uint32_t vector)
 }
 
 /**
- * @pre pcpu_id < CONFIG_MAX_PCPU_NUM
+ * @pre pcpu_id < MAX_PCPU_NUM
  *
  * @return None
  */

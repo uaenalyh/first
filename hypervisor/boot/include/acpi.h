@@ -100,7 +100,7 @@ struct acpi_madt_local_apic_nmi {
 } __packed;
 
 struct ioapic_info;
-uint16_t parse_madt(uint32_t lapic_id_array[CONFIG_MAX_PCPU_NUM]);
+uint16_t parse_madt(uint32_t lapic_id_array[MAX_PCPU_NUM]);
 uint16_t parse_madt_ioapic(struct ioapic_info *ioapic_id_array);
 
 #endif /* !ACPI_H */

@@ -43,7 +43,7 @@ static inline int32_t atomic_inc_return(int32_t *v)
 
 extern uint16_t console_loglevel;
 
-static char logbuf[CONFIG_MAX_PCPU_NUM][LOG_MESSAGE_MAX_SIZE];
+static char logbuf[MAX_PCPU_NUM][LOG_MESSAGE_MAX_SIZE];
 
 struct acrn_logmsg_ctl {
 	uint32_t flags;
