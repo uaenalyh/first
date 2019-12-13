@@ -33,6 +33,19 @@
 #include "vpci_priv.h"
 
 /**
+ * @addtogroup vp-dm_vperipheral
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
+/**
  * @pre vdev != NULL
  * @pre vdev->vpci != NULL
  * @pre vdev->vpci->vm != NULL
@@ -201,3 +214,7 @@ void init_vdev_pt(struct pci_vdev *vdev)
 	pci_command |= 0x400U;
 	pci_pdev_write_cfg(vdev->pbdf, PCIR_COMMAND, 2U, pci_command);
 }
+
+/**
+ * @}
+ */

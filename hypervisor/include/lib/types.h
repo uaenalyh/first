@@ -7,6 +7,19 @@
 #ifndef TYPES_H
 #define TYPES_H
 
+/**
+ * @addtogroup lib_utils
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 #define ARRAY_SIZE(arr) (sizeof(arr) / sizeof((arr)[0]))
 #define __aligned(x)    __attribute__((aligned(x)))
 #define __packed        __attribute__((packed))
@@ -41,5 +54,9 @@ typedef _Bool bool;
 #endif
 
 #endif /* ASSEMBLER */
+
+/**
+ * @}
+ */
 
 #endif /* INCLUDE_TYPES_H defined */

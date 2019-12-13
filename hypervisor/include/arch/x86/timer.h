@@ -7,6 +7,19 @@
 #ifndef TIMER_H
 #define TIMER_H
 
+/**
+ * @addtogroup hwmgmt_time
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 #include <list.h>
 
 /**
@@ -62,6 +75,10 @@ void calibrate_tsc(void);
  * @return tsc(KHz)
  */
 uint32_t get_tsc_khz(void);
+
+/**
+ * @}
+ */
 
 /**
  * @}

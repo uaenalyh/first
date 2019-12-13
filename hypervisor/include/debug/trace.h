@@ -11,6 +11,19 @@
 
 #ifndef TRACE_H
 #define TRACE_H
+
+/**
+ * @addtogroup debug
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
 #include <per_cpu.h>
 
 #define TRACE_VM_EXIT      0x10U
@@ -32,5 +45,9 @@
 
 void TRACE_2L(uint32_t evid, uint64_t e, uint64_t f);
 void TRACE_4I(uint32_t evid, uint32_t a, uint32_t b, uint32_t c, uint32_t d);
+
+/**
+ * @}
+ */
 
 #endif /* TRACE_H */

@@ -15,6 +15,19 @@
 #include <acpi.h>
 #include <logmsg.h>
 
+/**
+ * @addtogroup hwmgmt_apic
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 #define NR_MAX_GSI (CONFIG_MAX_IOAPIC_NUM * CONFIG_MAX_IOAPIC_LINES)
 
 static struct gsi_table gsi_table_data[NR_MAX_GSI];
@@ -308,3 +321,7 @@ void ioapic_setup_irqs(void)
 	/* system max gsi numbers */
 	ioapic_nr_gsi = gsi;
 }
+
+/**
+ * @}
+ */

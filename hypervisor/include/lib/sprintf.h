@@ -7,6 +7,19 @@
 #ifndef SPRINTF_H
 #define SPRINTF_H
 
+/**
+ * @addtogroup lib_utils
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 /** The well known snprintf() function.
  *
  *  Formats a string and writes it to the console output.
@@ -19,6 +32,10 @@
  *	  number if an error occurred.
  *
  *  @bug    sz == 0 doesn't work
+ */
+
+/**
+ * @}
  */
 
 #endif /* SPRINTF_H */

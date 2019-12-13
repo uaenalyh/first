@@ -20,6 +20,23 @@
 #include <trace.h>
 #include <logmsg.h>
 
+/**
+ * @defgroup vp-base_vcr vp-base.vcr
+ * @ingroup vp-base
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 /* CR0 bits hv want to trap to track status change */
 #define CR0_TRAP_MASK (CR0_PE | CR0_PG | CR0_WP | CR0_CD | CR0_NW)
 #define CR0_RESERVED_MASK \
@@ -464,3 +481,7 @@ int32_t cr_access_vmexit_handler(struct acrn_vcpu *vcpu)
 
 	return ret;
 }
+
+/**
+ * @}
+ */

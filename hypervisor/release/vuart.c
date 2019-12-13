@@ -32,6 +32,19 @@
 #include <vm.h>
 #include <vuart.h>
 
+/**
+ * @addtogroup debug
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 void init_vuart(__unused struct acrn_vm *vm, __unused const struct vuart_config *vu_config)
 {
 }
@@ -39,3 +52,7 @@ void init_vuart(__unused struct acrn_vm *vm, __unused const struct vuart_config 
 void deinit_vuart(__unused struct acrn_vm *vm)
 {
 }
+
+/**
+ * @}
+ */

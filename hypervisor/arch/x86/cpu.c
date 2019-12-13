@@ -29,6 +29,23 @@
 #include <sgx.h>
 #include <uart16550.h>
 
+/**
+ * @defgroup hwmgmt_cpu hwmgmt.cpu
+ * @ingroup hwmgmt
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 #define CPU_UP_TIMEOUT   100U /* millisecond */
 #define CPU_DOWN_TIMEOUT 100U /* millisecond */
 
@@ -447,3 +464,7 @@ static void init_pcpu_xsave(void)
 		}
 	}
 }
+
+/**
+ * @}
+ */

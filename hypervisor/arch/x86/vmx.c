@@ -13,6 +13,23 @@
 #include <vmx.h>
 
 /**
+ * @defgroup hwmgmt_vmx hwmgmt.vmx
+ * @ingroup hwmgmt
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
+/**
  * @pre addr != NULL && addr is 4KB-aligned
  * rev[31:0]  32 bits located at vmxon region physical address
  * @pre rev[30:0] == VMCS revision && rev[31] == 0
@@ -145,3 +162,7 @@ void exec_vmwrite16(uint32_t field, uint16_t value)
 {
 	exec_vmwrite64(field, (uint64_t)value);
 }
+
+/**
+ * @}
+ */

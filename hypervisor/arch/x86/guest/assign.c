@@ -13,6 +13,19 @@
 #include <per_cpu.h>
 #include <ioapic.h>
 
+/**
+ * @addtogroup vp-dm_ptirq
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 /*
  * lookup a ptdev entry by sid
  * Before adding a ptdev remapping, should lookup by physical sid to check
@@ -303,3 +316,7 @@ void ptirq_remove_msix_remapping(const struct acrn_vm *vm, uint16_t virt_bdf, ui
 		spinlock_release(&ptdev_lock);
 	}
 }
+
+/**
+ * @}
+ */

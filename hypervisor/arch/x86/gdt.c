@@ -8,6 +8,19 @@
 #include <gdt.h>
 #include <per_cpu.h>
 
+/**
+ * @addtogroup hwmgmt_cpu
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 static void set_tss_desc(struct tss_64_descriptor *desc, uint64_t tss, size_t tss_limit, uint32_t type)
 {
 	uint32_t u1, u2, u3;
@@ -56,3 +69,7 @@ void load_gdtr_and_tr(void)
 
 	CPU_LTR_EXECUTE(HOST_GDT_RING0_CPU_TSS_SEL);
 }
+
+/**
+ * @}
+ */

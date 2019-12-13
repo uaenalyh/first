@@ -7,6 +7,19 @@
 #ifndef SPINLOCK_H
 #define SPINLOCK_H
 
+/**
+ * @addtogroup lib_lock
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 #ifndef ASSEMBLER
 
 #include <types.h>
@@ -85,4 +98,9 @@ static inline void spinlock_release(spinlock_t *lock)
 		spinlock_release(lock);           \
 		CPU_INT_ALL_RESTORE(rflags);      \
 	} while (0)
+
+/**
+ * @}
+ */
+
 #endif /* SPINLOCK_H */

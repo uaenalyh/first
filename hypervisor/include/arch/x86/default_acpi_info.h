@@ -12,4 +12,21 @@
 #ifndef DEFAULT_ACPI_INFO_H
 #define DEFAULT_ACPI_INFO_H
 
+/**
+ * @addtogroup hwmgmt_configs
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
+/**
+ * @}
+ */
+
 #endif /* DEFAULT_ACPI_INFO_H */

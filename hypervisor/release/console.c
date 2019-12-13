@@ -8,6 +8,19 @@
 #include <pci.h>
 #include <console.h>
 
+/**
+ * @addtogroup debug
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 void console_init(void)
 {
 }
@@ -22,3 +35,7 @@ void console_kick(void)
 void shell_init(void)
 {
 }
+
+/**
+ * @}
+ */

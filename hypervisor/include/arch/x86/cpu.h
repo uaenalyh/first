@@ -37,6 +37,19 @@
 
 #ifndef CPU_H
 #define CPU_H
+
+/**
+ * @addtogroup hwmgmt_cpu
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
 #include <types.h>
 #include <acrn_common.h>
 
@@ -528,5 +541,9 @@ bool is_pcpu_active(uint16_t pcpu_id);
 #else /* ASSEMBLER defined */
 
 #endif /* ASSEMBLER defined */
+
+/**
+ * @}
+ */
 
 #endif /* CPU_H */

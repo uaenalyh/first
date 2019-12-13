@@ -39,6 +39,23 @@
 #include <ld_sym.h>
 #include <logmsg.h>
 
+/**
+ * @defgroup hwmgmt_mmu hwmgmt.mmu
+ * @ingroup hwmgmt
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 static void *ppt_mmu_pml4_addr;
 static uint8_t sanitized_page[PAGE_SIZE] __aligned(PAGE_SIZE);
 
@@ -292,3 +309,7 @@ void flush_address_space(void *addr, uint64_t size)
 		n += CACHE_LINE_SIZE;
 	}
 }
+
+/**
+ * @}
+ */

@@ -7,6 +7,19 @@
 #ifndef MISC_CFG_H
 #define MISC_CFG_H
 
+/**
+ * @addtogroup vp-base_vboot
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 #define MAX_PCPU_NUM 4U
 #define ROOTFS_0            "root=/dev/sda3 "
 
@@ -16,5 +29,9 @@
 	"memmap=0x200000$0x1fe00000 "
 #else
 #endif
+
+/**
+ * @}
+ */
 
 #endif /* MISC_CFG_H */

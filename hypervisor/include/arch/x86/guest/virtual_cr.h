@@ -8,6 +8,19 @@
 #define VCR_H
 
 /**
+ * @addtogroup vp-base_vcr
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
+/**
  * @file virtual_cr.h
  *
  * @brief public APIs for vCR operations
@@ -80,5 +93,9 @@ void vcpu_set_cr4(struct acrn_vcpu *vcpu, uint64_t val);
 /* End of vCR */
 
 int32_t cr_access_vmexit_handler(struct acrn_vcpu *vcpu);
+
+/**
+ * @}
+ */
 
 #endif /* VCR_H */

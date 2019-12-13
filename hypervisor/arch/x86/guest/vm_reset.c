@@ -12,6 +12,19 @@
 #include <vm_reset.h>
 
 /**
+ * @addtogroup vp-base_vm
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
+/**
  * @pre vm != NULL
  */
 void triple_fault_shutdown_vm(struct acrn_vcpu *vcpu)
@@ -39,3 +52,7 @@ void shutdown_vm_from_idle(uint16_t pcpu_id)
 
 	(void)shutdown_vm(vm);
 }
+
+/**
+ * @}
+ */

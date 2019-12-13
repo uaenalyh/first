@@ -46,6 +46,30 @@
 #include <logmsg.h>
 #include "vlapic_priv.h"
 
+/**
+ * @defgroup vp-base vp-base
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
+/**
+ * @defgroup vp-base_vlapic vp-base.vlapic
+ * @ingroup vp-base
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 #define APICBASE_BSP     0x00000100UL
 #define APICBASE_X2APIC  0x00000400U
 #define APICBASE_ENABLED 0x00000800UL
@@ -495,3 +519,7 @@ void vlapic_create(struct acrn_vcpu *vcpu)
 
 	vlapic_init(vcpu_vlapic(vcpu));
 }
+
+/**
+ * @}
+ */

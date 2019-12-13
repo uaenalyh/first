@@ -7,6 +7,19 @@
 #include <e820.h>
 #include <vm.h>
 
+/**
+ * @addtogroup vp-base_vboot
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 #define VE820_ENTRIES_KBL_NUC_i7 5U
 static const struct e820_entry ve820_entry[VE820_ENTRIES_KBL_NUC_i7] = {
 	{ /* usable RAM under 1MB */
@@ -42,3 +55,7 @@ void create_prelaunched_vm_e820(struct acrn_vm *vm)
 	vm->e820_entry_num = VE820_ENTRIES_KBL_NUC_i7;
 	vm->e820_entries = ve820_entry;
 }
+
+/**
+ * @}
+ */

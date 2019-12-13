@@ -30,6 +30,19 @@
 #ifndef VLAPIC_H
 #define VLAPIC_H
 
+/**
+ * @addtogroup vp-base_vlapic
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 #include <page.h>
 #include <timer.h>
 #include <apicreg.h>
@@ -99,4 +112,9 @@ void vlapic_calc_dest(struct acrn_vm *vm, uint64_t *dmask, bool is_broadcast, ui
  * @}
  */
 /* End of acrn_vlapic */
+
+/**
+ * @}
+ */
+
 #endif /* VLAPIC_H */

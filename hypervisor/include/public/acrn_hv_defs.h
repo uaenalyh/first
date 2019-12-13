@@ -15,6 +15,19 @@
 #ifndef ACRN_HV_DEFS_H
 #define ACRN_HV_DEFS_H
 
+/**
+ * @addtogroup lib_utils
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 /*
  * Common structures for HV/VHM
  */
@@ -30,6 +43,10 @@
 
 #define MR_DEL    2U
 #define MR_MODIFY 3U
+
+/**
+ * @}
+ */
 
 /**
  * @}

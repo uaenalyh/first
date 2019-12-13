@@ -7,6 +7,19 @@
 #ifndef VM_H_
 #define VM_H_
 
+/**
+ * @addtogroup vp-base_vm
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 /* Defines for VM Launch and Resume */
 #define VM_RESUME 0
 #define VM_LAUNCH 1
@@ -175,5 +188,9 @@ bool is_rt_vm(const struct acrn_vm *vm);
 bool has_rt_vm(void);
 enum vm_vlapic_state check_vm_vlapic_state(const struct acrn_vm *vm);
 #endif /* !ASSEMBLER */
+
+/**
+ * @}
+ */
 
 #endif /* VM_H_ */

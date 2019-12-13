@@ -7,6 +7,19 @@
 #ifndef VMCS_H_
 #define VMCS_H_
 
+/**
+ * @addtogroup vp-base_hv_main
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 #define VM_SUCCESS 0
 #define VM_FAIL    -1
 
@@ -21,5 +34,9 @@ void load_vmcs(const struct acrn_vcpu *vcpu);
 
 void switch_apicv_mode_x2apic(struct acrn_vcpu *vcpu);
 #endif /* ASSEMBLER */
+
+/**
+ * @}
+ */
 
 #endif /* VMCS_H_ */

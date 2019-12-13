@@ -13,6 +13,23 @@
 #include <security.h>
 #include <logmsg.h>
 
+/**
+ * @defgroup hwmgmt_security hwmgmt.security
+ * @ingroup hwmgmt
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 static bool skip_l1dfl_vmentry;
 static bool cpu_md_clear;
 static int32_t ibrs_type;
@@ -220,3 +237,7 @@ bool is_ept_force_4k_ipage(void)
 	return force_4k_ipage;
 }
 #endif
+
+/**
+ * @}
+ */

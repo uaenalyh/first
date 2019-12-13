@@ -11,6 +11,23 @@
 #include <irq.h>
 #include <logmsg.h>
 
+/**
+ * @defgroup vp-dm_ptirq vp-dm.ptirq
+ * @ingroup vp-dm
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 #define PTIRQ_BITMAP_ARRAY_SIZE INT_DIV_ROUNDUP(CONFIG_MAX_PT_IRQ_ENTRIES, 64U)
 struct ptirq_remapping_info ptirq_entries[CONFIG_MAX_PT_IRQ_ENTRIES];
 static uint64_t ptirq_entry_bitmaps[PTIRQ_BITMAP_ARRAY_SIZE];
@@ -107,3 +124,7 @@ void ptdev_release_all_entries(const struct acrn_vm *vm)
 		}
 	}
 }
+
+/**
+ * @}
+ */

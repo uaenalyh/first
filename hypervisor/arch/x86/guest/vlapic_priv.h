@@ -30,10 +30,27 @@
 #ifndef VLAPIC_PRIV_H
 #define VLAPIC_PRIV_H
 
+/**
+ * @addtogroup vp-base_vlapic
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 /*
  * APIC Register:		Offset	Description
  */
 #define APIC_OFFSET_ID  0x20U /* Local APIC ID		*/
 #define APIC_OFFSET_LDR 0xD0U /* Logical Destination		*/
+
+/**
+ * @}
+ */
 
 #endif /* VLAPIC_PRIV_H */

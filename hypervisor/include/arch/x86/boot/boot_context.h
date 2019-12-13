@@ -7,6 +7,19 @@
 #ifndef BOOT_CTX_H
 #define BOOT_CTX_H
 
+/**
+ * @addtogroup boot
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 #ifdef ASSEMBLER
 #define BOOT_CTX_CR0_OFFSET       176
 #define BOOT_CTX_CR3_OFFSET       192
@@ -47,4 +60,9 @@
 #define SIZE_OF_BOOT_CTX          296U
 struct acrn_vcpu_regs;
 #endif /* ASSEMBLER */
+
+/**
+ * @}
+ */
+
 #endif /* BOOT_CTX_H */

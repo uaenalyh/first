@@ -12,6 +12,19 @@
 #include <vboot.h>
 #include <ld_sym.h>
 
+/**
+ * @addtogroup hwmgmt_cpu
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 static uint64_t trampoline_start16_paddr;
 
 /*
@@ -105,3 +118,7 @@ uint64_t prepare_trampoline(void)
 
 	return dest_pa;
 }
+
+/**
+ * @}
+ */

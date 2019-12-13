@@ -29,6 +29,19 @@
 #ifndef APICREG_H
 #define APICREG_H
 
+/**
+ * @addtogroup hwmgmt_apic
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 #include <page.h>
 
 /*
@@ -157,5 +170,9 @@ union ioapic_rte {
 /* fields in VER, for redirection entry */
 #define IOAPIC_MAX_RTE_MASK 0x00ff0000U
 #define MAX_RTE_SHIFT       16U
+
+/**
+ * @}
+ */
 
 #endif /* APICREG_H */

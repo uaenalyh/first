@@ -14,6 +14,19 @@
 #ifndef CPUID_H_
 #define CPUID_H_
 
+/**
+ * @addtogroup hwmgmt_cpu
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 /* CPUID bit definitions */
 #define CPUID_ECX_SSE3    (1U << 0U)
 #define CPUID_ECX_DTES64  (1U << 2U)
@@ -86,5 +99,9 @@ static inline void cpuid_subleaf(
 
 	asm_cpuid(eax, ebx, ecx, edx);
 }
+
+/**
+ * @}
+ */
 
 #endif /* CPUID_H_ */

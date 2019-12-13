@@ -7,6 +7,19 @@
 #ifndef VM_CONFIGURATIONS_H
 #define VM_CONFIGURATIONS_H
 
+/**
+ * @addtogroup hwmgmt_configs
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 #include <pci_devices.h>
 #include <misc_cfg.h>
 
@@ -54,5 +67,9 @@
 
 #define VM1_STORAGE_CONTROLLER USB_CONTROLLER
 #define VM1_CONFIG_PCI_DEV_NUM 2U
+
+/**
+ * @}
+ */
 
 #endif /* VM_CONFIGURATIONS_H */

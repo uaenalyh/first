@@ -9,6 +9,23 @@
 #include <logmsg.h>
 
 /**
+ * @defgroup vp-dm_io_req vp-dm.io_req
+ * @ingroup vp-dm
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
+/**
  * @pre width < 8U
  * @pre vcpu != NULL
  * @pre vcpu->vm != NULL
@@ -154,3 +171,7 @@ void register_pio_emulation_handler(struct acrn_vm *vm, uint32_t pio_idx, const 
 	vm->emul_pio[pio_idx].io_read = io_read_fn_ptr;
 	vm->emul_pio[pio_idx].io_write = io_write_fn_ptr;
 }
+
+/**
+ * @}
+ */

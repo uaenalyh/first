@@ -6,6 +6,19 @@
 
 #ifndef ZEROPAGE_H
 #define ZEROPAGE_H
+
+/**
+ * @addtogroup vp-base_vboot
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
 #include <e820.h>
 
 struct zero_page {
@@ -37,5 +50,9 @@ struct zero_page {
 	struct e820_entry entries[0x80]; /* 0x2d0 */
 	uint8_t pad4[0x330]; /* 0xcd0 */
 } __packed;
+
+/**
+ * @}
+ */
 
 #endif

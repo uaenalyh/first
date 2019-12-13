@@ -7,6 +7,19 @@
 #ifndef IOREQ_H
 #define IOREQ_H
 
+/**
+ * @addtogroup vp-dm_io_req
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 #include <types.h>
 #include <acrn_common.h>
 #include <list.h>
@@ -137,6 +150,10 @@ int32_t emulate_io(struct acrn_vcpu *vcpu, struct io_request *io_req);
  */
 void register_pio_emulation_handler(struct acrn_vm *vm, uint32_t pio_idx, const struct vm_io_range *range,
 	io_read_fn_t io_read_fn_ptr, io_write_fn_t io_write_fn_ptr);
+
+/**
+ * @}
+ */
 
 /**
  * @}

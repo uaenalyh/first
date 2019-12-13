@@ -32,6 +32,23 @@
 #include <pci_dev.h>
 #include <vacpi.h>
 
+/**
+ * @defgroup vp-base_vm vp-base.vm
+ * @ingroup vp-base
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 vm_sw_loader_t vm_sw_loader;
 
 /* Local variables */
@@ -438,3 +455,7 @@ bool need_shutdown_vm(uint16_t pcpu_id)
 {
 	return bitmap_test_and_clear_lock(NEED_SHUTDOWN_VM, &per_cpu(pcpu_flag, pcpu_id));
 }
+
+/**
+ * @}
+ */

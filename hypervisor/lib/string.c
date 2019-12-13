@@ -7,6 +7,30 @@
 #include <logmsg.h>
 
 /**
+ * @defgroup lib lib
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
+/**
+ * @defgroup lib_utils lib.utils
+ * @ingroup lib
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
+/**
  *
  *    strnlen_s
  *
@@ -66,3 +90,7 @@ int32_t strncmp(const char *s1_arg, const char *s2_arg, size_t n_arg)
 
 	return ret;
 }
+
+/**
+ * @}
+ */

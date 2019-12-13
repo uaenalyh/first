@@ -19,6 +19,30 @@
 #include <dump.h>
 #include <logmsg.h>
 
+/**
+ * @defgroup hwmgmt hwmgmt
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
+/**
+ * @defgroup hwmgmt_irq hwmgmt.irq
+ * @ingroup hwmgmt
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 static spinlock_t exception_spinlock = {
 	.head = 0U,
 	.tail = 0U,
@@ -388,3 +412,7 @@ void init_interrupt(uint16_t pcpu_id)
 	init_lapic(pcpu_id);
 	init_default_irqs(pcpu_id);
 }
+
+/**
+ * @}
+ */

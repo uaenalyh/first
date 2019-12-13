@@ -8,6 +8,19 @@
 #define SGX_H
 
 /**
+ * @addtogroup hwmgmt_cpu
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
+/**
  * @file sgx.h
  *
  * @brief public APIs for SGX
@@ -25,6 +38,10 @@ struct epc_section {
 
 struct epc_map {
 };
+
+/**
+ * @}
+ */
 
 /**
  * @}

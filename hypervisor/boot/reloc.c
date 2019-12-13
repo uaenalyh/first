@@ -8,6 +8,20 @@
 #include <reloc.h>
 #include <ld_sym.h>
 
+/**
+ * @defgroup boot boot
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 #ifdef CONFIG_RELOC
 #define DT_NULL    0U /* end of .dynamic section */
 #define DT_RELA    7U /* relocation table */
@@ -123,3 +137,7 @@ void relocate(void)
 	}
 #endif
 }
+
+/**
+ * @}
+ */

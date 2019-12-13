@@ -11,6 +11,19 @@
 #include <mmu.h>
 #include <logmsg.h>
 
+/**
+ * @addtogroup hwmgmt_page
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 #define ACRN_DBG_MMU 6U
 
 /*
@@ -437,3 +450,7 @@ const uint64_t *lookup_address(uint64_t *pml4_page, uint64_t addr, uint64_t *pg_
 
 	return pret;
 }
+
+/**
+ * @}
+ */

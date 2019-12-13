@@ -5,8 +5,25 @@
  */
 #ifndef DEPRIVILEGE_BOOT_H
 
+
+/**
+ * @addtogroup vp-base_vboot
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
 #define DEPRIVILEGE_BOOT_H
 
 #include <vboot.h>
+
+/**
+ * @}
+ */
 
 #endif /* end of include guard: DEPRIVILEGE_BOOT_H */

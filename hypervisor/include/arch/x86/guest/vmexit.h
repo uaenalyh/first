@@ -7,6 +7,19 @@
 #ifndef VMEXIT_H_
 #define VMEXIT_H_
 
+/**
+ * @addtogroup vp-base_hv_main
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 struct vm_exit_dispatch {
 	int32_t (*handler)(struct acrn_vcpu *);
 	uint32_t need_exit_qualification;
@@ -54,5 +67,9 @@ static inline uint64_t vm_exit_io_instruction_port_number(uint64_t exit_qual)
 {
 	return (vm_exit_qualification_bit_mask(exit_qual, 31U, 16U) >> 16U);
 }
+
+/**
+ * @}
+ */
 
 #endif /* VMEXIT_H_ */

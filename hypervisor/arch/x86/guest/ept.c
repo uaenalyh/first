@@ -16,6 +16,19 @@
 #include <logmsg.h>
 #include <trace.h>
 
+/**
+ * @addtogroup vp-base_guest_mem
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 #define ACRN_DBG_EPT 6U
 
 bool ept_is_mr_valid(const struct acrn_vm *vm, uint64_t base, uint64_t size)
@@ -227,3 +240,7 @@ void walk_ept_table(struct acrn_vm *vm, pge_handler cb)
 		}
 	}
 }
+
+/**
+ * @}
+ */

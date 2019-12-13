@@ -7,6 +7,19 @@
 #ifndef MULTIBOOT_H
 #define MULTIBOOT_H
 
+/**
+ * @addtogroup hwmgmt_configs
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 #include <types.h>
 #define MULTIBOOT_INFO_MAGIC    0x2BADB002U
 #define MULTIBOOT_INFO_HAS_MODS 0x00000008U
@@ -82,4 +95,9 @@ struct multiboot_module {
 
 /* boot_regs store the multiboot header address */
 extern uint32_t boot_regs[2];
+
+/**
+ * @}
+ */
+
 #endif

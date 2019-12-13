@@ -38,6 +38,19 @@
 #include "vpci_priv.h"
 
 /**
+ * @addtogroup vp-dm_vperipheral
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
+/**
  * @pre vdev != NULL
  * @pre vdev->vpci != NULL
  * @pre vdev->vpci->vm != NULL
@@ -120,3 +133,7 @@ const struct pci_vdev_ops vhostbridge_ops = {
 	.write_vdev_cfg = vhostbridge_write_cfg,
 	.read_vdev_cfg = vhostbridge_read_cfg,
 };
+
+/**
+ * @}
+ */

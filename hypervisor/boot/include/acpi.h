@@ -7,6 +7,19 @@
 #ifndef ACPI_H
 #define ACPI_H
 
+/**
+ * @addtogroup hwmgmt_configs
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 #include <vm_configurations.h>
 
 #define ACPI_RSDP_CHECKSUM_LENGTH  20U
@@ -102,5 +115,9 @@ struct acpi_madt_local_apic_nmi {
 struct ioapic_info;
 uint16_t parse_madt(uint32_t lapic_id_array[MAX_PCPU_NUM]);
 uint16_t parse_madt_ioapic(struct ioapic_info *ioapic_id_array);
+
+/**
+ * @}
+ */
 
 #endif /* !ACPI_H */

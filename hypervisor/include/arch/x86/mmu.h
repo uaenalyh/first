@@ -10,6 +10,19 @@
  */
 #ifndef MMU_H
 #define MMU_H
+
+/**
+ * @addtogroup hwmgmt_mmu
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
 /**
  * @brief Memory Management
  *
@@ -171,5 +184,9 @@ static inline uint64_t get_pae_pdpt_addr(uint64_t cr3)
  * @}
  */
 #endif /* ASSEMBLER not defined */
+
+/**
+ * @}
+ */
 
 #endif /* MMU_H */

@@ -7,6 +7,19 @@
 #ifndef ARCH_IRQ_H
 #define ARCH_IRQ_H
 
+/**
+ * @addtogroup hwmgmt_irq
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 #include <acrn_common.h>
 #include <util.h>
 #include <spinlock.h>
@@ -275,4 +288,9 @@ void init_interrupt(uint16_t pcpu_id);
  * @}
  */
 /* End of acrn_virq */
+
+/**
+ * @}
+ */
+
 #endif /* ARCH_IRQ_H */

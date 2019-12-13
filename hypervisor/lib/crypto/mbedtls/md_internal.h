@@ -29,6 +29,23 @@
 #ifndef MBEDTLS_MD_WRAP_H
 #define MBEDTLS_MD_WRAP_H
 
+/**
+ * @addtogroup hwmgmt_security
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 #include "md.h"
+
+/**
+ * @}
+ */
 
 #endif /* MBEDTLS_MD_WRAP_H */

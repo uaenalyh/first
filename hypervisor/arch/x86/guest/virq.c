@@ -17,6 +17,23 @@
 #include <trace.h>
 #include <logmsg.h>
 
+/**
+ * @defgroup vp-base_virq vp-base.virq
+ * @ingroup vp-base
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 #define EXCEPTION_ERROR_CODE_VALID 8U
 
 #define EXCEPTION_CLASS_BENIGN 1
@@ -438,3 +455,7 @@ int32_t exception_vmexit_handler(struct acrn_vcpu *vcpu)
 
 	return status;
 }
+
+/**
+ * @}
+ */

@@ -8,6 +8,19 @@
 #include <pci_devices.h>
 #include <vpci.h>
 
+/**
+ * @addtogroup hwmgmt_configs
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 struct acrn_vm_pci_dev_config vm0_pci_devs[VM0_CONFIG_PCI_DEV_NUM] = {
 	{
 		.emu_type = PCI_DEV_TYPE_HVEMUL,
@@ -23,3 +36,7 @@ struct acrn_vm_pci_dev_config vm1_pci_devs[VM1_CONFIG_PCI_DEV_NUM] = {
 		.vdev_ops = &vhostbridge_ops,
 	},
 };
+
+/**
+ * @}
+ */

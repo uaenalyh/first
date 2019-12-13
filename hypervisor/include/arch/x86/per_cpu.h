@@ -7,6 +7,19 @@
 #ifndef PER_CPU_H
 #define PER_CPU_H
 
+/**
+ * @addtogroup hwmgmt_cpu
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 #include <types.h>
 #include <sbuf.h>
 #include <irq.h>
@@ -52,5 +65,9 @@ extern struct per_cpu_region per_cpu_data[MAX_PCPU_NUM];
 
 /* get percpu data for current pcpu */
 #define get_cpu_var(name) per_cpu(name, get_pcpu_id())
+
+/**
+ * @}
+ */
 
 #endif

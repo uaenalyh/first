@@ -30,6 +30,19 @@
 #ifndef VPCI_H_
 #define VPCI_H_
 
+/**
+ * @addtogroup vp-dm_vperipheral
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 #include <spinlock.h>
 #include <pci.h>
 
@@ -110,5 +123,9 @@ struct acrn_vpci {
 extern const struct pci_vdev_ops vhostbridge_ops;
 void vpci_init(struct acrn_vm *vm);
 void vpci_cleanup(struct acrn_vm *vm);
+
+/**
+ * @}
+ */
 
 #endif /* VPCI_H_ */

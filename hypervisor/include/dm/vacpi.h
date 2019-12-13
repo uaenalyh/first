@@ -21,6 +21,19 @@
 #ifndef VACPI_H
 #define VACPI_H
 
+/**
+ * @addtogroup vp-base_vboot
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 #include <acpi.h>
 
 /*
@@ -59,5 +72,9 @@ struct acpi_table_info {
 };
 
 void build_vacpi(struct acrn_vm *vm);
+
+/**
+ * @}
+ */
 
 #endif /* VACPI_H */

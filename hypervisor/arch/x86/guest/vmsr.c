@@ -19,6 +19,23 @@
 #include <trace.h>
 #include <logmsg.h>
 
+/**
+ * @defgroup vp-base_vmsr vp-base.vmsr
+ * @ingroup vp-base
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 #define INTERCEPT_DISABLE    (0U)
 #define INTERCEPT_READ       (1U << 0U)
 #define INTERCEPT_WRITE      (1U << 1U)
@@ -736,3 +753,7 @@ void update_msr_bitmap_x2apic_passthru(struct acrn_vcpu *vcpu)
 	enable_msr_interception(msr_bitmap, MSR_IA32_EXT_APIC_ICR, INTERCEPT_WRITE);
 	set_tsc_msr_interception(vcpu, exec_vmread64(VMX_TSC_OFFSET_FULL) != 0UL);
 }
+
+/**
+ * @}
+ */

@@ -7,6 +7,19 @@
 #ifndef CPUINFO_H
 #define CPUINFO_H
 
+/**
+ * @addtogroup hwmgmt_cpu_caps
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 /* CPUID feature words */
 #define FEAT_1_ECX         0U /* CPUID[1].ECX */
 #define FEAT_1_EDX         1U /* CPUID[1].EDX */
@@ -42,5 +55,9 @@ bool pcpu_has_vmx_ept_cap(uint32_t bit_mask);
 void init_pcpu_capabilities(void);
 void init_pcpu_model_name(void);
 struct cpuinfo_x86 *get_pcpu_info(void);
+
+/**
+ * @}
+ */
 
 #endif /* CPUINFO_H */

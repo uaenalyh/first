@@ -6,6 +6,19 @@
 
 #ifndef E820_H
 #define E820_H
+
+/**
+ * @addtogroup hwmgmt_configs
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
 #include <types.h>
 
 /* E820 memory types */
@@ -44,5 +57,9 @@ const struct e820_entry *get_e820_entry(void);
 
 /* get the e820 total memory info */
 const struct mem_range *get_mem_range_info(void);
+
+/**
+ * @}
+ */
 
 #endif

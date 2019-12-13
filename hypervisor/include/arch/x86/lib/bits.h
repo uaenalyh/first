@@ -29,6 +29,23 @@
 
 #ifndef BITS_H
 #define BITS_H
+
+/**
+ * @defgroup lib_bits lib.bits
+ * @ingroup lib
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
 #include <atomic.h>
 
 /**
@@ -227,5 +244,9 @@ build_bitmap_testandset(bitmap_test_and_set_lock, "q", uint64_t, BUS_LOCK)
 	}
 build_bitmap_testandclear(bitmap_test_and_clear_nolock, "q", uint64_t, "")
 build_bitmap_testandclear(bitmap_test_and_clear_lock, "q", uint64_t, BUS_LOCK)
+
+/**
+ * @}
+ */
 
 #endif /* BITS_H*/

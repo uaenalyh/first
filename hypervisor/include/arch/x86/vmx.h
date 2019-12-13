@@ -7,6 +7,19 @@
 #ifndef VMX_H_
 #define VMX_H_
 
+/**
+ * @addtogroup hwmgmt_vmx
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 /* 16-bit control fields */
 #define VMX_VPID 0x00000000U
 /* 16-bit guest-state fields */
@@ -280,5 +293,9 @@ void exec_vmwrite64(uint32_t field_full, uint64_t value);
 
 void exec_vmclear(void *addr);
 void exec_vmptrld(void *addr);
+
+/**
+ * @}
+ */
 
 #endif /* VMX_H_ */

@@ -14,6 +14,19 @@
 #define HYPERCALL_H
 
 /**
+ * @addtogroup lib_utils
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
+/**
  * @brief Hypercall
  *
  * @addtogroup acrn_hypercall ACRN Hypercall
@@ -64,5 +77,9 @@
  * @}
  */
 /* End of acrn_hypercall */
+
+/**
+ * @}
+ */
 
 #endif /* HYPERCALL_H*/

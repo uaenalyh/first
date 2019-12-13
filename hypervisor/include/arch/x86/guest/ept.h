@@ -6,6 +6,19 @@
 
 #ifndef EPT_H
 #define EPT_H
+
+/**
+ * @addtogroup vp-base_guest_mem
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
 #include <types.h>
 
 typedef void (*pge_handler)(uint64_t *pgentry, uint64_t size);
@@ -152,4 +165,9 @@ int32_t ept_misconfig_vmexit_handler(__unused struct acrn_vcpu *vcpu);
 /**
  * @}
  */
+
+/**
+ * @}
+ */
+
 #endif /* EPT_H */

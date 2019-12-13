@@ -7,6 +7,30 @@
 #include <vm.h>
 #include <io.h>
 
+/**
+ * @defgroup vp-dm vp-dm
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
+/**
+ * @defgroup vp-dm_vperipheral vp-dm.vperipheral
+ * @ingroup vp-dm
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 #define CMOS_ADDR_PORT 0x70U
 #define CMOS_DATA_PORT 0x71U
 
@@ -87,3 +111,7 @@ void vrtc_init(struct acrn_vm *vm)
 
 	register_pio_emulation_handler(vm, RTC_PIO_IDX, &range, vrtc_read, vrtc_write);
 }
+
+/**
+ * @}
+ */

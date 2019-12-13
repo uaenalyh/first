@@ -14,6 +14,23 @@
 #include <security.h>
 #include <vm.h>
 
+/**
+ * @defgroup hwmgmt_page hwmgmt.page
+ * @ingroup hwmgmt
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 static struct page ppt_pml4_pages[PML4_PAGE_NUM(CONFIG_PLATFORM_RAM_SIZE + PLATFORM_LO_MMIO_SIZE)];
 static struct page ppt_pdpt_pages[PDPT_PAGE_NUM(CONFIG_PLATFORM_RAM_SIZE + PLATFORM_LO_MMIO_SIZE)];
 static struct page ppt_pd_pages[PD_PAGE_NUM(CONFIG_PLATFORM_RAM_SIZE + PLATFORM_LO_MMIO_SIZE)];
@@ -224,3 +241,7 @@ void init_ept_mem_ops(struct memory_ops *mem_ops, uint16_t vm_id)
 		mem_ops->recover_exe_right = nop_recover_exe_right;
 	}
 }
+
+/**
+ * @}
+ */

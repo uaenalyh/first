@@ -7,6 +7,19 @@
 #ifndef SECURITY_H
 #define SECURITY_H
 
+/**
+ * @addtogroup hwmgmt_security
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 /* type of speculation control
  * 0 - no speculation control support
  * 1 - raw IBRS + IBPB support
@@ -32,5 +45,9 @@ void set_fs_base(void);
 #endif
 
 #endif /* ASSEMBLER */
+
+/**
+ * @}
+ */
 
 #endif /* SECURITY_H */

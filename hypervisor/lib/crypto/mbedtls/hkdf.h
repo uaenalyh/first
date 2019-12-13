@@ -27,8 +27,25 @@
 #ifndef MBEDTLS_HKDF_H
 #define MBEDTLS_HKDF_H
 
+/**
+ * @addtogroup hwmgmt_security
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 #include "md.h"
 
 /* \} name */
+
+/**
+ * @}
+ */
 
 #endif /* hkdf.h */

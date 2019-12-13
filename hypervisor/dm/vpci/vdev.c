@@ -33,6 +33,19 @@
 #include <logmsg.h>
 
 /**
+ * @addtogroup vp-dm_vperipheral
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
+/**
  * @pre vdev != NULL
  */
 uint32_t pci_vdev_read_cfg(const struct pci_vdev *vdev, uint32_t offset, uint32_t bytes)
@@ -165,3 +178,7 @@ void pci_vdev_write_bar(struct pci_vdev *vdev, uint32_t idx, uint32_t val)
 
 	pci_vdev_update_bar_base(vdev, update_idx);
 }
+
+/**
+ * @}
+ */

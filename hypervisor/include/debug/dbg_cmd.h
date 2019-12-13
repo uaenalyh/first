@@ -7,4 +7,21 @@
 #ifndef DBG_CMD_H
 #define DBG_CMD_H
 
+/**
+ * @addtogroup debug
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
+/**
+ * @}
+ */
+
 #endif /* DBG_CMD_H */

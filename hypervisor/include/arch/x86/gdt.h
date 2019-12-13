@@ -7,6 +7,19 @@
 #ifndef GDT_H
 #define GDT_H
 
+/**
+ * @addtogroup hwmgmt_cpu
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 /* GDT is defined in assembly so it can be used to switch modes before long mode
  * is established.
  * With 64-bit EFI this is not required since are already in long mode when EFI
@@ -128,5 +141,9 @@ struct host_gdt_descriptor {
 void load_gdtr_and_tr(void);
 
 #endif /* end #ifndef ASSEMBLER */
+
+/**
+ * @}
+ */
 
 #endif /* GDT_H */

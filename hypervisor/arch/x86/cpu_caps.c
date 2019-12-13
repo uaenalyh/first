@@ -17,6 +17,23 @@
 #include <logmsg.h>
 #include <vmcs.h>
 
+/**
+ * @defgroup hwmgmt_cpu_caps hwmgmt.cpu_caps
+ * @ingroup hwmgmt
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 /* TODO: add more capability per requirement */
 
 static struct cpu_capability {
@@ -220,3 +237,7 @@ struct cpuinfo_x86 *get_pcpu_info(void)
 {
 	return &boot_cpu_data;
 }
+
+/**
+ * @}
+ */

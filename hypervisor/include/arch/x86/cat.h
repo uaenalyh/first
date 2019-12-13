@@ -7,4 +7,21 @@
 #ifndef CAT_H
 #define CAT_H
 
+/**
+ * @addtogroup hwmgmt_cpu
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
+/**
+ * @}
+ */
+
 #endif /* CAT_H */

@@ -23,6 +23,23 @@
 #include <vm_configurations.h>
 #include <pci.h>
 
+/**
+ * @defgroup hwmgmt_iommu hwmgmt.iommu
+ * @ingroup hwmgmt
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 #define ACRN_DBG_IOMMU 6U
 #define LEVEL_WIDTH    9U
 
@@ -1019,3 +1036,7 @@ void dmar_free_irte(struct intr_source intr_src, uint16_t index)
 		dmar_invalid_iec(dmar_unit, index, 0U, false);
 	}
 }
+
+/**
+ * @}
+ */

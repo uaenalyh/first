@@ -15,6 +15,19 @@
 #include <irq.h>
 #include <logmsg.h>
 
+/**
+ * @addtogroup vp-base_vmsr
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 uint64_t get_microcode_version(void)
 {
 	uint64_t val;
@@ -26,3 +39,7 @@ uint64_t get_microcode_version(void)
 
 	return val;
 }
+
+/**
+ * @}
+ */

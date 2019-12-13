@@ -12,6 +12,19 @@
 #include <multiboot.h>
 #include <logmsg.h>
 
+/**
+ * @addtogroup hwmgmt_configs
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 /*
  * e820.c contains the related e820 operations; like HV to get memory info for its MMU setup;
  * and hide HV memory from SOS_VM...
@@ -178,3 +191,7 @@ const struct mem_range *get_mem_range_info(void)
 {
 	return &hv_mem_range;
 }
+
+/**
+ * @}
+ */

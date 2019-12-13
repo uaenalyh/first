@@ -6,6 +6,19 @@
 
 #ifndef TRUSTY_H_
 #define TRUSTY_H_
+
+/**
+ * @addtogroup vp-base_vcpu
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
 #include <acrn_hv_defs.h>
 #include <seed.h>
 
@@ -29,5 +42,9 @@ struct secure_world_control {
 		uint64_t reserved : 61;
 	} flag;
 };
+
+/**
+ * @}
+ */
 
 #endif /* TRUSTY_H_ */

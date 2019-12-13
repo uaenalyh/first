@@ -6,8 +6,25 @@
 
 #ifndef VBOOT_INFO_H
 
+
+/**
+ * @addtogroup vp-base_vboot
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
 #define VBOOT_INFO_H
 
 int32_t init_vm_boot_info(struct acrn_vm *vm);
+
+/**
+ * @}
+ */
 
 #endif /* end of include guard: VBOOT_INFO_H */

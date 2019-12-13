@@ -15,6 +15,23 @@
 #include <ept.h>
 #include <logmsg.h>
 
+/**
+ * @defgroup vp-base_guest_mem vp-base.guest_mem
+ * @ingroup vp-base
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 static inline uint32_t local_copy_gpa(
 	struct acrn_vm *vm, void *h_ptr, uint64_t gpa, uint32_t size, uint32_t fix_pg_size, bool cp_from_vm)
 {
@@ -100,3 +117,7 @@ void *gpa2hva(struct acrn_vm *vm, uint64_t x)
 {
 	return hpa2hva(gpa2hpa(vm, x));
 }
+
+/**
+ * @}
+ */

@@ -8,6 +8,19 @@
 #include <pci_devices.h>
 #include <vpci.h>
 
+/**
+ * @addtogroup hwmgmt_configs
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 /* The vbar_base info of pt devices is included in device MACROs which defined in
  *	   arch/x86/configs/$(CONFIG_BOARD)/pci_devices.h.
  * The memory range of vBAR should exactly match with the e820 layout of VM.
@@ -38,3 +51,7 @@ struct acrn_vm_pci_dev_config vm1_pci_devs[VM1_CONFIG_PCI_DEV_NUM] = {
 		VM1_STORAGE_CONTROLLER
 	},
 };
+
+/**
+ * @}
+ */

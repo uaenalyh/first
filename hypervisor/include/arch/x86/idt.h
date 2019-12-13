@@ -7,6 +7,19 @@
 #ifndef IDT_H
 #define IDT_H
 
+/**
+ * @addtogroup hwmgmt_irq
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 /*
  * IDT is defined in assembly so we handle exceptions as early as possible.
  */
@@ -78,5 +91,9 @@ extern struct host_idt_descriptor HOST_IDTR;
 #define HOST_IDT_SIZE     (HOST_IDT_ENTRIES * X64_IDT_DESC_SIZE)
 
 #endif /* end #ifndef ASSEMBLER */
+
+/**
+ * @}
+ */
 
 #endif /* IDT_H */

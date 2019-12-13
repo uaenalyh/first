@@ -7,6 +7,19 @@
 #ifndef VM_CONFIG_H_
 #define VM_CONFIG_H_
 
+/**
+ * @addtogroup hwmgmt_configs
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 #include <types.h>
 #include <pci.h>
 #include <multiboot.h>
@@ -119,5 +132,9 @@ struct acrn_vm_config {
 struct acrn_vm_config *get_vm_config(uint16_t vm_id);
 
 extern struct acrn_vm_config vm_configs[CONFIG_MAX_VM_NUM];
+
+/**
+ * @}
+ */
 
 #endif /* VM_CONFIG_H_ */

@@ -31,6 +31,19 @@
 #ifndef PCI_H_
 #define PCI_H_
 
+/**
+ * @addtogroup hwmgmt_pci
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 /*
  * PCIM_xxx: mask to locate subfield in register
  * PCIR_xxx: config register offset
@@ -173,5 +186,9 @@ static inline bool bdf_is_equal(union pci_bdf a, union pci_bdf b)
 uint32_t pci_pdev_read_cfg(union pci_bdf bdf, uint32_t offset, uint32_t bytes);
 void pci_pdev_write_cfg(union pci_bdf bdf, uint32_t offset, uint32_t bytes, uint32_t val);
 void enable_disable_pci_intx(union pci_bdf bdf, bool enable);
+
+/**
+ * @}
+ */
 
 #endif /* PCI_H_ */

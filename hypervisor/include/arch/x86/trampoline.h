@@ -6,6 +6,19 @@
 #ifndef TRAMPOLINE_H
 #define TRAMPOLINE_H
 
+/**
+ * @addtogroup hwmgmt_cpu
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 extern void write_trampoline_stack_sym(uint16_t pcpu_id);
 extern uint64_t prepare_trampoline(void);
 
@@ -17,4 +30,9 @@ extern uint8_t cpu_boot_page_tables_start;
 extern uint8_t cpu_boot_page_tables_ptr;
 extern uint8_t trampoline_gdt_ptr;
 extern uint8_t trampoline_start64_fixup;
+
+/**
+ * @}
+ */
+
 #endif /* TRAMPOLINE_H */

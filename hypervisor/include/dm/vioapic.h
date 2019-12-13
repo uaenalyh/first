@@ -32,6 +32,19 @@
 #define VIOAPIC_H
 
 /**
+ * @addtogroup vp-dm_vperipheral
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
+/**
  * @file vioapic.h
  *
  * @brief public APIs for virtual I/O APIC
@@ -51,4 +64,9 @@
  * @}
  */
 /* End of acrn_vioapic */
+
+/**
+ * @}
+ */
+
 #endif /* VIOAPIC_H */

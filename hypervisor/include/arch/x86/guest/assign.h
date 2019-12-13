@@ -7,6 +7,19 @@
 #ifndef ASSIGN_H
 #define ASSIGN_H
 
+/**
+ * @addtogroup vp-dm_ptirq
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 #include <types.h>
 #include <ptdev.h>
 
@@ -63,6 +76,10 @@ int32_t ptirq_prepare_msix_remap(
  *
  */
 void ptirq_remove_msix_remapping(const struct acrn_vm *vm, uint16_t virt_bdf, uint32_t vector_count);
+
+/**
+ * @}
+ */
 
 /**
  * @}

@@ -12,6 +12,23 @@
 #include <cpu_caps.h>
 #include <lapic.h>
 
+/**
+ * @defgroup hwmgmt_apic hwmgmt.apic
+ * @ingroup hwmgmt
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 union lapic_base_msr {
 	uint64_t value;
 	struct {
@@ -179,3 +196,7 @@ void send_single_init(uint16_t pcpu_id)
 
 	msr_write(MSR_IA32_EXT_APIC_ICR, icr.value);
 }
+
+/**
+ * @}
+ */

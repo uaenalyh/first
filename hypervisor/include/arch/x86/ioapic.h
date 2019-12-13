@@ -7,6 +7,19 @@
 #ifndef IOAPIC_H
 #define IOAPIC_H
 
+/**
+ * @addtogroup hwmgmt_apic
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 #include <apicreg.h>
 
 #define NR_LEGACY_IRQ 16U
@@ -41,5 +54,9 @@ struct gsi_table {
 	uint32_t pin;
 	void *addr;
 };
+
+/**
+ * @}
+ */
 
 #endif /* IOAPIC_H */

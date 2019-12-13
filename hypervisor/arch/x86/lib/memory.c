@@ -4,6 +4,19 @@
  */
 #include <types.h>
 
+/**
+ * @addtogroup lib_utils
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 static inline void memcpy_erms(void *d, const void *s, size_t slen)
 {
 	asm volatile("rep; movsb" : "=&D"(d), "=&S"(s) : "c"(slen), "0"(d), "1"(s) : "memory");
@@ -51,3 +64,7 @@ void *memset(void *base, uint8_t v, size_t n)
 
 	return base;
 }
+
+/**
+ * @}
+ */

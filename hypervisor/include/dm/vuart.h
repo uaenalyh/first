@@ -29,6 +29,19 @@
 
 #ifndef VUART_H
 #define VUART_H
+
+/**
+ * @addtogroup vp-dm_vperipheral
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
 #include <types.h>
 #include <spinlock.h>
 #include <vm_config.h>
@@ -41,5 +54,9 @@
 
 void init_vuart(struct acrn_vm *vm, const struct vuart_config *vu_config);
 void deinit_vuart(struct acrn_vm *vm);
+
+/**
+ * @}
+ */
 
 #endif /* VUART_H */

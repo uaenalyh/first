@@ -19,6 +19,19 @@
 #include <vmexit.h>
 #include <logmsg.h>
 
+/**
+ * @addtogroup vp-base_hv_main
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 /* rip, rsp, ia32_efer and rflags are written to VMCS in start_vcpu */
 static void init_guest_vmx(struct acrn_vcpu *vcpu, uint64_t cr0, uint64_t cr3, uint64_t cr4)
 {
@@ -553,3 +566,7 @@ void switch_apicv_mode_x2apic(struct acrn_vcpu *vcpu)
 	 */
 	vcpu->thread_obj.notify_mode = SCHED_NOTIFY_INIT;
 }
+
+/**
+ * @}
+ */

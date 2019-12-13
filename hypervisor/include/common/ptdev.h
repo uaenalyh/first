@@ -6,6 +6,19 @@
 
 #ifndef PTDEV_H
 #define PTDEV_H
+
+/**
+ * @addtogroup vp-dm_ptirq
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
 #include <list.h>
 #include <spinlock.h>
 #include <timer.h>
@@ -130,5 +143,9 @@ struct ptirq_remapping_info *ptirq_alloc_entry(struct acrn_vm *vm, uint32_t intr
 void ptirq_release_entry(struct ptirq_remapping_info *entry);
 int32_t ptirq_activate_entry(struct ptirq_remapping_info *entry, uint32_t phys_irq);
 void ptirq_deactivate_entry(struct ptirq_remapping_info *entry);
+
+/**
+ * @}
+ */
 
 #endif /* PTDEV_H */

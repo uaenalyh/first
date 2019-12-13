@@ -6,6 +6,19 @@
 
 #ifndef UTIL_H
 #define UTIL_H
+
+/**
+ * @addtogroup lib_utils
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
 #include <types.h>
 
 /** Roundup (x/y) to ( x/y + (x%y) ? 1 : 0) **/
@@ -49,5 +62,9 @@ static inline uint8_t calculate_checksum8(const void *buf, uint32_t len)
 {
 	return (uint8_t)(0x100U - calculate_sum8(buf, len));
 }
+
+/**
+ * @}
+ */
 
 #endif /* UTIL_H */

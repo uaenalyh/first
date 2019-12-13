@@ -15,6 +15,23 @@
 #include <trace.h>
 #include <logmsg.h>
 
+/**
+ * @defgroup vp-base_hv_main vp-base.hv_main
+ * @ingroup vp-base
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 void vcpu_thread(struct thread_object *obj)
 {
 	struct acrn_vcpu *vcpu = list_entry(obj, struct acrn_vcpu, thread_obj);
@@ -101,3 +118,7 @@ void run_idle_thread(void)
 	/* Control should not come here */
 	cpu_dead();
 }
+
+/**
+ * @}
+ */

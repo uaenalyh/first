@@ -14,6 +14,23 @@
 #include <sprintf.h>
 #include <logmsg.h>
 
+/**
+ * @defgroup vp-base_vboot vp-base.vboot
+ * @ingroup vp-base
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 /*
  * We put the guest init gdt after kernel/bootarg/ramdisk images. Suppose this is a
  * safe place for guest init gdt of guest whatever the configuration is used by guest.
@@ -209,3 +226,7 @@ int32_t direct_boot_sw_loader(struct acrn_vm *vm)
 
 	return ret;
 }
+
+/**
+ * @}
+ */

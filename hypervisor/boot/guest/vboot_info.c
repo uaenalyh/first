@@ -20,6 +20,19 @@
 #include <deprivilege_boot.h>
 #include <vboot_info.h>
 
+/**
+ * @addtogroup vp-base_vboot
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 #define ACRN_DBG_BOOT 6U
 
 #define INVALID_MOD_IDX 0xFFFFU
@@ -214,3 +227,7 @@ int32_t init_vm_boot_info(struct acrn_vm *vm)
 
 	return ret;
 }
+
+/**
+ * @}
+ */

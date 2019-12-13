@@ -29,6 +29,19 @@
 #ifndef LIST_H_
 #define LIST_H_
 
+/**
+ * @addtogroup lib_utils
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 struct list_head {
 	struct list_head *next, *prev;
 };
@@ -52,5 +65,9 @@ static inline void list_del_init(struct list_head *entry)
 }
 
 #define list_entry(ptr, type, member) ((type *)((char *)(ptr) - (uint64_t)(&((type *)0)->member)))
+
+/**
+ * @}
+ */
 
 #endif /* LIST_H_ */

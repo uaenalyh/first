@@ -7,6 +7,19 @@
 #ifndef MSR_H
 #define MSR_H
 
+/**
+ * @addtogroup vp-base_vmsr
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 /* architectural (common) MSRs */
 
 #define MSR_IA32_TIME_STAMP_COUNTER 0x00000010U
@@ -230,5 +243,9 @@ void update_msr_bitmap_x2apic_passthru(struct acrn_vcpu *vcpu);
 #define IA32_ARCH_CAP_SSB_NO             (1UL << 4U)
 #define IA32_ARCH_CAP_MDS_NO             (1UL << 5U)
 #define IA32_ARCH_CAP_IF_PSCHANGE_MC_NO  (1UL << 6U)
+
+/**
+ * @}
+ */
 
 #endif /* MSR_H */

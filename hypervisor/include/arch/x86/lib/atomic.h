@@ -29,6 +29,23 @@
 
 #ifndef ATOMIC_H
 #define ATOMIC_H
+
+/**
+ * @defgroup lib_lock lib.lock
+ * @ingroup lib
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
 #include <types.h>
 
 #define BUS_LOCK "lock ; "
@@ -49,5 +66,9 @@ static inline uint32_t atomic_readandclear32(uint32_t *p)
 {
 	return atomic_swap32(p, 0U);
 }
+
+/**
+ * @}
+ */
 
 #endif /* ATOMIC_H*/

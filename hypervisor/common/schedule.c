@@ -13,6 +13,23 @@
 #include <schedule.h>
 #include <sprintf.h>
 
+/**
+ * @defgroup hwmgmt_schedule hwmgmt.schedule
+ * @ingroup hwmgmt
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 static inline bool is_blocked(const struct thread_object *obj)
 {
 	return obj->status == THREAD_STS_BLOCKED;
@@ -234,3 +251,7 @@ void run_thread(struct thread_object *obj)
 		obj->thread_entry(obj);
 	}
 }
+
+/**
+ * @}
+ */

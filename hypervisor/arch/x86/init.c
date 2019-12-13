@@ -16,6 +16,20 @@
 #include <logmsg.h>
 #include <seed.h>
 
+/**
+ * @defgroup init init
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 /* Push sp magic to top of stack for call trace */
 #define SWITCH_TO(rsp, to)                                                \
 	{                                                                 \
@@ -99,3 +113,7 @@ void init_secondary_pcpu(void)
 
 	run_idle_thread();
 }
+
+/**
+ * @}
+ */

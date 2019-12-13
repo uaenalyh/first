@@ -10,6 +10,23 @@
 #include <cat.h>
 #include <pgtable.h>
 
+/**
+ * @defgroup hwmgmt_configs hwmgmt.configs
+ * @ingroup hwmgmt
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 /*
  * @pre vm_id < CONFIG_MAX_VM_NUM
  * @post return != NULL
@@ -18,3 +35,7 @@ struct acrn_vm_config *get_vm_config(uint16_t vm_id)
 {
 	return &vm_configs[vm_id];
 }
+
+/**
+ * @}
+ */

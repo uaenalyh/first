@@ -9,6 +9,19 @@
 #include <vacpi.h>
 #include <pgtable.h>
 
+/**
+ * @addtogroup vp-base_vboot
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 /* ACPI tables for pre-launched VM and SOS */
 static struct acpi_table_info acpi_table_template[CONFIG_MAX_VM_NUM] = {
 	[0U ... (CONFIG_MAX_VM_NUM - 1U)] = {
@@ -100,3 +113,7 @@ void build_vacpi(struct acrn_vm *vm)
 	/* Copy MADT table and its subtables to guest physical memory */
 	(void)copy_to_gpa(vm, madt, ACPI_MADT_ADDR, madt->header.length);
 }
+
+/**
+ * @}
+ */

@@ -6,6 +6,19 @@
 
 #ifndef LOGMSG_H
 #define LOGMSG_H
+
+/**
+ * @addtogroup debug
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
 #include <cpu.h>
 
 /* Logging severity levels */
@@ -93,5 +106,9 @@ void printf(const char *fmt, ...);
 		pr_fatal(__VA_ARGS__);                                \
 		bsp_fatal_error();                                    \
 	} while (0)
+
+/**
+ * @}
+ */
 
 #endif /* LOGMSG_H */

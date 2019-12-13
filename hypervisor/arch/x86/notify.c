@@ -13,6 +13,19 @@
 #include <per_cpu.h>
 #include <lapic.h>
 
+/**
+ * @addtogroup hwmgmt_cpu
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 static uint32_t notification_irq = IRQ_INVALID;
 
 static uint64_t smp_call_mask = 0UL;
@@ -84,3 +97,7 @@ void setup_posted_intr_notification(void)
 		pr_err("Failed to setup posted-intr notification");
 	}
 }
+
+/**
+ * @}
+ */

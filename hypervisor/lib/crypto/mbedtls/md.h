@@ -28,7 +28,24 @@
 #ifndef MBEDTLS_MD_H
 #define MBEDTLS_MD_H
 
+/**
+ * @addtogroup hwmgmt_security
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 #include <rtl.h>
 #include "sha256.h"
+
+/**
+ * @}
+ */
 
 #endif /* MBEDTLS_MD_H */

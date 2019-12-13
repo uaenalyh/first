@@ -31,6 +31,19 @@
 #define VPIC_H
 
 /**
+ * @addtogroup vp-dm_vperipheral
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
+/**
  * @file vpic.h
  *
  * @brief public APIs for virtual PIC
@@ -68,5 +81,9 @@ enum vpic_wire_mode { VPIC_WIRE_INTR = 0, VPIC_WIRE_LAPIC, VPIC_WIRE_IOAPIC, VPI
  * @}
  */
 /* End of acrn_vpic */
+
+/**
+ * @}
+ */
 
 #endif /* VPIC_H */

@@ -7,6 +7,19 @@
 #ifndef IO_EMUL_H
 #define IO_EMUL_H
 
+/**
+ * @addtogroup vp-dm_io_req
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 #include <types.h>
 
 /* Define emulated port IO index */
@@ -56,5 +69,9 @@ int32_t ept_violation_vmexit_handler(struct acrn_vcpu *vcpu);
  * request having transferred to the COMPLETE state.
  */
 void emulate_pio_complete(struct acrn_vcpu *vcpu, const struct io_request *io_req);
+
+/**
+ * @}
+ */
 
 #endif /* IO_EMUL_H */

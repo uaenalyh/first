@@ -13,6 +13,19 @@
 #define SHARED_BUFFER_H
 
 /**
+ * @addtogroup debug
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
+/**
  * (sbuf) head + buf (store (ele_num - 1) elements at most)
  * buffer empty: tail == head
  * buffer full:  (tail + ele_size) % size == head
@@ -26,6 +39,10 @@
  * |
  * |
  * struct shared_buf *buf
+ */
+
+/**
+ * @}
  */
 
 #endif /* SHARED_BUFFER_H */

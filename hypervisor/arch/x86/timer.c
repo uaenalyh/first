@@ -14,6 +14,23 @@
 #include <softirq.h>
 #include <trace.h>
 
+/**
+ * @defgroup hwmgmt_time hwmgmt.time
+ * @ingroup hwmgmt
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 #define CAL_MS 10U
 
 static uint32_t tsc_khz = 0U;
@@ -146,3 +163,7 @@ void udelay(uint32_t us)
 	while (rdtsc() < dest_tsc) {
 	}
 }
+
+/**
+ * @}
+ */

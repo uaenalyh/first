@@ -43,6 +43,23 @@
 #include <board.h>
 #include <platform_acpi_info.h>
 
+/**
+ * @defgroup hwmgmt_pci hwmgmt.pci
+ * @ingroup hwmgmt
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 static spinlock_t pci_device_lock;
 
 /* @brief: Find the DRHD index corresponding to a PCI device
@@ -135,3 +152,7 @@ void enable_disable_pci_intx(union pci_bdf bdf, bool enable)
 		pci_pdev_write_cfg(bdf, PCIR_COMMAND, 0x2U, new_cmd);
 	}
 }
+
+/**
+ * @}
+ */

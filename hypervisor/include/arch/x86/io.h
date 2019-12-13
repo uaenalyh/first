@@ -7,6 +7,23 @@
 #ifndef IO_H
 #define IO_H
 
+/**
+ * @defgroup hwmgmt_io hwmgmt.io
+ * @ingroup hwmgmt
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 #include <types.h>
 
 /* Write 1 byte to specified I/O port */
@@ -75,5 +92,9 @@ static inline uint32_t mmio_read32(const void *addr)
 {
 	return *((volatile const uint32_t *)addr);
 }
+
+/**
+ * @}
+ */
 
 #endif /* _IO_H defined */

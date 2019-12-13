@@ -6,6 +6,19 @@
 
 #ifndef SCHEDULE_H
 #define SCHEDULE_H
+
+/**
+ * @addtogroup hwmgmt_schedule
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
 #include <spinlock.h>
 #include <list.h>
 #include <timer.h>
@@ -91,4 +104,9 @@ void schedule(void);
 
 void arch_switch_to(void *prev_sp, void *next_sp);
 void run_idle_thread(void);
+
+/**
+ * @}
+ */
+
 #endif /* SCHEDULE_H */

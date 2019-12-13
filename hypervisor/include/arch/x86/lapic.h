@@ -7,6 +7,19 @@
 #ifndef INTR_LAPIC_H
 #define INTR_LAPIC_H
 
+/**
+ * @addtogroup hwmgmt_apic
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 #include <types.h>
 #include <apicreg.h>
 
@@ -134,5 +147,9 @@ void send_single_ipi(uint16_t pcpu_id, uint32_t vector);
  * @return None
  */
 void send_single_init(uint16_t pcpu_id);
+
+/**
+ * @}
+ */
 
 #endif /* INTR_LAPIC_H */

@@ -30,10 +30,27 @@
 #ifndef INSTR_EMUL_H
 #define INSTR_EMUL_H
 
+/**
+ * @addtogroup vp-dm_io_req
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 #include <types.h>
 #include <cpu.h>
 #include <guest_memory.h>
 
 struct acrn_vcpu;
+
+/**
+ * @}
+ */
 
 #endif

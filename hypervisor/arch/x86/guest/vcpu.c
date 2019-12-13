@@ -18,6 +18,23 @@
 #include <mmu.h>
 #include <sprintf.h>
 
+/**
+ * @defgroup vp-base_vcpu vp-base.vcpu
+ * @ingroup vp-base
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 /* stack_frame is linked with the sequence of stack operation in arch_switch_to() */
 struct stack_frame {
 	uint64_t rdi;
@@ -722,3 +739,7 @@ uint64_t vcpumask2pcpumask(struct acrn_vm *vm, uint64_t vdmask)
 
 	return dmask;
 }
+
+/**
+ * @}
+ */

@@ -7,6 +7,19 @@
 #include <per_cpu.h>
 #include <schedule.h>
 
+/**
+ * @addtogroup hwmgmt_schedule
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 static int32_t sched_noop_init(struct sched_control *ctl)
 {
 	struct sched_noop_control *noop_ctl = &per_cpu(sched_noop_ctl, ctl->pcpu_id);
@@ -53,3 +66,7 @@ struct acrn_scheduler sched_noop = {
 	.sleep = sched_noop_sleep,
 	.wake = sched_noop_wake,
 };
+
+/**
+ * @}
+ */

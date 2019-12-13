@@ -11,6 +11,19 @@
 #ifndef GUEST_H
 #define GUEST_H
 
+/**
+ * @addtogroup vp-base_guest_mem
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 #ifndef ASSEMBLER
 
 #include <types.h>
@@ -69,5 +82,9 @@ int32_t copy_to_gpa(struct acrn_vm *vm, void *h_ptr, uint64_t gpa, uint32_t size
  * @}
  */
 #endif /* !ASSEMBLER */
+
+/**
+ * @}
+ */
 
 #endif /* GUEST_H*/

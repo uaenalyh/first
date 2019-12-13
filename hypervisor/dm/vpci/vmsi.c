@@ -34,6 +34,19 @@
 #include "vpci_priv.h"
 
 /**
+ * @addtogroup vp-dm_vperipheral
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
+/**
  * @pre vdev != NULL
  * @pre vdev->pdev != NULL
  */
@@ -162,3 +175,7 @@ void init_vmsi(struct pci_vdev *vdev)
 		pci_vdev_write_cfg(vdev, vdev->msi.capoff, 4U, val);
 	}
 }
+
+/**
+ * @}
+ */

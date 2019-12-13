@@ -11,6 +11,19 @@
 #ifndef PGTABLE_H
 #define PGTABLE_H
 
+/**
+ * @addtogroup hwmgmt_page
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 #include <page.h>
 
 #define PAGE_PRESENT (1UL << 0U)
@@ -228,4 +241,9 @@ const uint64_t *lookup_address(uint64_t *pml4_page, uint64_t addr, uint64_t *pg_
 /**
  * @}
  */
+
+/**
+ * @}
+ */
+
 #endif /* PGTABLE_H */

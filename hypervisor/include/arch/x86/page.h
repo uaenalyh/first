@@ -7,6 +7,19 @@
 #ifndef PAGE_H
 #define PAGE_H
 
+/**
+ * @addtogroup hwmgmt_page
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 #define PAGE_SHIFT 12U
 #define PAGE_SIZE  (1U << PAGE_SHIFT)
 #define PAGE_MASK  0xFFFFFFFFFFFFF000UL
@@ -80,5 +93,9 @@ struct memory_ops {
 extern const struct memory_ops ppt_mem_ops;
 void init_ept_mem_ops(struct memory_ops *mem_ops, uint16_t vm_id);
 void *get_reserve_sworld_memory_base(void);
+
+/**
+ * @}
+ */
 
 #endif /* PAGE_H */

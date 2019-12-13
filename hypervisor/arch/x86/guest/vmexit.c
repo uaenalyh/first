@@ -19,6 +19,19 @@
 #include <vcpuid.h>
 #include <trace.h>
 
+/**
+ * @addtogroup vp-base_hv_main
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 /*
  * According to "SDM APPENDIX C VMX BASIC EXIT REASONS",
  * there are 65 Basic Exit Reasons.
@@ -382,3 +395,7 @@ static int32_t init_signal_vmexit_handler(__unused struct acrn_vcpu *vcpu)
 	vcpu_retain_rip(vcpu);
 	return 0;
 }
+
+/**
+ * @}
+ */

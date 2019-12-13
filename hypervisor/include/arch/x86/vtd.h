@@ -6,6 +6,19 @@
 
 #ifndef VTD_H
 #define VTD_H
+
+/**
+ * @addtogroup hwmgmt_iommu
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
 #include <types.h>
 #include <pci.h>
 #include <platform_acpi_info.h>
@@ -358,6 +371,10 @@ void dmar_free_irte(struct intr_source intr_src, uint16_t index);
  *
  */
 void iommu_flush_cache(const void *p, uint32_t size);
+/**
+ * @}
+ */
+
 /**
  * @}
  */

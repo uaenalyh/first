@@ -7,6 +7,19 @@
 #ifndef CPUFEATURES_H
 #define CPUFEATURES_H
 
+/**
+ * @addtogroup hwmgmt_cpu
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 #define X86_FEATURE_MONITOR ((FEAT_1_ECX << 5U) + 3U)
 #define X86_FEATURE_OSXSAVE ((FEAT_1_ECX << 5U) + 27U)
 
@@ -17,5 +30,9 @@
 #define X86_FEATURE_L1D_FLUSH ((FEAT_7_0_EDX << 5U) + 28U)
 #define X86_FEATURE_ARCH_CAP  ((FEAT_7_0_EDX << 5U) + 29U)
 #define X86_FEATURE_SSBD      ((FEAT_7_0_EDX << 5U) + 31U)
+
+/**
+ * @}
+ */
 
 #endif /* CPUFEATURES_H */

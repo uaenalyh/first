@@ -7,6 +7,19 @@
 #ifndef ERRNO_H
 #define ERRNO_H
 
+/**
+ * @addtogroup lib_utils
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 /** Indicates that operation not permitted. */
 #define EPERM 1
 /** Indicates that not enough memory. */
@@ -23,5 +36,9 @@
 #define EINVAL 22
 /** Indicates that timeout occurs. */
 #define ETIMEDOUT 110
+
+/**
+ * @}
+ */
 
 #endif /* ERRNO_H */

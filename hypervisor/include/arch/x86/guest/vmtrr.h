@@ -11,6 +11,24 @@
 #define VMTRR_H
 
 /**
+ * @addtogroup vp-base_vcpu
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
+/**
  * @}
  */
+
+/**
+ * @}
+ */
+
 #endif /* VMTRR_H */

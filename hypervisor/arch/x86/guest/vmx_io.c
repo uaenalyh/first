@@ -19,6 +19,19 @@
 #include <logmsg.h>
 
 /**
+ * @addtogroup vp-dm_io_req
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
+/**
  * @brief General complete-work for port I/O emulation
  *
  * @pre io_req->io_type == REQ_PORTIO
@@ -105,3 +118,7 @@ int32_t ept_violation_vmexit_handler(struct acrn_vcpu *vcpu)
 
 	return 0;
 }
+
+/**
+ * @}
+ */

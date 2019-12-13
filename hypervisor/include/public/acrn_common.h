@@ -15,6 +15,19 @@
 #ifndef ACRN_COMMON_H
 #define ACRN_COMMON_H
 
+/**
+ * @addtogroup lib_utils
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 #include <types.h>
 
 /*
@@ -151,4 +164,9 @@ struct acrn_vcpu_regs {
 /**
  * @}
  */
+
+/**
+ * @}
+ */
+
 #endif /* ACRN_COMMON_H */

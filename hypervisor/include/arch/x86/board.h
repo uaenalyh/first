@@ -6,6 +6,19 @@
 #ifndef BOARD_H
 #define BOARD_H
 
+/**
+ * @addtogroup hwmgmt_configs
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 #include <types.h>
 #include <misc_cfg.h>
 #include <host_pm.h>
@@ -17,5 +30,9 @@ extern struct dmar_info plat_dmar_info;
 
 /* board specific functions */
 void create_prelaunched_vm_e820(struct acrn_vm *vm);
+
+/**
+ * @}
+ */
 
 #endif /* BOARD_H */

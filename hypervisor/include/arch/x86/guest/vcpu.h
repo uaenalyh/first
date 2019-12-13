@@ -13,6 +13,19 @@
 #ifndef VCPU_H
 #define VCPU_H
 
+/**
+ * @addtogroup vp-base_vcpu
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 #ifndef ASSEMBLER
 
 #include <acrn_common.h>
@@ -584,5 +597,9 @@ uint64_t vcpumask2pcpumask(struct acrn_vm *vm, uint64_t vdmask);
 /* End of acrn_vcpu */
 
 #endif /* ASSEMBLER */
+
+/**
+ * @}
+ */
 
 #endif /* VCPU_H */

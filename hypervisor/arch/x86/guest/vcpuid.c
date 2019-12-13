@@ -15,6 +15,23 @@
 #include <sgx.h>
 #include <logmsg.h>
 
+/**
+ * @defgroup vp-base_vcpuid vp-base.vcpuid
+ * @ingroup vp-base
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 static inline const struct vcpuid_entry *local_find_vcpuid_entry(
 	const struct acrn_vcpu *vcpu, uint32_t leaf, uint32_t subleaf)
 {
@@ -537,3 +554,7 @@ void guest_cpuid(struct acrn_vcpu *vcpu, uint32_t *eax, uint32_t *ebx, uint32_t 
 
 	guest_limit_cpuid(vcpu, leaf, eax, ebx, ecx, edx);
 }
+
+/**
+ * @}
+ */

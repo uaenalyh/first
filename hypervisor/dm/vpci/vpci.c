@@ -34,6 +34,19 @@
 #include "vpci_priv.h"
 #include "pci_dev.h"
 
+/**
+ * @addtogroup vp-dm_vperipheral
+ *
+ * @{
+ */
+
+/**
+ * @file
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ */
+
 static void vpci_init_vdevs(struct acrn_vm *vm);
 static void deinit_prelaunched_vm_vpci(struct acrn_vm *vm);
 static void read_cfg(struct acrn_vpci *vpci, union pci_bdf bdf, uint32_t offset, uint32_t bytes, uint32_t *val);
@@ -439,3 +452,7 @@ static void deinit_prelaunched_vm_vpci(struct acrn_vm *vm)
 		vdev->vdev_ops->deinit_vdev(vdev);
 	}
 }
+
+/**
+ * @}
+ */
