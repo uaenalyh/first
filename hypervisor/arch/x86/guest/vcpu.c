@@ -173,10 +173,10 @@ static void init_xsave(struct acrn_vcpu *vcpu)
 	struct ext_context *ectx = &(vcpu->arch.contexts[vcpu->arch.cur_context].ext_ctx);
 
 	/* Get user state components */
-	ectx->xcr0 = ((uint64_t)cpu_info->cpuid_leaves[FEAT_D_0_EDX] << 32U) + cpu_info->cpuid_leaves[FEAT_D_0_EAX];
+	ectx->xcr0 = XCR0_INIT;
 
 	/* Get supervisor state components */
-	ectx->xss = ((uint64_t)cpu_info->cpuid_leaves[FEAT_D_1_EDX] << 32U) + cpu_info->cpuid_leaves[FEAT_D_1_ECX];
+	ectx->xss = XSS_INIT;
 
 	/* xsaves only support compacted format, so set it in xcomp_bv[63],
 	 * keep the reset area in header area as zero.

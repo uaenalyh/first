@@ -23,6 +23,8 @@
 #define CPUID_CHECK_SUBLEAF   (1U << 0U)
 #define MAX_VM_VCPUID_ENTRIES 64U
 
+#define VIRT_CRYSTAL_CLOCK_FREQ 0x16C2154U
+
 struct vcpuid_entry {
 	uint32_t eax;
 	uint32_t ebx;

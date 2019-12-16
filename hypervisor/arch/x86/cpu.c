@@ -430,7 +430,6 @@ static void init_pcpu_xsave(void)
 {
 	uint64_t val64;
 	struct cpuinfo_x86 *cpu_info;
-	uint64_t xcr0, xss;
 	uint32_t eax, ecx, unused, xsave_area_size;
 
 	CPU_CR_READ(cr4, &val64);
@@ -445,13 +444,8 @@ static void init_pcpu_xsave(void)
 			cpu_info = get_pcpu_info();
 			cpu_info->cpuid_leaves[FEAT_1_ECX] |= CPUID_ECX_OSXSAVE;
 
-			/* set xcr0 and xss with the componets bitmap get from cpuid */
-			xcr0 = ((uint64_t)cpu_info->cpuid_leaves[FEAT_D_0_EDX] << 32U) +
-				cpu_info->cpuid_leaves[FEAT_D_0_EAX];
-			xss = ((uint64_t)cpu_info->cpuid_leaves[FEAT_D_1_EDX] << 32U) +
-				cpu_info->cpuid_leaves[FEAT_D_1_ECX];
-			write_xcr(0, xcr0);
-			msr_write(MSR_IA32_XSS, xss);
+			write_xcr(0, XCR0_INIT);
+			msr_write(MSR_IA32_XSS, XSS_INIT);
 
 			/* get xsave area size, containing all the state components
 			 * corresponding to bits currently set in XCR0 | IA32_XSS */

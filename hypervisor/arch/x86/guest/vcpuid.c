@@ -76,7 +76,7 @@ static inline const struct vcpuid_entry *find_vcpuid_entry(
 		uint32_t limit;
 		struct acrn_vm *vm = vcpu->vm;
 
-		if ((leaf & 0x80000000U) != 0U) {
+		if ((leaf & CPUID_MAX_EXTENDED_FUNCTION) != 0U) {
 			limit = vm->vcpuid_xlevel;
 		} else {
 			limit = vm->vcpuid_level;
@@ -119,99 +119,44 @@ static inline int32_t set_vcpuid_entry(struct acrn_vm *vm, const struct vcpuid_e
  */
 static void init_vcpuid_entry(uint32_t leaf, uint32_t subleaf, uint32_t flags, struct vcpuid_entry *entry)
 {
-	struct cpuinfo_x86 *cpu_info;
-
 	entry->leaf = leaf;
 	entry->subleaf = subleaf;
 	entry->flags = flags;
 
 	switch (leaf) {
+	case 0x06U:
+		entry->eax = CPUID_EAX_ARAT;
+		entry->ebx = 0U;
+		entry->ecx = 0U;
+		entry->edx = 0U;
+		break;
+
 	case 0x07U:
-		if (subleaf == 0U) {
-			cpuid_subleaf(leaf, subleaf, &entry->eax, &entry->ebx, &entry->ecx, &entry->edx);
-			/* mask invpcid */
-			entry->ebx &= ~(CPUID_EBX_INVPCID | CPUID_EBX_PQM | CPUID_EBX_PQE);
+		cpuid_subleaf(leaf, subleaf, &entry->eax, &entry->ebx, &entry->ecx, &entry->edx);
+		/* mask invpcid */
+		entry->ebx &= ~(CPUID_EBX_INVPCID | CPUID_EBX_PQM | CPUID_EBX_PQE);
 
-			/* mask SGX and SGX_LC */
-			entry->ebx &= ~CPUID_EBX_SGX;
-			entry->ecx &= ~CPUID_ECX_SGX_LC;
+		/* mask SGX and SGX_LC */
+		entry->ebx &= ~CPUID_EBX_SGX;
+		entry->ecx &= ~CPUID_ECX_SGX_LC;
 
-			/* mask MPX */
-			entry->ebx &= ~CPUID_EBX_MPX;
+		/* mask MPX */
+		entry->ebx &= ~CPUID_EBX_MPX;
 
-			/* mask Intel Processor Trace, since 14h is disabled */
-			entry->ebx &= ~CPUID_EBX_PROC_TRC;
-		} else {
-			entry->eax = 0U;
-			entry->ebx = 0U;
-			entry->ecx = 0U;
-			entry->edx = 0U;
-		}
+		/* mask Intel Processor Trace, since 14h is disabled */
+		entry->ebx &= ~CPUID_EBX_PROC_TRC;
+
+		/* mask STIBP */
+		entry->edx &= ~CPUID_EDX_STIBP;
+
+		/* TODO: May be revised later */
+		/* mask TSX_FORCE_ABORT */
+		entry->edx &= ~CPUID_EDX_TSX_FORCE_ABORT;
 		break;
 
-	case 0x16U:
-		cpu_info = get_pcpu_info();
-		if (cpu_info->cpuid_level >= 0x16U) {
-			/* call the cpuid when 0x16 is supported */
-			cpuid_subleaf(leaf, subleaf, &entry->eax, &entry->ebx, &entry->ecx, &entry->edx);
-		} else {
-			/* Use the tsc to derive the emulated 0x16U cpuid. */
-			entry->eax = (uint32_t)(get_tsc_khz() / 1000U);
-			entry->ebx = entry->eax;
-			/* Bus frequency: hard coded to 100M */
-			entry->ecx = 100U;
-			entry->edx = 0U;
-		}
-		break;
-
-	/*
-	 * Leaf 0x40000000
-	 * This leaf returns the CPUID leaf range supported by the
-	 * hypervisor and the hypervisor vendor signature.
-	 *
-	 * EAX: The maximum input value for CPUID supported by the
-	 *	hypervisor.
-	 * EBX, ECX, EDX: Hypervisor vendor ID signature.
-	 */
-	case 0x40000000U: {
-		static const char sig[12] = "ACRNACRNACRN";
-		const uint32_t *sigptr = (const uint32_t *)sig;
-
-		entry->eax = 0x40000010U;
-		entry->ebx = sigptr[0];
-		entry->ecx = sigptr[1];
-		entry->edx = sigptr[2];
-		break;
-	}
-
-	/*
-	 * Leaf 0x40000001 - ACRN extended information.
-	 * This leaf returns the extended information of ACRN hypervisor.
-	 *
-	 * EAX: Guest capability flags
-	 * EBX, ECX, EDX: RESERVED (reserved fields are set to zero).
-	 */
-	case 0x40000001U:
-		entry->eax = 0U;
-		entry->ebx = 0U;
-		entry->ecx = 0U;
-		entry->edx = 0U;
-		break;
-
-	/*
-	 * Leaf 0x40000010 - Timing Information.
-	 * This leaf returns the current TSC frequency and
-	 * current Bus frequency in kHz.
-	 *
-	 * EAX: (Virtual) TSC frequency in kHz.
-	 *      TSC frequency is calculated from PIT in ACRN
-	 * EBX, ECX, EDX: RESERVED (reserved fields are set to zero).
-	 */
-	case 0x40000010U:
-		entry->eax = get_tsc_khz();
-		entry->ebx = 0U;
-		entry->ecx = 0U;
-		entry->edx = 0U;
+	case 0x15U:
+		cpuid_subleaf(leaf, subleaf, &entry->eax, &entry->ebx, &entry->ecx, &entry->edx);
+		entry->ecx = VIRT_CRYSTAL_CLOCK_FREQ;
 		break;
 
 	default:
@@ -220,40 +165,19 @@ static void init_vcpuid_entry(uint32_t leaf, uint32_t subleaf, uint32_t flags, s
 	}
 }
 
-static int32_t set_vcpuid_sgx(struct acrn_vm *vm)
-{
-	int32_t result = 0;
-
-	return result;
-}
-
 static int32_t set_vcpuid_extended_function(struct acrn_vm *vm)
 {
 	uint32_t i, limit;
 	struct vcpuid_entry entry;
 	int32_t result;
 
-	init_vcpuid_entry(0x40000000U, 0U, 0U, &entry);
+	init_vcpuid_entry(CPUID_MAX_EXTENDED_FUNCTION, 0U, 0U, &entry);
 	result = set_vcpuid_entry(vm, &entry);
-	if (result == 0) {
-		init_vcpuid_entry(0x40000001U, 0U, 0U, &entry);
-		result = set_vcpuid_entry(vm, &entry);
-	}
-
-	if (result == 0) {
-		init_vcpuid_entry(0x40000010U, 0U, 0U, &entry);
-		result = set_vcpuid_entry(vm, &entry);
-	}
-
-	if (result == 0) {
-		init_vcpuid_entry(0x80000000U, 0U, 0U, &entry);
-		result = set_vcpuid_entry(vm, &entry);
-	}
 
 	if (result == 0) {
 		limit = entry.eax;
 		vm->vcpuid_xlevel = limit;
-		for (i = 0x80000002U; i <= limit; i++) {
+		for (i = CPUID_EXTEND_FUNCTION_2; i <= limit; i++) {
 			init_vcpuid_entry(i, 0U, 0U, &entry);
 			result = set_vcpuid_entry(vm, &entry);
 			if (result != 0) {
@@ -271,13 +195,8 @@ int32_t set_vcpuid_entries(struct acrn_vm *vm)
 	struct vcpuid_entry entry;
 	uint32_t limit;
 	uint32_t i, j;
-	struct cpuinfo_x86 *cpu_info = get_pcpu_info();
 
 	init_vcpuid_entry(0U, 0U, 0U, &entry);
-	if (cpu_info->cpuid_level < 0x16U) {
-		/* The cpuid with zero leaf returns the max level. Emulate that the 0x16U is supported */
-		entry.eax = 0x16U;
-	}
 	result = set_vcpuid_entry(vm, &entry);
 	if (result == 0) {
 		limit = entry.eax;
@@ -305,23 +224,21 @@ int32_t set_vcpuid_entries(struct acrn_vm *vm)
 				break;
 			case 0x07U:
 				init_vcpuid_entry(i, 0U, CPUID_CHECK_SUBLEAF, &entry);
-				if (entry.eax != 0U) {
-					pr_warn("vcpuid: only support subleaf 0 for cpu leaf 07h");
-					entry.eax = 0U;
-				}
 				result = set_vcpuid_entry(vm, &entry);
 				break;
-			case 0x12U:
-				result = set_vcpuid_sgx(vm);
-				break;
 			/* These features are disabled */
-			/* PMU is not supported */
-			case 0x0aU:
-			/* Intel RDT */
-			case 0x0fU:
-			case 0x10U:
-			/* Intel Processor Trace */
-			case 0x14U:
+			case 0x05U: /* Monitor/Mwait */
+			case 0x08U: /* unimplemented leaf */
+			case 0x09U: /* Cache */
+			case 0x0aU: /* PMU is not supported */
+			case 0x0cU: /* unimplemented leaf */
+			case 0x0eU: /* unimplemented leaf */
+			case 0x0fU: /* Intel RDT */
+			case 0x10U: /* Intel RDT */
+			case 0x11U: /* unimplemented leaf */
+			case 0x12U: /* SGX */
+			case 0x13U: /* unimplemented leaf */
+			case 0x14U: /* Intel Processor Trace */
 				break;
 			default:
 				init_vcpuid_entry(i, 0U, 0U, &entry);
@@ -352,20 +269,28 @@ static inline bool is_percpu_related(uint32_t leaf)
 static void guest_cpuid_01h(struct acrn_vcpu *vcpu, uint32_t *eax, uint32_t *ebx, uint32_t *ecx, uint32_t *edx)
 {
 	uint32_t apicid = vlapic_get_apicid(vcpu_vlapic(vcpu));
-	uint64_t guest_ia32_misc_enable = vcpu_get_guest_msr(vcpu, MSR_IA32_MISC_ENABLE);
+	uint64_t cr4;
 
 	cpuid(0x1U, eax, ebx, ecx, edx);
+
 	/* Patching initial APIC ID */
 	*ebx &= ~APIC_ID_MASK;
 	*ebx |= (apicid << APIC_ID_SHIFT);
-	/* mask mtrr */
-	*edx &= ~CPUID_EDX_MTRR;
+
+	/* mask MONITOR/MWAIT */
+	*ecx &= ~CPUID_ECX_MONITOR;
 
 	/* mask Debug Store feature */
 	*ecx &= ~(CPUID_ECX_DTES64 | CPUID_ECX_DS_CPL);
 
 	/* mask Safer Mode Extension */
 	*ecx &= ~CPUID_ECX_SMX;
+
+	/* mask Enhanced Intel SpeedStep technology */
+	*ecx &= ~CPUID_ECX_EST;
+
+	/* mask Thermal Monitor 2 */
+	*ecx &= ~CPUID_ECX_TM2;
 
 	/* mask PDCM: Perfmon and Debug Capability */
 	*ecx &= ~CPUID_ECX_PDCM;
@@ -379,31 +304,41 @@ static void guest_cpuid_01h(struct acrn_vcpu *vcpu, uint32_t *eax, uint32_t *ebx
 	/*mask vmx to guest os */
 	*ecx &= ~CPUID_ECX_VMX;
 
-	/* set Hypervisor Present Bit */
-	*ecx |= CPUID_ECX_HV;
-
-	/* if guest disabed monitor/mwait, clear cpuid.01h[3] */
-	if ((guest_ia32_misc_enable & MSR_IA32_MISC_ENABLE_MONITOR_ENA) == 0UL) {
-		*ecx &= ~CPUID_ECX_MONITOR;
-	}
-
-	/*no xsave support for guest if it is not enabled on host*/
-	if ((*ecx & CPUID_ECX_OSXSAVE) == 0U) {
-		*ecx &= ~CPUID_ECX_XSAVE;
-	}
-
+	/* read guest CR4, set CPUID_ECX_OSXSAVE only if guest sets OSXSAVE in CR4 */
+	cr4 = exec_vmread(VMX_GUEST_CR4);
 	*ecx &= ~CPUID_ECX_OSXSAVE;
-	if ((*ecx & CPUID_ECX_XSAVE) != 0U) {
-		uint64_t cr4;
-		/*read guest CR4*/
-		cr4 = exec_vmread(VMX_GUEST_CR4);
-		if ((cr4 & CR4_OSXSAVE) != 0UL) {
-			*ecx |= CPUID_ECX_OSXSAVE;
-		}
+	if ((cr4 & CR4_OSXSAVE) != 0UL) {
+		*ecx |= CPUID_ECX_OSXSAVE;
 	}
 
 	/* mask Debug Store feature */
 	*edx &= ~CPUID_EDX_DTES;
+
+	/* mask Virtual 8086 Mode Enhancements */
+	*edx &= ~CPUID_EDX_VME;
+
+	/* mask Debugging Extensions */
+	*edx &= ~CPUID_EDX_DE;
+
+	/* mask mtrr */
+	*edx &= ~CPUID_EDX_MTRR;
+
+	/* mask ACPI */
+	*edx &= ~CPUID_EDX_ACPI;
+
+	/* mask Thermal Monitor */
+	*edx &= ~CPUID_EDX_TM1;
+
+	if(is_safety_vm(vcpu->vm)) {
+		/* mask HTT */
+		*edx &= ~CPUID_EDX_HTT;
+	} else {
+		/* mask MCE */
+		*edx &= ~CPUID_EDX_MCE;
+
+		/* mask MCA */
+		*edx &= ~CPUID_EDX_MCA;
+	}
 }
 
 static void guest_cpuid_0bh(struct acrn_vcpu *vcpu, uint32_t *eax, uint32_t *ebx, uint32_t *ecx, uint32_t *edx)
@@ -440,45 +375,70 @@ static void guest_cpuid_0bh(struct acrn_vcpu *vcpu, uint32_t *eax, uint32_t *ebx
 static void guest_cpuid_0dh(__unused struct acrn_vcpu *vcpu, uint32_t *eax, uint32_t *ebx, uint32_t *ecx, uint32_t *edx)
 {
 	uint32_t subleaf = *ecx;
+	uint32_t avx_area_size, unused;
 
-	if (!pcpu_has_cap(X86_FEATURE_OSXSAVE)) {
+	cpuid_subleaf(0x0dU, 2U, &avx_area_size, &unused, &unused, &unused);
+
+	cpuid_subleaf(0x0dU, subleaf, eax, ebx, ecx, edx);
+
+	switch (subleaf) {
+	case 0U:
+		/* SDM Vol.1 17-2, On processors that do not support Intel MPX,
+		 * CPUID.(EAX=0DH,ECX=0):EAX[3] and
+		 * CPUID.(EAX=0DH,ECX=0):EAX[4] will both be 0 */
+		*eax &= ~CPUID_EAX_XCR0_BNDREGS;
+		*eax &= ~CPUID_EAX_XCR0_BNDCSR;
+
+		/*
+		 * Correct EBX depends on correct initialization value of physical XCR0 and MSR IA32_XSS.
+		 * Physical XCR0 shall be initialized to 1H.
+		 * Physical MSR IA32_XSS shall be initialized to 0H.
+		 */
+
+		*ecx = XSAVE_LEGACY_AREA_SIZE + XSAVE_HEADER_AREA_SIZE + avx_area_size;
+		break;
+
+	case 1U:
+		/* mask XSAVES/XRSTORS instructions */
+		*eax &= ~CPUID_EAX_XSAVES;
+
+		/*
+		 * Correct EBX depends on correct initialization value of physical XCR0 and MSR IA32_XSS.
+		 * Physical XCR0 shall be initialized to 1H.
+		 * Physical MSR IA32_XSS shall be initialized to 0H.
+		 */
+
+		/* mask PT STATE */
+		*ecx &= ~CPUID_ECX_PT_STATE;
+		break;
+
+	case 2U:
+		/* AVX state: return native value */
+		break;
+
+	default:
+		/* hide all the other state */
 		*eax = 0U;
 		*ebx = 0U;
 		*ecx = 0U;
 		*edx = 0U;
-	} else {
-		cpuid_subleaf(0x0dU, subleaf, eax, ebx, ecx, edx);
-		if (subleaf == 0U) {
-			/* SDM Vol.1 17-2, On processors that do not support Intel MPX,
-			 * CPUID.(EAX=0DH,ECX=0):EAX[3] and
-			 * CPUID.(EAX=0DH,ECX=0):EAX[4] will both be 0 */
-			*eax &= ~CPUID_EAX_XCR0_BNDREGS;
-			*eax &= ~CPUID_EAX_XCR0_BNDCSR;
-		}
+		break;
 	}
 }
 
 static void guest_cpuid_80000001h(
 	const struct acrn_vcpu *vcpu, uint32_t *eax, uint32_t *ebx, uint32_t *ecx, uint32_t *edx)
 {
-	const struct vcpuid_entry *entry_check = find_vcpuid_entry(vcpu, 0x80000000U, 0);
 	uint64_t guest_ia32_misc_enable = vcpu_get_guest_msr(vcpu, MSR_IA32_MISC_ENABLE);
 	uint32_t leaf = 0x80000001U;
 
-	if ((entry_check != NULL) && (entry_check->eax >= leaf)) {
-		cpuid(leaf, eax, ebx, ecx, edx);
-		/* SDM Vol4 2.1, XD Bit Disable of MSR_IA32_MISC_ENABLE
-		 * When set to 1, the Execute Disable Bit feature (XD Bit) is disabled and the XD Bit
-		 * extended feature flag will be clear (CPUID.80000001H: EDX[20]=0)
-		 */
-		if ((guest_ia32_misc_enable & MSR_IA32_MISC_ENABLE_XD_DISABLE) != 0UL) {
-			*edx = *edx & ~CPUID_EDX_XD_BIT_AVIL;
-		}
-	} else {
-		*eax = 0U;
-		*ebx = 0U;
-		*ecx = 0U;
-		*edx = 0U;
+	cpuid(leaf, eax, ebx, ecx, edx);
+	/* SDM Vol4 2.1, XD Bit Disable of MSR_IA32_MISC_ENABLE
+	 * When set to 1, the Execute Disable Bit feature (XD Bit) is disabled and the XD Bit
+	 * extended feature flag will be clear (CPUID.80000001H: EDX[20]=0)
+	 */
+	if ((guest_ia32_misc_enable & MSR_IA32_MISC_ENABLE_XD_DISABLE) != 0UL) {
+		*edx = *edx & ~CPUID_EDX_XD_BIT_AVIL;
 	}
 }
 
@@ -486,18 +446,23 @@ static void guest_limit_cpuid(
 	const struct acrn_vcpu *vcpu, uint32_t leaf, uint32_t *eax, uint32_t *ebx, uint32_t *ecx, uint32_t *edx)
 {
 	uint64_t guest_ia32_misc_enable = vcpu_get_guest_msr(vcpu, MSR_IA32_MISC_ENABLE);
+	const struct vcpuid_entry *entry;
 
 	if ((guest_ia32_misc_enable & MSR_IA32_MISC_ENABLE_LIMIT_CPUID) != 0UL) {
 		/* limit the leaf number to 2 */
 		if (leaf == 0U) {
 			*eax = 2U;
-		} else if (leaf > 2U) {
-			*eax = 0U;
-			*ebx = 0U;
-			*ecx = 0U;
-			*edx = 0U;
+		} else if (((leaf > 2U) && (leaf < CPUID_MAX_EXTENDED_FUNCTION)) || (leaf > vcpu->vm->vcpuid_xlevel)) {
+			entry = find_vcpuid_entry(vcpu, 2U, 0U);
+			*eax = entry->eax;
+			*ebx = entry->ebx;
+			*ecx = entry->ecx;
+			*edx = entry->edx;
 		} else {
-			/* In this case, leaf is 1U, return the cpuid value get above */
+			/* In this case,
+			 * leaf is 1H, 2H, or extended function leaves in the range [80000000H, 80000008H],
+			 * return the cpuid value get previously.
+			 */
 		}
 	}
 }
