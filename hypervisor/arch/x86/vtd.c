@@ -73,7 +73,6 @@ static inline uint64_t dmar_set_bitslice(uint64_t var, uint64_t mask, uint32_t p
 
 /* translation type */
 #define DMAR_CTX_TT_UNTRANSLATED 0x0UL
-#define DMAR_CTX_TT_PASSTHROUGH  0x2UL
 
 #define DMAR_INVALIDATION_QUEUE_SIZE 4096U
 #define DMAR_QI_INV_ENTRY_SIZE       16U
@@ -110,16 +109,7 @@ struct dmar_drhd_rt {
 	uint64_t qi_queue;
 	uint16_t qi_tail;
 
-	uint64_t cap;
-	uint64_t ecap;
 	uint32_t gcmd; /* sw cache value of global cmd register */
-
-	uint32_t dmar_irq;
-
-	uint8_t cap_msagaw;
-	uint16_t cap_num_fault_regs;
-	uint16_t cap_fault_reg_offset;
-	uint16_t ecap_iotlb_offset;
 };
 
 struct context_table {
@@ -157,21 +147,7 @@ static inline uint8_t *get_ir_table(uint32_t dmar_index)
 	return ir_tables[dmar_index].tables[0].contents;
 }
 
-bool iommu_snoop_supported(const struct iommu_domain *iommu)
-{
-	bool ret;
-
-	if ((iommu == NULL) || (iommu->iommu_snoop)) {
-		ret = true;
-	} else {
-		ret = false;
-	}
-
-	return ret;
-}
-
 static struct dmar_drhd_rt dmar_drhd_units[MAX_DRHDS];
-static bool iommu_page_walk_coherent = true;
 static uint32_t qi_status = 0U;
 static struct dmar_info *platform_dmar_info = NULL;
 
@@ -183,44 +159,26 @@ static inline uint16_t vmid_to_domainid(uint16_t vm_id)
 	return vm_id + 1U;
 }
 
-static int32_t dmar_register_hrhd(struct dmar_drhd_rt *dmar_unit);
-static int32_t register_hrhd_units(void)
+static void dmar_register_hrhd(struct dmar_drhd_rt *dmar_unit);
+static void register_hrhd_units(void)
 {
 	struct dmar_drhd_rt *drhd_rt;
 	uint32_t i;
-	int32_t ret = 0;
 
 	for (i = 0U; i < platform_dmar_info->drhd_count; i++) {
 		drhd_rt = &dmar_drhd_units[i];
 		drhd_rt->index = i;
 		drhd_rt->drhd = &platform_dmar_info->drhd_units[i];
-		drhd_rt->dmar_irq = IRQ_INVALID;
 
 		hv_access_memory_region_update(drhd_rt->drhd->reg_base_addr, PAGE_SIZE);
 
-		ret = dmar_register_hrhd(drhd_rt);
-		if (ret != 0) {
-			break;
-		}
+		dmar_register_hrhd(drhd_rt);
 	}
-
-	return ret;
 }
 
 static uint32_t iommu_read32(const struct dmar_drhd_rt *dmar_unit, uint32_t offset)
 {
 	return mmio_read32(hpa2hva(dmar_unit->drhd->reg_base_addr + offset));
-}
-
-static uint64_t iommu_read64(const struct dmar_drhd_rt *dmar_unit, uint32_t offset)
-{
-	uint64_t value;
-
-	value = mmio_read32(hpa2hva(dmar_unit->drhd->reg_base_addr + offset + 4U));
-	value = value << 32U;
-	value = value | mmio_read32(hpa2hva(dmar_unit->drhd->reg_base_addr + offset));
-
-	return value;
 }
 
 static void iommu_write32(const struct dmar_drhd_rt *dmar_unit, uint32_t offset, uint32_t value)
@@ -253,10 +211,10 @@ static inline void dmar_wait_completion(
 		/*
 		 * pre_condition    temp_condition    | condition
 		 * -----------------------------------|----------
-		 * true	     true	      | true
-		 * true	     false	     | false
-		 * false	    true	      | false
-		 * false	    false	     | true
+		 * true             true              | true
+		 * true             false             | false
+		 * false            true              | false
+		 * false            false             | true
 		 */
 		condition = (temp_condition == pre_condition) ? true : false;
 
@@ -274,13 +232,11 @@ static inline void dmar_wait_completion(
  */
 void iommu_flush_cache(const void *p, uint32_t size)
 {
+
 	uint32_t i;
 
-	/* if vtd support page-walk coherency, no need to flush cacheline */
-	if (!iommu_page_walk_coherent) {
-		for (i = 0U; i < size; i += CACHE_LINE_SIZE) {
-			clflush((const char *)p + i);
-		}
+	for (i = 0U; i < size; i += CACHE_LINE_SIZE) {
+		clflush((const char *)p + i);
 	}
 }
 
@@ -292,29 +248,6 @@ static inline uint8_t width_to_level(uint32_t width)
 static inline uint8_t width_to_agaw(uint32_t width)
 {
 	return width_to_level(width) - 2U;
-}
-
-static uint8_t dmar_unit_get_msagw(const struct dmar_drhd_rt *dmar_unit)
-{
-	uint8_t i;
-	uint8_t sgaw = iommu_cap_sagaw(dmar_unit->cap);
-
-	for (i = 5U; i > 0U;) {
-		i--;
-		if (((1U << i) & sgaw) != 0U) {
-			break;
-		}
-	}
-	return i;
-}
-
-static bool dmar_unit_support_aw(const struct dmar_drhd_rt *dmar_unit, uint32_t addr_width)
-{
-	uint8_t aw;
-
-	aw = width_to_agaw(addr_width);
-
-	return (((1U << aw) & iommu_cap_sagaw(dmar_unit->cap)) != 0U);
 }
 
 static void dmar_enable_intr_remapping(struct dmar_drhd_rt *dmar_unit)
@@ -365,16 +298,11 @@ static void dmar_disable_translation(struct dmar_drhd_rt *dmar_unit)
 	spinlock_release(&(dmar_unit->lock));
 }
 
-static int32_t dmar_register_hrhd(struct dmar_drhd_rt *dmar_unit)
+static void dmar_register_hrhd(struct dmar_drhd_rt *dmar_unit)
 {
-	int32_t ret = 0;
-
 	dev_dbg(ACRN_DBG_IOMMU, "Register dmar uint [%d] @0x%lx", dmar_unit->index, dmar_unit->drhd->reg_base_addr);
 
 	spinlock_init(&dmar_unit->lock);
-
-	dmar_unit->cap = iommu_read64(dmar_unit, DMAR_CAP_REG);
-	dmar_unit->ecap = iommu_read64(dmar_unit, DMAR_ECAP_REG);
 
 	/*
 	 * The initialization of "dmar_unit->gcmd" shall be done via reading from Global Status Register rather than
@@ -385,47 +313,7 @@ static int32_t dmar_register_hrhd(struct dmar_drhd_rt *dmar_unit)
 	 */
 	dmar_unit->gcmd = iommu_read32(dmar_unit, DMAR_GSTS_REG);
 
-	dmar_unit->cap_msagaw = dmar_unit_get_msagw(dmar_unit);
-
-	dmar_unit->cap_num_fault_regs = iommu_cap_num_fault_regs(dmar_unit->cap);
-	dmar_unit->cap_fault_reg_offset = iommu_cap_fault_reg_offset(dmar_unit->cap);
-	dmar_unit->ecap_iotlb_offset = iommu_ecap_iro(dmar_unit->ecap) * 16U;
-
-	/* check capability */
-	if ((iommu_cap_super_page_val(dmar_unit->cap) & 0x1U) == 0U) {
-		pr_fatal("%s: dmar uint doesn't support 2MB page!\n", __func__);
-		ret = -ENODEV;
-	} else if ((iommu_cap_super_page_val(dmar_unit->cap) & 0x2U) == 0U) {
-		pr_fatal("%s: dmar uint doesn't support 1GB page!\n", __func__);
-		ret = -ENODEV;
-	} else if (iommu_ecap_qi(dmar_unit->ecap) == 0U) {
-		pr_fatal("%s: dmar unit doesn't support Queued Invalidation!", __func__);
-		ret = -ENODEV;
-	} else if (iommu_ecap_ir(dmar_unit->ecap) == 0U) {
-		pr_fatal("%s: dmar unit doesn't support Interrupt Remapping!", __func__);
-		ret = -ENODEV;
-	} else if (iommu_ecap_eim(dmar_unit->ecap) == 0U) {
-		pr_fatal("%s: dmar unit doesn't support Extended Interrupt Mode!", __func__);
-		ret = -ENODEV;
-	} else {
-		if ((iommu_ecap_c(dmar_unit->ecap) == 0U) && (!dmar_unit->drhd->ignore)) {
-			iommu_page_walk_coherent = false;
-		}
-
-		/* when the hardware support snoop control,
-		 * to make sure snoop control is always enabled,
-		 * the SNP filed in the leaf PTE should be set.
-		 * How to guarantee it when EPT is used as second-level
-		 * translation paging structures?
-		 */
-		if (iommu_ecap_sc(dmar_unit->ecap) == 0U) {
-			dev_dbg(ACRN_DBG_IOMMU, "dmar uint doesn't support snoop control!");
-		}
-
-		dmar_disable_translation(dmar_unit);
-	}
-
-	return ret;
+	dmar_disable_translation(dmar_unit);
 }
 
 static void dmar_issue_qi_request(struct dmar_drhd_rt *dmar_unit, struct dmar_entry invalidate_desc)
@@ -477,9 +365,6 @@ static void dmar_invalid_context_cache(
 	case DMAR_CIRG_GLOBAL:
 		invalidate_desc.lo_64 |= DMA_CONTEXT_GLOBAL_INVL;
 		break;
-	case DMAR_CIRG_DOMAIN:
-		invalidate_desc.lo_64 |= DMA_CONTEXT_DOMAIN_INVL | dma_ccmd_did(did);
-		break;
 	case DMAR_CIRG_DEVICE:
 		invalidate_desc.lo_64 |=
 			DMA_CONTEXT_DEVICE_INVL | dma_ccmd_did(did) | dma_ccmd_sid(sid) | dma_ccmd_fm(fm);
@@ -523,14 +408,6 @@ static void dmar_invalid_iotlb(
 		break;
 	case DMAR_IIRG_DOMAIN:
 		invalidate_desc.lo_64 |= DMA_IOTLB_DOMAIN_INVL | dma_iotlb_did(did);
-		break;
-	case DMAR_IIRG_PAGE:
-		invalidate_desc.lo_64 |= DMA_IOTLB_PAGE_INVL | dma_iotlb_did(did);
-		addr = address | dma_iotlb_invl_addr_am(am);
-		if (hint) {
-			addr |= DMA_IOTLB_INVL_ADDR_IH_UNMODIFIED;
-		}
-		invalidate_desc.hi_64 |= addr;
 		break;
 	default:
 		invalidate_desc.lo_64 = 0UL;
@@ -596,13 +473,11 @@ static void dmar_invalid_iec(struct dmar_drhd_rt *dmar_unit, uint16_t intr_index
 		invalidate_desc.lo_64 |= DMAR_IECI_INDEXED | dma_iec_index(intr_index, index_mask);
 	}
 
-	if (invalidate_desc.lo_64 != 0UL) {
-		spinlock_obtain(&(dmar_unit->lock));
+	spinlock_obtain(&(dmar_unit->lock));
 
-		dmar_issue_qi_request(dmar_unit, invalidate_desc);
+	dmar_issue_qi_request(dmar_unit, invalidate_desc);
 
-		spinlock_release(&(dmar_unit->lock));
-	}
+	spinlock_release(&(dmar_unit->lock));
 }
 
 static void dmar_invalid_iec_global(struct dmar_drhd_rt *dmar_unit)
@@ -677,7 +552,7 @@ static void dmar_enable(struct dmar_drhd_rt *dmar_unit)
 	dmar_enable_translation(dmar_unit);
 }
 
-static int32_t add_iommu_device(struct iommu_domain *domain, uint8_t bus, uint8_t devfun)
+int32_t add_iommu_device(struct iommu_domain *domain, uint8_t bus, uint8_t devfun)
 {
 	struct dmar_drhd_rt *dmar_unit;
 	struct dmar_entry *root_table;
@@ -695,104 +570,55 @@ static int32_t add_iommu_device(struct iommu_domain *domain, uint8_t bus, uint8_
 	sid.fields.devfun = devfun;
 
 	dmar_unit = &dmar_drhd_units[1];
-	if (dmar_unit == NULL) {
-		pr_err("no dmar unit found for device: %x:%x.%x", bus, sid.bits.d, sid.bits.f);
-		ret = -EINVAL;
-	} else if (dmar_unit->drhd->ignore) {
-		dev_dbg(ACRN_DBG_IOMMU, "device is ignored :0x%x:%x.%x", bus, sid.bits.d, sid.bits.f);
-	} else if ((!dmar_unit_support_aw(dmar_unit, domain->addr_width)) || (dmar_unit->root_table_addr == 0UL)) {
-		pr_err("invalid dmar unit");
-		ret = -EINVAL;
+
+	root_table = (struct dmar_entry *)hpa2hva(dmar_unit->root_table_addr);
+
+	root_entry = root_table + bus;
+
+	if (dmar_get_bitslice(root_entry->lo_64, ROOT_ENTRY_LOWER_PRESENT_MASK, ROOT_ENTRY_LOWER_PRESENT_POS) == 0UL) {
+		/* create context table for the bus if not present */
+		context_table_addr = hva2hpa(get_ctx_table(dmar_unit->index, bus));
+
+		context_table_addr = context_table_addr >> PAGE_SHIFT;
+
+		lo_64 = dmar_set_bitslice(
+			lo_64, ROOT_ENTRY_LOWER_CTP_MASK, ROOT_ENTRY_LOWER_CTP_POS, context_table_addr);
+		lo_64 = dmar_set_bitslice(lo_64, ROOT_ENTRY_LOWER_PRESENT_MASK, ROOT_ENTRY_LOWER_PRESENT_POS, 1UL);
+
+		root_entry->hi_64 = 0UL;
+		root_entry->lo_64 = lo_64;
+		iommu_flush_cache(root_entry, sizeof(struct dmar_entry));
 	} else {
-		if (iommu_ecap_sc(dmar_unit->ecap) == 0U) {
-			/* TODO: remove iommu_snoop from iommu_domain */
-			domain->iommu_snoop = false;
-			dev_dbg(ACRN_DBG_IOMMU, "vm=%d add %x:%x no snoop control!", domain->vm_id, bus, devfun);
-		}
-
-		root_table = (struct dmar_entry *)hpa2hva(dmar_unit->root_table_addr);
-
-		root_entry = root_table + bus;
-
-		if (dmar_get_bitslice(root_entry->lo_64, ROOT_ENTRY_LOWER_PRESENT_MASK, ROOT_ENTRY_LOWER_PRESENT_POS) ==
-			0UL) {
-			/* create context table for the bus if not present */
-			context_table_addr = hva2hpa(get_ctx_table(dmar_unit->index, bus));
-
-			context_table_addr = context_table_addr >> PAGE_SHIFT;
-
-			lo_64 = dmar_set_bitslice(
-				lo_64, ROOT_ENTRY_LOWER_CTP_MASK, ROOT_ENTRY_LOWER_CTP_POS, context_table_addr);
-			lo_64 = dmar_set_bitslice(
-				lo_64, ROOT_ENTRY_LOWER_PRESENT_MASK, ROOT_ENTRY_LOWER_PRESENT_POS, 1UL);
-
-			root_entry->hi_64 = 0UL;
-			root_entry->lo_64 = lo_64;
-			iommu_flush_cache(root_entry, sizeof(struct dmar_entry));
-		} else {
-			context_table_addr = dmar_get_bitslice(
-				root_entry->lo_64, ROOT_ENTRY_LOWER_CTP_MASK, ROOT_ENTRY_LOWER_CTP_POS);
-		}
-
-		context_table_addr = context_table_addr << PAGE_SHIFT;
-
-		context = (struct dmar_entry *)hpa2hva(context_table_addr);
-		context_entry = context + devfun;
-
-		if (context_entry == NULL) {
-			pr_err("dmar context entry is invalid");
-			ret = -EINVAL;
-		} else if (dmar_get_bitslice(context_entry->lo_64, CTX_ENTRY_LOWER_P_MASK, CTX_ENTRY_LOWER_P_POS) !=
-			0UL) {
-			/* the context entry should not be present */
-			pr_err("%s: context entry@0x%lx (Lower:%x) ", __func__, context_entry, context_entry->lo_64);
-			pr_err("already present for %x:%x.%x", bus, sid.bits.d, sid.bits.f);
-			ret = -EBUSY;
-		} else {
-			/* setup context entry for the devfun */
-			hi_64 = 0UL;
-			lo_64 = 0UL;
-			if (domain->is_host) {
-				if (iommu_ecap_pt(dmar_unit->ecap) != 0U) {
-					/* When the Translation-type (T) field indicates
-					 * pass-through processing (10b), AW field must be
-					 * programmed to indicate the largest AGAW value
-					 * supported by hardware.
-					 */
-					hi_64 = dmar_set_bitslice(hi_64, CTX_ENTRY_UPPER_AW_MASK,
-						CTX_ENTRY_UPPER_AW_POS, dmar_unit->cap_msagaw);
-					lo_64 = dmar_set_bitslice(lo_64, CTX_ENTRY_LOWER_TT_MASK,
-						CTX_ENTRY_LOWER_TT_POS, DMAR_CTX_TT_PASSTHROUGH);
-				} else {
-					pr_err("dmaru[%d] doesn't support trans passthrough", dmar_unit->index);
-					ret = -ENODEV;
-				}
-			} else {
-				/* TODO: add Device TLB support */
-				hi_64 = dmar_set_bitslice(hi_64, CTX_ENTRY_UPPER_AW_MASK, CTX_ENTRY_UPPER_AW_POS,
-					(uint64_t)width_to_agaw(domain->addr_width));
-				lo_64 = dmar_set_bitslice(lo_64, CTX_ENTRY_LOWER_TT_MASK, CTX_ENTRY_LOWER_TT_POS,
-					DMAR_CTX_TT_UNTRANSLATED);
-			}
-
-			if (ret == 0) {
-				hi_64 = dmar_set_bitslice(hi_64, CTX_ENTRY_UPPER_DID_MASK, CTX_ENTRY_UPPER_DID_POS,
-					(uint64_t)vmid_to_domainid(domain->vm_id));
-				lo_64 = dmar_set_bitslice(lo_64, CTX_ENTRY_LOWER_SLPTPTR_MASK,
-					CTX_ENTRY_LOWER_SLPTPTR_POS, domain->trans_table_ptr >> PAGE_SHIFT);
-				lo_64 = dmar_set_bitslice(lo_64, CTX_ENTRY_LOWER_P_MASK, CTX_ENTRY_LOWER_P_POS, 1UL);
-
-				context_entry->hi_64 = hi_64;
-				context_entry->lo_64 = lo_64;
-				iommu_flush_cache(context_entry, sizeof(struct dmar_entry));
-			}
-		}
+		context_table_addr =
+			dmar_get_bitslice(root_entry->lo_64, ROOT_ENTRY_LOWER_CTP_MASK, ROOT_ENTRY_LOWER_CTP_POS);
 	}
+
+	context_table_addr = context_table_addr << PAGE_SHIFT;
+
+	context = (struct dmar_entry *)hpa2hva(context_table_addr);
+	context_entry = context + devfun;
+	/* setup context entry for the devfun */
+	hi_64 = 0UL;
+	lo_64 = 0UL;
+	/* TODO: add Device TLB support */
+	hi_64 = dmar_set_bitslice(
+		hi_64, CTX_ENTRY_UPPER_AW_MASK, CTX_ENTRY_UPPER_AW_POS, (uint64_t)width_to_agaw(domain->addr_width));
+	lo_64 = dmar_set_bitslice(lo_64, CTX_ENTRY_LOWER_TT_MASK, CTX_ENTRY_LOWER_TT_POS, DMAR_CTX_TT_UNTRANSLATED);
+
+	hi_64 = dmar_set_bitslice(hi_64, CTX_ENTRY_UPPER_DID_MASK, CTX_ENTRY_UPPER_DID_POS,
+		(uint64_t)vmid_to_domainid(domain->vm_id));
+	lo_64 = dmar_set_bitslice(lo_64, CTX_ENTRY_LOWER_SLPTPTR_MASK, CTX_ENTRY_LOWER_SLPTPTR_POS,
+		domain->trans_table_ptr >> PAGE_SHIFT);
+	lo_64 = dmar_set_bitslice(lo_64, CTX_ENTRY_LOWER_P_MASK, CTX_ENTRY_LOWER_P_POS, 1UL);
+
+	context_entry->hi_64 = hi_64;
+	context_entry->lo_64 = lo_64;
+	iommu_flush_cache(context_entry, sizeof(struct dmar_entry));
 
 	return ret;
 }
 
-static int32_t remove_iommu_device(const struct iommu_domain *domain, uint8_t bus, uint8_t devfun)
+int32_t remove_iommu_device(const struct iommu_domain *domain, uint8_t bus, uint8_t devfun)
 {
 	struct dmar_drhd_rt *dmar_unit;
 	struct dmar_entry *root_table;
@@ -809,46 +635,21 @@ static int32_t remove_iommu_device(const struct iommu_domain *domain, uint8_t bu
 	sid.fields.bus = bus;
 	sid.fields.devfun = devfun;
 
-	if (dmar_unit == NULL) {
-		pr_err("no dmar unit found for device: %x:%x.%x", bus, sid.bits.d, sid.bits.f);
-		ret = -EINVAL;
-	} else if (dmar_unit->drhd->ignore) {
-		dev_dbg(ACRN_DBG_IOMMU, "device is ignored :0x%x:%x.%x", bus, sid.bits.d, sid.bits.f);
-	} else {
-		root_table = (struct dmar_entry *)hpa2hva(dmar_unit->root_table_addr);
-		root_entry = root_table + bus;
+	root_table = (struct dmar_entry *)hpa2hva(dmar_unit->root_table_addr);
+	root_entry = root_table + bus;
 
-		if (root_entry == NULL) {
-			pr_err("dmar root table entry is invalid\n");
-			ret = -EINVAL;
-		} else {
-			context_table_addr = dmar_get_bitslice(
-				root_entry->lo_64, ROOT_ENTRY_LOWER_CTP_MASK, ROOT_ENTRY_LOWER_CTP_POS);
-			context_table_addr = context_table_addr << PAGE_SHIFT;
-			context = (struct dmar_entry *)hpa2hva(context_table_addr);
+	context_table_addr = dmar_get_bitslice(root_entry->lo_64, ROOT_ENTRY_LOWER_CTP_MASK, ROOT_ENTRY_LOWER_CTP_POS);
+	context_table_addr = context_table_addr << PAGE_SHIFT;
+	context = (struct dmar_entry *)hpa2hva(context_table_addr);
 
-			context_entry = context + devfun;
+	context_entry = context + devfun;
+	/* clear the present bit first */
+	context_entry->lo_64 = 0UL;
+	context_entry->hi_64 = 0UL;
+	iommu_flush_cache(context_entry, sizeof(struct dmar_entry));
 
-			if ((context == NULL) || (context_entry == NULL)) {
-				pr_err("dmar context entry is invalid");
-				ret = -EINVAL;
-			} else if ((uint16_t)dmar_get_bitslice(context_entry->hi_64, CTX_ENTRY_UPPER_DID_MASK,
-					   CTX_ENTRY_UPPER_DID_POS) != vmid_to_domainid(domain->vm_id)) {
-				pr_err("%s: domain id mismatch", __func__);
-				ret = -EPERM;
-			} else {
-				/* clear the present bit first */
-				context_entry->lo_64 = 0UL;
-				context_entry->hi_64 = 0UL;
-				iommu_flush_cache(context_entry, sizeof(struct dmar_entry));
-
-				dmar_invalid_context_cache(
-					dmar_unit, vmid_to_domainid(domain->vm_id), sid.value, 0U, DMAR_CIRG_DEVICE);
-				dmar_invalid_iotlb(
-					dmar_unit, vmid_to_domainid(domain->vm_id), 0UL, 0U, false, DMAR_IIRG_DOMAIN);
-			}
-		}
-	}
+	dmar_invalid_context_cache(dmar_unit, vmid_to_domainid(domain->vm_id), sid.value, 0U, DMAR_CIRG_DEVICE);
+	dmar_invalid_iotlb(dmar_unit, vmid_to_domainid(domain->vm_id), 0UL, 0U, false, DMAR_IIRG_DOMAIN);
 	return ret;
 }
 
@@ -875,30 +676,19 @@ struct iommu_domain *create_iommu_domain(uint16_t vm_id, uint64_t translation_ta
 {
 	static struct iommu_domain iommu_domains[MAX_DOMAIN_NUM];
 	struct iommu_domain *domain;
+	/*
+	 * A hypercall is called to create an iommu domain for a valid VM,
+	 * and hv code limit the VM number to CONFIG_MAX_VM_NUM.
+	 * So the array iommu_domains will not be accessed out of range.
+	 */
+	domain = &iommu_domains[vmid_to_domainid(vm_id)];
 
-	/* TODO: check if a domain with the vm_id exists */
+	domain->vm_id = vm_id;
+	domain->trans_table_ptr = translation_table;
+	domain->addr_width = addr_width;
 
-	if (translation_table == 0UL) {
-		pr_err("translation table is NULL");
-		domain = NULL;
-	} else {
-		/*
-		 * A hypercall is called to create an iommu domain for a valid VM,
-		 * and hv code limit the VM number to CONFIG_MAX_VM_NUM.
-		 * So the array iommu_domains will not be accessed out of range.
-		 */
-		domain = &iommu_domains[vmid_to_domainid(vm_id)];
-
-		domain->is_host = false;
-		domain->vm_id = vm_id;
-		domain->trans_table_ptr = translation_table;
-		domain->addr_width = addr_width;
-		domain->is_tt_ept = true;
-		domain->iommu_snoop = true;
-
-		dev_dbg(ACRN_DBG_IOMMU, "create domain [%d]: vm_id = %hu, ept@0x%x", vmid_to_domainid(domain->vm_id),
-			domain->vm_id, domain->trans_table_ptr);
-	}
+	dev_dbg(ACRN_DBG_IOMMU, "create domain [%d]: vm_id = %hu, ept@0x%x", vmid_to_domainid(domain->vm_id),
+		domain->vm_id, domain->trans_table_ptr);
 
 	return domain;
 }
@@ -908,10 +698,6 @@ struct iommu_domain *create_iommu_domain(uint16_t vm_id, uint64_t translation_ta
  */
 void destroy_iommu_domain(struct iommu_domain *domain)
 {
-	/* currently only support ept */
-	if (!domain->is_tt_ept) {
-		ASSERT(false, "translation_table is not EPT!");
-	}
 
 	/* TODO: check if any device assigned to this domain */
 	(void)memset(domain, 0U, sizeof(*domain));
@@ -920,29 +706,6 @@ void destroy_iommu_domain(struct iommu_domain *domain)
 /*
  * @pre (from_domain != NULL) || (to_domain != NULL)
  */
-
-int32_t move_pt_device(
-	const struct iommu_domain *from_domain, struct iommu_domain *to_domain, uint8_t bus, uint8_t devfun)
-{
-	int32_t status = 0;
-	uint16_t bus_local = bus;
-
-	/* TODO: check if the device assigned */
-
-	if (bus_local < CONFIG_IOMMU_BUS_NUM) {
-		if (from_domain != NULL) {
-			status = remove_iommu_device(from_domain, bus, devfun);
-		}
-
-		if ((status == 0) && (to_domain != NULL)) {
-			status = add_iommu_device(to_domain, bus, devfun);
-		}
-	} else {
-		status = -EINVAL;
-	}
-
-	return status;
-}
 
 void enable_iommu(void)
 {
@@ -958,58 +721,41 @@ static struct dmar_info *get_dmar_info(void)
 	return &plat_dmar_info;
 }
 
-int32_t init_iommu(void)
+void init_iommu(void)
 {
-	int32_t ret = 0;
-
 	platform_dmar_info = get_dmar_info();
 
-	ret = register_hrhd_units();
-	if (ret == 0) {
-		do_action_for_iommus(dmar_prepare);
-	}
-	return ret;
+	register_hrhd_units();
+
+	do_action_for_iommus(dmar_prepare);
 }
 
-int32_t dmar_assign_irte(struct intr_source intr_src, union dmar_ir_entry irte, uint16_t index)
+void dmar_assign_irte(struct intr_source intr_src, union dmar_ir_entry irte, uint16_t index)
 {
 	struct dmar_drhd_rt *dmar_unit;
 	union dmar_ir_entry *ir_table, *ir_entry;
 	union pci_bdf sid;
 	uint64_t trigger_mode;
-	int32_t ret = 0;
 
 	dmar_unit = &dmar_drhd_units[1];
 	sid.value = intr_src.src.msi.value;
 	trigger_mode = 0x0UL;
 
-	if (dmar_unit == NULL) {
-		pr_err("no dmar unit found for device: %x:%x.%x", sid.bits.b, sid.bits.d, sid.bits.f);
-		ret = -EINVAL;
-	} else if (dmar_unit->drhd->ignore) {
-		dev_dbg(ACRN_DBG_IOMMU, "device is ignored :0x%x:%x.%x", sid.bits.b, sid.bits.d, sid.bits.f);
-		ret = -EINVAL;
-	} else if (dmar_unit->ir_table_addr == 0UL) {
-		pr_err("IR table is not set for dmar unit");
-		ret = -EINVAL;
-	} else {
-		dmar_enable_intr_remapping(dmar_unit);
-		irte.bits.svt = 0x1UL;
-		irte.bits.sq = 0x0UL;
-		irte.bits.sid = sid.value;
-		irte.bits.present = 0x1UL;
-		irte.bits.mode = 0x0UL;
-		irte.bits.trigger_mode = trigger_mode;
-		irte.bits.fpd = 0x0UL;
-		ir_table = (union dmar_ir_entry *)hpa2hva(dmar_unit->ir_table_addr);
-		ir_entry = ir_table + index;
-		ir_entry->entry.hi_64 = irte.entry.hi_64;
-		ir_entry->entry.lo_64 = irte.entry.lo_64;
+	dmar_enable_intr_remapping(dmar_unit);
+	irte.bits.svt = 0x1UL;
+	irte.bits.sq = 0x0UL;
+	irte.bits.sid = sid.value;
+	irte.bits.present = 0x1UL;
+	irte.bits.mode = 0x0UL;
+	irte.bits.trigger_mode = trigger_mode;
+	irte.bits.fpd = 0x0UL;
+	ir_table = (union dmar_ir_entry *)hpa2hva(dmar_unit->ir_table_addr);
+	ir_entry = ir_table + index;
+	ir_entry->entry.hi_64 = irte.entry.hi_64;
+	ir_entry->entry.lo_64 = irte.entry.lo_64;
 
-		iommu_flush_cache(ir_entry, sizeof(union dmar_ir_entry));
-		dmar_invalid_iec(dmar_unit, index, 0U, false);
-	}
-	return ret;
+	iommu_flush_cache(ir_entry, sizeof(union dmar_ir_entry));
+	dmar_invalid_iec(dmar_unit, index, 0U, false);
 }
 
 void dmar_free_irte(struct intr_source intr_src, uint16_t index)
@@ -1019,22 +765,12 @@ void dmar_free_irte(struct intr_source intr_src, uint16_t index)
 
 	dmar_unit = &dmar_drhd_units[1];
 
-	if (dmar_unit == NULL) {
-		pr_err("no dmar unit found for device: %x:%x.%x", intr_src.src.msi.bits.b, intr_src.src.msi.bits.d,
-			intr_src.src.msi.bits.f);
-	} else if (dmar_unit->drhd->ignore) {
-		dev_dbg(ACRN_DBG_IOMMU, "device is ignored :0x%x:%x.%x", intr_src.src.msi.bits.b,
-			intr_src.src.msi.bits.d, intr_src.src.msi.bits.f);
-	} else if (dmar_unit->ir_table_addr == 0UL) {
-		pr_err("IR table is not set for dmar unit");
-	} else {
-		ir_table = (union dmar_ir_entry *)hpa2hva(dmar_unit->ir_table_addr);
-		ir_entry = ir_table + index;
-		ir_entry->bits.present = 0x0UL;
+	ir_table = (union dmar_ir_entry *)hpa2hva(dmar_unit->ir_table_addr);
+	ir_entry = ir_table + index;
+	ir_entry->bits.present = 0x0UL;
 
-		iommu_flush_cache(ir_entry, sizeof(union dmar_ir_entry));
-		dmar_invalid_iec(dmar_unit, index, 0U, false);
-	}
+	iommu_flush_cache(ir_entry, sizeof(union dmar_ir_entry));
+	dmar_invalid_iec(dmar_unit, index, 0U, false);
 }
 
 /**

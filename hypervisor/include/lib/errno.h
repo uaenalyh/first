@@ -20,8 +20,6 @@
  * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
  */
 
-/** Indicates that operation not permitted. */
-#define EPERM 1
 /** Indicates that not enough memory. */
 #define ENOMEM 12
 /** Indicates Permission denied */

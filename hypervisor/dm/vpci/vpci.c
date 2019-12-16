@@ -259,7 +259,7 @@ static void assign_vdev_pt_iommu_domain(const struct pci_vdev *vdev)
 	int32_t ret;
 	struct acrn_vm *vm = vdev->vpci->vm;
 
-	ret = move_pt_device(NULL, vm->iommu, (uint8_t)vdev->pbdf.bits.b, (uint8_t)(vdev->pbdf.value & 0xFFU));
+	ret = add_iommu_device(vm->iommu, (uint8_t)vdev->pbdf.bits.b, (uint8_t)(vdev->pbdf.value & 0xFFU));
 	if (ret != 0) {
 		panic("failed to assign iommu device!");
 	}
@@ -276,7 +276,7 @@ static void remove_vdev_pt_iommu_domain(const struct pci_vdev *vdev)
 	int32_t ret;
 	struct acrn_vm *vm = vdev->vpci->vm;
 
-	ret = move_pt_device(vm->iommu, NULL, (uint8_t)vdev->pbdf.bits.b, (uint8_t)(vdev->pbdf.value & 0xFFU));
+	ret = remove_iommu_device(vm->iommu, (uint8_t)vdev->pbdf.bits.b, (uint8_t)(vdev->pbdf.value & 0xFFU));
 	if (ret != 0) {
 		/*
 		 *TODO

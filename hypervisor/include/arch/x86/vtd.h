@@ -27,8 +27,6 @@
  * Intel IOMMU register specification per version 1.0 public spec.
  */
 
-#define DMAR_CAP_REG    0x8U /* Hardware supported capabilities */
-#define DMAR_ECAP_REG   0x10U /* Extended capabilities supported */
 #define DMAR_GCMD_REG   0x18U /* Global command register */
 #define DMAR_GSTS_REG   0x1cU /* Global status register */
 #define DMAR_RTADDR_REG 0x20U /* Root entry table */
@@ -48,12 +46,9 @@ enum acpi_dmar_scope_type {
 };
 
 struct iommu_domain {
-	bool is_host;
-	bool is_tt_ept; /* if reuse EPT of the domain */
 	uint16_t vm_id;
 	uint32_t addr_width; /* address width of the domain */
 	uint64_t trans_table_ptr;
-	bool iommu_snoop;
 };
 
 union source {
@@ -64,64 +59,6 @@ struct intr_source {
 	bool is_msi;
 	union source src;
 };
-
-static inline uint16_t iommu_cap_num_fault_regs(uint64_t cap)
-{
-	return (((uint16_t)(cap >> 40U) & 0xffU) + 1U);
-}
-
-static inline uint8_t iommu_cap_super_page_val(uint64_t cap)
-{
-	return ((uint8_t)(cap >> 34U) & 0xfU);
-}
-
-static inline uint16_t iommu_cap_fault_reg_offset(uint64_t cap)
-{
-	return (((uint16_t)(cap >> 24U) & 0x3ffU) * 16U);
-}
-
-static inline uint8_t iommu_cap_sagaw(uint64_t cap)
-{
-	return ((uint8_t)(cap >> 8U) & 0x1fU);
-}
-
-/*
- * Decoding Extended Capability Register
- */
-static inline uint8_t iommu_ecap_c(uint64_t ecap)
-{
-	return ((uint8_t)(ecap >> 0U) & 1U);
-}
-
-static inline uint8_t iommu_ecap_qi(uint64_t ecap)
-{
-	return ((uint8_t)(ecap >> 1U) & 1U);
-}
-
-static inline uint8_t iommu_ecap_ir(uint64_t ecap)
-{
-	return ((uint8_t)(ecap >> 3U) & 1U);
-}
-
-static inline uint8_t iommu_ecap_eim(uint64_t ecap)
-{
-	return ((uint8_t)(ecap >> 4U) & 1U);
-}
-
-static inline uint8_t iommu_ecap_pt(uint64_t ecap)
-{
-	return ((uint8_t)(ecap >> 6U) & 1U);
-}
-
-static inline uint8_t iommu_ecap_sc(uint64_t ecap)
-{
-	return ((uint8_t)(ecap >> 7U) & 1U);
-}
-
-static inline uint16_t iommu_ecap_iro(uint64_t ecap)
-{
-	return ((uint16_t)(ecap >> 8U) & 0x3ffU);
-}
 
 /* GCMD_REG */
 #define DMA_GCMD_TE    (1U << 31U)
@@ -253,26 +190,8 @@ union dmar_ir_entry {
  *
  */
 struct iommu_domain;
-
-/**
- * @brief Assign a device specified by bus & devfun to a iommu domain.
- *
- * Remove the device from the from_domain (if non-NULL), and add it to the to_domain (if non-NULL).
- * API silently fails to add/remove devices to/from domains that are under "Ignored" DMAR units.
- *
- * @param[in]    from_domain iommu domain from which the device is removed from
- * @param[in]    to_domain iommu domain to which the device is assgined to
- * @param[in]    bus the 8-bit bus number of the device
- * @param[in]    devfun the 8-bit device(5-bit):function(3-bit) of the device
- *
- * @retval 0 on success.
- * @retval 1 fail to unassign the device
- *
- * @pre domain != NULL
- *
- */
-int32_t move_pt_device(
-	const struct iommu_domain *from_domain, struct iommu_domain *to_domain, uint8_t bus, uint8_t devfun);
+int32_t remove_iommu_device(const struct iommu_domain *domain, uint8_t bus, uint8_t devfun);
+int32_t add_iommu_device(struct iommu_domain *domain, uint8_t bus, uint8_t devfun);
 
 /**
  * @brief Create a iommu domain for a VM specified by vm_id.
@@ -325,18 +244,7 @@ void enable_iommu(void);
  * @retval <0 on failure
  *
  */
-int32_t init_iommu(void);
-
-/**
- * @brief check the iommu if support cache snoop.
- *
- * @param[in] iommu pointer to iommu domain to check
- *
- * @retval true support
- * @retval false not support
- *
- */
-bool iommu_snoop_supported(const struct iommu_domain *iommu);
+void init_iommu(void);
 
 /**
  * @brief Assign RTE for Interrupt Remapping Table.
@@ -349,7 +257,7 @@ bool iommu_snoop_supported(const struct iommu_domain *iommu);
  * @retval 0 otherwise
  *
  */
-int32_t dmar_assign_irte(struct intr_source intr_src, union dmar_ir_entry irte, uint16_t index);
+void dmar_assign_irte(struct intr_source intr_src, union dmar_ir_entry irte, uint16_t index);
 
 /**
  * @brief Free RTE for Interrupt Remapping Table.

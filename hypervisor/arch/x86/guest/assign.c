@@ -93,7 +93,7 @@ static void ptirq_build_physical_msi(
 	bool phys;
 	union dmar_ir_entry irte;
 	union irte_index ir_index;
-	int32_t ret;
+	int32_t ret = 0;
 	struct intr_source intr_src;
 
 	/* get physical destination cpu mask */
@@ -122,7 +122,7 @@ static void ptirq_build_physical_msi(
 
 	intr_src.is_msi = true;
 	intr_src.src.msi.value = entry->phys_sid.msi_id.bdf;
-	ret = dmar_assign_irte(intr_src, irte, (uint16_t)entry->allocated_pirq);
+	dmar_assign_irte(intr_src, irte, (uint16_t)entry->allocated_pirq);
 
 	if (ret == 0) {
 		/*

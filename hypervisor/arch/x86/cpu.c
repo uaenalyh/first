@@ -218,9 +218,7 @@ void init_pcpu_post(uint16_t pcpu_id)
 		setup_notification();
 		setup_posted_intr_notification();
 
-		if (init_iommu() != 0) {
-			panic("failed to initialize iommu!");
-		}
+		init_iommu();
 
 		/* Start all secondary cores */
 		startup_paddr = prepare_trampoline();
