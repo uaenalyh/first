@@ -65,6 +65,11 @@ bool is_rt_vm(const struct acrn_vm *vm)
 	return ((vm_config->guest_flags & GUEST_FLAG_RT) != 0U);
 }
 
+bool is_safety_vm(const struct acrn_vm *vm)
+{
+	return (vm->vm_id == 0U);
+}
+
 /**
  * @brief Initialize the I/O bitmap for \p vm
  *
