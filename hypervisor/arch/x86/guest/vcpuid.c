@@ -113,6 +113,9 @@ static inline void set_vcpuid_entry(struct acrn_vm *vm, const struct vcpuid_entr
  */
 static void init_vcpuid_entry(uint32_t leaf, uint32_t subleaf, uint32_t flags, struct vcpuid_entry *entry)
 {
+#ifdef QEMU
+	struct cpuinfo_x86 *cpu_info;
+#endif
 	entry->leaf = leaf;
 	entry->subleaf = subleaf;
 	entry->flags = flags;
@@ -153,6 +156,22 @@ static void init_vcpuid_entry(uint32_t leaf, uint32_t subleaf, uint32_t flags, s
 		entry->ecx = VIRT_CRYSTAL_CLOCK_FREQ;
 		break;
 
+#ifdef QEMU
+	case 0x16U:
+		cpu_info = get_pcpu_info();
+		if (cpu_info->cpuid_level >= 0x16U) {
+			/* call the cpuid when 0x16 is supported */
+			cpuid_subleaf(leaf, subleaf, &entry->eax, &entry->ebx, &entry->ecx, &entry->edx);
+		} else {
+			/* Use the tsc to derive the emulated 0x16U cpuid. */
+			entry->eax = (uint32_t)(get_tsc_khz() / 1000U);
+			entry->ebx = entry->eax;
+			/* Bus frequency: hard coded to 100M */
+			entry->ecx = 100U;
+			entry->edx = 0U;
+		}
+		break;
+#endif
 	default:
 		cpuid_subleaf(leaf, subleaf, &entry->eax, &entry->ebx, &entry->ecx, &entry->edx);
 		break;
@@ -184,6 +203,13 @@ void set_vcpuid_entries(struct acrn_vm *vm)
 	uint32_t i, j;
 
 	init_vcpuid_entry(0U, 0U, 0U, &entry);
+#ifdef QEMU
+	struct cpuinfo_x86 *cpu_info = get_pcpu_info();
+	if (cpu_info->cpuid_level < 0x16U) {
+		/* The cpuid with zero leaf returns the max level. Emulate that the 0x16U is supported */
+		entry.eax = 0x16U;
+	}
+#endif
 	set_vcpuid_entry(vm, &entry);
 
 	limit = entry.eax;

@@ -67,6 +67,10 @@ else
 CFLAGS += -static
 endif
 
+ifdef QEMU
+CFLAGS += -DQEMU
+endif
+
 ifdef STACK_PROTECTOR
 ifeq (true, $(shell [ $(GCC_MAJOR) -gt 4 ] && echo true))
 CFLAGS += -fstack-protector-strong
