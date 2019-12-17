@@ -558,8 +558,6 @@ void switch_apicv_mode_x2apic(struct acrn_vcpu *vcpu)
 	value32 &= ~VMX_PROCBASED_CTLS2_VAPIC;
 	exec_vmwrite32(VMX_PROC_VM_EXEC_CONTROLS2, value32);
 
-	update_msr_bitmap_x2apic_passthru(vcpu);
-
 	/*
 	 * After passthroughing lapic to guest, we should use INIT signal to
 	 * notify vcpu thread instead of IPI

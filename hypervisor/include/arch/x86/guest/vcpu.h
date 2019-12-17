@@ -32,7 +32,6 @@
 #include <guest_memory.h>
 #include <virtual_cr.h>
 #include <vlapic.h>
-#include <vmtrr.h>
 #include <schedule.h>
 #include <io_req.h>
 #include <msr.h>
