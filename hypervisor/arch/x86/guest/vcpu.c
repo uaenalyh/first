@@ -608,7 +608,7 @@ void reset_vcpu(struct acrn_vcpu *vcpu)
 		vcpu->thread_obj.notify_mode = SCHED_NOTIFY_IPI;
 
 		vlapic = vcpu_vlapic(vcpu);
-		vlapic_reset(vlapic, &ptapic_ops);
+		vlapic_reset(vlapic);
 
 		reset_vcpu_regs(vcpu);
 	}

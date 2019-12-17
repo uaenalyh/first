@@ -69,22 +69,7 @@ struct acrn_vlapic {
 	struct acrn_vcpu *vcpu;
 
 	uint64_t msr_apicbase;
-
-	const struct acrn_apicv_ops *ops;
-
 } __aligned(PAGE_SIZE);
-
-struct acrn_apicv_ops {
-	void (*accept_intr)(struct acrn_vlapic *vlapic, uint32_t vector, bool level);
-	bool (*inject_intr)(struct acrn_vlapic *vlapic, bool guest_irq_enabled, bool injected);
-	bool (*has_pending_delivery_intr)(struct acrn_vcpu *vcpu);
-	bool (*apic_read_access_may_valid)(uint32_t offset);
-	bool (*apic_write_access_may_valid)(uint32_t offset);
-	bool (*x2apic_read_msr_may_valid)(uint32_t offset);
-	bool (*x2apic_write_msr_may_valid)(uint32_t offset);
-};
-
-extern const struct acrn_apicv_ops ptapic_ops;
 
 /**
  * @brief virtual LAPIC
@@ -106,7 +91,7 @@ void vlapic_create(struct acrn_vcpu *vcpu);
  * @pre vlapic->vcpu->vcpu_id < MAX_VCPUS_PER_VM
  */
 void vlapic_init(struct acrn_vlapic *vlapic);
-void vlapic_reset(struct acrn_vlapic *vlapic, const struct acrn_apicv_ops *ops);
+void vlapic_reset(struct acrn_vlapic *vlapic);
 void vlapic_calc_dest(struct acrn_vm *vm, uint64_t *dmask, bool is_broadcast, uint32_t dest, bool phys, bool lowprio);
 /**
  * @}

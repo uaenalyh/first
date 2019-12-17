@@ -339,7 +339,7 @@ static int32_t vlapic_read(struct acrn_vlapic *vlapic, uint32_t offset_arg, uint
 /*
  * @pre vlapic != NULL && ops != NULL
  */
-void vlapic_reset(struct acrn_vlapic *vlapic, const struct acrn_apicv_ops *ops)
+void vlapic_reset(struct acrn_vlapic *vlapic)
 {
 	struct lapic_regs *lapic;
 
@@ -356,8 +356,6 @@ void vlapic_reset(struct acrn_vlapic *vlapic, const struct acrn_apicv_ops *ops)
 	(void)memset((void *)lapic, 0U, sizeof(struct lapic_regs));
 
 	vlapic_build_x2apic_id(vlapic);
-
-	vlapic->ops = ops;
 }
 
 /**
@@ -366,7 +364,7 @@ void vlapic_reset(struct acrn_vlapic *vlapic, const struct acrn_apicv_ops *ops)
  */
 void vlapic_init(struct acrn_vlapic *vlapic)
 {
-	vlapic_reset(vlapic, &ptapic_ops);
+	vlapic_reset(vlapic);
 }
 
 uint64_t vlapic_get_apicbase(const struct acrn_vlapic *vlapic)
@@ -394,16 +392,6 @@ static bool ptapic_invalid(__unused uint32_t offset)
 {
 	return false;
 }
-
-const struct acrn_apicv_ops ptapic_ops = {
-	.accept_intr = ptapic_accept_intr,
-	.inject_intr = ptapic_inject_intr,
-	.has_pending_delivery_intr = ptapic_has_pending_delivery_intr,
-	.apic_read_access_may_valid = ptapic_invalid,
-	.apic_write_access_may_valid = ptapic_invalid,
-	.x2apic_read_msr_may_valid = ptapic_invalid,
-	.x2apic_write_msr_may_valid = ptapic_invalid,
-};
 
 static inline uint32_t x2apic_msr_to_regoff(uint32_t msr)
 {
