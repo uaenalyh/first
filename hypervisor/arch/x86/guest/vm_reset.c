@@ -27,7 +27,7 @@
 /**
  * @pre vm != NULL
  */
-void triple_fault_shutdown_vm(struct acrn_vcpu *vcpu)
+void fatal_error_shutdown_vm(struct acrn_vcpu *vcpu)
 {
 	struct acrn_vm *vm = vcpu->vm;
 	/* Either SOS or pre-launched VMs */

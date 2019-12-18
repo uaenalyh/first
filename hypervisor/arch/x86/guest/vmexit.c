@@ -266,7 +266,7 @@ static int32_t triple_fault_vmexit_handler(struct acrn_vcpu *vcpu)
 {
 	pr_fatal("VM%d: triple fault @ guest RIP 0x%016lx, exit qualification: 0x%016lx", vcpu->vm->vm_id,
 		exec_vmread(VMX_GUEST_RIP), exec_vmread(VMX_EXIT_QUALIFICATION));
-	triple_fault_shutdown_vm(vcpu);
+	fatal_error_shutdown_vm(vcpu);
 
 	return 0;
 }

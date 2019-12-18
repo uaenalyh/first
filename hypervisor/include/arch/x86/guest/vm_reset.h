@@ -23,7 +23,7 @@
 #include <acrn_common.h>
 
 void shutdown_vm_from_idle(uint16_t pcpu_id);
-void triple_fault_shutdown_vm(struct acrn_vcpu *vcpu);
+void fatal_error_shutdown_vm(struct acrn_vcpu *vcpu);
 
 /**
  * @}
