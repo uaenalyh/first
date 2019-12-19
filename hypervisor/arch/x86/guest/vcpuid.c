@@ -96,22 +96,16 @@ static inline const struct vcpuid_entry *find_vcpuid_entry(
 	return entry;
 }
 
-static inline int32_t set_vcpuid_entry(struct acrn_vm *vm, const struct vcpuid_entry *entry)
+static inline void set_vcpuid_entry(struct acrn_vm *vm, const struct vcpuid_entry *entry)
 {
 	struct vcpuid_entry *tmp;
 	size_t entry_size = sizeof(struct vcpuid_entry);
-	int32_t ret;
 
-	if (vm->vcpuid_entry_nr == MAX_VM_VCPUID_ENTRIES) {
-		pr_err("%s, vcpuid entry over MAX_VM_VCPUID_ENTRIES(%u)\n", __func__, MAX_VM_VCPUID_ENTRIES);
-		ret = -ENOMEM;
-	} else {
-		tmp = &vm->vcpuid_entries[vm->vcpuid_entry_nr];
-		vm->vcpuid_entry_nr++;
-		(void)memcpy_s(tmp, entry_size, entry, entry_size);
-		ret = 0;
-	}
-	return ret;
+	tmp = &vm->vcpuid_entries[vm->vcpuid_entry_nr];
+	vm->vcpuid_entry_nr++;
+	(void)memcpy_s(tmp, entry_size, entry, entry_size);
+
+	return;
 }
 
 /**
@@ -165,100 +159,80 @@ static void init_vcpuid_entry(uint32_t leaf, uint32_t subleaf, uint32_t flags, s
 	}
 }
 
-static int32_t set_vcpuid_extended_function(struct acrn_vm *vm)
+static void set_vcpuid_extended_function(struct acrn_vm *vm)
 {
 	uint32_t i, limit;
 	struct vcpuid_entry entry;
-	int32_t result;
 
 	init_vcpuid_entry(CPUID_MAX_EXTENDED_FUNCTION, 0U, 0U, &entry);
-	result = set_vcpuid_entry(vm, &entry);
+	set_vcpuid_entry(vm, &entry);
 
-	if (result == 0) {
-		limit = entry.eax;
-		vm->vcpuid_xlevel = limit;
-		for (i = CPUID_EXTEND_FUNCTION_2; i <= limit; i++) {
-			init_vcpuid_entry(i, 0U, 0U, &entry);
-			result = set_vcpuid_entry(vm, &entry);
-			if (result != 0) {
-				break;
-			}
-		}
+	limit = entry.eax;
+	vm->vcpuid_xlevel = limit;
+	for (i = CPUID_EXTEND_FUNCTION_2; i <= limit; i++) {
+		init_vcpuid_entry(i, 0U, 0U, &entry);
+		set_vcpuid_entry(vm, &entry);
 	}
 
-	return result;
+	return;
 }
 
-int32_t set_vcpuid_entries(struct acrn_vm *vm)
+void set_vcpuid_entries(struct acrn_vm *vm)
 {
-	int32_t result;
 	struct vcpuid_entry entry;
 	uint32_t limit;
 	uint32_t i, j;
 
 	init_vcpuid_entry(0U, 0U, 0U, &entry);
-	result = set_vcpuid_entry(vm, &entry);
-	if (result == 0) {
-		limit = entry.eax;
-		vm->vcpuid_level = limit;
+	set_vcpuid_entry(vm, &entry);
 
-		for (i = 1U; i <= limit; i++) {
-			/* cpuid 1/0xb is percpu related */
-			if ((i == 1U) || (i == 0xbU) || (i == 0xdU)) {
-				continue;
-			}
+	limit = entry.eax;
+	vm->vcpuid_level = limit;
 
-			switch (i) {
-			case 0x04U:
-				for (j = 0U;; j++) {
-					init_vcpuid_entry(i, j, CPUID_CHECK_SUBLEAF, &entry);
-					if (entry.eax == 0U) {
-						break;
-					}
-					result = set_vcpuid_entry(vm, &entry);
-					if (result != 0) {
-						/* wants to break out of switch */
-						break;
-					}
-				}
-				break;
-			case 0x07U:
-				init_vcpuid_entry(i, 0U, CPUID_CHECK_SUBLEAF, &entry);
-				result = set_vcpuid_entry(vm, &entry);
-				break;
-			/* These features are disabled */
-			case 0x05U: /* Monitor/Mwait */
-			case 0x08U: /* unimplemented leaf */
-			case 0x09U: /* Cache */
-			case 0x0aU: /* PMU is not supported */
-			case 0x0cU: /* unimplemented leaf */
-			case 0x0eU: /* unimplemented leaf */
-			case 0x0fU: /* Intel RDT */
-			case 0x10U: /* Intel RDT */
-			case 0x11U: /* unimplemented leaf */
-			case 0x12U: /* SGX */
-			case 0x13U: /* unimplemented leaf */
-			case 0x14U: /* Intel Processor Trace */
-				break;
-			default:
-				init_vcpuid_entry(i, 0U, 0U, &entry);
-				result = set_vcpuid_entry(vm, &entry);
-				break;
-			}
-
-			/* WARNING: do nothing between break out of switch and before this check */
-			if (result != 0) {
-				/* break out of for */
-				break;
-			}
+	for (i = 1U; i <= limit; i++) {
+		/* cpuid 1/0xb is percpu related */
+		if ((i == 1U) || (i == 0xbU) || (i == 0xdU)) {
+			continue;
 		}
 
-		if (result == 0) {
-			result = set_vcpuid_extended_function(vm);
+		switch (i) {
+		case 0x04U:
+			for (j = 0U;; j++) {
+				init_vcpuid_entry(i, j, CPUID_CHECK_SUBLEAF, &entry);
+				if (entry.eax == 0U) {
+					break;
+				}
+				set_vcpuid_entry(vm, &entry);
+			}
+			break;
+		case 0x07U:
+			init_vcpuid_entry(i, 0U, CPUID_CHECK_SUBLEAF, &entry);
+			set_vcpuid_entry(vm, &entry);
+			break;
+		/* These features are disabled */
+		case 0x05U: /* Monitor/Mwait */
+		case 0x08U: /* unimplemented leaf */
+		case 0x09U: /* Cache */
+		case 0x0aU: /* PMU is not supported */
+		case 0x0cU: /* unimplemented leaf */
+		case 0x0eU: /* unimplemented leaf */
+		case 0x0fU: /* Intel RDT */
+		case 0x10U: /* Intel RDT */
+		case 0x11U: /* unimplemented leaf */
+		case 0x12U: /* SGX */
+		case 0x13U: /* unimplemented leaf */
+		case 0x14U: /* Intel Processor Trace */
+			break;
+		default:
+			init_vcpuid_entry(i, 0U, 0U, &entry);
+			set_vcpuid_entry(vm, &entry);
+			break;
 		}
 	}
 
-	return result;
+	set_vcpuid_extended_function(vm);
+
+	return;
 }
 
 static inline bool is_percpu_related(uint32_t leaf)

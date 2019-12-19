@@ -232,20 +232,18 @@ int32_t create_vm(uint16_t vm_id, struct acrn_vm_config *vm_config, struct acrn_
 	/* Populate return VM handle */
 	*rtn_vm = vm;
 	vm->sw.io_shared_page = NULL;
-	status = set_vcpuid_entries(vm);
+	set_vcpuid_entries(vm);
 
-	if (status == 0) {
-		vm->state = VM_CREATED;
-		/* We have assumptions:
-		 *   1) vcpus used by SOS has been offlined by DM before UOS re-use it.
-		 *   2) vcpu_affinity[] passed sanitization is OK for vcpu creating.
-		 */
-		for (i = 0U; i < vm_config->vcpu_num; i++) {
-			pcpu_id = ffs64(vm_config->vcpu_affinity[i]);
-			status = prepare_vcpu(vm, pcpu_id);
-			if (status != 0) {
-				break;
-			}
+	vm->state = VM_CREATED;
+	/* We have assumptions:
+	 *   1) vcpus used by SOS has been offlined by DM before UOS re-use it.
+	 *   2) vcpu_affinity[] passed sanitization is OK for vcpu creating.
+	 */
+	for (i = 0U; i < vm_config->vcpu_num; i++) {
+		pcpu_id = ffs64(vm_config->vcpu_affinity[i]);
+		status = prepare_vcpu(vm, pcpu_id);
+		if (status != 0) {
+			break;
 		}
 	}
 
