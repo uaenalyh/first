@@ -34,10 +34,10 @@ test_launch_cl_zephyr_job:
     - schedules
     
     
-test_launch_acrn_unit_test_job:
+test_srs_job:
   stage: test
   script:
-    - echo "start to test lauching acrn unit test ..."
+    - echo "start to test srs lauching acrn unit test ..."
     - pwd
     - /opt/fusa_ci.sh launch_acrn_unit_test
   dependencies:
@@ -47,6 +47,50 @@ test_launch_acrn_unit_test_job:
     - schedules
     
     
+test_sas_job:
+  stage: test
+  script:
+    - echo "start to test sas build ..."
+    - pwd
+    - mkdir ./image
+    - cd ../acrn-sas-test-code/host/
+    - make clean
+    - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
+    - make boot RELEASE=1 UT=1
+    - cp ../build/acrn-unit-test/host/bin/boot.32.out ../../acrn-sliced-mainline/image/
+    - make clean
+    - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
+    - make hw RELEASE=1 UT=1
+    - cp ../build/acrn-unit-test/host/bin/hw.32.out ../../acrn-sliced-mainline/image/
+    - make clean
+    - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
+    - make init RELEASE=1 UT=1
+    - cp ../build/acrn-unit-test/host/bin/init.32.out ../../acrn-sliced-mainline/image/
+    - make clean
+    - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
+    - make lib RELEASE=1 UT=1
+    - cp ../build/acrn-unit-test/host/bin/lib.32.out ../../acrn-sliced-mainline/image/
+    - make clean
+    - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
+    - make vp-base RELEASE=0 UT=1
+    - cp ../build/acrn-unit-test/host/bin/vp-base.32.out ../../acrn-sliced-mainline/image/
+    - make clean
+    - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
+    - make vp-dm RELEASE=0 UT=1
+    - cp ../build/acrn-unit-test/host/bin/vp-dm.32.out ../../acrn-sliced-mainline/image/
+    - cp ../host/guest/x86/stitched.bzimage ../../acrn-sliced-mainline/image/
+    - /opt/fusa_ci.sh sas
+  dependencies:
+    - build_job
+  artifacts:
+    paths:
+      - image/
+    expire_in: 3 weeks
+  only:
+    - merge_requests
+    - schedules
+
+
 deploy_build_job:
   stage: deploy
   script:
