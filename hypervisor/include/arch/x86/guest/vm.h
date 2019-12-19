@@ -179,9 +179,6 @@ struct acrn_vm *get_vm_from_vmid(uint16_t vm_id);
 
 int32_t direct_boot_sw_loader(struct acrn_vm *vm);
 
-typedef int32_t (*vm_sw_loader_t)(struct acrn_vm *vm);
-extern vm_sw_loader_t vm_sw_loader;
-
 void vrtc_init(struct acrn_vm *vm);
 
 bool is_safety_vm(const struct acrn_vm *vm);

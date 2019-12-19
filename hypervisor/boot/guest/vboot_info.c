@@ -94,7 +94,7 @@ static void *get_kernel_load_addr(struct acrn_vm *vm)
 /**
  * @pre vm != NULL && mod != NULL
  */
-static int32_t init_vm_kernel_info(struct acrn_vm *vm, const struct multiboot_module *mod)
+static void init_vm_kernel_info(struct acrn_vm *vm, const struct multiboot_module *mod)
 {
 	struct acrn_vm_config *vm_config = get_vm_config(vm->vm_id);
 
@@ -102,12 +102,8 @@ static int32_t init_vm_kernel_info(struct acrn_vm *vm, const struct multiboot_mo
 
 	vm->sw.kernel_type = vm_config->os_config.kernel_type;
 	vm->sw.kernel_info.kernel_src_addr = hpa2hva((uint64_t)mod->mm_mod_start);
-	if ((vm->sw.kernel_info.kernel_src_addr != NULL) && (mod->mm_mod_end > mod->mm_mod_start)) {
-		vm->sw.kernel_info.kernel_size = mod->mm_mod_end - mod->mm_mod_start;
-		vm->sw.kernel_info.kernel_load_addr = get_kernel_load_addr(vm);
-	}
-
-	return (vm->sw.kernel_info.kernel_load_addr == NULL) ? (-EINVAL) : 0;
+	vm->sw.kernel_info.kernel_size = mod->mm_mod_end - mod->mm_mod_start;
+	vm->sw.kernel_info.kernel_load_addr = get_kernel_load_addr(vm);
 }
 
 /**
@@ -153,79 +149,37 @@ static uint32_t get_mod_idx_by_tag(const struct multiboot_module *mods, uint32_t
 
 /* @pre vm != NULL && mbi != NULL
  */
-static int32_t init_vm_sw_load(struct acrn_vm *vm, const struct multiboot_info *mbi)
+static void init_vm_sw_load(struct acrn_vm *vm, const struct multiboot_info *mbi)
 {
 	struct acrn_vm_config *vm_config = get_vm_config(vm->vm_id);
 	struct multiboot_module *mods = (struct multiboot_module *)hpa2hva((uint64_t)mbi->mi_mods_addr);
 	uint32_t mod_idx;
-	int32_t ret = -EINVAL;
-
 	dev_dbg(ACRN_DBG_BOOT, "mod counts=%d\n", mbi->mi_mods_count);
 
-	if (mods != NULL) {
-		mod_idx = get_mod_idx_by_tag(mods, mbi->mi_mods_count, vm_config->os_config.kernel_mod_tag);
-		if (mod_idx != INVALID_MOD_IDX) {
-			ret = init_vm_kernel_info(vm, &mods[mod_idx]);
-		}
-	}
-
-	if (ret == 0) {
-		init_vm_bootargs_info(vm, mbi);
-		/* check whether there is a ramdisk module */
-		mod_idx = get_mod_idx_by_tag(mods, mbi->mi_mods_count, vm_config->os_config.ramdisk_mod_tag);
-		if (mod_idx != INVALID_MOD_IDX) {
-			init_vm_ramdisk_info(vm, &mods[mod_idx]);
-			/* TODO: prepare other modules like firmware, seedlist */
-		}
-	} else {
-		pr_err("failed to load VM %d kernel module", vm->vm_id);
-	}
-	return ret;
+	mod_idx = get_mod_idx_by_tag(mods, mbi->mi_mods_count, vm_config->os_config.kernel_mod_tag);
+	init_vm_kernel_info(vm, &mods[mod_idx]);
+	init_vm_bootargs_info(vm, mbi);
 }
 
 /**
  * @pre vm != NULL
  */
-static int32_t init_general_vm_boot_info(struct acrn_vm *vm)
+static void init_general_vm_boot_info(struct acrn_vm *vm)
 {
-	struct multiboot_info *mbi = NULL;
-	int32_t ret = -EINVAL;
-
-	if (boot_regs[0] != MULTIBOOT_INFO_MAGIC) {
-		panic("no multiboot info found");
-	} else {
-		mbi = (struct multiboot_info *)hpa2hva((uint64_t)boot_regs[1]);
-
-		if (mbi != NULL) {
-			stac();
-			dev_dbg(ACRN_DBG_BOOT, "Multiboot detected, flag=0x%x", mbi->mi_flags);
-			if ((mbi->mi_flags & MULTIBOOT_INFO_HAS_MODS) == 0U) {
-				panic("no multiboot module info found");
-			} else {
-				ret = init_vm_sw_load(vm, mbi);
-			}
-			clac();
-		}
-	}
-	return ret;
+	struct multiboot_info *mbi = (struct multiboot_info *)hpa2hva((uint64_t)boot_regs[1]);
+	stac();
+	dev_dbg(ACRN_DBG_BOOT, "Multiboot detected, flag=0x%x", mbi->mi_flags);
+	init_vm_sw_load(vm, mbi);
+	clac();
 }
 
 /**
  * @param[inout] vm pointer to a vm descriptor
- *
- * @retval 0 on success
- * @retval -EINVAL on invalid parameters
- *
  * @pre vm != NULL
  */
-int32_t init_vm_boot_info(struct acrn_vm *vm)
+void init_vm_boot_info(struct acrn_vm *vm)
 {
-	int32_t ret = 0;
-
-	vm_sw_loader = direct_boot_sw_loader;
-	ret = init_general_vm_boot_info(vm);
-
-	return ret;
+	init_general_vm_boot_info(vm);
 }
 
 /**

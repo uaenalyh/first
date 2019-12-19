@@ -49,8 +49,6 @@
  * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
  */
 
-vm_sw_loader_t vm_sw_loader;
-
 /* Local variables */
 
 static struct acrn_vm vm_array[CONFIG_MAX_VM_NUM] __aligned(PAGE_SIZE);
@@ -205,43 +203,39 @@ int32_t create_vm(uint16_t vm_id, struct acrn_vm_config *vm_config, struct acrn_
 
 	create_prelaunched_vm_e820(vm);
 	prepare_prelaunched_vm_memmap(vm, vm_config);
-	status = init_vm_boot_info(vm);
+        init_vm_boot_info(vm);
+
+	prepare_epc_vm_memmap(vm);
+
+	spinlock_init(&vm->vm_lock);
+	spinlock_init(&vm->emul_mmio_lock);
+
+	vm->arch_vm.vlapic_state = VM_VLAPIC_X2APIC;
+	vm->intr_inject_delay_delta = 0UL;
+
+	/* Set up IO bit-mask such that VM exit occurs on
+	 * selected IO ranges
+	 */
+	setup_io_bitmap(vm);
+
+	/* Create virtual uart;*/
+	init_vuart(vm, vm_config->vuart);
+
+	vrtc_init(vm);
+
+	vpci_init(vm);
+	enable_iommu();
+
+	/* vpic wire_mode default is INTR */
+	vm->wire_mode = VPIC_WIRE_INTR;
+
+	/* Populate return VM handle */
+	*rtn_vm = vm;
+	vm->sw.io_shared_page = NULL;
+	status = set_vcpuid_entries(vm);
 
 	if (status == 0) {
-		prepare_epc_vm_memmap(vm);
-
-		spinlock_init(&vm->vm_lock);
-		spinlock_init(&vm->emul_mmio_lock);
-
-		vm->arch_vm.vlapic_state = VM_VLAPIC_X2APIC;
-		vm->intr_inject_delay_delta = 0UL;
-
-		/* Set up IO bit-mask such that VM exit occurs on
-		 * selected IO ranges
-		 */
-		setup_io_bitmap(vm);
-
-		/* Create virtual uart;*/
-		init_vuart(vm, vm_config->vuart);
-
-		vrtc_init(vm);
-
-		vpci_init(vm);
-		enable_iommu();
-
-		/* vpic wire_mode default is INTR */
-		vm->wire_mode = VPIC_WIRE_INTR;
-
-		/* Populate return VM handle */
-		*rtn_vm = vm;
-		vm->sw.io_shared_page = NULL;
-		status = set_vcpuid_entries(vm);
-		if (status == 0) {
-			vm->state = VM_CREATED;
-		}
-	}
-
-	if (status == 0) {
+		vm->state = VM_CREATED;
 		/* We have assumptions:
 		 *   1) vcpus used by SOS has been offlined by DM before UOS re-use it.
 		 *   2) vcpu_affinity[] passed sanitization is OK for vcpu creating.
@@ -392,7 +386,7 @@ void prepare_vm(uint16_t vm_id, struct acrn_vm_config *vm_config)
 	if (err == 0) {
 		build_vacpi(vm);
 
-		(void)vm_sw_loader(vm);
+		(void)direct_boot_sw_loader(vm);
 
 		/* start vm BSP automatically */
 		start_vm(vm);
