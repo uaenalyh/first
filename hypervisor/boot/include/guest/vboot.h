@@ -25,4 +25,5 @@
  * @}
  */
 
+uint64_t get_ap_trampoline_buf(void);
 #endif /* end of include guard: VBOOT_H */

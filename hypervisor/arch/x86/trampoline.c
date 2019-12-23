@@ -27,6 +27,30 @@
 
 static uint64_t trampoline_start16_paddr;
 
+uint64_t get_ap_trampoline_buf(void)
+{
+        struct multiboot_info *mbi;
+        uint32_t size = CONFIG_LOW_RAM_SIZE;
+        uint64_t ret = e820_alloc_low_memory(size);
+        uint64_t end = ret + size;
+
+        mbi = (struct multiboot_info *)hpa2hva((uint64_t)boot_regs[1]);
+        if ((end > mbi->mi_mmap_addr) && (ret < (mbi->mi_mmap_addr + mbi->mi_mmap_length))) {
+                panic("overlaped with memroy map");
+        }
+
+        if ((end > (uint64_t)mbi) && (ret < ((uint64_t)mbi + sizeof(struct multiboot_info)))) {
+                panic("overlaped with multiboot information");
+        }
+
+        if ((end > mbi->mi_mods_addr) &&
+                (ret < (mbi->mi_mods_addr + mbi->mi_mods_count * sizeof(struct multiboot_module)))) {
+                panic("overlaped with module address");
+        }
+
+        return ret;
+}
+
 /*
  * Because trampoline code is relocated in different way, if HV code
  * accesses trampoline using relative addressing, it needs to take
@@ -102,7 +126,7 @@ uint64_t prepare_trampoline(void)
 	uint64_t size, dest_pa, i;
 
 	size = (uint64_t)(&ld_trampoline_end - &ld_trampoline_start);
-	dest_pa = e820_alloc_low_memory(CONFIG_LOW_RAM_SIZE);
+	dest_pa = get_ap_trampoline_buf();
 
 	pr_dbg("trampoline code: %lx size %x", dest_pa, size);
 
