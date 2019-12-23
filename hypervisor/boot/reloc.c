@@ -45,17 +45,7 @@ struct Elf64_Rel {
 /* get the delta between CONFIG_HV_RAM_START and the actual load address */
 uint64_t get_hv_image_delta(void)
 {
-	uint64_t addr;
-
-	asm volatile(" call 0f\n"
-		     "0: pop %%rax\n"
-		     "	sub $0b, %%rax\n"
-		     "	mov %%rax, %0\n"
-		     : "=m"(addr)
-		     :
-		     : "%rax");
-
-	return addr;
+	return 0UL;
 }
 
 /* get the actual Hypervisor load address (HVA) */
