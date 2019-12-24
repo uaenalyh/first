@@ -297,15 +297,10 @@ static void intercept_x2apic_msrs(uint8_t *msr_bitmap_arg, uint32_t mode)
  */
 static void init_msr_area(struct acrn_vcpu *vcpu)
 {
-	struct acrn_vm_config *cfg = get_vm_config(vcpu->vm->vm_id);
-
-	vcpu->arch.msr_area.count = 0U;
-
 	vcpu->arch.msr_area.guest[MSR_AREA_TSC_AUX].msr_index = MSR_IA32_TSC_AUX;
 	vcpu->arch.msr_area.guest[MSR_AREA_TSC_AUX].value = vcpu->vcpu_id;
 	vcpu->arch.msr_area.host[MSR_AREA_TSC_AUX].msr_index = MSR_IA32_TSC_AUX;
 	vcpu->arch.msr_area.host[MSR_AREA_TSC_AUX].value = pcpuid_from_vcpu(vcpu);
-	vcpu->arch.msr_area.count++;
 }
 
 /**
