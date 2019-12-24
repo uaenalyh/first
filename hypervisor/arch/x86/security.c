@@ -32,39 +32,6 @@
 
 static bool skip_l1dfl_vmentry;
 static bool cpu_md_clear;
-static int32_t ibrs_type;
-
-static void detect_ibrs(void)
-{
-	/* For speculation defence.
-	 * The default way is to set IBRS at vmexit and then do IBPB at vcpu
-	 * context switch(ibrs_type == IBRS_RAW).
-	 * Now provide an optimized way (ibrs_type == IBRS_OPT) which set
-	 * STIBP and do IBPB at vmexit,since having STIBP always set has less
-	 * impact than having IBRS always set. Also since IBPB is already done
-	 * at vmexit, it is no necessary to do so at vcpu context switch then.
-	 */
-	ibrs_type = IBRS_NONE;
-
-	/* Currently for APL, if we enabled retpoline, then IBRS should not
-	 * take effect
-	 * TODO: add IA32_ARCH_CAPABILITIES[1] check, if this bit is set, IBRS
-	 * should be set all the time instead of relying on retpoline
-	 */
-#ifndef CONFIG_RETPOLINE
-	if (pcpu_has_cap(X86_FEATURE_IBRS_IBPB)) {
-		ibrs_type = IBRS_RAW;
-		if (pcpu_has_cap(X86_FEATURE_STIBP)) {
-			ibrs_type = IBRS_OPT;
-		}
-	}
-#endif
-}
-
-int32_t get_ibrs_type(void)
-{
-	return ibrs_type;
-}
 
 bool check_cpu_security_cap(void)
 {
@@ -72,8 +39,6 @@ bool check_cpu_security_cap(void)
 	bool mds_no = false;
 	bool ssb_no = false;
 	uint64_t x86_arch_capabilities;
-
-	detect_ibrs();
 
 	if (pcpu_has_cap(X86_FEATURE_ARCH_CAP)) {
 		x86_arch_capabilities = msr_read(MSR_IA32_ARCH_CAPABILITIES);

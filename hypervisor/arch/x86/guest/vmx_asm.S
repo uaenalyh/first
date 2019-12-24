@@ -27,7 +27,7 @@
 
     .text
 
-/*int vmx_vmrun(struct run_context *context, int32_t launch, int32_t ibrs_type) */
+/*int vmx_vmrun(struct run_context *context, int32_t launch)*/
    .code64
    .align       8
    .global      vmx_vmrun
@@ -46,22 +46,6 @@ vmx_vmrun:
     /* Save RDI on top of host stack for easy access to VCPU pointer
        on return from guest context */
     push	%rdi
-
-    /* rdx = ibrs_type */
-    /* if ibrs_type != IBRS_NONE, means IBRS feature is supported,
-     * restore MSR SPEC_CTRL to guest
-     */
-    cmp	 $IBRS_NONE,%rdx
-    je	  next
-
-    /* 0x00000048 = MSR_IA32_SPEC_CTRL */
-    movl	$0x00000048,%ecx
-    /*0xa8=168U=CPU_CONTEXT_OFFSET_IA32_SPEC_CTRL*/
-    mov	 0xa8(%rdi),%rax
-    movl	$0,%edx
-    wrmsr
-
-next:
 
     /* Load VMCS_HOST_RSP_FIELD field value
      *
@@ -208,54 +192,6 @@ vm_eval_error:
     xor	 %r9,%r9
     xor	 %r10,%r10
     xor	 %r11,%r11
-
-    /* rdx = ibrs_type */
-    /* IBRS_NONE: no ibrs setting, just flush rsb
-     * IBRS_RAW: set IBRS then flush rsb
-     * IBRS_OPT: set STIBP & IBPB then flush rsb
-     */
-    cmp	 $IBRS_NONE,%rdx
-    je	  stuff_rsb
-
-    cmp	 $IBRS_OPT,%rdx
-    je	  ibrs_opt
-
-    /* Save guest MSR SPEC_CTRL, low 32 bit is enough
-     *
-     *     0x00000048 = MSR_IA32_SPEC_CTRL
-     */
-    movl	$0x00000048,%ecx
-    rdmsr
-    /*168U=0xa8=CPU_CONTEXT_OFFSET_IA32_SPEC_CTRL*/
-    mov	 %rax,0xa8(%rsi)
-    /* 0x1 = SPEC_ENABLE_IBRS */
-    movl	$0x1,%eax
-    movl	$0,%edx
-    wrmsr
-
-    jmp	 stuff_rsb
-
-ibrs_opt:
-
-    /* 0x00000049 = MSR_IA32_PRED_CMD */
-    movl	$0x00000049,%ecx
-    /* 0x1 = PRED_SET_IBPB */
-    movl	$0x1,%eax
-    movl	$0,%edx
-    wrmsr
-
-    /* Save guest MSR SPEC_CTRL, low 32 bit is enough
-     *
-     *     0x00000048 = MSR_IA32_SPEC_CTRL
-     */
-    movl	$0x00000048,%ecx
-    rdmsr
-    /*168U=0xa8=CPU_CONTEXT_OFFSET_IA32_SPEC_CTRL*/
-    mov	 %rax,0xa8(%rsi)
-    /* 0x2 = SPEC_ENABLE_STIBP */
-    movl	$0x2,%eax
-    movl	$0,%edx
-    wrmsr
 
     /* stuff rsb by 32 CALLs, make sure no any "ret" is executed before this
      * stuffing rsb, otherwise, someone may insert some code before this for

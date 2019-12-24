@@ -151,12 +151,10 @@ endif
 # retpoline support
 ifeq (true, $(shell [ $(GCC_MAJOR) -eq 7 ] && [ $(GCC_MINOR) -ge 3 ] && echo true))
 CFLAGS += -mindirect-branch=thunk-extern -mindirect-branch-register
-CFLAGS += -DCONFIG_RETPOLINE
 LIB_S_SRCS += arch/x86/lib/retpoline-thunk.S
 else
 ifeq (true, $(shell [ $(GCC_MAJOR) -ge 8 ] && echo true))
 CFLAGS += -mindirect-branch=thunk-extern -mindirect-branch-register
-CFLAGS += -DCONFIG_RETPOLINE
 LIB_S_SRCS += arch/x86/lib/retpoline-thunk.S
 endif
 endif

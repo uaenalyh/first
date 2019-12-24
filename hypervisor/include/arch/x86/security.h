@@ -20,17 +20,7 @@
  * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
  */
 
-/* type of speculation control
- * 0 - no speculation control support
- * 1 - raw IBRS + IBPB support
- * 2 - with STIBP optimization support
- */
-#define IBRS_NONE 0
-#define IBRS_RAW  1
-#define IBRS_OPT  2
-
 #ifndef ASSEMBLER
-int32_t get_ibrs_type(void);
 bool check_cpu_security_cap(void);
 void cpu_internal_buffers_clear(void);
 bool is_ept_force_4k_ipage(void);

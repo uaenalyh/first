@@ -417,7 +417,6 @@ int32_t run_vcpu(struct acrn_vcpu *vcpu)
 	uint64_t rip, ia32_efer, cr0;
 	struct run_context *ctx = &vcpu->arch.contexts[vcpu->arch.cur_context].run_ctx;
 	int32_t status = 0;
-	int32_t ibrs_type = get_ibrs_type();
 
 	if (bitmap_test_and_clear_lock(CPU_REG_RIP, &vcpu->reg_updated)) {
 		exec_vmwrite(VMX_GUEST_RIP, ctx->rip);
@@ -462,15 +461,6 @@ int32_t run_vcpu(struct acrn_vcpu *vcpu)
 		/* Set vcpu launched */
 		vcpu->launched = true;
 
-		/* avoid VMCS recycling RSB usage, set IBPB.
-		 * NOTE: this should be done for any time vmcs got switch
-		 * currently, there is no other place to do vmcs switch
-		 * Please add IBPB set for future vmcs switch case(like trusty)
-		 */
-		if (ibrs_type == IBRS_RAW) {
-			msr_write(MSR_IA32_PRED_CMD, PRED_SET_IBPB);
-		}
-
 #ifdef CONFIG_L1D_FLUSH_VMENTRY_ENABLED
 		cpu_l1d_flush();
 #endif
@@ -479,7 +469,7 @@ int32_t run_vcpu(struct acrn_vcpu *vcpu)
 		cpu_internal_buffers_clear();
 
 		/* Launch the VM */
-		status = vmx_vmrun(ctx, VM_LAUNCH, ibrs_type);
+		status = vmx_vmrun(ctx, VM_LAUNCH);
 
 		/* See if VM launched successfully */
 		if (status == 0) {
@@ -502,7 +492,7 @@ int32_t run_vcpu(struct acrn_vcpu *vcpu)
 		cpu_internal_buffers_clear();
 
 		/* Resume the VM */
-		status = vmx_vmrun(ctx, VM_RESUME, ibrs_type);
+		status = vmx_vmrun(ctx, VM_RESUME);
 	}
 
 	vcpu->reg_cached = 0UL;
