@@ -54,11 +54,9 @@ static void pio_default_write(
  *
  * @pre io_req->io_type == REQ_PORTIO
  *
- * @retval 0 Successfully emulated by registered handlers.
- * @retval -ENODEV No proper handler found.
- * @retval -EIO The request spans multiple devices and cannot be emulated.
+ * @retval void
  */
-static int32_t hv_emulate_pio(struct acrn_vcpu *vcpu, struct io_request *io_req)
+static void hv_emulate_pio(struct acrn_vcpu *vcpu, struct io_request *io_req)
 {
 	uint16_t port, size;
 	uint32_t idx;
@@ -100,8 +98,6 @@ static int32_t hv_emulate_pio(struct acrn_vcpu *vcpu, struct io_request *io_req)
 
 	pr_dbg("IO %s on port %04x, data %08x", (pio_req->direction == REQUEST_READ) ? "read" : "write", port,
 		pio_req->value);
-
-	return 0;
 }
 
 /**
@@ -117,33 +113,12 @@ static int32_t hv_emulate_pio(struct acrn_vcpu *vcpu, struct io_request *io_req)
  * @param vcpu The virtual CPU that triggers the MMIO access
  * @param io_req The I/O request holding the details of the MMIO access
  *
- * @retval 0 Successfully emulated by registered handlers.
- * @retval IOREQ_PENDING The I/O request is delivered to VHM.
- * @retval -EIO The request spans multiple devices and cannot be emulated.
- * @retval -EINVAL \p io_req has an invalid io_type.
- * @retval <0 on other errors during emulation.
+ * @retval void
  */
-int32_t emulate_io(struct acrn_vcpu *vcpu, struct io_request *io_req)
+void emulate_io(struct acrn_vcpu *vcpu, struct io_request *io_req)
 {
-	int32_t status;
-	struct acrn_vm_config *vm_config;
-
-	vm_config = get_vm_config(vcpu->vm->vm_id);
-
-	switch (io_req->io_type) {
-	case REQ_PORTIO:
-		status = hv_emulate_pio(vcpu, io_req);
-		if (status == 0) {
-			emulate_pio_complete(vcpu, io_req);
-		}
-		break;
-	default:
-		/* Unknown I/O request io_type */
-		status = -EINVAL;
-		break;
-	}
-
-	return status;
+	hv_emulate_pio(vcpu, io_req);
+	emulate_pio_complete(vcpu, io_req);
 }
 
 /**

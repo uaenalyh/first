@@ -61,7 +61,6 @@ void emulate_pio_complete(struct acrn_vcpu *vcpu, const struct io_request *io_re
  */
 int32_t pio_instr_vmexit_handler(struct acrn_vcpu *vcpu)
 {
-	int32_t status;
 	uint64_t exit_qual;
 	uint32_t mask;
 	int32_t cur_context_idx = vcpu->arch.cur_context;
@@ -70,7 +69,6 @@ int32_t pio_instr_vmexit_handler(struct acrn_vcpu *vcpu)
 
 	exit_qual = vcpu->arch.exit_qualification;
 
-	io_req->io_type = REQ_PORTIO;
 	pio_req->size = vm_exit_io_instruction_size(exit_qual) + 1UL;
 	pio_req->address = vm_exit_io_instruction_port_number(exit_qual);
 	if (vm_exit_io_instruction_access_direction(exit_qual) == 0UL) {
@@ -84,9 +82,9 @@ int32_t pio_instr_vmexit_handler(struct acrn_vcpu *vcpu)
 	TRACE_4I(TRACE_VMEXIT_IO_INSTRUCTION, (uint32_t)pio_req->address, (uint32_t)pio_req->direction,
 		(uint32_t)pio_req->size, (uint32_t)cur_context_idx);
 
-	status = emulate_io(vcpu, io_req);
+	emulate_io(vcpu, io_req);
 
-	return status;
+	return 0;
 }
 
 int32_t ept_violation_vmexit_handler(struct acrn_vcpu *vcpu)

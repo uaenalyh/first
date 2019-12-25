@@ -35,12 +35,6 @@
  * @brief Internal representation of a I/O request.
  */
 struct io_request {
-	/**
-	 * @brief Type of the request (PIO, MMIO, etc).
-	 *
-	 * Refer to vhm_request for detailed description of I/O request types.
-	 */
-	uint32_t io_type;
 
 	/**
 	 * @brief Details of this request in the same format as vhm_request.
@@ -130,13 +124,9 @@ struct vm_io_handler_desc {
  * @param vcpu The virtual CPU that triggers the MMIO access
  * @param io_req The I/O request holding the details of the MMIO access
  *
- * @retval 0 Successfully emulated by registered handlers.
- * @retval IOREQ_PENDING The I/O request is delivered to VHM.
- * @retval -EIO The request spans multiple devices and cannot be emulated.
- * @retval -EINVAL \p io_req has an invalid type.
- * @retval <0 on other errors during emulation.
+ * @retval void
  */
-int32_t emulate_io(struct acrn_vcpu *vcpu, struct io_request *io_req);
+void emulate_io(struct acrn_vcpu *vcpu, struct io_request *io_req);
 
 /**
  * @brief Register a port I/O handler

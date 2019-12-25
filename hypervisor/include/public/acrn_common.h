@@ -34,8 +34,6 @@
  * Common structures for ACRN/VHM/DM
  */
 
-#define REQ_PORTIO 0U
-
 #define REQUEST_READ  0U
 #define REQUEST_WRITE 1U
 
