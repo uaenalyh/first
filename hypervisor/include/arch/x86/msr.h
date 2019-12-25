@@ -237,8 +237,6 @@ void update_msr_bitmap_x2apic_passthru(struct acrn_vcpu *vcpu);
 		(PAT_MEM_TYPE_UC << 32U) + (PAT_MEM_TYPE_UC << 40U) + (PAT_MEM_TYPE_UC << 48U) +           \
 		(PAT_MEM_TYPE_UC << 56U))
 
-#define PRED_SET_IBPB (1U << 0U)
-
 #define IA32_ARCH_CAP_SKIP_L1DFL_VMENTRY (1UL << 3U)
 #define IA32_ARCH_CAP_SSB_NO             (1UL << 4U)
 #define IA32_ARCH_CAP_MDS_NO             (1UL << 5U)

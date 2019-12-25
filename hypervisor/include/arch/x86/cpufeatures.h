@@ -26,7 +26,6 @@
 /* Intel-defined CPU features, CPUID level 0x00000007 (EDX)*/
 #define X86_FEATURE_MDS_CLEAR ((FEAT_7_0_EDX << 5U) + 10U)
 #define X86_FEATURE_IBRS_IBPB ((FEAT_7_0_EDX << 5U) + 26U)
-#define X86_FEATURE_STIBP     ((FEAT_7_0_EDX << 5U) + 27U)
 #define X86_FEATURE_L1D_FLUSH ((FEAT_7_0_EDX << 5U) + 28U)
 #define X86_FEATURE_ARCH_CAP  ((FEAT_7_0_EDX << 5U) + 29U)
 #define X86_FEATURE_SSBD      ((FEAT_7_0_EDX << 5U) + 31U)

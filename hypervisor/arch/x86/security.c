@@ -64,7 +64,7 @@ bool check_cpu_security_cap(void)
 		ret = false;
 	}
 
-	if ((!pcpu_has_cap(X86_FEATURE_IBRS_IBPB)) && (!pcpu_has_cap(X86_FEATURE_STIBP))) {
+	if (!pcpu_has_cap(X86_FEATURE_IBRS_IBPB)) {
 		ret = false;
 	}
 

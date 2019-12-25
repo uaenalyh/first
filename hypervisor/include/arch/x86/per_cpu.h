@@ -38,7 +38,7 @@ struct per_cpu_region {
 	void *vmcs_run;
 	struct acrn_vcpu *ever_run_vcpu;
 #ifdef STACK_PROTECTOR
-	struct stack_canary stk_canary;
+	struct stack_canary stk_canary __aligned(8);
 #endif
 	struct sched_control sched_ctl;
 	struct sched_noop_control sched_noop_ctl;
