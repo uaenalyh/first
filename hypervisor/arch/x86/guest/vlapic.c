@@ -75,6 +75,7 @@
 #define APICBASE_ENABLED 0x00000800UL
 #define LOGICAL_ID_MASK  0xFU
 #define CLUSTER_ID_MASK  0xFFFF0U
+#define APIC_ICR_MASK    0x000C0FFFUL
 
 #define ACRN_DBG_LAPIC 6U
 
@@ -326,6 +327,9 @@ static int32_t vlapic_read(struct acrn_vlapic *vlapic, uint32_t offset_arg, uint
 		case APIC_OFFSET_LDR:
 			*data = lapic->ldr.v;
 			break;
+		case APIC_OFFSET_ICR_LOW:
+			*data = ((uint64_t)lapic->icr_lo.v) | (((uint64_t)lapic->icr_hi.v) << 32UL);
+			break;
 		default:
 			ret = -EACCES;
 			break;
@@ -467,6 +471,7 @@ int32_t vlapic_x2apic_read(struct acrn_vcpu *vcpu, uint32_t msr, uint64_t *val)
 	switch (msr) {
 	case MSR_IA32_EXT_APIC_LDR:
 	case MSR_IA32_EXT_XAPICID:
+	case MSR_IA32_EXT_APIC_ICR:
 		offset = x2apic_msr_to_regoff(msr);
 		error = vlapic_read(vlapic, offset, val);
 		break;
@@ -481,6 +486,7 @@ int32_t vlapic_x2apic_read(struct acrn_vcpu *vcpu, uint32_t msr, uint64_t *val)
 int32_t vlapic_x2apic_write(struct acrn_vcpu *vcpu, uint32_t msr, uint64_t val)
 {
 	struct acrn_vlapic *vlapic;
+	struct lapic_regs *lapic;
 	int32_t error = -1;
 
 	/*
@@ -488,8 +494,11 @@ int32_t vlapic_x2apic_write(struct acrn_vcpu *vcpu, uint32_t msr, uint64_t val)
 	 * inject a GP to guest
 	 */
 	vlapic = vcpu_vlapic(vcpu);
+	lapic = &(vlapic->apic_page);
 	switch (msr) {
 	case MSR_IA32_EXT_APIC_ICR:
+		lapic->icr_hi.v = (uint32_t)(val >> 32UL);
+		lapic->icr_lo.v = (uint32_t)(val & APIC_ICR_MASK);
 		error = vlapic_x2apic_pt_icr_access(vcpu->vm, val);
 		break;
 	default:
