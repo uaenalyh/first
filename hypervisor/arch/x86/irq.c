@@ -17,6 +17,7 @@
 #include <softirq.h>
 #include <dump.h>
 #include <logmsg.h>
+#include <vcpu.h>
 
 /**
  * @defgroup hwmgmt hwmgmt
@@ -322,16 +323,16 @@ void dispatch_exception(struct intr_excp_ctx *ctx)
 	/* Release lock to let other CPUs handle exception */
 	spinlock_release(&exception_spinlock);
 
-	/* Halt the CPU */
-	cpu_dead();
+	/* panic the CPU */
+	panic("Unexpected expection.");
 }
 
-void handle_nmi(__unused struct intr_excp_ctx *ctx)
+void handle_nmi(struct intr_excp_ctx *ctx)
 {
 	/*
-	 * Just ignore the NMI here for now.
-	 * TODO: implement specific NMI handling function.
+	 * If the NMI happened in root mode, ARCN hypervisor shall inject it to guest vm.
 	 */
+	(void)vcpu_queue_exception(get_cpu_var(ever_run_vcpu), ctx->vector, ctx->error_code);
 }
 
 static void init_irq_descs(void)
