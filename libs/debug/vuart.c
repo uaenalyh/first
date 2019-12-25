@@ -338,7 +338,7 @@ static bool vuart_write(struct acrn_vcpu *vcpu, uint16_t offset_arg,
 	return true;
 }
 
-static bool vuart_read(struct acrn_vcpu *vcpu, uint16_t offset_arg,
+static void vuart_read(struct acrn_vcpu *vcpu, uint16_t offset_arg,
 			__unused size_t width)
 {
 	struct acrn_vm *vm = vcpu->vm;
@@ -420,8 +420,6 @@ static bool vuart_read(struct acrn_vcpu *vcpu, uint16_t offset_arg,
 		pio_req->value = (uint32_t)reg;
 		vuart_unlock(vu);
 	}
-
-	return true;
 }
 
 /*

@@ -30,13 +30,11 @@
  * @pre vcpu != NULL
  * @pre vcpu->vm != NULL
  */
-static bool pio_default_read(struct acrn_vcpu *vcpu, __unused uint16_t addr, size_t width)
+static void pio_default_read(struct acrn_vcpu *vcpu, __unused uint16_t addr, size_t width)
 {
 	struct pio_request *pio_req = &vcpu->req.reqs.pio;
 
 	pio_req->value = (uint32_t)((1UL << (width * 8U)) - 1UL);
-
-	return true;
 }
 
 /**
@@ -44,10 +42,10 @@ static bool pio_default_read(struct acrn_vcpu *vcpu, __unused uint16_t addr, siz
  * @pre vcpu != NULL
  * @pre vcpu->vm != NULL
  */
-static bool pio_default_write(
+static void pio_default_write(
 	__unused struct acrn_vcpu *vcpu, __unused uint16_t addr, __unused size_t width, __unused uint32_t v)
 {
-	return true; /* ignore write */
+	/* ignore write */
 }
 
 /**
@@ -62,7 +60,6 @@ static bool pio_default_write(
  */
 static int32_t hv_emulate_pio(struct acrn_vcpu *vcpu, struct io_request *io_req)
 {
-	int32_t status = -ENODEV;
 	uint16_t port, size;
 	uint32_t idx;
 	struct acrn_vm *vm = vcpu->vm;
@@ -94,13 +91,9 @@ static int32_t hv_emulate_pio(struct acrn_vcpu *vcpu, struct io_request *io_req)
 	}
 
 	if ((pio_req->direction == REQUEST_WRITE) && (io_write != NULL)) {
-		if (io_write(vcpu, port, size, pio_req->value)) {
-			status = 0;
-		}
+		io_write(vcpu, port, size, pio_req->value);
 	} else if ((pio_req->direction == REQUEST_READ) && (io_read != NULL)) {
-		if (io_read(vcpu, port, size)) {
-			status = 0;
-		}
+		io_read(vcpu, port, size);
 	} else {
 		/* do nothing */
 	}
@@ -108,7 +101,7 @@ static int32_t hv_emulate_pio(struct acrn_vcpu *vcpu, struct io_request *io_req)
 	pr_dbg("IO %s on port %04x, data %08x", (pio_req->direction == REQUEST_READ) ? "read" : "write", port,
 		pio_req->value);
 
-	return status;
+	return 0;
 }
 
 /**

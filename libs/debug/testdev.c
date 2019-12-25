@@ -14,13 +14,12 @@ static struct vm_io_range testdev_range = {
 	.len = 4U,
 };
 
-static bool
+static void
 testdev_io_read(__unused struct acrn_vm *vm, __unused struct acrn_vcpu *vcpu, __unused uint16_t port, __unused size_t size)
 {
-	return true;
 }
 
-static bool
+static void
 testdev_io_write(struct acrn_vm *vm, __unused uint16_t port, __unused size_t size, __unused uint32_t val)
 {
 	uint16_t i;
@@ -29,8 +28,6 @@ testdev_io_write(struct acrn_vm *vm, __unused uint16_t port, __unused size_t siz
 	foreach_vcpu(i, vm, vcpu) {
 		pause_vcpu(vcpu, VCPU_PAUSED);
 	}
-
-	return true;
 }
 
 void

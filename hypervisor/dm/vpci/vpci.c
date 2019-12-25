@@ -56,7 +56,7 @@ static void write_cfg(struct acrn_vpci *vpci, union pci_bdf bdf, uint32_t offset
  * @pre vcpu != NULL
  * @pre vcpu->vm != NULL
  */
-static bool pci_cfgaddr_io_read(struct acrn_vcpu *vcpu, uint16_t addr, size_t bytes)
+static void pci_cfgaddr_io_read(struct acrn_vcpu *vcpu, uint16_t addr, size_t bytes)
 {
 	uint32_t val = ~0U;
 	struct acrn_vpci *vpci = &vcpu->vm->vpci;
@@ -68,15 +68,13 @@ static bool pci_cfgaddr_io_read(struct acrn_vcpu *vcpu, uint16_t addr, size_t by
 	}
 
 	pio_req->value = val;
-
-	return true;
 }
 
 /**
  * @pre vcpu != NULL
  * @pre vcpu->vm != NULL
  */
-static bool pci_cfgaddr_io_write(struct acrn_vcpu *vcpu, uint16_t addr, size_t bytes, uint32_t val)
+static void pci_cfgaddr_io_write(struct acrn_vcpu *vcpu, uint16_t addr, size_t bytes, uint32_t val)
 {
 	struct acrn_vpci *vpci = &vcpu->vm->vpci;
 	union pci_cfg_addr_reg *cfg_addr = &vpci->addr;
@@ -85,8 +83,6 @@ static bool pci_cfgaddr_io_write(struct acrn_vcpu *vcpu, uint16_t addr, size_t b
 		/* unmask reserved fields: BITs 24-30 and BITs 0-1 */
 		cfg_addr->value = val & (~0x7f000003U);
 	}
-
-	return true;
 }
 
 static inline bool vpci_is_valid_access_offset(uint32_t offset, uint32_t bytes)
@@ -111,7 +107,7 @@ static inline bool vpci_is_valid_access(uint32_t offset, uint32_t bytes)
  * @pre (get_vm_config(vcpu->vm->vm_id)->load_order == PRE_LAUNCHED_VM)
  *	|| (get_vm_config(vcpu->vm->vm_id)->load_order == SOS_VM)
  */
-static bool pci_cfgdata_io_read(struct acrn_vcpu *vcpu, uint16_t addr, size_t bytes)
+static void pci_cfgdata_io_read(struct acrn_vcpu *vcpu, uint16_t addr, size_t bytes)
 {
 	struct acrn_vm *vm = vcpu->vm;
 	struct acrn_vpci *vpci = &vm->vpci;
@@ -143,8 +139,6 @@ static bool pci_cfgdata_io_read(struct acrn_vcpu *vcpu, uint16_t addr, size_t by
 	}
 
 	pio_req->value = val;
-
-	return true;
 }
 
 /**
@@ -154,7 +148,7 @@ static bool pci_cfgdata_io_read(struct acrn_vcpu *vcpu, uint16_t addr, size_t by
  * @pre (get_vm_config(vcpu->vm->vm_id)->load_order == PRE_LAUNCHED_VM)
  *	|| (get_vm_config(vcpu->vm->vm_id)->load_order == SOS_VM)
  */
-static bool pci_cfgdata_io_write(struct acrn_vcpu *vcpu, uint16_t addr, size_t bytes, uint32_t val)
+static void pci_cfgdata_io_write(struct acrn_vcpu *vcpu, uint16_t addr, size_t bytes, uint32_t val)
 {
 	struct acrn_vm *vm = vcpu->vm;
 	struct acrn_vpci *vpci = &vm->vpci;
@@ -183,7 +177,6 @@ static bool pci_cfgdata_io_write(struct acrn_vcpu *vcpu, uint16_t addr, size_t b
 		}
 	}
 
-	return true;
 }
 
 /**

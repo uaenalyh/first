@@ -72,7 +72,7 @@ static uint8_t cmos_get_reg_val(uint8_t addr)
  * @pre vcpu != NULL
  * @pre vcpu->vm != NULL
  */
-static bool vrtc_read(struct acrn_vcpu *vcpu, uint16_t addr, __unused size_t width)
+static void vrtc_read(struct acrn_vcpu *vcpu, uint16_t addr, __unused size_t width)
 {
 	uint8_t offset;
 	struct pio_request *pio_req = &vcpu->req.reqs.pio;
@@ -85,21 +85,17 @@ static bool vrtc_read(struct acrn_vcpu *vcpu, uint16_t addr, __unused size_t wid
 	} else {
 		pio_req->value = cmos_get_reg_val(offset);
 	}
-
-	return true;
 }
 
 /**
  * @pre vcpu != NULL
  * @pre vcpu->vm != NULL
  */
-static bool vrtc_write(struct acrn_vcpu *vcpu, uint16_t addr, size_t width, uint32_t value)
+static void vrtc_write(struct acrn_vcpu *vcpu, uint16_t addr, size_t width, uint32_t value)
 {
 	if ((width == 1U) && (addr == CMOS_ADDR_PORT)) {
 		vcpu->vm->vrtc_offset = (uint8_t)value & 0x7FU;
 	}
-
-	return true;
 }
 
 void vrtc_init(struct acrn_vm *vm)
