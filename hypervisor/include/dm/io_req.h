@@ -54,7 +54,7 @@ struct io_request {
 struct vm_io_range {
 	uint16_t base; /**< IO port base */
 	uint16_t len; /**< IO port range */
-};
+} __aligned(2);
 
 struct vm_io_handler_desc;
 struct acrn_vm;
@@ -113,7 +113,7 @@ struct vm_io_handler_desc {
 	 * If the pointer is null, the write access is ignored.
 	 */
 	io_write_fn_t io_write;
-};
+} __aligned(8);
 
 /* External Interfaces */
 
