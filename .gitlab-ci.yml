@@ -52,7 +52,7 @@ test_sas_job:
   script:
     - echo "start to test sas build ..."
     - pwd
-    - mkdir ./image
+    - mkdir -p ./image
     - cd ../acrn-sas-test-code/host/
     - make clean
     - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
@@ -98,6 +98,7 @@ deploy_build_job:
     - /opt/fusa_ci.sh $BUILD_TYPE
   dependencies:
     - build_job
+    - test_sas_job
   only:
     - schedules
 
