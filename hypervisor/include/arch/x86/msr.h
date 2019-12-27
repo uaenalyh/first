@@ -166,7 +166,6 @@ struct acrn_vcpu;
 
 void init_msr_emulation(struct acrn_vcpu *vcpu);
 uint32_t vmsr_get_guest_msr_index(uint32_t msr);
-void update_msr_bitmap_x2apic_passthru(struct acrn_vcpu *vcpu);
 
 #endif /* ASSEMBLER */
 

@@ -251,6 +251,8 @@ static void init_msr_area(struct acrn_vcpu *vcpu)
 	vcpu->arch.msr_area.host[MSR_AREA_TSC_AUX].value = pcpuid_from_vcpu(vcpu);
 }
 
+static void update_msr_bitmap_x2apic_passthru(struct acrn_vcpu *vcpu);
+
 /**
  * @pre vcpu != NULL
  */
@@ -684,7 +686,7 @@ int32_t wrmsr_vmexit_handler(struct acrn_vcpu *vcpu)
 /**
  * @pre vcpu != NULL
  */
-void update_msr_bitmap_x2apic_passthru(struct acrn_vcpu *vcpu)
+static void update_msr_bitmap_x2apic_passthru(struct acrn_vcpu *vcpu)
 {
 	uint8_t *msr_bitmap = vcpu->arch.msr_bitmap;
 
