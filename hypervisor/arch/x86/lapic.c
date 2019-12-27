@@ -100,7 +100,14 @@ void init_lapic(uint16_t pcpu_id)
 
 	/* Enable Local APIC */
 	/* TODO: add spurious-interrupt handler */
-	msr_write(MSR_IA32_EXT_APIC_SIVR, LAPIC_SVR_APIC_ENABLE_MASK | LAPIC_SVR_VECTOR);
+	msr_write(MSR_IA32_EXT_APIC_SIVR, LAPIC_SVR_VECTOR);
+
+	/* Reset timer */
+	msr_write(MSR_IA32_EXT_APIC_DIV_CONF, 0x00000000U);
+	msr_write(MSR_IA32_TSC_DEADLINE, 0x00000000U);
+
+	/* Reset interrupt control registers */
+	msr_write(MSR_IA32_EXT_APIC_ICR, 0x0000000000000000U);
 
 	/* Ensure there are no ISR bits set. */
 	clear_lapic_isr();
