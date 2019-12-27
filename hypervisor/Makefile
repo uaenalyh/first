@@ -238,7 +238,6 @@ VP_DM_C_SRCS += arch/x86/guest/vlapic.c
 VP_DM_C_SRCS += arch/x86/guest/assign.c
 VP_DM_C_SRCS += arch/x86/guest/vmx_io.c
 VP_DM_C_SRCS += arch/x86/guest/vm_reset.c
-VP_DM_C_SRCS += common/ptdev.c
 
 # virtual platform trusty
 

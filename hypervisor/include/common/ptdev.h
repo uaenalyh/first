@@ -23,31 +23,12 @@
 #include <spinlock.h>
 #include <timer.h>
 
-#define PTDEV_INTR_MSI (1U << 0U)
-
-#define INVALID_PTDEV_ENTRY_ID 0xffffU
-
-#define DEFINE_MSI_SID(name, a, b) union source_id(name) = { .msi_id = { .bdf = (a), .entry_nr = (b) } }
-
 union irte_index {
 	uint16_t index;
 	struct {
 		uint16_t index_low : 15;
 		uint16_t index_high : 1;
 	} bits __packed;
-};
-
-union source_id {
-	uint64_t value;
-	struct {
-		uint16_t bdf;
-		uint16_t entry_nr;
-		uint32_t reserved;
-	} msi_id;
-	struct {
-		uint32_t pin;
-		uint32_t src;
-	} intx_id;
 };
 
 /*
@@ -106,43 +87,6 @@ struct ptirq_msi_info {
 	union msi_addr_reg pmsi_addr; /* phys msi_addr */
 	union msi_data_reg pmsi_data; /* phys msi_data */
 };
-
-struct ptirq_remapping_info;
-typedef void (*ptirq_arch_release_fn_t)(const struct ptirq_remapping_info *entry);
-
-/* entry per each allocated irq/vector
- * it represents a pass-thru device's remapping data entry which collecting
- * information related with its vm and msi/intx mapping & interaction nodes
- * with interrupt handler and softirq.
- */
-struct ptirq_remapping_info {
-	uint16_t ptdev_entry_id;
-	uint32_t intr_type;
-	union source_id phys_sid;
-	union source_id virt_sid;
-	struct acrn_vm *vm;
-	bool active; /* true=active, false=inactive*/
-	uint32_t allocated_pirq;
-	struct ptirq_msi_info msi;
-
-	uint64_t intr_count;
-	ptirq_arch_release_fn_t release_cb;
-};
-
-static inline bool is_entry_active(const struct ptirq_remapping_info *entry)
-{
-	return entry->active;
-}
-
-extern struct ptirq_remapping_info ptirq_entries[CONFIG_MAX_PT_IRQ_ENTRIES];
-extern spinlock_t ptdev_lock;
-
-void ptdev_release_all_entries(const struct acrn_vm *vm);
-
-struct ptirq_remapping_info *ptirq_alloc_entry(struct acrn_vm *vm, uint32_t intr_type);
-void ptirq_release_entry(struct ptirq_remapping_info *entry);
-int32_t ptirq_activate_entry(struct ptirq_remapping_info *entry, uint32_t phys_irq);
-void ptirq_deactivate_entry(struct ptirq_remapping_info *entry);
 
 /**
  * @}

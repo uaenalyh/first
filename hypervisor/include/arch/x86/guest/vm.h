@@ -162,7 +162,6 @@ void vrtc_init(struct acrn_vm *vm);
 
 bool is_safety_vm(const struct acrn_vm *vm);
 bool is_rt_vm(const struct acrn_vm *vm);
-enum vm_vlapic_state check_vm_vlapic_state(const struct acrn_vm *vm);
 #endif /* !ASSEMBLER */
 
 /**

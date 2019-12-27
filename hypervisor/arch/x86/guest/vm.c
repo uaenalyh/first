@@ -284,8 +284,6 @@ int32_t shutdown_vm(struct acrn_vm *vm)
 
 		deinit_vuart(vm);
 
-		ptdev_release_all_entries(vm);
-
 		/* Free iommu */
 		destroy_iommu_domain(vm->iommu);
 

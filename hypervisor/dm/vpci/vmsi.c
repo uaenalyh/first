@@ -91,18 +91,17 @@ static void remap_vmsi(const struct pci_vdev *vdev)
 	info.vmsi_addr.full = (uint64_t)vmsi_addrlo | ((uint64_t)vmsi_addrhi << 32U);
 	info.vmsi_data.full = vmsi_msgdata;
 
-	if (ptirq_prepare_msix_remap(vm, vdev->bdf.value, pbdf.value, 0U, &info) == 0) {
-		pci_pdev_write_cfg(pbdf, capoff + PCIR_MSI_ADDR, 0x4U, (uint32_t)info.pmsi_addr.full);
-		if (vdev->msi.is_64bit) {
-			pci_pdev_write_cfg(
-				pbdf, capoff + PCIR_MSI_ADDR_HIGH, 0x4U, (uint32_t)(info.pmsi_addr.full >> 32U));
-			pci_pdev_write_cfg(pbdf, capoff + PCIR_MSI_DATA_64BIT, 0x2U, (uint16_t)info.pmsi_data.full);
-		} else {
-			pci_pdev_write_cfg(pbdf, capoff + PCIR_MSI_DATA, 0x2U, (uint16_t)info.pmsi_data.full);
-		}
-
-		enable_disable_msi(vdev, true);
+	ptirq_msix_remap(vm, vdev->bdf.value, pbdf.value, 0U, &info);
+	pci_pdev_write_cfg(pbdf, capoff + PCIR_MSI_ADDR, 0x4U, (uint32_t)info.pmsi_addr.full);
+	if (vdev->msi.is_64bit) {
+		pci_pdev_write_cfg(
+			pbdf, capoff + PCIR_MSI_ADDR_HIGH, 0x4U, (uint32_t)(info.pmsi_addr.full >> 32U));
+		pci_pdev_write_cfg(pbdf, capoff + PCIR_MSI_DATA_64BIT, 0x2U, (uint16_t)info.pmsi_data.full);
+	} else {
+		pci_pdev_write_cfg(pbdf, capoff + PCIR_MSI_DATA, 0x2U, (uint16_t)info.pmsi_data.full);
 	}
+
+	enable_disable_msi(vdev, true);
 }
 
 /**
