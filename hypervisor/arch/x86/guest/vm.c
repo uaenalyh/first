@@ -352,7 +352,7 @@ void pause_vm(struct acrn_vm *vm)
 			 *  - It is powering off by itself
 			 *  - It is created but doesn't start
 			 */
-			if ((vm->state == VM_POWERING_OFF) || (vm->state == VM_CREATED)) {
+			if (vm->state == VM_CREATED) {
 				foreach_vcpu (i, vm, vcpu) {
 					pause_vcpu(vcpu, VCPU_ZOMBIE);
 				}
