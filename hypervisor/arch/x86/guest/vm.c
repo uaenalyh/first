@@ -363,7 +363,7 @@ void prepare_vm(uint16_t vm_id, struct acrn_vm_config *vm_config)
 	if (err == 0) {
 		build_vacpi(vm);
 
-		(void)direct_boot_sw_loader(vm);
+		direct_boot_sw_loader(vm);
 
 		/* start vm BSP automatically */
 		start_vm(vm);

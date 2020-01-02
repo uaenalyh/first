@@ -156,7 +156,7 @@ void prepare_vm(uint16_t vm_id, struct acrn_vm_config *vm_config);
 void launch_vms(uint16_t pcpu_id);
 struct acrn_vm *get_vm_from_vmid(uint16_t vm_id);
 
-int32_t direct_boot_sw_loader(struct acrn_vm *vm);
+void direct_boot_sw_loader(struct acrn_vm *vm);
 
 void vrtc_init(struct acrn_vm *vm);
 

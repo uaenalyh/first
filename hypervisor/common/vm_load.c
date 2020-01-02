@@ -159,9 +159,8 @@ static void prepare_loading_rawimage(struct acrn_vm *vm)
 /**
  * @pre vm != NULL
  */
-int32_t direct_boot_sw_loader(struct acrn_vm *vm)
+void direct_boot_sw_loader(struct acrn_vm *vm)
 {
-	int32_t ret = 0;
 	struct sw_kernel_info *sw_kernel = &(vm->sw.kernel_info);
 	struct sw_module_info *bootargs_info = &(vm->sw.bootargs_info);
 	/* get primary vcpu */
@@ -194,18 +193,13 @@ int32_t direct_boot_sw_loader(struct acrn_vm *vm)
 		break;
 	default:
 		pr_err("%s, Loading VM SW failed", __func__);
-		ret = -EINVAL;
 		break;
 	}
 
-	if (ret == 0) {
-		/* Set VCPU entry point to kernel entry */
-		vcpu_set_rip(vcpu, (uint64_t)sw_kernel->kernel_entry_addr);
-		pr_info("%s, VM %hu VCPU %hu Entry: 0x%016lx ", __func__, vm->vm_id, vcpu->vcpu_id,
-			sw_kernel->kernel_entry_addr);
-	}
-
-	return ret;
+	/* Set VCPU entry point to kernel entry */
+	vcpu_set_rip(vcpu, (uint64_t)sw_kernel->kernel_entry_addr);
+	pr_info("%s, VM %hu VCPU %hu Entry: 0x%016lx ", __func__, vm->vm_id, vcpu->vcpu_id,
+		sw_kernel->kernel_entry_addr);
 }
 
 /**
