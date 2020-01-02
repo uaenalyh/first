@@ -211,7 +211,6 @@ int32_t create_vm(uint16_t vm_id, struct acrn_vm_config *vm_config, struct acrn_
 
 	/* Populate return VM handle */
 	*rtn_vm = vm;
-	vm->sw.io_shared_page = NULL;
 	set_vcpuid_entries(vm);
 
 	vm->state = VM_CREATED;

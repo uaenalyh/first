@@ -37,13 +37,12 @@
  */
 static uint64_t get_guest_gdt_base_gpa(const struct acrn_vm *vm)
 {
-	uint64_t new_guest_gdt_base_gpa, guest_kernel_end_gpa, guest_bootargs_end_gpa, guest_ramdisk_end_gpa;
+	uint64_t new_guest_gdt_base_gpa, guest_kernel_end_gpa, guest_bootargs_end_gpa;
 
 	guest_kernel_end_gpa = (uint64_t)vm->sw.kernel_info.kernel_load_addr + vm->sw.kernel_info.kernel_size;
 	guest_bootargs_end_gpa = (uint64_t)vm->sw.bootargs_info.load_addr + vm->sw.bootargs_info.size;
-	guest_ramdisk_end_gpa = (uint64_t)vm->sw.ramdisk_info.load_addr + vm->sw.ramdisk_info.size;
 
-	new_guest_gdt_base_gpa = max(guest_kernel_end_gpa, max(guest_bootargs_end_gpa, guest_ramdisk_end_gpa));
+	new_guest_gdt_base_gpa = max(guest_kernel_end_gpa, guest_bootargs_end_gpa);
 	new_guest_gdt_base_gpa = (new_guest_gdt_base_gpa + 7UL) & ~(8UL - 1UL);
 
 	return new_guest_gdt_base_gpa;
@@ -76,7 +75,6 @@ static uint64_t create_zero_page(struct acrn_vm *vm)
 	struct zero_page *zeropage;
 	struct sw_kernel_info *sw_kernel = &(vm->sw.kernel_info);
 	struct sw_module_info *bootargs_info = &(vm->sw.bootargs_info);
-	struct sw_module_info *ramdisk_info = &(vm->sw.ramdisk_info);
 	struct zero_page *hva;
 	uint64_t gpa, addr;
 
@@ -92,15 +90,6 @@ static uint64_t create_zero_page(struct acrn_vm *vm)
 	/* copy part of the header into the zero page */
 	hva = (struct zero_page *)gpa2hva(vm, (uint64_t)sw_kernel->kernel_load_addr);
 	(void)memcpy_s(&(zeropage->hdr), sizeof(zeropage->hdr), &(hva->hdr), sizeof(hva->hdr));
-
-	/* See if kernel has a RAM disk */
-	if (ramdisk_info->src_addr != NULL) {
-		/* Copy ramdisk load_addr and size in zeropage header structure
-		 */
-		addr = (uint64_t)ramdisk_info->load_addr;
-		zeropage->hdr.ramdisk_addr = (uint32_t)addr;
-		zeropage->hdr.ramdisk_size = (uint32_t)ramdisk_info->size;
-	}
 
 	/* Copy bootargs load_addr in zeropage header structure */
 	addr = (uint64_t)bootargs_info->load_addr;
@@ -125,12 +114,9 @@ static uint64_t create_zero_page(struct acrn_vm *vm)
 static void prepare_loading_bzimage(struct acrn_vm *vm, struct acrn_vcpu *vcpu)
 {
 	uint32_t i;
-	char dyn_bootargs[100] = { 0 };
 	uint32_t kernel_entry_offset;
 	struct zero_page *zeropage;
 	struct sw_kernel_info *sw_kernel = &(vm->sw.kernel_info);
-	struct sw_module_info *bootargs_info = &(vm->sw.bootargs_info);
-	const struct acrn_vm_config *vm_config = get_vm_config(vm->vm_id);
 
 	/* calculate the kernel entry point */
 	zeropage = (struct zero_page *)sw_kernel->kernel_src_addr;
@@ -178,7 +164,6 @@ int32_t direct_boot_sw_loader(struct acrn_vm *vm)
 	int32_t ret = 0;
 	struct sw_kernel_info *sw_kernel = &(vm->sw.kernel_info);
 	struct sw_module_info *bootargs_info = &(vm->sw.bootargs_info);
-	struct sw_module_info *ramdisk_info = &(vm->sw.ramdisk_info);
 	/* get primary vcpu */
 	struct acrn_vcpu *vcpu = vcpu_from_vid(vm, BOOT_CPU_ID);
 
@@ -195,11 +180,6 @@ int32_t direct_boot_sw_loader(struct acrn_vm *vm)
 	(void)copy_to_gpa(
 		vm, sw_kernel->kernel_src_addr, (uint64_t)sw_kernel->kernel_load_addr, sw_kernel->kernel_size);
 
-	/* Check if a RAM disk is present */
-	if (ramdisk_info->size != 0U) {
-		/* Copy RAM disk to its load location */
-		(void)copy_to_gpa(vm, ramdisk_info->src_addr, (uint64_t)ramdisk_info->load_addr, ramdisk_info->size);
-	}
 	/* Copy Guest OS bootargs to its load location */
 	if (bootargs_info->size != 0U) {
 		(void)copy_to_gpa(vm, bootargs_info->src_addr, (uint64_t)bootargs_info->load_addr,

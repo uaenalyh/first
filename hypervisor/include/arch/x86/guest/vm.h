@@ -65,9 +65,6 @@ struct vm_sw_info {
 	/* Kernel information (common for all guest types) */
 	struct sw_kernel_info kernel_info;
 	struct sw_module_info bootargs_info;
-	struct sw_module_info ramdisk_info;
-	/* HVA to IO shared page */
-	void *io_shared_page;
 };
 
 /* Enumerated type for VM states */

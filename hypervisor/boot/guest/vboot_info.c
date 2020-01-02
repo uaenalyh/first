@@ -38,21 +38,6 @@
 #define INVALID_MOD_IDX 0xFFFFU
 
 /**
- * @pre vm != NULL && mbi != NULL
- */
-static void init_vm_ramdisk_info(struct acrn_vm *vm, const struct multiboot_module *mod)
-{
-	void *mod_addr = hpa2hva((uint64_t)mod->mm_mod_start);
-
-	if ((mod_addr != NULL) && (mod->mm_mod_end > mod->mm_mod_start)) {
-		vm->sw.ramdisk_info.src_addr = mod_addr;
-		vm->sw.ramdisk_info.load_addr = vm->sw.kernel_info.kernel_load_addr + vm->sw.kernel_info.kernel_size;
-		vm->sw.ramdisk_info.load_addr = (void *)round_page_up((uint64_t)vm->sw.ramdisk_info.load_addr);
-		vm->sw.ramdisk_info.size = mod->mm_mod_end - mod->mm_mod_start;
-	}
-}
-
-/**
  * @pre vm != NULL
  */
 static void *get_kernel_load_addr(struct acrn_vm *vm)
@@ -109,7 +94,7 @@ static void init_vm_kernel_info(struct acrn_vm *vm, const struct multiboot_modul
 /**
  * @pre vm != NULL && mbi != NULL
  */
-static void init_vm_bootargs_info(struct acrn_vm *vm, const struct multiboot_info *mbi)
+static void init_vm_bootargs_info(struct acrn_vm *vm)
 {
 	struct acrn_vm_config *vm_config = get_vm_config(vm->vm_id);
 	char *bootargs = vm_config->os_config.bootargs;
@@ -158,7 +143,7 @@ static void init_vm_sw_load(struct acrn_vm *vm, const struct multiboot_info *mbi
 
 	mod_idx = get_mod_idx_by_tag(mods, mbi->mi_mods_count, vm_config->os_config.kernel_mod_tag);
 	init_vm_kernel_info(vm, &mods[mod_idx]);
-	init_vm_bootargs_info(vm, mbi);
+	init_vm_bootargs_info(vm);
 }
 
 /**
