@@ -78,24 +78,14 @@ enum vm_state {
 	VM_PAUSED, /* VM paused */
 };
 
-enum vm_vlapic_state { VM_VLAPIC_DISABLED = 0U, VM_VLAPIC_XAPIC, VM_VLAPIC_X2APIC, VM_VLAPIC_TRANSITION };
-
 struct vm_arch {
 	/* I/O bitmaps A and B for this VM, MUST be 4-Kbyte aligned */
 	uint8_t io_bitmap[PAGE_SIZE * 2];
 
 	/* EPT hierarchy for Normal World */
 	void *nworld_eptp;
-	/* EPT hierarchy for Secure World
-	 * Secure world can access Normal World's memory,
-	 * but Normal World can not access Secure World's memory.
-	 */
-	void *sworld_eptp;
 	struct memory_ops ept_mem_ops;
 
-	enum vm_vlapic_state vlapic_state; /* Represents vLAPIC state across vCPUs*/
-
-	/* reference to virtual platform to come here (as needed) */
 } __aligned(PAGE_SIZE);
 
 struct acrn_vm {
@@ -106,24 +96,17 @@ struct acrn_vm {
 	const struct e820_entry *e820_entries;
 	uint16_t vm_id; /* Virtual machine identifier */
 	enum vm_state state; /* VM state */
-	enum vpic_wire_mode wire_mode;
 	struct iommu_domain *iommu; /* iommu domain of this VM */
-	spinlock_t vm_lock; /* Spin-lock used to protect vlapic_state modifications for a VM */
-
-	spinlock_t emul_mmio_lock; /* Used to protect emulation mmio_node concurrent access for a VM */
 
 	struct vm_io_handler_desc emul_pio[EMUL_PIO_IDX_MAX];
 
 	uint8_t uuid[16];
-	struct secure_world_control sworld_control;
 
 	uint32_t vcpuid_entry_nr, vcpuid_level, vcpuid_xlevel;
 	struct vcpuid_entry vcpuid_entries[MAX_VM_VCPUID_ENTRIES];
 	struct acrn_vpci vpci;
 
 	uint8_t vrtc_offset;
-
-	uint64_t intr_inject_delay_delta; /* delay of intr injection */
 } __aligned(PAGE_SIZE);
 
 /*
@@ -182,7 +165,6 @@ void vrtc_init(struct acrn_vm *vm);
 
 bool is_safety_vm(const struct acrn_vm *vm);
 bool is_rt_vm(const struct acrn_vm *vm);
-bool has_rt_vm(void);
 enum vm_vlapic_state check_vm_vlapic_state(const struct acrn_vm *vm);
 #endif /* !ASSEMBLER */
 

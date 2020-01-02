@@ -148,11 +148,6 @@ static void prepare_prelaunched_vm_memmap(struct acrn_vm *vm, const struct acrn_
 	}
 }
 
-/* Add EPT mapping of EPC reource for the VM */
-static void prepare_epc_vm_memmap(struct acrn_vm *vm)
-{
-}
-
 /**
  * @brief get bitmap of pCPUs whose vCPUs have LAPIC PT enabled
  *
@@ -196,22 +191,10 @@ int32_t create_vm(uint16_t vm_id, struct acrn_vm_config *vm_config, struct acrn_
 	sanitize_pte((uint64_t *)vm->arch_vm.nworld_eptp, &vm->arch_vm.ept_mem_ops);
 
 	(void)memcpy_s(&vm->uuid[0], sizeof(vm->uuid), &vm_config->uuid[0], sizeof(vm_config->uuid));
-	/* For PRE_LAUNCHED_VM and POST_LAUNCHED_VM */
-	if ((vm_config->guest_flags & GUEST_FLAG_SECURE_WORLD_ENABLED) != 0U) {
-		vm->sworld_control.flag.supported = 1U;
-	}
 
 	create_prelaunched_vm_e820(vm);
 	prepare_prelaunched_vm_memmap(vm, vm_config);
-        init_vm_boot_info(vm);
-
-	prepare_epc_vm_memmap(vm);
-
-	spinlock_init(&vm->vm_lock);
-	spinlock_init(&vm->emul_mmio_lock);
-
-	vm->arch_vm.vlapic_state = VM_VLAPIC_X2APIC;
-	vm->intr_inject_delay_delta = 0UL;
+	init_vm_boot_info(vm);
 
 	/* Set up IO bit-mask such that VM exit occurs on
 	 * selected IO ranges
@@ -225,9 +208,6 @@ int32_t create_vm(uint16_t vm_id, struct acrn_vm_config *vm_config, struct acrn_
 
 	vpci_init(vm);
 	enable_iommu();
-
-	/* vpic wire_mode default is INTR */
-	vm->wire_mode = VPIC_WIRE_INTR;
 
 	/* Populate return VM handle */
 	*rtn_vm = vm;
@@ -409,35 +389,6 @@ void launch_vms(uint16_t pcpu_id)
 			prepare_vm(vm_id, vm_config);
 		}
 	}
-}
-
-/*
- * @brief Check state of vLAPICs of a VM
- *
- * @pre vm != NULL
- */
-enum vm_vlapic_state check_vm_vlapic_state(const struct acrn_vm *vm)
-{
-	enum vm_vlapic_state vlapic_state;
-
-	vlapic_state = vm->arch_vm.vlapic_state;
-	return vlapic_state;
-}
-
-/**
- * if there is RT VM return true otherwise return false.
- */
-bool has_rt_vm(void)
-{
-	uint16_t vm_id;
-
-	for (vm_id = 0U; vm_id < CONFIG_MAX_VM_NUM; vm_id++) {
-		if (is_rt_vm(get_vm_from_vmid(vm_id))) {
-			break;
-		}
-	}
-
-	return ((vm_id == CONFIG_MAX_VM_NUM) ? false : true);
 }
 
 void make_shutdown_vm_request(uint16_t pcpu_id)

@@ -186,12 +186,10 @@ void ept_flush_leaf_page(uint64_t *pge, uint64_t size)
  */
 void *get_ept_entry(struct acrn_vm *vm)
 {
-	void *eptp;
+	void *eptp = NULL;
 	struct acrn_vcpu *vcpu = vcpu_from_pid(vm, get_pcpu_id());
 
-	if ((vcpu != NULL) && (vcpu->arch.cur_context == SECURE_WORLD)) {
-		eptp = vm->arch_vm.sworld_eptp;
-	} else {
+	if (vcpu != NULL) {
 		eptp = vm->arch_vm.nworld_eptp;
 	}
 
