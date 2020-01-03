@@ -149,7 +149,6 @@ static inline bool is_bar_offset(uint32_t nr_bars, uint32_t offset)
 
 uint32_t pci_pdev_read_cfg(union pci_bdf bdf, uint32_t offset, uint32_t bytes);
 void pci_pdev_write_cfg(union pci_bdf bdf, uint32_t offset, uint32_t bytes, uint32_t val);
-void enable_disable_pci_intx(union pci_bdf bdf, bool enable);
 
 /**
  * @}

@@ -101,8 +101,6 @@ static void remap_vmsi(const struct pci_vdev *vdev)
 			pci_pdev_write_cfg(pbdf, capoff + PCIR_MSI_DATA, 0x2U, (uint16_t)info.pmsi_data.full);
 		}
 
-		/* If MSI Enable is being set, make sure INTxDIS bit is set */
-		enable_disable_pci_intx(pbdf, false);
 		enable_disable_msi(vdev, true);
 	}
 }

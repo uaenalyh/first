@@ -148,7 +148,7 @@ void vdev_pt_write_vbar(struct pci_vdev *vdev, uint32_t idx, uint32_t val)
  * by platform firmware during boot. It is assumed a valid hpa is always assigned to a
  * mmio pbar, hypervisor shall not change the value of a pbar.
  *
- * vbar: for each pci_pdev, it has a virtual PCI device (pci_vdev) counterpart. pci_vdev
+ * vbar: for each PCI device, it has a virtual PCI device (pci_vdev) counterpart. pci_vdev
  * virtualizes all the bars (called vbars). a vbar can be initialized by hypervisor by
  * assigning a gpa to it; if vbar has a value of 0 (unassigned), guest may assign
  * and program a gpa to it. The guest only sees the vbars, it will not see and can
@@ -184,7 +184,7 @@ void init_vdev_pt(struct pci_vdev *vdev)
 		if (type == PCIBAR_NONE) {
 			continue;
 		}
-		mask = (type == PCIBAR_IO_SPACE) ? PCI_BASE_ADDRESS_IO_MASK : PCI_BASE_ADDRESS_MEM_MASK;
+		mask = PCI_BASE_ADDRESS_MEM_MASK;
 		vbar->base_hpa = (uint64_t)lo & mask;
 
 		if (type == PCIBAR_MEM64) {
