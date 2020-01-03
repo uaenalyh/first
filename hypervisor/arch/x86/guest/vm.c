@@ -29,7 +29,6 @@
 #include <board.h>
 #include <sgx.h>
 #include <sbuf.h>
-#include <pci_dev.h>
 #include <vacpi.h>
 
 /**

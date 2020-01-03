@@ -45,6 +45,30 @@
  * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
  */
 
+
+static inline enum pci_bar_type pci_get_bar_type(uint32_t val)
+{
+	enum pci_bar_type type = PCIBAR_NONE;
+
+	if ((val & PCIM_BAR_SPACE) != PCIM_BAR_IO_SPACE) {
+		switch (val & PCIM_BAR_MEM_TYPE) {
+		case PCIM_BAR_MEM_32:
+			type = PCIBAR_MEM32;
+			break;
+
+		case PCIM_BAR_MEM_64:
+			type = PCIBAR_MEM64;
+			break;
+
+		default:
+			/*no actions are required for other cases.*/
+			break;
+		}
+	}
+
+	return type;
+}
+
 /**
  * @pre vdev != NULL
  * @pre vdev->vpci != NULL
@@ -120,7 +144,7 @@ void vdev_pt_write_vbar(struct pci_vdev *vdev, uint32_t idx, uint32_t val)
  * 2 bars at byte offset 0x10-0x14 for type 1 PCI device) of the PCI configuration space
  * header.
  *
- * pbar: bar for the physical PCI device (pci_pdev), the value of pbar (hpa) is assigned
+ * pbar: bar for the physical PCI device, the value of pbar (hpa) is assigned
  * by platform firmware during boot. It is assumed a valid hpa is always assigned to a
  * mmio pbar, hypervisor shall not change the value of a pbar.
  *

@@ -152,7 +152,6 @@ void deinit_vmsi(const struct pci_vdev *vdev)
  */
 void init_vmsi(struct pci_vdev *vdev)
 {
-	struct pci_pdev *pdev = vdev->pdev;
 	uint32_t val;
 
 	val = pci_pdev_read_cfg(vdev->pbdf, PCIR_CAP_PTR, 1U);

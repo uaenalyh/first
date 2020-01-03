@@ -129,17 +129,9 @@ enum pci_bar_type {
 	PCIBAR_MEM64HI,
 };
 
-struct pci_pdev {
-};
-
 static inline uint32_t pci_bar_offset(uint32_t idx)
 {
 	return PCIR_BARS + (idx << 2U);
-}
-
-static inline uint32_t pci_bar_index(uint32_t offset)
-{
-	return (offset - PCIR_BARS) >> 2U;
 }
 
 static inline bool is_bar_offset(uint32_t nr_bars, uint32_t offset)
@@ -153,34 +145,6 @@ static inline bool is_bar_offset(uint32_t nr_bars, uint32_t offset)
 	}
 
 	return ret;
-}
-
-static inline enum pci_bar_type pci_get_bar_type(uint32_t val)
-{
-	enum pci_bar_type type = PCIBAR_NONE;
-
-	if ((val & PCIM_BAR_SPACE) != PCIM_BAR_IO_SPACE) {
-		switch (val & PCIM_BAR_MEM_TYPE) {
-		case PCIM_BAR_MEM_32:
-			type = PCIBAR_MEM32;
-			break;
-
-		case PCIM_BAR_MEM_64:
-			type = PCIBAR_MEM64;
-			break;
-
-		default:
-			/*no actions are required for other cases.*/
-			break;
-		}
-	}
-
-	return type;
-}
-
-static inline bool bdf_is_equal(union pci_bdf a, union pci_bdf b)
-{
-	return (a.value == b.value);
 }
 
 uint32_t pci_pdev_read_cfg(union pci_bdf bdf, uint32_t offset, uint32_t bytes);

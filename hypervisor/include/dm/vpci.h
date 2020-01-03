@@ -82,8 +82,6 @@ struct pci_vdev {
 	union pci_bdf bdf;
 	union pci_bdf pbdf;
 
-	struct pci_pdev *pdev;
-
 	union pci_cfgdata cfgdata;
 
 	/* The bar info of the virtual PCI device. */

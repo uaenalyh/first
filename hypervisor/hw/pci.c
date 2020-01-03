@@ -37,7 +37,6 @@
 #include <pci.h>
 #include <uart16550.h>
 #include <logmsg.h>
-#include <pci_dev.h>
 #include <vtd.h>
 #include <bits.h>
 #include <board.h>
@@ -61,15 +60,6 @@
  */
 
 static spinlock_t pci_device_lock;
-
-/* @brief: Find the DRHD index corresponding to a PCI device
- * Runs through the pci_pdev_array and returns the value in drhd_idx
- * member from pdev structure that matches matches B:D.F
- *
- * @pbdf[in]	B:D.F of a PCI device
- *
- * @return if there is a matching pbdf in pci_pdev_array, pdev->drhd_idx, else INVALID_DRHD_INDEX
- */
 
 static uint32_t pci_pdev_calc_address(union pci_bdf bdf, uint32_t offset)
 {

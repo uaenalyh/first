@@ -32,7 +32,6 @@
 #include <mmu.h>
 #include <logmsg.h>
 #include "vpci_priv.h"
-#include "pci_dev.h"
 
 /**
  * @addtogroup vp-dm_vperipheral
@@ -314,6 +313,11 @@ static void vpci_deinit_pt_dev(struct pci_vdev *vdev)
 {
 	remove_vdev_pt_iommu_domain(vdev);
 	deinit_vmsi(vdev);
+}
+
+static inline uint32_t pci_bar_index(uint32_t offset)
+{
+	return (offset - PCIR_BARS) >> 2U;
 }
 
 static int32_t vpci_write_pt_dev_cfg(struct pci_vdev *vdev, uint32_t offset, uint32_t bytes, uint32_t val)
