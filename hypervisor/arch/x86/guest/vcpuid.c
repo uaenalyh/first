@@ -32,6 +32,11 @@
  * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
  */
 
+#define CPUID_CHECK_SUBLEAF		(1U << 0U)
+
+#define VIRT_CRYSTAL_CLOCK_FREQ		0x16C2154U
+#define L2_WAYS_OF_ASSOCIATIVITY	4U
+
 static inline const struct vcpuid_entry *local_find_vcpuid_entry(
 	const struct acrn_vcpu *vcpu, uint32_t leaf, uint32_t subleaf)
 {
@@ -104,11 +109,7 @@ static inline void set_vcpuid_entry(struct acrn_vm *vm, const struct vcpuid_entr
 	tmp = &vm->vcpuid_entries[vm->vcpuid_entry_nr];
 	vm->vcpuid_entry_nr++;
 	(void)memcpy_s(tmp, entry_size, entry, entry_size);
-
-	return;
 }
-
-#define L2_WAYS_OF_ASSOCIATIVITY	4U
 
 /**
  * initialization of virtual CPUID leaf
@@ -201,8 +202,6 @@ static void set_vcpuid_extended_function(struct acrn_vm *vm)
 		init_vcpuid_entry(i, 0U, 0U, &entry);
 		set_vcpuid_entry(vm, &entry);
 	}
-
-	return;
 }
 
 void set_vcpuid_entries(struct acrn_vm *vm)
@@ -266,8 +265,6 @@ void set_vcpuid_entries(struct acrn_vm *vm)
 	}
 
 	set_vcpuid_extended_function(vm);
-
-	return;
 }
 
 static inline bool is_percpu_related(uint32_t leaf)
