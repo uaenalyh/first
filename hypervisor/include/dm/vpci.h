@@ -95,9 +95,6 @@ struct pci_vdev {
 
 	/* Pointer to corressponding operations */
 	const struct pci_vdev_ops *vdev_ops;
-
-	/* For SOS, if the device is latterly assigned to a UOS, we use this field to track the new owner. */
-	struct pci_vdev *new_owner;
 };
 
 union pci_cfg_addr_reg {

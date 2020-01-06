@@ -236,21 +236,6 @@ static void remove_vdev_pt_iommu_domain(const struct pci_vdev *vdev)
 	}
 }
 
-/**
- * @pre vpci != NULL
- * @pre vpci->vm != NULL
- */
-static struct pci_vdev *find_vdev(struct acrn_vpci *vpci, union pci_bdf bdf)
-{
-	struct pci_vdev *vdev = pci_find_vdev(vpci, bdf);
-
-	if ((vdev != NULL) && (vdev->vpci != vpci)) {
-		vdev = vdev->new_owner;
-	}
-
-	return vdev;
-}
-
 static void vpci_init_pt_dev(struct pci_vdev *vdev)
 {
 	/*
@@ -326,7 +311,7 @@ static void read_cfg(struct acrn_vpci *vpci, union pci_bdf bdf, uint32_t offset,
 	struct pci_vdev *vdev;
 
 	spinlock_obtain(&vpci->lock);
-	vdev = find_vdev(vpci, bdf);
+	vdev = pci_find_vdev(vpci, bdf);
 	if (vdev != NULL) {
 		vdev->vdev_ops->read_vdev_cfg(vdev, offset, bytes, val);
 	}
@@ -341,7 +326,7 @@ static void write_cfg(struct acrn_vpci *vpci, union pci_bdf bdf, uint32_t offset
 	struct pci_vdev *vdev;
 
 	spinlock_obtain(&vpci->lock);
-	vdev = find_vdev(vpci, bdf);
+	vdev = pci_find_vdev(vpci, bdf);
 	if (vdev != NULL) {
 		vdev->vdev_ops->write_vdev_cfg(vdev, offset, bytes, val);
 	}
