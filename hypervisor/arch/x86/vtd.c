@@ -389,14 +389,14 @@ static void dmar_invalid_context_cache_global(struct dmar_drhd_rt *dmar_unit)
 	dmar_invalid_context_cache(dmar_unit, 0U, 0U, 0U, DMAR_CIRG_GLOBAL);
 }
 
-static void dmar_invalid_iotlb(
-	struct dmar_drhd_rt *dmar_unit, uint16_t did, uint64_t address, uint8_t am, bool hint, enum dmar_iirg_type iirg)
+/* Some arguments are not used in current scope, keeping it here for scope extension in the future. */
+static void dmar_invalid_iotlb(struct dmar_drhd_rt *dmar_unit, uint16_t did, __unused uint64_t address,
+	__unused uint8_t am, __unused bool hint, enum dmar_iirg_type iirg)
 {
 	/* set Drain Reads & Drain Writes,
 	 * if hardware doesn't support it, will be ignored by hardware
 	 */
 	struct dmar_entry invalidate_desc;
-	uint64_t addr = 0UL;
 
 	invalidate_desc.hi_64 = 0UL;
 
@@ -563,11 +563,6 @@ int32_t add_iommu_device(struct iommu_domain *domain, uint8_t bus, uint8_t devfu
 	uint64_t hi_64;
 	uint64_t lo_64 = 0UL;
 	int32_t ret = 0;
-	/* source id */
-	union pci_bdf sid;
-
-	sid.fields.bus = bus;
-	sid.fields.devfun = devfun;
 
 	dmar_unit = &dmar_drhd_units[1];
 
@@ -758,7 +753,8 @@ void dmar_assign_irte(struct intr_source intr_src, union dmar_ir_entry irte, uin
 	dmar_invalid_iec(dmar_unit, index, 0U, false);
 }
 
-void dmar_free_irte(struct intr_source intr_src, uint16_t index)
+/* Some arguments are not used in current scope, keeping it here for scope extension in the future. */
+void dmar_free_irte(__unused struct intr_source intr_src, uint16_t index)
 {
 	struct dmar_drhd_rt *dmar_unit;
 	union dmar_ir_entry *ir_table, *ir_entry;
