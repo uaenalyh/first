@@ -108,6 +108,8 @@ static inline void set_vcpuid_entry(struct acrn_vm *vm, const struct vcpuid_entr
 	return;
 }
 
+#define L2_WAYS_OF_ASSOCIATIVITY	4U
+
 /**
  * initialization of virtual CPUID leaf
  */
@@ -172,6 +174,13 @@ static void init_vcpuid_entry(uint32_t leaf, uint32_t subleaf, uint32_t flags, s
 		}
 		break;
 #endif
+
+	case 0x80000006U:
+		cpuid_subleaf(leaf, subleaf, &entry->eax, &entry->ebx, &entry->ecx, &entry->edx);
+		entry->ecx = (entry->ecx & ~CPUID_ECX_L2_ASSOCIATIVITY_FIELD_MASK) |
+				(L2_WAYS_OF_ASSOCIATIVITY << CPUID_ECX_L2_ASSOCIATIVITY_FIELD_POS);
+		break;
+
 	default:
 		cpuid_subleaf(leaf, subleaf, &entry->eax, &entry->ebx, &entry->ecx, &entry->edx);
 		break;
@@ -328,6 +337,9 @@ static void guest_cpuid_01h(struct acrn_vcpu *vcpu, uint32_t *eax, uint32_t *ebx
 
 	/* mask Thermal Monitor */
 	*edx &= ~CPUID_EDX_TM1;
+
+	/* mask Pending Break Enable */
+	*edx &= ~CPUID_EDX_PBE;
 
 	if(is_safety_vm(vcpu->vm)) {
 		/* mask HTT */

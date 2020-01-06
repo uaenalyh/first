@@ -49,6 +49,7 @@
 #define CPUID_EDX_ACPI			(1U << 22U)
 #define CPUID_EDX_HTT			(1U << 28U)
 #define CPUID_EDX_TM1			(1U << 29U)
+#define CPUID_EDX_PBE			(1U << 31U)
 /* CPUID.07H:EBX.SGX */
 #define CPUID_EBX_SGX			(1U << 2U)
 /* CPUID.07H:EBX.MPX */
@@ -83,6 +84,10 @@
 
 /* CPUID.06H.EAX.ARAT */
 #define CPUID_EAX_ARAT			(1U << 2U)
+
+/* CPUID.80000006H.ECX.L2_Associativity_field (Bits 15 - 12) */
+#define CPUID_ECX_L2_ASSOCIATIVITY_FIELD_POS	12U
+#define CPUID_ECX_L2_ASSOCIATIVITY_FIELD_MASK	(0xFU << CPUID_ECX_L2_ASSOCIATIVITY_FIELD_POS)
 
 /* CPUID source operands */
 #define CPUID_VENDORSTRING		0U
