@@ -9,6 +9,7 @@
 #include <types.h>
 #include <vmcs.h>
 #include <vcpu.h>
+#include <vmsr.h>
 #include <vm.h>
 #include <vmx.h>
 #include <gdt.h>

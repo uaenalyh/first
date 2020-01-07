@@ -8,7 +8,7 @@
 #define MSR_H
 
 /**
- * @addtogroup vp-base_vmsr
+ * @addtogroup hwmgmt_cpu
  *
  * @{
  */
@@ -159,15 +159,6 @@
 #define MSR_IA32_MISC_ENABLE_MONITOR_ENA (1UL << 18U)
 #define MSR_IA32_MISC_ENABLE_LIMIT_CPUID (1UL << 22U)
 #define MSR_IA32_MISC_ENABLE_XD_DISABLE  (1UL << 34U)
-
-#ifndef ASSEMBLER
-
-struct acrn_vcpu;
-
-void init_msr_emulation(struct acrn_vcpu *vcpu);
-uint32_t vmsr_get_guest_msr_index(uint32_t msr);
-
-#endif /* ASSEMBLER */
 
 #define PAT_POWER_ON_VALUE                                                                                  \
 	(PAT_MEM_TYPE_WB + (PAT_MEM_TYPE_WT << 8U) + (PAT_MEM_TYPE_UCM << 16U) + (PAT_MEM_TYPE_UC << 24U) + \
