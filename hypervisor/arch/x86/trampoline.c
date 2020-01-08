@@ -9,7 +9,6 @@
 #include <per_cpu.h>
 #include <trampoline.h>
 #include <reloc.h>
-#include <vboot.h>
 #include <ld_sym.h>
 
 /**
@@ -27,7 +26,7 @@
 
 static uint64_t trampoline_start16_paddr;
 
-uint64_t get_ap_trampoline_buf(void)
+static uint64_t get_ap_trampoline_buf(void)
 {
         struct multiboot_info *mbi;
         uint32_t size = CONFIG_LOW_RAM_SIZE;

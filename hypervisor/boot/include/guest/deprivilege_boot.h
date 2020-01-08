@@ -20,8 +20,6 @@
  */
 #define DEPRIVILEGE_BOOT_H
 
-#include <vboot.h>
-
 /**
  * @}
  */

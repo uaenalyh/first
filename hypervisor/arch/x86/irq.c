@@ -15,7 +15,6 @@
 #include <ioapic.h>
 #include <lapic.h>
 #include <softirq.h>
-#include <vboot.h>
 #include <dump.h>
 #include <logmsg.h>
 

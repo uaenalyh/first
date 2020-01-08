@@ -25,7 +25,6 @@
 #include <ld_sym.h>
 #include <logmsg.h>
 #include <cat.h>
-#include <vboot.h>
 #include <sgx.h>
 #include <uart16550.h>
 

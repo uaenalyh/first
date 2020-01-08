@@ -21,8 +21,6 @@
  */
 #define DIRECT_BOOT_H
 
-#include <vboot.h>
-
 /**
  * @}
  */
