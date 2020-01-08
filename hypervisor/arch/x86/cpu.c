@@ -217,7 +217,6 @@ void init_pcpu_post(uint16_t pcpu_id)
 		init_iommu();
 
 		/* Start all secondary cores */
-		startup_paddr = prepare_trampoline();
 		if (!start_pcpus(AP_MASK)) {
 			panic("Failed to start all secondary cores!");
 		}
@@ -298,6 +297,8 @@ bool start_pcpus(uint64_t mask)
 	uint16_t i;
 	uint16_t pcpu_id = get_pcpu_id();
 	uint64_t expected_start_mask = mask;
+
+	startup_paddr = prepare_trampoline();
 
 	/* secondary cpu start up will wait for pcpu_sync -> 0UL */
 	pcpu_sync = 1UL;
