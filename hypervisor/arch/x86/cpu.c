@@ -214,9 +214,6 @@ void init_pcpu_post(uint16_t pcpu_id)
 		/* Initialize interrupts */
 		init_interrupt(BOOT_CPU_ID);
 
-		setup_notification();
-		setup_posted_intr_notification();
-
 		init_iommu();
 
 		/* Start all secondary cores */

@@ -69,33 +69,12 @@ static int32_t request_notification_irq(irq_action_t func, void *data)
 	return retval;
 }
 
-/*
- * @pre be called only by BSP initialization process
- */
-void setup_notification(void)
-{
-	/* support IPI notification, SOS_VM will register all CPU */
-	if (request_notification_irq(kick_notification, NULL) < 0) {
-		pr_err("Failed to setup notification");
-	}
-
-	dev_dbg(ACRN_DBG_PTIRQ, "NOTIFY: irq[%d] setup vector %x", notification_irq, irq_to_vector(notification_irq));
-}
-
 static void posted_intr_notification(__unused uint32_t irq, __unused void *data)
 {
 	/* Dummy IRQ handler for case that Posted-Interrupt Notification
 	 * is sent to vCPU in root mode(isn't running),interrupt will be
 	 * picked up in next vmentry,do nothine here.
 	 */
-}
-
-/*pre-conditon: be called only by BSP initialization proccess*/
-void setup_posted_intr_notification(void)
-{
-	if (request_irq(POSTED_INTR_NOTIFY_IRQ, posted_intr_notification, NULL, IRQF_NONE) < 0) {
-		pr_err("Failed to setup posted-intr notification");
-	}
 }
 
 /**

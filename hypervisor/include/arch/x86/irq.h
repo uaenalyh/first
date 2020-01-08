@@ -92,9 +92,6 @@ void init_default_irqs(uint16_t cpu_id);
 
 void dispatch_exception(struct intr_excp_ctx *ctx);
 
-void setup_notification(void);
-void setup_posted_intr_notification(void);
-
 uint32_t alloc_irq_num(uint32_t req_irq);
 uint32_t alloc_irq_vector(uint32_t irq);
 
