@@ -151,18 +151,16 @@ void init_vmsi(struct pci_vdev *vdev)
 {
 	uint32_t val;
 
-	val = pci_pdev_read_cfg(vdev->pbdf, PCIR_CAP_PTR, 1U);
-	while ((val != 0U) && (val != 0xFFU)) {
-		uint8_t cap = pci_pdev_read_cfg(vdev->pbdf, val + PCICAP_ID, 1U);
+	val = pci_vdev_read_cfg(vdev, PCIR_CAP_PTR, 1U);
+	if ((val != 0U) && (val != 0xFFU)) {
+		uint8_t cap = pci_vdev_read_cfg(vdev, val + PCICAP_ID, 1U);
 		if (cap == PCIY_MSI) {
 			vdev->msi.capoff = val;
-			break;
 		}
-		val = pci_pdev_read_cfg(vdev->pbdf, val + PCICAP_NEXTPTR, 1U);
 	}
 
 	if (has_msi_cap(vdev)) {
-		val = pci_pdev_read_cfg(vdev->pbdf, vdev->msi.capoff, 4U);
+		val = pci_vdev_read_cfg(vdev, vdev->msi.capoff, 4U);
 		vdev->msi.caplen = ((val & (PCIM_MSICTRL_64BIT << 16U)) != 0U) ? 14U : 10U;
 		vdev->msi.is_64bit = ((val & (PCIM_MSICTRL_64BIT << 16U)) != 0U);
 

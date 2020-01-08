@@ -46,6 +46,19 @@
  * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
  */
 
+#define PCI_USB_CONTROLLER 0x0CU
+#define PCI_ETH_CONTROLLER 0x02U
+
+struct cap_info {
+	uint8_t id;
+	uint8_t length;
+};
+
+struct unused_fields {
+	uint8_t offset;
+	uint8_t length;
+};
+
 static void vpci_init_vdevs(struct acrn_vm *vm);
 static void deinit_prelaunched_vm_vpci(struct acrn_vm *vm);
 static void read_cfg(struct acrn_vpci *vpci, union pci_bdf bdf, uint32_t offset, uint32_t bytes, uint32_t *val);
@@ -236,9 +249,74 @@ static void remove_vdev_pt_iommu_domain(const struct pci_vdev *vdev)
 	}
 }
 
+/* read  some specific fields from physical configure space */
+static void init_default_cfg(struct pci_vdev *vdev)
+{
+	const struct cap_info caps[2] = { {0x01U, 8U}, {0x13U, 4U} };
+	const struct unused_fields eth_unused[] = { {0x90U, 16U} };
+	const struct unused_fields usb_unused[] = { {0x9CU, 4U}, {0xA0U, 2U}, {0xA8U, 8U}, {0xf8U, 4U} };
+
+	uint8_t offset, index;
+	uint8_t max_index = (PCI_REGMAX + 1U) >> 2U;
+	uint32_t val;
+
+	for (index = 0U; index < max_index; index++) {
+		/* read default physical configure space values except BARs */
+		if ((index < (PCIR_BARS/4U)) || (index > (PCIR_BARS/4U + PCI_BAR_COUNT - 1U))) {
+			offset = (uint8_t)(index << 2U);
+			val = pci_pdev_read_cfg(vdev->pbdf, offset, 4U);
+			pci_vdev_write_cfg(vdev, offset, 4U, val);
+		}
+	}
+
+	/* just handle two PCI devices: USB/network controller, hide unused fields */
+	val = pci_vdev_read_cfg(vdev, PCIR_CLASS, 1U);
+	if (val == PCI_USB_CONTROLLER) {
+		for (index = 0U; index < ARRAY_SIZE(usb_unused); index++) {
+			memset(vdev->cfgdata.data_8 + usb_unused[index].offset, 0U, usb_unused[index].length);
+		}
+	} else if (val == PCI_ETH_CONTROLLER) {
+		for (index = 0U; index < ARRAY_SIZE(eth_unused); index++) {
+			memset(vdev->cfgdata.data_8 + eth_unused[index].offset, 0U, eth_unused[index].length);
+		}
+	}
+
+	/* hide other CAPs except MSI, just for USB/ETH controller */
+	offset = pci_vdev_read_cfg(vdev, PCIR_CAP_PTR, 1U);
+	while ((offset != 0U) && (offset != 0xFFU)) {
+		uint8_t cap = pci_vdev_read_cfg(vdev, offset + PCICAP_ID, 1U);
+		uint8_t next = pci_vdev_read_cfg(vdev, offset + PCICAP_NEXTPTR, 1U);
+
+		/* just expose MSI */
+		if (cap == PCIY_MSI) {
+			pci_vdev_write_cfg(vdev, PCIR_CAP_PTR, 1U, offset);
+		} else {
+			/* hide other CAPs, set all its fields 0U */
+			if (cap == caps[0].id) {
+				index = 0U;
+			} else if (cap == caps[1].id) {
+				index = 1U;
+			} else {
+				pr_fatal("CAP: %d, not handled, please check!\n", cap);
+			}
+
+			memset(vdev->cfgdata.data_8 + offset, 0U, caps[index].length);
+		}
+
+		offset = next;
+	}
+
+	/* write 0U to MSI-CAP-->next CAP, hide others */
+	offset = pci_vdev_read_cfg(vdev, PCIR_CAP_PTR, 1U);
+	pci_vdev_write_cfg(vdev, offset + PCICAP_NEXTPTR, 1U, 0U);
+
+}
+
 static void vpci_init_pt_dev(struct pci_vdev *vdev)
 {
-	/*
+	init_default_cfg(vdev);
+
+    /*
 	 * Here init_vdev_pt() needs to be called after init_vmsix() for the following reason:
 	 * init_vdev_pt() will indirectly call has_msix_cap(), which
 	 * requires init_vmsix() to be called first.
