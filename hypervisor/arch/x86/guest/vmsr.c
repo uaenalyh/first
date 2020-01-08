@@ -43,7 +43,11 @@
 
 #define MSR_IA32_SPEC_CTRL_STIBP	(1UL << 1U)
 #define MCG_CAP_FOR_SAFETY_VM		0x040AUL
+
+/* Only following bits are not reserved: 22 and 34. */
 #define MSR_IA32_MISC_ENABLE_MASK	0x400400000UL
+/* Only following bits are not reserved: 0, 8, 10, and 11. */
+#define MSR_IA32_EFER_MASK		0xD01UL
 
 #define LOW_MSR_START			0U
 #define LOW_MSR_END			0x1FFFU
@@ -92,7 +96,7 @@ static const uint32_t emulated_guest_msrs[NUM_GUEST_MSRS] = {
 	MSR_RSVD,			/* MSR_IA32_SGX_SVN_STATUS, */
 };
 
-#define NUM_UNINTERCEPTED_MSRS 21U
+#define NUM_UNINTERCEPTED_MSRS 20U
 static const uint32_t unintercepted_msrs[NUM_UNINTERCEPTED_MSRS] = {
 	MSR_IA32_P5_MC_ADDR,
 	MSR_IA32_P5_MC_TYPE,
@@ -106,7 +110,6 @@ static const uint32_t unintercepted_msrs[NUM_UNINTERCEPTED_MSRS] = {
 	MSR_IA32_SYSENTER_ESP,
 	MSR_IA32_SYSENTER_EIP,
 	MSR_IA32_MCG_STATUS,
-	MSR_IA32_EFER,
 	MSR_IA32_STAR,
 	MSR_IA32_LSTAR,
 	MSR_IA32_CSTAR,
@@ -276,8 +279,9 @@ void init_msr_emulation(struct acrn_vcpu *vcpu)
 		enable_msr_interception(msr_bitmap, unintercepted_msrs[i], INTERCEPT_DISABLE);
 	}
 
-	/* only intercept wrmsr for MSR_IA32_TIME_STAMP_COUNTER */
+	/* only intercept wrmsr for MSR_IA32_TIME_STAMP_COUNTER, MSR_IA32_EFER */
 	enable_msr_interception(msr_bitmap, MSR_IA32_TIME_STAMP_COUNTER, INTERCEPT_WRITE);
+	enable_msr_interception(msr_bitmap, MSR_IA32_EFER, INTERCEPT_WRITE);
 
 	/* handle cases different between safety VM and non-safety VM */
 	/* Machine Check */
@@ -604,6 +608,66 @@ static int32_t set_guest_ia32_misc_enalbe(struct acrn_vcpu *vcpu, uint64_t v)
 	return err;
 }
 
+static int32_t write_efer_msr(struct acrn_vcpu *vcpu, uint64_t value)
+{
+	int32_t err = 0;
+	uint32_t cpuid_xd_feat_flag, eax, ebx, ecx, edx;
+	uint64_t guest_efer, efer_changed_bits, new_val;
+
+	guest_efer = vcpu_get_efer(vcpu);
+	efer_changed_bits = guest_efer ^ value;
+
+	if ((efer_changed_bits & (~MSR_IA32_EFER_MASK)) != 0UL) {
+		/*
+		 * Handle invalid write to Reserved bits.
+		 *
+		 * Modifying Reserved bits causes a general-protection exception (#GP(0)).
+		 */
+		err = -EACCES;
+	} else if (((efer_changed_bits & MSR_IA32_EFER_LME_BIT) != 0UL) && (is_paging_enabled(vcpu))) {
+		/*
+		 * Handle invalid write to LME bit.
+		 *
+		 * Modifying LME bit while paging is enabled causes a general-protection exception (#GP(0)).
+		 */
+		err = -EACCES;
+	} else {
+		/* Get guest XD Bit extended feature flag (CPUID.80000001H:EDX[20]). */
+		eax = CPUID_EXTEND_FUNCTION_1;
+		guest_cpuid(vcpu, &eax, &ebx, &ecx, &edx);
+		cpuid_xd_feat_flag = edx & CPUID_EDX_XD_BIT_AVIL;
+
+		if ((cpuid_xd_feat_flag == 0U) && ((value & MSR_IA32_EFER_NXE_BIT) != 0UL)) {
+			/*
+			 * Handle invalid write to NXE bit.
+			 *
+			 * Writing NXE bit to 1 when the XD Bit extended feature flag is set to 0
+			 * causes a general-protection exception (#GP(0)).
+			 */
+			err = -EACCES;
+		} else {
+			new_val = value;
+			/* Handle LMA bit (read-only). Write operation is ignored. */
+			if ((efer_changed_bits & MSR_IA32_EFER_LMA_BIT) != 0UL) {
+				new_val &= ~MSR_IA32_EFER_LMA_BIT;
+				new_val |= guest_efer & MSR_IA32_EFER_LMA_BIT;
+			}
+
+			vcpu_set_efer(vcpu, new_val);
+
+			if ((efer_changed_bits & MSR_IA32_EFER_NXE_BIT) != 0UL) {
+				/*
+				 * When NXE bit is changed, flush TLB entries and paging structure cache entries
+				 * applicable to the vCPU.
+				 */
+				vcpu_make_request(vcpu, ACRN_REQUEST_EPT_FLUSH);
+			}
+		}
+	}
+
+	return err;
+}
+
 /**
  * @pre vcpu != NULL
  */
@@ -639,6 +703,10 @@ int32_t wrmsr_vmexit_handler(struct acrn_vcpu *vcpu)
 	}
 	case MSR_IA32_PAT: {
 		err = write_pat_msr(vcpu, v);
+		break;
+	}
+	case MSR_IA32_EFER: {
+		err = write_efer_msr(vcpu, v);
 		break;
 	}
 	case MSR_IA32_MISC_ENABLE: {
