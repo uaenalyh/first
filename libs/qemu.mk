@@ -20,7 +20,7 @@ UT_BINARY_2 := $(UT_DIR)/guest/x86/$(UT_CASE_2).bzimage
 GRUBISO := ./grub_iso
 QEMUEXE	:= qemu-system-x86_64
 
-QEMU_CPU := max,level=21,invtsc
+QEMU_CPU := max,level=22,invtsc
 QEMUOPTS += -machine q35,kernel_irqchip=split,accel=kvm -cpu $(QEMU_CPU)
 QEMUOPTS += -m 4G -smp cpus=8,cores=4,threads=2 -enable-kvm
 QEMUOPTS += -device isa-debug-exit -device intel-iommu,intremap=on,aw-bits=48,caching-mode=on,device-iotlb=on
