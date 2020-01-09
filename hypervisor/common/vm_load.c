@@ -107,8 +107,9 @@ static uint64_t create_zero_page(struct acrn_vm *vm)
 	zeropage->hdr.bootargs_addr = (uint32_t)addr;
 
 	/* set constant arguments in zero page */
+	zeropage->hdr.version = 0x20cU;
 	zeropage->hdr.loader_type = 0xffU;
-	zeropage->hdr.load_flags |= (1U << 5U); /* quiet */
+	zeropage->hdr.load_flags = (1U << 5U); /* quiet */
 
 	/* Create/add e820 table entries in zeropage */
 	zeropage->e820_nentries = (uint8_t)create_zeropage_e820(zeropage, vm);

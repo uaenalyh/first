@@ -28,7 +28,9 @@ struct zero_page {
 
 	struct {
 		uint8_t setup_sects; /* 0x1f1 */
-		uint8_t hdr_pad1[0x1e]; /* 0x1f2 */
+		uint8_t hdr_pad1[0x14]; /* 0x1f2 */
+		uint16_t version;	/* 0x206 */
+		uint8_t hdr_pad8[0x8]; /* 0x208 */
 		uint8_t loader_type; /* 0x210 */
 		uint8_t load_flags; /* 0x211 */
 		uint8_t hdr_pad2[0x6]; /* 0x212 */
