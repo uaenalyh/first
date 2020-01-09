@@ -419,40 +419,48 @@ static int32_t vlapic_x2apic_pt_icr_access(struct acrn_vm *vm, uint64_t val)
 	struct acrn_vcpu *target_vcpu;
 	bool phys;
 	uint32_t shorthand;
-	int32_t ret = -1;
+	uint32_t reserved_bits;
+	int32_t ret;
 
-	phys = ((icr_low & APIC_DESTMODE_LOG) == 0UL);
-	shorthand = icr_low & APIC_DEST_MASK;
-
-	if ((phys == false) || (shorthand != APIC_DEST_DESTFLD)) {
-		pr_err("Logical destination mode or shorthands \
-				not supported in ICR forpartition mode\n");
-		/*
-		 * TODO: To support logical destination and shorthand modes
-		 */
+	reserved_bits = ~(APIC_VECTOR_MASK | APIC_DELMODE_MASK | APIC_DESTMODE_LOG
+			| APIC_LEVEL_MASK | APIC_TRIGMOD_MASK | APIC_DEST_MASK);
+	if ((icr_low & reserved_bits) != 0U) {
+		pr_err("Setting reserved bits in ICR");
+		ret = -1;
 	} else {
-		vcpu_id = vm_apicid2vcpu_id(vm, vapic_id);
-		if ((vcpu_id < vm->hw.created_vcpus) && (vm->hw.vcpu_array[vcpu_id].state != VCPU_OFFLINE)) {
-			target_vcpu = vcpu_from_vid(vm, vcpu_id);
+		phys = ((icr_low & APIC_DESTMODE_LOG) == 0UL);
+		shorthand = icr_low & APIC_DEST_MASK;
 
-			switch (mode) {
-			case APIC_DELMODE_INIT:
-				vlapic_process_init_sipi(target_vcpu, mode, icr_low);
-				break;
-			case APIC_DELMODE_STARTUP:
-				vlapic_process_init_sipi(target_vcpu, mode, icr_low);
-				break;
-			default:
-				/* convert the dest from virtual apic_id to physical apic_id */
-				papic_id = per_cpu(lapic_id, pcpuid_from_vcpu(target_vcpu));
-				dev_dbg(ACRN_DBG_LAPICPT, "%s vapic_id: 0x%08lx papic_id: 0x%08lx icr_low:0x%08lx",
-					__func__, vapic_id, papic_id, icr_low);
-				msr_write(MSR_IA32_EXT_APIC_ICR, (((uint64_t)papic_id) << 32U) | icr_low);
-				break;
+		if ((phys == false) || (shorthand != APIC_DEST_DESTFLD)) {
+			pr_err("Logical destination mode or shorthands \
+				not supported in ICR forpartition mode\n");
+		} else {
+			vcpu_id = vm_apicid2vcpu_id(vm, vapic_id);
+			if ((vcpu_id < vm->hw.created_vcpus) && (vm->hw.vcpu_array[vcpu_id].state != VCPU_OFFLINE)) {
+				target_vcpu = vcpu_from_vid(vm, vcpu_id);
+
+				switch (mode) {
+				case APIC_DELMODE_INIT:
+					vlapic_process_init_sipi(target_vcpu, mode, icr_low);
+					break;
+				case APIC_DELMODE_STARTUP:
+					vlapic_process_init_sipi(target_vcpu, mode, icr_low);
+					break;
+				default:
+					/* convert the dest from virtual apic_id to physical apic_id */
+					papic_id = per_cpu(lapic_id, pcpuid_from_vcpu(target_vcpu));
+					dev_dbg(ACRN_DBG_LAPICPT,
+						"%s vapic_id: 0x%08lx papic_id: 0x%08lx icr_low:0x%08lx",
+						__func__, vapic_id, papic_id, icr_low);
+					msr_write(MSR_IA32_EXT_APIC_ICR, (((uint64_t)papic_id) << 32U) | icr_low);
+					break;
+				}
 			}
-			ret = 0;
 		}
+
+		ret = 0;
 	}
+
 	return ret;
 }
 
