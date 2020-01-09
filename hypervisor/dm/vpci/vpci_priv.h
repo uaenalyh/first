@@ -126,7 +126,6 @@ void init_vdev_pt(struct pci_vdev *vdev);
 void vdev_pt_write_vbar(struct pci_vdev *vdev, uint32_t idx, uint32_t val);
 
 void init_vmsi(struct pci_vdev *vdev);
-void vmsi_read_cfg(const struct pci_vdev *vdev, uint32_t offset, uint32_t bytes, uint32_t *val);
 void vmsi_write_cfg(struct pci_vdev *vdev, uint32_t offset, uint32_t bytes, uint32_t val);
 void deinit_vmsi(const struct pci_vdev *vdev);
 

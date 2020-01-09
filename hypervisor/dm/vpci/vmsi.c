@@ -105,15 +105,6 @@ static void remap_vmsi(const struct pci_vdev *vdev)
 }
 
 /**
- * @pre vdev != NULL
- */
-void vmsi_read_cfg(const struct pci_vdev *vdev, uint32_t offset, uint32_t bytes, uint32_t *val)
-{
-	/* For PIO access, we emulate Capability Structures only */
-	*val = pci_vdev_read_cfg(vdev, offset, bytes);
-}
-
-/**
  * @brief Writing MSI Capability Structure
  *
  * @pre vdev != NULL

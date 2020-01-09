@@ -347,9 +347,13 @@ static int32_t vpci_write_pt_dev_cfg(struct pci_vdev *vdev, uint32_t offset, uin
 		}
 	} else if (msicap_access(vdev, offset)) {
 		vmsi_write_cfg(vdev, offset, bytes, val);
+	} else if (offset == PCIR_COMMAND) {
+		/* for command register write to physical space, but INTx is disabled by default */
+		pci_pdev_write_cfg(vdev->pbdf, offset, bytes, val | 0x400U);
 	} else {
-		/* passthru to physical device */
-		pci_pdev_write_cfg(vdev->pbdf, offset, bytes, val);
+		/* ignore other writing */
+		pr_dbg("pci write: bdf=%d, offset=0x%x, val=0x%x, bytes=%d\n",
+			vdev->pbdf, offset, val, bytes);
 	}
 
 	return 0;
@@ -364,11 +368,12 @@ static int32_t vpci_read_pt_dev_cfg(const struct pci_vdev *vdev, uint32_t offset
 		} else {
 			*val = ~0U;
 		}
-	} else if (msicap_access(vdev, offset)) {
-		vmsi_read_cfg(vdev, offset, bytes, val);
-	} else {
-		/* passthru to physical device */
+	} else if ((offset >= PCIR_COMMAND) && (offset < PCIR_REVID)) {
+		/* for command / status registers read from physical space */
 		*val = pci_pdev_read_cfg(vdev->pbdf, offset, bytes);
+	} else {
+		/* others read from virtual space */
+		*val = pci_vdev_read_cfg(vdev, offset, bytes);
 	}
 
 	return 0;
