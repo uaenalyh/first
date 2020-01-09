@@ -103,10 +103,10 @@ static struct page sos_vm_pd_pages[PD_PAGE_NUM(EPT_ADDRESS_SPACE(CONFIG_SOS_RAM_
 static struct page sos_vm_pt_pages[PT_PAGE_NUM(EPT_ADDRESS_SPACE(CONFIG_SOS_RAM_SIZE))];
 
 /* uos_nworld_pml4_pages[i] is ...... of UOS i (whose vm_id = i +1) */
-static struct page uos_nworld_pml4_pages[CONFIG_MAX_VM_NUM - 1U][PML4_PAGE_NUM(EPT_ADDRESS_SPACE(CONFIG_UOS_RAM_SIZE))];
-static struct page uos_nworld_pdpt_pages[CONFIG_MAX_VM_NUM - 1U][PDPT_PAGE_NUM(EPT_ADDRESS_SPACE(CONFIG_UOS_RAM_SIZE))];
-static struct page uos_nworld_pd_pages[CONFIG_MAX_VM_NUM - 1U][PD_PAGE_NUM(EPT_ADDRESS_SPACE(CONFIG_UOS_RAM_SIZE))];
-static struct page uos_nworld_pt_pages[CONFIG_MAX_VM_NUM - 1U][PT_PAGE_NUM(EPT_ADDRESS_SPACE(CONFIG_UOS_RAM_SIZE))];
+static struct page uos_nworld_pml4_pages[CONFIG_MAX_VM_NUM][PML4_PAGE_NUM(EPT_ADDRESS_SPACE(CONFIG_UOS_RAM_SIZE))];
+static struct page uos_nworld_pdpt_pages[CONFIG_MAX_VM_NUM][PDPT_PAGE_NUM(EPT_ADDRESS_SPACE(CONFIG_UOS_RAM_SIZE))];
+static struct page uos_nworld_pd_pages[CONFIG_MAX_VM_NUM][PD_PAGE_NUM(EPT_ADDRESS_SPACE(CONFIG_UOS_RAM_SIZE))];
+static struct page uos_nworld_pt_pages[CONFIG_MAX_VM_NUM][PT_PAGE_NUM(EPT_ADDRESS_SPACE(CONFIG_UOS_RAM_SIZE))];
 
 static struct page uos_sworld_pgtable_pages[CONFIG_MAX_VM_NUM - 1U][TRUSTY_PGTABLE_PAGE_NUM(TRUSTY_RAM_SIZE)];
 /* pre-assumption: TRUSTY_RAM_SIZE is 2M aligned */
@@ -207,17 +207,12 @@ static inline void ept_recover_exe_right(uint64_t *entry)
 
 void init_ept_mem_ops(struct memory_ops *mem_ops, uint16_t vm_id)
 {
-	if (vm_id != 0U) {
-		ept_pages_info[vm_id].ept.top_address_space = EPT_ADDRESS_SPACE(CONFIG_UOS_RAM_SIZE);
-		ept_pages_info[vm_id].ept.nworld_pml4_base = uos_nworld_pml4_pages[vm_id - 1U];
-		ept_pages_info[vm_id].ept.nworld_pdpt_base = uos_nworld_pdpt_pages[vm_id - 1U];
-		ept_pages_info[vm_id].ept.nworld_pd_base = uos_nworld_pd_pages[vm_id - 1U];
-		ept_pages_info[vm_id].ept.nworld_pt_base = uos_nworld_pt_pages[vm_id - 1U];
-		ept_pages_info[vm_id].ept.sworld_pgtable_base = uos_sworld_pgtable_pages[vm_id - 1U];
-		ept_pages_info[vm_id].ept.sworld_memory_base = uos_sworld_memory[vm_id - 1U];
+	ept_pages_info[vm_id].ept.top_address_space = EPT_ADDRESS_SPACE(CONFIG_UOS_RAM_SIZE);
+	ept_pages_info[vm_id].ept.nworld_pml4_base = uos_nworld_pml4_pages[vm_id];
+	ept_pages_info[vm_id].ept.nworld_pdpt_base = uos_nworld_pdpt_pages[vm_id];
+	ept_pages_info[vm_id].ept.nworld_pd_base = uos_nworld_pd_pages[vm_id];
+	ept_pages_info[vm_id].ept.nworld_pt_base = uos_nworld_pt_pages[vm_id];
 
-		mem_ops->get_sworld_memory_base = ept_get_sworld_memory_base;
-	}
 	mem_ops->info = &ept_pages_info[vm_id];
 	mem_ops->get_default_access_right = ept_get_default_access_right;
 	mem_ops->pgentry_present = ept_pgentry_present;
