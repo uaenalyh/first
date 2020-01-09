@@ -53,9 +53,6 @@ static uint16_t phys_cpu_num = 0U;
 static uint64_t pcpu_sync = 0UL;
 static uint64_t startup_paddr = 0UL;
 
-/* physical cpu active bitmap, support up to 64 cpus */
-static volatile uint64_t pcpu_active_bitmap = 0UL;
-
 static void init_pcpu_xsave(void);
 static void set_current_pcpu_id(uint16_t pcpu_id);
 static void print_hv_banner(void);
@@ -87,7 +84,7 @@ static bool init_percpu_lapic_id(void)
 static void pcpu_set_current_state(uint16_t pcpu_id, enum pcpu_boot_state state)
 {
 	/* Check if state is initializing */
-	if (state == PCPU_STATE_INITIALIZING) {
+	if (state == PCPU_STATE_RUNNING) {
 
 		/* Save this CPU's logical ID to the TSC AUX MSR */
 		set_current_pcpu_id(pcpu_id);
@@ -103,11 +100,6 @@ static void pcpu_set_current_state(uint16_t pcpu_id, enum pcpu_boot_state state)
 uint16_t get_pcpu_nums(void)
 {
 	return phys_cpu_num;
-}
-
-bool is_pcpu_active(uint16_t pcpu_id)
-{
-	return bitmap_test(pcpu_id, &pcpu_active_bitmap);
 }
 
 void init_pcpu_pre(bool is_bsp)
@@ -173,10 +165,8 @@ void init_pcpu_pre(bool is_bsp)
 		}
 	}
 
-	bitmap_set_lock(pcpu_id, &pcpu_active_bitmap);
-
 	/* Set state for this CPU to initializing */
-	pcpu_set_current_state(pcpu_id, PCPU_STATE_INITIALIZING);
+	pcpu_set_current_state(pcpu_id, PCPU_STATE_RUNNING);
 }
 
 void init_pcpu_post(uint16_t pcpu_id)
@@ -254,9 +244,10 @@ static uint16_t get_pcpu_id_from_lapic_id(uint32_t lapic_id)
 	return pcpu_id;
 }
 
-static void start_pcpu(uint16_t pcpu_id)
+static bool start_pcpu(uint16_t pcpu_id)
 {
 	uint32_t timeout;
+	bool status = true;
 
 	/* Update the stack for pcpu */
 	stac();
@@ -269,7 +260,7 @@ static void start_pcpu(uint16_t pcpu_id)
 	 * configured time-out has expired
 	 */
 	timeout = CPU_UP_TIMEOUT * 1000U;
-	while (!is_pcpu_active(pcpu_id) && (timeout != 0U)) {
+	while ((per_cpu_data[pcpu_id].boot_state != PCPU_STATE_RUNNING) && (timeout != 0U)) {
 		/* Delay 10us */
 		udelay(10U);
 
@@ -278,10 +269,13 @@ static void start_pcpu(uint16_t pcpu_id)
 	}
 
 	/* Check to see if expected CPU is actually up */
-	if (!is_pcpu_active(pcpu_id)) {
+	if (per_cpu_data[pcpu_id].boot_state != PCPU_STATE_RUNNING) {
 		pr_fatal("Secondary CPU%hu failed to come up", pcpu_id);
 		pcpu_set_current_state(pcpu_id, PCPU_STATE_DEAD);
+		status = false;
 	}
+
+	return status;
 }
 
 /**
@@ -297,6 +291,7 @@ bool start_pcpus(uint64_t mask)
 	uint16_t i;
 	uint16_t pcpu_id = get_pcpu_id();
 	uint64_t expected_start_mask = mask;
+	bool status = true;
 
 	startup_paddr = prepare_trampoline();
 
@@ -312,14 +307,17 @@ bool start_pcpus(uint64_t mask)
 			continue; /* Avoid start itself */
 		}
 
-		start_pcpu(i);
+		if (start_pcpu(i) == false) {
+			status = false;
+			break;
+		}
 		i = ffs64(expected_start_mask);
 	}
 
 	/* Trigger event to allow secondary CPUs to continue */
 	pcpu_sync = 0UL;
 
-	return ((pcpu_active_bitmap & mask) == mask);
+	return status;
 }
 
 void make_pcpu_offline(uint16_t pcpu_id)
@@ -335,12 +333,39 @@ bool need_offline(uint16_t pcpu_id)
 	return bitmap_test_and_clear_lock(NEED_OFFLINE, &per_cpu(pcpu_flag, pcpu_id));
 }
 
+/**
+ * @check if there is any pcpu still active.
+ *
+ * @param[in] mask bits mask of pcpus which should have been started
+ *
+ * @return true if there is pcpu still active.
+ * @return false if there is no pcpu active.
+ */
+static bool is_any_pcpu_active(uint64_t mask)
+{
+	uint16_t i;
+	uint64_t pcpu_mask = mask;
+	bool status = false;
+
+	i = ffs64(pcpu_mask);
+	while (i != INVALID_BIT_INDEX) {
+		if (per_cpu_data[i].boot_state == PCPU_STATE_RUNNING) {
+			status = true;
+			break;
+		}
+		bitmap_clear_nolock(i, &pcpu_mask);
+		i = ffs64(pcpu_mask);
+	}
+
+	return status;
+}
+
 void wait_pcpus_offline(uint64_t mask)
 {
 	uint32_t timeout;
 
 	timeout = CPU_DOWN_TIMEOUT * 1000U;
-	while (((pcpu_active_bitmap & mask) != 0UL) && (timeout != 0U)) {
+	while (is_any_pcpu_active(mask) && (timeout != 0U)) {
 		udelay(10U);
 		timeout -= 10U;
 	}
@@ -363,14 +388,13 @@ void cpu_dead(void)
 	uint16_t pcpu_id = get_pcpu_id();
 
 	deinit_sched(pcpu_id);
-	if (bitmap_test(pcpu_id, &pcpu_active_bitmap)) {
+	if (per_cpu_data[pcpu_id].boot_state == PCPU_STATE_RUNNING) {
 		/* clean up native stuff */
 		vmx_off();
 		cache_flush_invalidate_all();
 
 		/* Set state to show CPU is dead */
 		pcpu_set_current_state(pcpu_id, PCPU_STATE_DEAD);
-		bitmap_clear_lock(pcpu_id, &pcpu_active_bitmap);
 
 		/* Halt the CPU */
 		do {

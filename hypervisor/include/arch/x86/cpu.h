@@ -246,11 +246,8 @@ struct descriptor_table {
 
 /* CPU states defined */
 enum pcpu_boot_state {
-	PCPU_STATE_RESET = 0U,
-	PCPU_STATE_INITIALIZING,
+	PCPU_STATE_DEAD = 0U,
 	PCPU_STATE_RUNNING,
-	PCPU_STATE_HALTED,
-	PCPU_STATE_DEAD,
 };
 
 #define NEED_OFFLINE     (1U)
@@ -540,7 +537,6 @@ static inline void clac(void)
  * @post return <= MAX_PCPU_NUM
  */
 uint16_t get_pcpu_nums(void);
-bool is_pcpu_active(uint16_t pcpu_id);
 #else /* ASSEMBLER defined */
 
 #endif /* ASSEMBLER defined */
