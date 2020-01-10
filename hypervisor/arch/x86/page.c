@@ -103,15 +103,7 @@ static struct page uos_nworld_pdpt_pages[CONFIG_MAX_VM_NUM][PDPT_PAGE_NUM(EPT_AD
 static struct page uos_nworld_pd_pages[CONFIG_MAX_VM_NUM][PD_PAGE_NUM(EPT_ADDRESS_SPACE(CONFIG_UOS_RAM_SIZE))];
 static struct page uos_nworld_pt_pages[CONFIG_MAX_VM_NUM][PT_PAGE_NUM(EPT_ADDRESS_SPACE(CONFIG_UOS_RAM_SIZE))];
 
-/* pre-assumption: TRUSTY_RAM_SIZE is 2M aligned */
-static struct page uos_sworld_memory[CONFIG_MAX_VM_NUM - 1U][TRUSTY_RAM_SIZE >> PAGE_SHIFT] __aligned(MEM_2M);
-
 static union pgtable_pages_info ept_pages_info[CONFIG_MAX_VM_NUM];
-
-void *get_reserve_sworld_memory_base(void)
-{
-	return uos_sworld_memory;
-}
 
 static inline uint64_t ept_get_default_access_right(void)
 {
@@ -147,10 +139,8 @@ static inline struct page *ept_get_pd_page(const union pgtable_pages_info *info,
 	struct page *pd_page;
 	if (gpa < TRUSTY_EPT_REBASE_GPA) {
 		pd_page = info->ept.nworld_pd_base + (gpa >> PDPTE_SHIFT);
-	} else {
-		pd_page = info->ept.sworld_pgtable_base + TRUSTY_PML4_PAGE_NUM(TRUSTY_EPT_REBASE_GPA) +
-			TRUSTY_PDPT_PAGE_NUM(TRUSTY_EPT_REBASE_GPA) + ((gpa - TRUSTY_EPT_REBASE_GPA) >> PDPTE_SHIFT);
 	}
+
 	(void)memset(pd_page, 0U, PAGE_SIZE);
 	return pd_page;
 }
@@ -160,11 +150,8 @@ static inline struct page *ept_get_pt_page(const union pgtable_pages_info *info,
 	struct page *pt_page;
 	if (gpa < TRUSTY_EPT_REBASE_GPA) {
 		pt_page = info->ept.nworld_pt_base + (gpa >> PDE_SHIFT);
-	} else {
-		pt_page = info->ept.sworld_pgtable_base + TRUSTY_PML4_PAGE_NUM(TRUSTY_EPT_REBASE_GPA) +
-			TRUSTY_PDPT_PAGE_NUM(TRUSTY_EPT_REBASE_GPA) + TRUSTY_PD_PAGE_NUM(TRUSTY_EPT_REBASE_GPA) +
-			((gpa - TRUSTY_EPT_REBASE_GPA) >> PDE_SHIFT);
 	}
+
 	(void)memset(pt_page, 0U, PAGE_SIZE);
 	return pt_page;
 }

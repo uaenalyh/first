@@ -70,8 +70,6 @@ union pgtable_pages_info {
 		struct page *nworld_pdpt_base;
 		struct page *nworld_pd_base;
 		struct page *nworld_pt_base;
-		struct page *sworld_pgtable_base;
-		struct page *sworld_memory_base;
 	} ept;
 };
 
@@ -91,7 +89,6 @@ struct memory_ops {
 
 extern const struct memory_ops ppt_mem_ops;
 void init_ept_mem_ops(struct memory_ops *mem_ops, uint16_t vm_id);
-void *get_reserve_sworld_memory_base(void);
 
 /**
  * @}
