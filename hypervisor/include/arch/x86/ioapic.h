@@ -34,7 +34,6 @@ struct ioapic_info {
 void ioapic_setup_irqs(void);
 
 bool ioapic_irq_is_gsi(uint32_t irq);
-int32_t init_ioapic_id_info(void);
 
 /**
  * @defgroup ioapic_ext_apis IOAPIC External Interfaces
@@ -48,15 +47,5 @@ int32_t init_ioapic_id_info(void);
  * @}
  */
 /* End of ioapic_ext_apis */
-
-struct gsi_table {
-	uint8_t ioapic_id;
-	uint32_t pin;
-	void *addr;
-};
-
-/**
- * @}
- */
 
 #endif /* IOAPIC_H */

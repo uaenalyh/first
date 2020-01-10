@@ -105,7 +105,6 @@ uint16_t get_pcpu_nums(void)
 void init_pcpu_pre(bool is_bsp)
 {
 	uint16_t pcpu_id;
-	int32_t ret;
 
 	if (is_bsp) {
 		pcpu_id = BOOT_CPU_ID;
@@ -144,11 +143,7 @@ void init_pcpu_pre(bool is_bsp)
 			panic("failed to init_percpu_lapic_id!");
 		}
 
-		ret = init_ioapic_id_info();
-		if (ret != 0) {
-			panic("System IOAPIC info is incorrect!");
-		}
-
+		ioapic_setup_irqs();
 	} else {
 		bsp_init();
 
