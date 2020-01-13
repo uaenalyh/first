@@ -580,9 +580,9 @@ static void set_guest_tsc_adjust(struct acrn_vcpu *vcpu, uint64_t tsc_adjust)
 /**
  * @pre vcpu != NULL
  */
-static int32_t set_guest_ia32_misc_enalbe(struct acrn_vcpu *vcpu, uint64_t v)
+static int32_t set_guest_ia32_misc_enable(struct acrn_vcpu *vcpu, uint64_t v)
 {
-	uint64_t msr_value, guest_ia32_misc_enable;
+	uint64_t msr_value, guest_ia32_misc_enable, guest_efer;
 	int32_t err = 0;
 
 	guest_ia32_misc_enable = vcpu_get_guest_msr(vcpu, MSR_IA32_MISC_ENABLE);
@@ -601,7 +601,16 @@ static int32_t set_guest_ia32_misc_enalbe(struct acrn_vcpu *vcpu, uint64_t v)
 		 * EFER.NXE should be cleared if guest disable XD in IA32_MISC_ENABLE
 		 */
 		if ((v & MSR_IA32_MISC_ENABLE_XD_DISABLE) != 0UL) {
-			vcpu_set_efer(vcpu, vcpu_get_efer(vcpu) & ~MSR_IA32_EFER_NXE_BIT);
+			guest_efer = vcpu_get_efer(vcpu);
+
+			if ((guest_efer & MSR_IA32_EFER_NXE_BIT) != 0UL) {
+				vcpu_set_efer(vcpu, guest_efer & ~MSR_IA32_EFER_NXE_BIT);
+				/*
+				 * When NXE bit is changed, flush TLB entries and paging structure cache entries
+				 * applicable to the vCPU.
+				 */
+				vcpu_make_request(vcpu, ACRN_REQUEST_EPT_FLUSH);
+			}
 		}
 	}
 
@@ -710,7 +719,7 @@ int32_t wrmsr_vmexit_handler(struct acrn_vcpu *vcpu)
 		break;
 	}
 	case MSR_IA32_MISC_ENABLE: {
-		err = set_guest_ia32_misc_enalbe(vcpu, v);
+		err = set_guest_ia32_misc_enable(vcpu, v);
 		break;
 	}
 	case MSR_IA32_SPEC_CTRL: {
