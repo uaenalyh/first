@@ -292,6 +292,14 @@ static void init_exec_ctrl(struct acrn_vcpu *vcpu)
 	 */
 	value32 |= VMX_PROCBASED_CTLS_RDPMC;
 
+	/*
+	 * Enable VM_EXIT for MWAIT, MOV-DR and MONITOR.
+	 */
+	value32 |= VMX_PROCBASED_CTLS_MWAIT;
+	value32 |= VMX_PROCBASED_CTLS_MOV_DR;
+	value32 |= VMX_PROCBASED_CTLS_MONITOR;
+
+
 	exec_vmwrite32(VMX_PROC_VM_EXEC_CONTROLS, value32);
 	pr_dbg("VMX_PROC_VM_EXEC_CONTROLS: 0x%x ", value32);
 
@@ -318,10 +326,14 @@ static void init_exec_ctrl(struct acrn_vcpu *vcpu)
 	 */
 	exec_vmwrite32(VMX_TPR_THRESHOLD, 0U);
 
-	if (pcpu_has_cap(X86_FEATURE_OSXSAVE)) {
-		exec_vmwrite64(VMX_XSS_EXITING_BITMAP_FULL, 0UL);
-		value32 |= VMX_PROCBASED_CTLS2_XSVE_XRSTR;
-	}
+	/*
+	 * Attempts to execute XRSTORS instructions in VMX non-root operation are handled
+	 * by hardware directly by injection #UD. The VM exit is configured by setting
+	 * the 'Enable XSAVES/XRSTORS' bit in secondary processor-based VM execution
+	 * control to 0.
+	 */
+
+	value32 &= ~VMX_PROCBASED_CTLS2_XSVE_XRSTR;
 
 	value32 |= VMX_PROCBASED_CTLS2_WBINVD;
 
@@ -338,9 +350,9 @@ static void init_exec_ctrl(struct acrn_vcpu *vcpu)
 
 	/* Set up guest exception mask bitmap setting a bit * causes a VM exit
 	 * on corresponding guest * exception - pg 2902 24.6.3
-	 * enable VM exit on MC only
+	 * enable VM exit on DB only
 	 */
-	value32 = (1U << IDT_MC);
+	value32 = (1U << IDT_DB);
 	exec_vmwrite32(VMX_EXCEPTION_BITMAP, value32);
 
 	/* Set up page fault error code mask - second paragraph * pg 2902

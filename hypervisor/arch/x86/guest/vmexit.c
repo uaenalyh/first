@@ -123,11 +123,11 @@ const struct vm_exit_dispatch dispatch_table[NR_VMX_EXIT_REASONS] = {
 	[VMX_EXIT_REASON_ENTRY_FAILURE_MSR_LOADING] = {
 		.handler = unexpected_vmexit_handler},
 	[VMX_EXIT_REASON_MWAIT] = {
-		.handler = unexpected_vmexit_handler},
+		.handler = undefined_vmexit_handler},
 	[VMX_EXIT_REASON_MONITOR_TRAP] = {
 		.handler = unexpected_vmexit_handler},
 	[VMX_EXIT_REASON_MONITOR] = {
-		.handler = unexpected_vmexit_handler},
+		.handler = undefined_vmexit_handler},
 	[VMX_EXIT_REASON_PAUSE] = {
 		.handler = unexpected_vmexit_handler},
 	[VMX_EXIT_REASON_ENTRY_FAILURE_MACHINE_CHECK] = {
@@ -401,6 +401,11 @@ static int32_t invd_vmexit_handler(struct acrn_vcpu *vcpu)
 
 static int32_t movdr_vmexit_handler(struct acrn_vcpu *vcpu)
 {
-	vcpu_inject_gp(vcpu, 0U);
+	/*
+	 * In the current usecase, triple fault will happen if vcpu inject gp during
+	 * mov_dr handler. Here just do nothing to work around and this issue will be
+	 * resolved in the future.
+	 */
+//	vcpu_inject_gp(vcpu, 0U);
 	return 0;
 }
