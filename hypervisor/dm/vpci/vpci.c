@@ -114,27 +114,14 @@ static void pci_cfgdata_io_read(struct acrn_vcpu *vcpu, uint16_t addr, size_t by
 	union pci_bdf bdf;
 	uint32_t offset = addr - PCI_CONFIG_DATA;
 	uint32_t val = ~0U;
-	struct acrn_vm_config *vm_config;
 	struct pio_request *pio_req = &vcpu->req.reqs.pio;
 
 	cfg_addr.value = atomic_readandclear32(&vpci->addr.value);
 	if (cfg_addr.bits.enable != 0U) {
 		uint32_t target_reg = cfg_addr.bits.reg_num + offset;
 		if (vpci_is_valid_access(target_reg, bytes)) {
-			vm_config = get_vm_config(vm->vm_id);
-
-			switch (vm_config->load_order) {
-			case PRE_LAUNCHED_VM:
-				bdf.value = cfg_addr.bits.bdf;
-				read_cfg(vpci, bdf, target_reg, bytes, &val);
-				break;
-
-			default:
-				ASSERT(false,
-					"Error, pci_cfgdata_io_read should only be called for PRE_LAUNCHED_VM and "
-					"SOS_VM");
-				break;
-			}
+			bdf.value = cfg_addr.bits.bdf;
+			read_cfg(vpci, bdf, cfg_addr.bits.reg_num + offset, bytes, &val);
 		}
 	}
 
@@ -155,26 +142,14 @@ static void pci_cfgdata_io_write(struct acrn_vcpu *vcpu, uint16_t addr, size_t b
 	union pci_cfg_addr_reg cfg_addr;
 	union pci_bdf bdf;
 	uint32_t offset = addr - PCI_CONFIG_DATA;
-	struct acrn_vm_config *vm_config;
 
 	cfg_addr.value = atomic_readandclear32(&vpci->addr.value);
 	if (cfg_addr.bits.enable != 0U) {
 		uint32_t target_reg = cfg_addr.bits.reg_num + offset;
 		if (vpci_is_valid_access(target_reg, bytes)) {
-			vm_config = get_vm_config(vm->vm_id);
+			bdf.value = cfg_addr.bits.bdf;
+			write_cfg(vpci, bdf, target_reg, bytes, val);
 
-			switch (vm_config->load_order) {
-			case PRE_LAUNCHED_VM:
-				bdf.value = cfg_addr.bits.bdf;
-				write_cfg(vpci, bdf, target_reg, bytes, val);
-				break;
-
-			default:
-				ASSERT(false,
-					"Error, pci_cfgdata_io_write should only be called for PRE_LAUNCHED_VM and "
-					"SOS_VM");
-				break;
-			}
 		}
 	}
 
@@ -190,33 +165,22 @@ void vpci_init(struct acrn_vm *vm)
 
 	struct vm_io_range pci_cfgdata_range = { .base = PCI_CONFIG_DATA, .len = 4U };
 
-	struct acrn_vm_config *vm_config;
-
 	vm->vpci.vm = vm;
 	vm->iommu = create_iommu_domain(vm->vm_id, hva2hpa(vm->arch_vm.nworld_eptp), 48U);
 	/* Build up vdev list for vm */
 	vpci_init_vdevs(vm);
 
-	vm_config = get_vm_config(vm->vm_id);
-	switch (vm_config->load_order) {
-	case PRE_LAUNCHED_VM:
-		/*
-		 * SOS: intercept port CF8 only.
-		 * UOS or pre-launched VM: register handler for CF8 only and I/O requests to CF9/CFA/CFB are
-		 * not handled by vpci.
-		 */
-		register_pio_emulation_handler(
-			vm, PCI_CFGADDR_PIO_IDX, &pci_cfgaddr_range, pci_cfgaddr_io_read, pci_cfgaddr_io_write);
+	/*
+	 * SOS: intercept port CF8 only.
+	 * UOS or pre-launched VM: register handler for CF8 only and I/O requests to CF9/CFA/CFB are
+	 * not handled by vpci.
+	 */
+	register_pio_emulation_handler(
+		vm, PCI_CFGADDR_PIO_IDX, &pci_cfgaddr_range, pci_cfgaddr_io_read, pci_cfgaddr_io_write);
 
-		/* Intercept and handle I/O ports CFC -- CFF */
-		register_pio_emulation_handler(
-			vm, PCI_CFGDATA_PIO_IDX, &pci_cfgdata_range, pci_cfgdata_io_read, pci_cfgdata_io_write);
-		break;
-
-	default:
-		/* Nothing to do for other vm types */
-		break;
-	}
+	/* Intercept and handle I/O ports CFC -- CFF */
+	register_pio_emulation_handler(
+		vm, PCI_CFGDATA_PIO_IDX, &pci_cfgdata_range, pci_cfgdata_io_read, pci_cfgdata_io_write);
 
 	spinlock_init(&vm->vpci.lock);
 }
@@ -227,19 +191,8 @@ void vpci_init(struct acrn_vm *vm)
  */
 void vpci_cleanup(struct acrn_vm *vm)
 {
-	struct acrn_vm_config *vm_config;
-
-	vm_config = get_vm_config(vm->vm_id);
-	switch (vm_config->load_order) {
-	case PRE_LAUNCHED_VM:
-		/* deinit function for both SOS and pre-launched VMs (consider sos also as pre-launched) */
-		deinit_prelaunched_vm_vpci(vm);
-		break;
-
-	default:
-		/* Unsupported VM type - Do nothing */
-		break;
-	}
+	/* deinit function for both SOS and pre-launched VMs (consider sos also as pre-launched) */
+	deinit_prelaunched_vm_vpci(vm);
 }
 
 /**

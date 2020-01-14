@@ -25,7 +25,6 @@ extern struct acrn_vm_pci_dev_config vm1_pci_devs[VM1_CONFIG_PCI_DEV_NUM];
 
 struct acrn_vm_config vm_configs[CONFIG_MAX_VM_NUM] = {
 	{	/* VM0 */
-		.load_order = PRE_LAUNCHED_VM,
 		.name = "ACRN PRE-LAUNCHED VM0",
 		.vcpu_num = 1U,
 		.vcpu_affinity = VM0_CONFIG_VCPU_AFFINITY,
@@ -51,7 +50,6 @@ struct acrn_vm_config vm_configs[CONFIG_MAX_VM_NUM] = {
 		.pci_devs = vm0_pci_devs,
 	},
 	{	/* VM1 */
-		.load_order = PRE_LAUNCHED_VM,
 		.name = "ACRN PRE-LAUNCHED VM1",
 		.vcpu_num = 3U,
 		.vcpu_affinity = VM1_CONFIG_VCPU_AFFINITY,

@@ -36,17 +36,6 @@
 #define PCI_DEV_TYPE_PTDEV  (1U << 0U)
 #define PCI_DEV_TYPE_HVEMUL (1U << 1U)
 
-/*
- * PRE_LAUNCHED_VM is launched by ACRN hypervisor, with LAPIC_PT;
- * SOS_VM is launched by ACRN hypervisor, without LAPIC_PT;
- * POST_LAUNCHED_VM is launched by ACRN devicemodel, with/without LAPIC_PT depends on usecases.
- */
-enum acrn_vm_load_order {
-	PRE_LAUNCHED_VM = 1,
-	SOS_VM,
-	POST_LAUNCHED_VM /* Launched by Devicemodel in SOS_VM */
-};
-
 struct acrn_vm_mem_config {
 	uint64_t start_hpa; /* the start HPA of VM memory configuration, for pre-launched VMs only */
 	uint64_t size; /* VM memory size configuration */
@@ -106,7 +95,6 @@ struct acrn_vm_pci_dev_config {
 } __aligned(8);
 
 struct acrn_vm_config {
-	enum acrn_vm_load_order load_order; /* specify the load order of VM */
 	char name[MAX_VM_OS_NAME_LEN]; /* VM name identifier, useful for debug. */
 	uint16_t vcpu_num; /* Number of vCPUs for the VM */
 
