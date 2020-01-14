@@ -106,7 +106,6 @@ struct acrn_vm_config {
 			       * We could add more guest flags in future;
 			       */
 	struct acrn_vm_mem_config memory; /* memory configuration of VM */
-	struct epc_section epc; /* EPC memory configuration of VM */
 	uint16_t pci_dev_num; /* indicate how many PCI devices in VM */
 	struct acrn_vm_pci_dev_config *pci_devs; /* point to PCI devices BDF list */
 	struct acrn_vm_os_config os_config; /* OS information the VM */
