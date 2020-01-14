@@ -108,7 +108,6 @@ struct acrn_vm_pci_dev_config {
 struct acrn_vm_config {
 	enum acrn_vm_load_order load_order; /* specify the load order of VM */
 	char name[MAX_VM_OS_NAME_LEN]; /* VM name identifier, useful for debug. */
-	const uint8_t uuid[16]; /* UUID of the VM */
 	uint16_t vcpu_num; /* Number of vCPUs for the VM */
 
 	uint64_t vcpu_affinity[MAX_VCPUS_PER_VM]; /* bitmaps for vCPUs' affinity */

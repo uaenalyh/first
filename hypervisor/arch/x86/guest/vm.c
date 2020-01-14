@@ -188,8 +188,6 @@ int32_t create_vm(uint16_t vm_id, struct acrn_vm_config *vm_config, struct acrn_
 	vm->arch_vm.nworld_eptp = vm->arch_vm.ept_mem_ops.get_pml4_page(vm->arch_vm.ept_mem_ops.info);
 	sanitize_pte((uint64_t *)vm->arch_vm.nworld_eptp, &vm->arch_vm.ept_mem_ops);
 
-	(void)memcpy_s(&vm->uuid[0], sizeof(vm->uuid), &vm_config->uuid[0], sizeof(vm_config->uuid));
-
 	create_prelaunched_vm_e820(vm);
 	prepare_prelaunched_vm_memmap(vm, vm_config);
 	init_vm_boot_info(vm);
