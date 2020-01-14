@@ -305,7 +305,6 @@ static void vlapic_process_init_sipi(struct acrn_vcpu *target_vcpu, uint32_t mod
 	} else {
 		/* No other state currently, do nothing */
 	}
-	return;
 }
 
 static int32_t vlapic_read(struct acrn_vlapic *vlapic, uint32_t offset_arg, uint64_t *data)
