@@ -6,6 +6,7 @@
 
 #include <vm.h>
 #include <io.h>
+#include <logmsg.h>
 
 /**
  * @defgroup vp-dm vp-dm
@@ -50,22 +51,27 @@ static bool cmos_update_in_progress(void)
 	return (cmos_read(RTC_STATUSA) & RTCSA_TUP) ? 1 : 0;
 }
 
-static uint8_t cmos_get_reg_val(uint8_t addr)
+static bool cmos_get_reg_val(uint8_t addr, uint32_t *value)
 {
-	uint8_t reg;
-	int32_t tries = 2000;
+	bool result = true;
+	int32_t tries = 3000;
 
 	spinlock_obtain(&cmos_lock);
 
 	/* Make sure an update isn't in progress */
 	while (cmos_update_in_progress() && (tries != 0)) {
 		tries -= 1;
+		udelay(10U);
 	}
 
-	reg = cmos_read(addr);
+	if (tries <= 0) {
+		result = false;
+	}
+
+	*value = cmos_read(addr);
 
 	spinlock_release(&cmos_lock);
-	return reg;
+	return result;
 }
 
 /**
@@ -83,7 +89,15 @@ static void vrtc_read(struct acrn_vcpu *vcpu, uint16_t addr, __unused size_t wid
 	if (addr == CMOS_ADDR_PORT) {
 		pio_req->value = vm->vrtc_offset;
 	} else {
-		pio_req->value = cmos_get_reg_val(offset);
+		bool ret = cmos_get_reg_val(offset, &(pio_req->value));
+
+		if (!ret) {
+			if (is_safety_vm(vcpu->vm)) {
+				panic("read rtc timeout, system exception!");				
+			} else {
+				shutdown_vm(vcpu->vm);
+			}
+		}
 	}
 }
 
