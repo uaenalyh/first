@@ -5,6 +5,7 @@
  */
 
 #include <types.h>
+#include <e820.h>
 #include <mmu.h>
 #include <per_cpu.h>
 #include <trampoline.h>
@@ -70,7 +71,7 @@ void write_trampoline_stack_sym(uint16_t pcpu_id)
 	uint64_t *hva, stack_sym_addr;
 	hva = (uint64_t *)(hpa2hva(trampoline_start16_paddr) + trampoline_relo_addr(secondary_cpu_stack));
 
-	stack_sym_addr = (uint64_t)&per_cpu(stack, pcpu_id)[CONFIG_STACK_SIZE - 1];
+	stack_sym_addr = (uint64_t)&per_cpu(stack, pcpu_id)[CONFIG_STACK_SIZE - 1U];
 	stack_sym_addr &= ~(CPU_STACK_ALIGN - 1UL);
 	*hva = stack_sym_addr;
 

@@ -57,7 +57,7 @@ uint16_t parse_madt(uint32_t lapic_id_array[MAX_PCPU_NUM])
 	lapic_id_array[2] = 4U;
 	lapic_id_array[3] = 6U;
 
-	return 4;
+	return 4U;
 }
 
 uint16_t parse_madt_ioapic(struct ioapic_info *ioapic_id_array)
@@ -68,7 +68,7 @@ uint16_t parse_madt_ioapic(struct ioapic_info *ioapic_id_array)
 	ioapic_id_array->gsi_base = 0U;
 	ioapic_id_array->nr_pins = 0U;
 
-	return 1;
+	return 1U;
 }
 
 /**

@@ -31,7 +31,7 @@
 #define CONFIG_UOS_RAM_SIZE              0x200000000UL
 #define CONFIG_MAX_IOAPIC_NUM            1U
 #define CONFIG_MAX_IOAPIC_LINES          120U
-#define CONFIG_MAX_IR_ENTRIES            256
+#define CONFIG_MAX_IR_ENTRIES            256U
 #define CONFIG_IOMMU_BUS_NUM             0x100U
 #define CONFIG_MAX_PCI_DEV_NUM           96U
 #define CONFIG_MAX_MSIX_TABLE_NUM        16U

@@ -80,7 +80,7 @@ int32_t strncmp(const char *s1_arg, const char *s2_arg, size_t n_arg)
 	int32_t ret = 0;
 
 	if (n > 0U) {
-		while (((n - 1) != 0U) && ((*str1) != '\0') && ((*str2) != '\0') && ((*str1) == (*str2))) {
+		while (((n - 1U) != 0U) && ((*str1) != '\0') && ((*str2) != '\0') && ((*str1) == (*str2))) {
 			str1++;
 			str2++;
 			n--;

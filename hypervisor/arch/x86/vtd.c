@@ -152,7 +152,7 @@ static uint32_t qi_status = 0U;
 static struct dmar_info *platform_dmar_info = NULL;
 
 /* Domain id 0 is reserved in some cases per VT-d */
-#define MAX_DOMAIN_NUM (CONFIG_MAX_VM_NUM + 1)
+#define MAX_DOMAIN_NUM (CONFIG_MAX_VM_NUM + 1U)
 
 static inline uint16_t vmid_to_domainid(uint16_t vm_id)
 {
@@ -252,7 +252,7 @@ static inline uint8_t width_to_agaw(uint32_t width)
 
 static void dmar_enable_intr_remapping(struct dmar_drhd_rt *dmar_unit)
 {
-	uint32_t status = 0;
+	uint32_t status = 0U;
 
 	spinlock_obtain(&(dmar_unit->lock));
 	if ((dmar_unit->gcmd & DMA_GCMD_IRE) == 0U) {
@@ -268,7 +268,7 @@ static void dmar_enable_intr_remapping(struct dmar_drhd_rt *dmar_unit)
 
 static void dmar_enable_translation(struct dmar_drhd_rt *dmar_unit)
 {
-	uint32_t status = 0;
+	uint32_t status = 0U;
 
 	spinlock_obtain(&(dmar_unit->lock));
 	if ((dmar_unit->gcmd & DMA_GCMD_TE) == 0U) {
@@ -517,7 +517,7 @@ static void dmar_set_root_table(struct dmar_drhd_rt *dmar_unit)
 
 static void dmar_enable_qi(struct dmar_drhd_rt *dmar_unit)
 {
-	uint32_t status = 0;
+	uint32_t status = 0U;
 
 	spinlock_obtain(&(dmar_unit->lock));
 

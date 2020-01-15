@@ -181,7 +181,7 @@ void vlapic_set_tsc_deadline_msr(struct acrn_vlapic *vlapic, uint64_t val_arg)
 		}
 		msr_write(MSR_IA32_TSC_DEADLINE, val);
 	} else {
-		msr_write(MSR_IA32_TSC_DEADLINE, 0);
+		msr_write(MSR_IA32_TSC_DEADLINE, 0UL);
 	}
 }
 

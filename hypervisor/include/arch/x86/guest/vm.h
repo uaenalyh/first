@@ -77,7 +77,7 @@ enum vm_state {
 
 struct vm_arch {
 	/* I/O bitmaps A and B for this VM, MUST be 4-Kbyte aligned */
-	uint8_t io_bitmap[PAGE_SIZE * 2];
+	uint8_t io_bitmap[PAGE_SIZE * 2U];
 
 	/* EPT hierarchy for Normal World */
 	void *nworld_eptp;

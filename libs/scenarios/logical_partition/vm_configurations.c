@@ -42,8 +42,8 @@ struct acrn_vm_config vm_configs[CONFIG_MAX_VM_NUM] = {
 			.kernel_type = KERNEL_ZEPHYR,
 			.kernel_mod_tag = "zephyr",
 			.bootargs = "",
-			.kernel_load_addr = 0x100000,
-			.kernel_entry_addr = 0x100000,
+			.kernel_load_addr = 0x100000UL,
+			.kernel_entry_addr = 0x100000UL,
 		},
 		.vuart[0] = {
 			.type = VUART_LEGACY_PIO,

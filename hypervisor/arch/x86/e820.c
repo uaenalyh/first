@@ -82,7 +82,7 @@ uint64_t e820_alloc_low_memory(uint32_t size_arg)
 		start = round_page_up(entry->baseaddr);
 		end = round_page_down(entry->baseaddr + entry->length);
 		length = end - start;
-		length = (end > start) ? (end - start) : 0;
+		length = (end > start) ? (end - start) : 0U;
 
 		/* Search for available low memory */
 		if ((entry->type != E820_TYPE_RAM) || (length < size) || ((start + size) > MEM_1M)) {

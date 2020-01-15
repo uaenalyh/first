@@ -92,7 +92,7 @@ void init_primary_pcpu(void)
 	init_pcpu_pre(true);
 
 	/* Switch to run-time stack */
-	rsp = (uint64_t)(&get_cpu_var(stack)[CONFIG_STACK_SIZE - 1]);
+	rsp = (uint64_t)(&get_cpu_var(stack)[CONFIG_STACK_SIZE - 1U]);
 	rsp &= ~(CPU_STACK_ALIGN - 1UL);
 	SWITCH_TO(rsp, init_primary_pcpu_post);
 }

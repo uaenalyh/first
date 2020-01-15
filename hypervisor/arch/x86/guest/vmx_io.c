@@ -106,7 +106,7 @@ int32_t ept_violation_vmexit_handler(struct acrn_vcpu *vcpu)
 		vcpu_retain_rip(vcpu);
 	} else {
 
-		vcpu_inject_pf(vcpu, exec_vmread64(VMX_GUEST_PHYSICAL_ADDR_FULL), 0);
+		vcpu_inject_pf(vcpu, exec_vmread64(VMX_GUEST_PHYSICAL_ADDR_FULL), 0U);
 	}
 
 	return 0;

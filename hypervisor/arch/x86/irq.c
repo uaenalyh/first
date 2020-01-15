@@ -54,7 +54,7 @@ static spinlock_t irq_alloc_spinlock = {
 
 uint64_t irq_alloc_bitmap[IRQ_ALLOC_BITMAP_SIZE];
 struct irq_desc irq_desc_array[NR_IRQS];
-static uint32_t vector_to_irq[NR_MAX_VECTOR + 1];
+static uint32_t vector_to_irq[NR_MAX_VECTOR + 1U];
 
 struct static_mapping_table {
 	uint32_t irq;

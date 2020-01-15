@@ -46,7 +46,7 @@
 #define EXCEPTION_ABORT     2U
 #define EXCEPTION_INTERRUPT 3U
 
-static const uint16_t exception_type[32] = { [0] = VMX_INT_TYPE_HW_EXP,
+static const uint32_t exception_type[32] = { [0] = VMX_INT_TYPE_HW_EXP,
 	[1] = VMX_INT_TYPE_HW_EXP,
 	[2] = VMX_INT_TYPE_HW_EXP,
 	[3] = VMX_INT_TYPE_HW_EXP,
@@ -257,7 +257,7 @@ void vcpu_inject_pf(struct acrn_vcpu *vcpu, uint64_t addr, uint32_t err_code)
 /* Inject invalid opcode exception(#UD) to guest */
 void vcpu_inject_ud(struct acrn_vcpu *vcpu)
 {
-	(void)vcpu_queue_exception(vcpu, IDT_UD, 0);
+	(void)vcpu_queue_exception(vcpu, IDT_UD, 0U);
 }
 
 int32_t interrupt_window_vmexit_handler(struct acrn_vcpu *vcpu)

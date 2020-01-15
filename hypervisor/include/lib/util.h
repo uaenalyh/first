@@ -22,7 +22,7 @@
 #include <types.h>
 
 /** Roundup (x/y) to ( x/y + (x%y) ? 1 : 0) **/
-#define INT_DIV_ROUNDUP(x, y) ((((x) + (y)) - 1) / (y))
+#define INT_DIV_ROUNDUP(x, y) ((((x) + (y)) - 1U) / (y))
 
 #define min(x, y) ((x) < (y)) ? (x) : (y)
 
