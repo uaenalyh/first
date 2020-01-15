@@ -1,7 +1,19 @@
 stages:
+- scan
 - build
 - test
 - deploy
+
+
+acrn_clang_tidy_job:
+  stage: scan
+  script:
+    - echo "start to check coding guideline violations ..."
+    - pwd
+    - cd hypervisor
+    - make codescan
+  only:
+    - merge_requests
 
 
 build_job:
@@ -12,6 +24,8 @@ build_job:
     - cd hypervisor
     - make clean
     - make RELEASE=0
+  dependencies:
+    - acrn_clang_tidy_job
   artifacts:
     paths:
       - hypervisor/build/
@@ -19,8 +33,8 @@ build_job:
   only:
     - merge_requests
     - schedules
-    
-    
+
+
 test_launch_cl_zephyr_job:
   stage: test
   script:
@@ -32,8 +46,8 @@ test_launch_cl_zephyr_job:
   only:
     - merge_requests
     - schedules
-    
-    
+
+
 test_srs_job:
   stage: test
   script:
@@ -45,8 +59,8 @@ test_srs_job:
   only:
     - merge_requests
     - schedules
-    
-    
+
+
 test_sas_job:
   stage: test
   script:
@@ -101,4 +115,3 @@ deploy_build_job:
     - test_sas_job
   only:
     - schedules
-
