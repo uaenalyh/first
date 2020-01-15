@@ -460,4 +460,4 @@ $(HV_OBJDIR)/%.o: %.S
 	[ ! -e $@ ] && mkdir -p $(dir $@) && mkdir -p $(HV_MODDIR); \
 	$(CC) $(patsubst %, -I%, $(INCLUDE_PATH)) -I. $(ASFLAGS) $(ARCH_ASFLAGS) -c $< -o $@ -MMD -MT $@
 
--include ../libs/qemu.mk
+-include ../libs/testing.mk
