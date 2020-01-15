@@ -14,7 +14,6 @@
 #include <vmx.h>
 #include <vm.h>
 #include <logmsg.h>
-#include <seed.h>
 
 /**
  * @defgroup init init

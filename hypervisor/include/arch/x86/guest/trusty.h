@@ -20,7 +20,6 @@
  * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
  */
 #include <acrn_hv_defs.h>
-#include <seed.h>
 
 #define TRUSTY_RAM_SIZE (16UL * 1024UL * 1024UL) /* 16 MB for now */
 

@@ -13,7 +13,6 @@
 #include <multiboot.h>
 #include <pgtable.h>
 #include <zeropage.h>
-#include <seed.h>
 #include <mmu.h>
 #include <vm.h>
 #include <logmsg.h>

@@ -15,9 +15,7 @@
 
 /**
  * @file
- * @brief {TBD brief description}
- *
- * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ * @brief this file declares the external data structures and APIs of the hwmgmt.security module.
  */
 
 #ifndef ASSEMBLER
@@ -26,10 +24,21 @@ void cpu_internal_buffers_clear(void);
 bool is_ept_force_4k_ipage(void);
 
 #ifdef STACK_PROTECTOR
+/**
+ * @brief Structure to define stack proctor canary type.
+ *
+ * GCC compiler will generate extra code and use IA32_FS_BASE+28H to access canary data.
+ * The base address of instance with this type will be set to IA32_FS_BASE MSR.
+ *
+ * @consistency n/a
+ *
+ * @alignment 8
+ *
+ * @remark Canary should be initialized with a random value.
+ */
 struct stack_canary {
-	/* Gcc generates extra code, using [fs:40] to access canary */
-	uint8_t reserved[40];
-	uint64_t canary;
+	uint8_t reserved[40]; /**< Reserved. */
+	uint64_t canary; /**< Canary variable. */
 };
 void set_fs_base(void);
 #endif
