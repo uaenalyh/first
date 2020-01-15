@@ -45,7 +45,7 @@
 #define MCG_CAP_FOR_SAFETY_VM		0x040AUL
 
 /* Only following bits are not reserved: 22 and 34. */
-#define MSR_IA32_MISC_ENABLE_MASK	0x400400000UL
+#define MSR_IA32_MISC_ENABLE_MASK	(MSR_IA32_MISC_ENABLE_LIMIT_CPUID | MSR_IA32_MISC_ENABLE_XD_DISABLE)
 /* Only following bits are not reserved: 0, 8, 10, and 11. */
 #define MSR_IA32_EFER_MASK		0xD01UL
 
@@ -582,19 +582,20 @@ static void set_guest_tsc_adjust(struct acrn_vcpu *vcpu, uint64_t tsc_adjust)
  */
 static int32_t set_guest_ia32_misc_enable(struct acrn_vcpu *vcpu, uint64_t v)
 {
-	uint64_t msr_value, guest_ia32_misc_enable, guest_efer;
+	uint64_t guest_ia32_misc_enable, guest_efer, misc_enable_changed_bits;
 	int32_t err = 0;
 
 	guest_ia32_misc_enable = vcpu_get_guest_msr(vcpu, MSR_IA32_MISC_ENABLE);
+	misc_enable_changed_bits = v ^ guest_ia32_misc_enable;
 
-	if (((v ^ guest_ia32_misc_enable) & (~MSR_IA32_MISC_ENABLE_MASK)) != 0UL) {
+	if ((misc_enable_changed_bits & (~MSR_IA32_MISC_ENABLE_MASK)) != 0UL) {
 		err = -EACCES;
 	} else {
-		/* Write value of bit 22 in specified "v" to guest IA32_MISC_ENABLE[bit 22] */
-		if (((v ^ guest_ia32_misc_enable) & MSR_IA32_MISC_ENABLE_LIMIT_CPUID) != 0UL) {
-			msr_value = guest_ia32_misc_enable & (~MSR_IA32_MISC_ENABLE_LIMIT_CPUID);
-			msr_value |= v & MSR_IA32_MISC_ENABLE_LIMIT_CPUID;
-			vcpu_set_guest_msr(vcpu, MSR_IA32_MISC_ENABLE, msr_value);
+		/* Write value of bit 22 and bit 34 in specified "v" to guest IA32_MISC_ENABLE [bit 22] and [bit 34] */
+		if ((misc_enable_changed_bits & MSR_IA32_MISC_ENABLE_MASK) != 0UL) {
+			guest_ia32_misc_enable &= ~MSR_IA32_MISC_ENABLE_MASK;
+			guest_ia32_misc_enable |= v & MSR_IA32_MISC_ENABLE_MASK;
+			vcpu_set_guest_msr(vcpu, MSR_IA32_MISC_ENABLE, guest_ia32_misc_enable);
 		}
 
 		/* According to SDM Vol4 2.1 & Vol 3A 4.1.4,
