@@ -707,7 +707,10 @@ int32_t wrmsr_vmexit_handler(struct acrn_vcpu *vcpu)
 		break;
 	}
 	case MSR_IA32_BIOS_SIGN_ID: {
-		/* No operations with "return == 0". */
+		/* Writing non-zero value causes a general-protection exception (#GP(0)). */
+		if (v != 0UL) {
+			err = -EACCES;
+		}
 		break;
 	}
 	case MSR_IA32_PAT: {
