@@ -290,11 +290,11 @@ void init_msr_emulation(struct acrn_vcpu *vcpu)
 			enable_msr_interception(msr_bitmap, msr, INTERCEPT_DISABLE);
 		}
 
-		for (msr = MSR_IA32_MC0_CTL; msr < MSR_IA32_MC0_CTL + 4U * NUM_MC_BANKS; msr = msr + 4U) {
+		for (msr = MSR_IA32_MC0_CTL; msr < (MSR_IA32_MC0_CTL + 4U * NUM_MC_BANKS); msr = msr + 4U) {
 			enable_msr_interception(msr_bitmap, msr, INTERCEPT_DISABLE);
 		}
 
-		for (msr = MSR_IA32_MC0_STATUS; msr < MSR_IA32_MC0_STATUS + 4U * NUM_MC_BANKS; msr = msr + 4U) {
+		for (msr = MSR_IA32_MC0_STATUS; msr < (MSR_IA32_MC0_STATUS + 4U * NUM_MC_BANKS); msr = msr + 4U) {
 			enable_msr_interception(msr_bitmap, msr, INTERCEPT_DISABLE);
 		}
 	}
