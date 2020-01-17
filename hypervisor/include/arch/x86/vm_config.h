@@ -79,11 +79,9 @@ struct acrn_vm_os_config {
 	char name[MAX_VM_OS_NAME_LEN]; /* OS name, useful for debug */
 	enum os_kernel_type kernel_type; /* used for kernel specifc loading method */
 	char kernel_mod_tag[MAX_MOD_TAG_LEN]; /* multiboot module tag for kernel */
-	char ramdisk_mod_tag[MAX_MOD_TAG_LEN]; /* multiboot module tag for ramdisk */
 	char bootargs[MAX_BOOTARGS_SIZE]; /* boot args/cmdline */
 	uint64_t kernel_load_addr;
 	uint64_t kernel_entry_addr;
-	uint64_t kernel_ramdisk_addr;
 } __aligned(8);
 
 struct acrn_vm_pci_dev_config {
