@@ -40,22 +40,22 @@
 
 #define VM0_CONFIG_VCPU_AFFINITY                   \
 	{                                          \
-		AFFINITY_CPU(2U), AFFINITY_CPU(3U) \
+		AFFINITY_CPU(0U), AFFINITY_CPU(2U), AFFINITY_CPU(3U) \
 	}
 #define VM0_CONFIG_MEM_START_HPA      0x100000000UL
 #define VM0_CONFIG_MEM_SIZE           0x20000000UL
 #define VM0_CONFIG_OS_BOOTARG_ROOT    ROOTFS_0
-#define VM0_CONFIG_OS_BOOTARG_MAXCPUS "maxcpus=2 "
+#define VM0_CONFIG_OS_BOOTARG_MAXCPUS "maxcpus=3 "
 #define VM0_CONFIG_OS_BOOTARG_CONSOLE "console=ttyS0 "
 
 #define VM1_CONFIG_VCPU_AFFINITY                   \
 	{                                          \
-		AFFINITY_CPU(0U), AFFINITY_CPU(1U) \
+		AFFINITY_CPU(1U) \
 	}
 #define VM1_CONFIG_MEM_START_HPA      0x120000000UL
 #define VM1_CONFIG_MEM_SIZE           0x20000000UL
 #define VM1_CONFIG_OS_BOOTARG_ROOT    ROOTFS_0
-#define VM1_CONFIG_OS_BOOTARG_MAXCPUS "maxcpus=2 "
+#define VM1_CONFIG_OS_BOOTARG_MAXCPUS "maxcpus=1 "
 #define VM1_CONFIG_OS_BOOTARG_CONSOLE "console=ttyS0 "
 
 /* VM pass-through devices assign policy:
