@@ -93,6 +93,11 @@
 #define ACRN_REQUEST_INIT_VMCS 8U
 
 /**
+ * @brief Request for resetting LAPIC
+ */
+#define ACRN_REQUEST_LAPIC_RESET 9U
+
+/**
  * @}
  */
 /* End of virt_int_injection */
