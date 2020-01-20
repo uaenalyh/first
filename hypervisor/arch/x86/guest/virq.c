@@ -351,6 +351,9 @@ int32_t acrn_handle_pending_request(struct acrn_vcpu *vcpu)
 				exec_vmwrite32(VMX_ENTRY_INT_INFO_FIELD,
 					VMX_INT_INFO_VALID | (VMX_INT_TYPE_NMI << 8U) | IDT_NMI);
 				injected = true;
+				if (bitmap_test(ACRN_REQUEST_EXCP, pending_req_bits)) {
+					vcpu_retain_rip(vcpu);
+				}
 			} else {
 				/* handling pending vector injection:
 				 * there are many reason inject failed, we need re-inject again
