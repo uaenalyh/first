@@ -16,6 +16,7 @@
 #include <vm.h>
 #include <trace.h>
 #include <logmsg.h>
+#include <vm_reset.h>
 
 /**
  * @defgroup vp-base_virq vp-base.virq
@@ -416,10 +417,8 @@ static inline bool acrn_inject_pending_intr(struct acrn_vcpu *vcpu, uint64_t *pe
  */
 int32_t exception_vmexit_handler(struct acrn_vcpu *vcpu)
 {
-	uint32_t intinfo, int_err_code = 0U;
+	uint32_t intinfo;
 	uint32_t exception_vector = VECTOR_INVALID;
-	uint32_t cpl;
-	int32_t status = 0;
 
 	pr_dbg(" Handling guest exception");
 
@@ -427,39 +426,25 @@ int32_t exception_vmexit_handler(struct acrn_vcpu *vcpu)
 	intinfo = exec_vmread32(VMX_EXIT_INT_INFO);
 	if ((intinfo & VMX_INT_INFO_VALID) != 0U) {
 		exception_vector = intinfo & 0xFFU;
-		/* Check if exception caused by the guest is a HW exception.
-		 * If the exit occurred due to a HW exception obtain the
-		 * error code to be conveyed to get via the stack
-		 */
-		if ((intinfo & VMX_INT_INFO_ERR_CODE_VALID) != 0U) {
-			int_err_code = exec_vmread32(VMX_EXIT_INT_ERROR_CODE);
-
-			/* get current privilege level and fault address */
-			cpl = exec_vmread32(VMX_GUEST_CS_ATTR);
-			cpl = (cpl >> 5U) & 3U;
-
-			if (cpl < 3U) {
-				int_err_code &= ~4U;
-			} else {
-				int_err_code |= 4U;
-			}
-		}
 	}
 
 	/* Handle all other exceptions */
 	vcpu_retain_rip(vcpu);
 
-	status = vcpu_queue_exception(vcpu, exception_vector, int_err_code);
-
-	if (exception_vector == IDT_MC) {
-		/* just print error message for #MC, it then will be injected
-		 * back to guest */
-		pr_fatal("Exception #MC got from guest!");
+	switch(exception_vector) {
+	case IDT_DB:
+		/* inject #GP(0) for #DB */
+		vcpu_inject_gp(vcpu, 0U);
+		break;
+	default:
+		if(is_safety_vm(vcpu->vm)) {
+			panic("Unexpected Exception from guest, vector: 0x%x!", exception_vector);
+		} else {
+			fatal_error_shutdown_vm(vcpu);
+		}
 	}
 
-	TRACE_4I(TRACE_VMEXIT_EXCEPTION_OR_NMI, exception_vector, int_err_code, 2U, 0U);
-
-	return status;
+	return 0;
 }
 
 /**
