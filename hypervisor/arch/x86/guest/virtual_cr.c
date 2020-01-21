@@ -23,119 +23,268 @@
 /**
  * @defgroup vp-base_vcr vp-base.vcr
  * @ingroup vp-base
- * @brief {TBD brief description}
+ * @brief The defination and implementation of virtual control registers (VCRs) related functions and APIs
  *
- * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ * The guest's control registers (VCRs) are emulated by the hypervisor. This module provides
+ * defination and implementation of virtual control registers (VCRs) related functions and
+ * APIs.
  *
  * @{
  */
 
 /**
  * @file
- * @brief {TBD brief description}
+ * @brief This file implements all external APIs that shall be provided by the vp-base.vcr module.
  *
- * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ * This file provides implementation of public APIs for VCRs interception configuration, public APIs
+ * for getting or setting VCRs inside the hypervisor, VM-Exit entry function caused by set to
+ * CR0/CR4 as well as private helper functions used by these public APIs.
+ *
+ * Public APIs:
+ *   - init_cr0_cr4_host_mask: public API for VCRs interception configuration.
+ *   - vcpu_get_cr0: public API for get the value of virtual CR0.
+ *   - vcpu_set_cr0: public API for set the value of virtual CR0.
+ *   - vcpu_set_cr2: public API for set the value of virtual CR2.
+ *   - vcpu_get_cr4: public API for get the value of virutal CR4.
+ *   - vcpu_set_cr4: public API for set the value of virutal CR4.
+ *   - cr_access_vmexit_handler: VM-Exit entry function when setting to virtual CR0/CR4.
+ *
+ * Private helper functions:
+ *   - is_cr0_write_valid: helper function for checking the validity of CR0 write operation.
+ *   - is_cr4_write_valid: helper function for checking the validity of CR4 write operation.
+ *   - vmx_write_cr0: helper function for virtual CR0 setting, the public API vcpu_set_cr0
+ *                    actually call this function to do the set operation.
+ *   - vmx_write_cr4: helper function for virtual CR4 setting, the public API vcpu_set_cr4
+ *                    actually call this function to do the set operation.
+ *   - load_pdptrs: helper function for reloading PDPTRs.
  */
 
-/* CR0 bits hv want to trap to track status change */
+/**
+ * @brief CR0 bits hypervisor wants to trap to track the status change.
+ *
+ * The hypervisor will trap CR0.PE, CR.PG, CR0.WP, CR0.CD, CR0.NW to track the status change.
+ * This macro marks these bits.
+ */
 #define CR0_TRAP_MASK (CR0_PE | CR0_PG | CR0_WP | CR0_CD | CR0_NW)
+/**
+ * @brief These CR0 bits are reserved according to the SDM and shall not be changed by the guests.
+ *
+ * The CR0 bits are reserved if they don't belongs to any bit of CR0.PG, CR0.CD, CR0.NW, CR0.AM,
+ * CRO.WP, CRO.NE, CRO.ET, CRO.TS CR0.EM. CRO.MP or CR0.PE. This macro marks these bits.
+ */
 #define CR0_RESERVED_MASK \
 	~(CR0_PG | CR0_CD | CR0_NW | CR0_AM | CR0_WP | CR0_NE | CR0_ET | CR0_TS | CR0_EM | CR0_MP | CR0_PE)
 
-/* CR4 bits hv want to trap to track status change */
+/**
+ * @brief CR4 bits hypervisor wants to trap to track status change.
+ *
+ * The hypervisor will trap CR4.PSE, CR4.PAE, CR4.VMXE, CR4.PCIDE, CR4.SMEP, CR4.SMAP, CR4.PKE to
+ * track the status change. This macro marks these bits.
+ */
 #define CR4_TRAP_MASK (CR4_PSE | CR4_PAE | CR4_VMXE | CR4_PCIDE | CR4_SMEP | CR4_SMAP | CR4_PKE)
+/**
+ * @brief These CR4 bits are reserved according to the SDM and shall not be changed by the guests.
+ *
+ * The CR4 bits are reserved if they don't belongs to any bit of CR4.VME, CR4.PVI, CR4.TSD,CR4.DE
+ * CR4.PSE, CR4.PAE, CR4.MCE, CR4.PGE, CR4.PCE, CR4.OSFXSR, CR4.PCIDE, CR4.OSXSAVE, CR4.SMEP,
+ * CR4.FSGSBASE, CR4.VMXE, CR4.OSXMMEXCPT, CR4.SMAP, CR4.PKE, CR4.SMXE or CR4.UMIP. This macro marks
+ * these bits.
+ */
 #define CR4_RESERVED_MASK                                                                                            \
 	~(CR4_VME | CR4_PVI | CR4_TSD | CR4_DE | CR4_PSE | CR4_PAE | CR4_MCE | CR4_PGE | CR4_PCE | CR4_OSFXSR |      \
 		CR4_PCIDE | CR4_OSXSAVE | CR4_SMEP | CR4_FSGSBASE | CR4_VMXE | CR4_OSXMMEXCPT | CR4_SMAP | CR4_PKE | \
 		CR4_SMXE | CR4_UMIP)
 
-/* PAE PDPTE bits 1 ~ 2, 5 ~ 8 are always reserved */
+/**
+ * @brief PAE PDPTE bits 1 ~ 2, 5 ~ 8 are always reserved. This macro marks these bits.
+ */
 #define PAE_PDPTE_FIXED_RESVD_BITS 0x00000000000001E6UL
 
+/**
+ * @brief the mask for CR0 bits which shall be always set to 1.
+ *
+ * Generally speaking, the reference value is hinted by the value of MSR_IA32_VMX_CR0_FIXED0.
+ * Currently, the actual value is initialized as (value of MSR_IA32_VMX_CR0_FIXED0) & (~(CR0_PE | CR0_PG)).
+ */
 static uint64_t cr0_always_on_mask;
+/**
+ * @brief the mask for CR0 bits which shall be always set to 0.
+ *
+ * Generally speaking, the reference value is hinted by the value of MSR_IA32_VMX_CR0_FIXED1.
+ * The value is initialized as ~(value of MSR_IA32_VMX_CR0_FIXED1).
+ */
 static uint64_t cr0_always_off_mask;
+/**
+ * @brief the mask for CR4 bits which shall be always set to 1.
+ *
+ * Generally speaking, the reference value is hinted by the value of MSR_IA32_VMX_CR4_FIXED0.
+ * The value is initialized as (value of MSR_IA32_VMX_CR4_FIXED0).
+ */
 static uint64_t cr4_always_on_mask;
+/**
+ * @brief the mask for CR4 bits which shall be always set to 0.
+ *
+ * Generally speaking, the reference value is hinted by the value of MSR_IA32_VMX_CR4_FIXED1.
+ * The value is is initialized as ~(value of MSR_IA32_VMX_CR4_FIXED1).
+ */
 static uint64_t cr4_always_off_mask;
 
+/**
+ * @brief Helper function for reloading PDPTRs.
+ *
+ * This function checks the validity of the address area pointed by the guest vCPU's cr3 and
+ * reload the PDPTRs for the guests if there are no errors.
+ *
+ * @param[inout] vcpu pointer to vcpu data structure whose virtual PDPTRs are to be reloaded.
+ *
+ * @return 0 if no error happened, otherwise return -EFAULT
+ *
+ * @pre vcpu != NULL
+ *
+ * @post N/A
+ *
+ * @mode HV_INIT
+ * @mode HV_OPERATIONAL
+ *
+ * @remark N/A
+ *
+ * @reentrancy unspecified
+ * @threadsafety when \a vcpu is different among parallel invocation
+ */
 static int32_t load_pdptrs(const struct acrn_vcpu *vcpu)
 {
+	/** Declare the following local variable of type uint64_t
+         *  - guest_cr3 representing the guest cr3 of the given vcpu, initialized as exec_vmread(VMX_GUEST_CR3) */
 	uint64_t guest_cr3 = exec_vmread(VMX_GUEST_CR3);
+	/** Declare the following local variable of type 'cpuinfo_x86*'
+         *  - cpu_info representing the physical cpu information, initialized as get_pcpu_info() */
 	struct cpuinfo_x86 *cpu_info = get_pcpu_info();
+	/** Declare the following local variable of type int32_t
+         *  - ret representing the return value of this function, initialized as 0 */
 	int32_t ret = 0;
-	uint64_t pdpte[4]; /* Total four PDPTE */
+	/** Declare the following local variable of type 'uint64_t[]'
+         *  - pdpte[4] representing the four PDPTEs of the given vcpu, not initialized */
+	uint64_t pdpte[4];
+	/** Declare the following local variable of type uint64_t
+         *  - rsvd_bits_mask representing the mask of PDPTE reserved bits, 1~2, 5~8, maxphyaddr ~ 63, not initialized */
 	uint64_t rsvd_bits_mask;
+	/** Declare the following local variable of type uint8_t
+         *  - maxphyaddr representing the max width of physical addresses, not initialized */
 	uint8_t maxphyaddr;
+	/** Declare the following local variable of type int32_t
+         *  - i representing the index of PDPTE, not initialized */
 	int32_t i;
 
-	/* check whether the address area pointed by the guest cr3
-	 * can be accessed or not
-	 */
+	/** Copy the full PDPT at the PDPT address in guest CR3 of the given vCPU to pdpte,
+         *  and check if the copy fails. */
 	if (copy_from_gpa(vcpu->vm, pdpte, get_pae_pdpt_addr(guest_cr3), sizeof(pdpte)) != 0) {
+		/** Set ret to -EFAULT to record the error */
 		ret = -EFAULT;
+	/** If no copy error happens */
 	} else {
-		/* Check if any of the PDPTEs sets both the P flag
-		 * and any reserved bit
-		 */
+		/** Set maxphyaddr to be cpu_info->phys_bits */
 		maxphyaddr = cpu_info->phys_bits;
-		/* reserved bits: 1~2, 5~8, maxphyaddr ~ 63 */
+		/** Set rsvd_bits_mask to be
+		 *  (63U < maxphyaddr) ? 0UL : (((1UL << (63U - maxphyaddr + 1U)) - 1UL) << maxphyaddr) */
 		rsvd_bits_mask = (63U < maxphyaddr) ? 0UL : (((1UL << (63U - maxphyaddr + 1U)) - 1UL) << maxphyaddr);
+		/** Set rsvd_bits_mask to be (rsvd_bits_mask | PAE_PDPTE_FIXED_RESVD_BITS) */
 		rsvd_bits_mask |= PAE_PDPTE_FIXED_RESVD_BITS;
+		/** loop for checking each pdpte, i ranging from 0 to 3 */
 		for (i = 0; i < 4; i++) {
+			/** Check if the ith PDPTE in pdpte sets both the P flag (bit 0) and any reserved bits */
 			if (((pdpte[i] & PAGE_PRESENT) != 0UL) && ((pdpte[i] & rsvd_bits_mask) != 0UL)) {
+				/** Set ret to -EFAULT to record the error */
 				ret = -EFAULT;
+				/** go out the loop due to error */
 				break;
 			}
 		}
 	}
 
+	/** If no error */
 	if (ret == 0) {
+		/** write checked pdpte 0 to VMCS */
 		exec_vmwrite64(VMX_GUEST_PDPTE0_FULL, pdpte[0]);
+		/** write checked pdpte 1 to VMCS */
 		exec_vmwrite64(VMX_GUEST_PDPTE1_FULL, pdpte[1]);
+		/** write checked pdpte 2 to VMCS */
 		exec_vmwrite64(VMX_GUEST_PDPTE2_FULL, pdpte[2]);
+		/** write checked pdpte 3 to VMCS */
 		exec_vmwrite64(VMX_GUEST_PDPTE3_FULL, pdpte[3]);
 	}
 
+	/** Return the result */
 	return ret;
 }
 
+/**
+ * @brief This function checks if writing \a cr0 to the vCPU CR0 of \a vcpu is valid.
+ *
+ * @param[in] vcpu pointer to the vcpu whose guest CR0 is to be written.
+ *
+ * @param[in] cr0 the value to be written to CR0
+ *
+ * @return true (1) if valid otherwise false (0)
+ *
+ * @pre vcpu != NULL
+ *
+ * @post N/A
+ *
+ * @mode HV_INIT
+ * @mode HV_OPERATIONAL
+ *
+ * @remark N/A
+ *
+ * @reentrancy unspecified
+ * @threadsafety when \a vcpu is different among parallel invocation
+ */
 static bool is_cr0_write_valid(struct acrn_vcpu *vcpu, uint64_t cr0)
 {
+	/** Declare the following local variable of type bool
+         *  - ret representing the return value of this function, initialized as true */
 	bool ret = true;
 
-	/* Shouldn't set always off bit */
+	/** If the given value has set any bit that must be 0 in guest CR0 */
 	if ((cr0 & cr0_always_off_mask) != 0UL) {
+		/** Set the value of ret to false */
 		ret = false;
+	/** If no always off bit is set */
 	} else {
-		/* SDM 25.3 "Changes to instruction behavior in VMX non-root"
-		 *
-		 * We always require "unrestricted guest" control enabled. So
-		 *
-		 * CR0.PG = 1, CR4.PAE = 0 and IA32_EFER.LME = 1 is invalid.
-		 * CR0.PE = 0 and CR0.PG = 1 is invalid.
-		 */
+		/** If the vCPU has CR0.PG set and it is not in PAE mode but has IA32_EFER.LME set
+		 *  We always require "unrestricted guest" control enabled. So CR0.PG = 1, CR4.PAE = 0
+		 *  and IA32_EFER.LME = 1 is invalid. CR0.PE = 0 and CR0.PG = 1 is invalid. */
 		if (((cr0 & CR0_PG) != 0UL) && (!is_pae(vcpu)) &&
 			((vcpu_get_efer(vcpu) & MSR_IA32_EFER_LME_BIT) != 0UL)) {
+			/** Set the ret to false */
 			ret = false;
+		/** The corresponding if condition is not meet */
 		} else {
+			/** If the PE bit is off but PG bit is on */
 			if (((cr0 & CR0_PE) == 0UL) && ((cr0 & CR0_PG) != 0UL)) {
+				/** Set the ret to false */
 				ret = false;
+			/** The corresponding if condition is not meet */
 			} else {
-				/* SDM 6.15 "Exception and Interrupt Refrerence" GP Exception
-				 *
-				 * Loading CR0 register with a set NW flag and a clear CD flag
-				 * is invalid
-				 */
+				/** If the vCPU has CR0.NW set but CR0.CD not set, Loading CR0 register with
+				 *  a set NW flag and a clear CD flag is invalid */
 				if (((cr0 & CR0_CD) == 0UL) && ((cr0 & CR0_NW) != 0UL)) {
+					/** Set the ret to false */
 					ret = false;
 				}
 			}
 		}
 	}
 
+	/** Return the result */
 	return ret;
 }
 
-/*
+/**
+ * @brief This function does the write operation to CR0
+ *
+ * This a helper function for virtual CR0 setting, the public API vcpu_set_cr0
+ * actually call this function to do the set operation.
+ *
  * Handling of CR0:
  * Assume "unrestricted guest" feature is supported by vmx.
  * For mode switch, hv only needs to take care of enabling/disabling long mode,
@@ -155,121 +304,208 @@ static bool is_cr0_write_valid(struct acrn_vcpu *vcpu, uint64_t cr0)
  *   - CD (30) Trapped to emulate cache disable situation
  *   - PG (31) Trapped to track cpu/paging mode.
  *	     Set the value according to the value from guest.
+ *
+ * @param[inout] vcpu pointer to the vcpu whose guest CR0 is to be written.
+ *
+ * @param[in] cr0 the value to be written to CR0
+ *
+ * @return None
+ *
+ * @pre vcpu != NULL
+ * @pre vcpu->vm != NULL
+ *
+ * @post N/A
+ *
+ * @mode HV_INIT
+ * @mode HV_OPERATIONAL
+ *
+ * @remark N/A
+ *
+ * @reentrancy unspecified
+ * @threadsafety when \a vcpu is different among parallel invocation
  */
 static void vmx_write_cr0(struct acrn_vcpu *vcpu, uint64_t cr0)
 {
+	/** Declare the following local variable of type bool
+         *  - err_found representing if error found or not, initialized as false */
 	bool err_found = false;
 
+	/** If the write to CR0 is invalid */
 	if (!is_cr0_write_valid(vcpu, cr0)) {
+		/** Print a debug message */
 		pr_dbg("Invalid cr0 write operation from guest");
+		/** Call vcpu_inject_gp to inject #GP(0) to \a vcpu */
 		vcpu_inject_gp(vcpu, 0U);
+	/** If write to CR0 is valid */
 	} else {
+		/** Declare the following local variable of type uint64_t
+                  * - cr0_vmx representing the vCPU CR0 value to be set, not initialized */
 		uint64_t cr0_vmx;
+		/** Declare the following local variable of type uint32_t
+                  * - entry_ctrls representing the vCPU VMX_ENTRY_CONTROLS value in VMCS, not initialized */
 		uint32_t entry_ctrls;
+		/** Declare the following local variable of type bool
+		 *  - old_paging_enabled representing the old value of guest paging state,
+                 *    initialized as is_paging_enabled() */
 		bool old_paging_enabled = is_paging_enabled(vcpu);
+		/** Declare the following local variable of type uint64_t
+		 *  - cr0_changed_bits representing the vCPU CR0 changed bits, initialized as
+                 *    vcpu_get_cr0(vcpu) ^ cr0 */
 		uint64_t cr0_changed_bits = vcpu_get_cr0(vcpu) ^ cr0;
+		/** Declare the following local variable of  type uint64_t
+                  * - cr0_mask representing the the vCPU CR0 shadow value */
 		uint64_t cr0_mask = cr0;
 
-		/* SDM 2.5
-		 * When loading a control register, reserved bit should always set
-		 * to the value previously read.
-		 */
+		/** Clear the reserved bits in cr0_mask, When loading a control register,
+		 *  reserved bit should always set to the value previously read. */
 		cr0_mask &= ~CR0_RESERVED_MASK;
 
+		/** If the given vCPU attempts to change guest CR0.PG from 0 to 1 */
 		if (!old_paging_enabled && ((cr0_mask & CR0_PG) != 0UL)) {
+			/** If \a vcpu has long mode enabled */
 			if ((vcpu_get_efer(vcpu) & MSR_IA32_EFER_LME_BIT) != 0UL) {
-				/* Enable long mode */
+				/** Print a debug message */
 				pr_dbg("VMM: Enable long mode");
+				/** Set entry_ctrls to the value of VMCS VM-entry controls
+                                 *  field on the current physical cpu */
 				entry_ctrls = exec_vmread32(VMX_ENTRY_CONTROLS);
+				/** Set the IA32E mode bit in the entry_ctrls */
 				entry_ctrls |= VMX_ENTRY_CTLS_IA32E_MODE;
+				/** Configure the VMX_ENTRY_CONTROLS in the VMCS to be entry_ctrls */
 				exec_vmwrite32(VMX_ENTRY_CONTROLS, entry_ctrls);
-
+				/** Set the long mode active bit in the guest EFER of \a vcpu */
 				vcpu_set_efer(vcpu, vcpu_get_efer(vcpu) | MSR_IA32_EFER_LMA_BIT);
+			/** \a vcpu has PAE mode enabled */
 			} else if (is_pae(vcpu)) {
-				/* enabled PAE from paging disabled */
+				/** If reloading PTPDRs for \a vcpu fails */
 				if (load_pdptrs(vcpu) != 0) {
+					/** Record the error found */
 					err_found = true;
+					/** Call vcpu_inject_gp to inject #GP(0) to \a vcpu */
 					vcpu_inject_gp(vcpu, 0U);
 				}
+			/** Not long mode and not pae mode */
 			} else {
-				/* do nothing */
+				/** do nothing */
 			}
+		/** If the given vCPU attempts to change guest CR0.PG from 1 to 0 */
 		} else if (old_paging_enabled && ((cr0_mask & CR0_PG) == 0UL)) {
+			/** If \a vcpu has long mode enabled */
 			if ((vcpu_get_efer(vcpu) & MSR_IA32_EFER_LME_BIT) != 0UL) {
-				/* Disable long mode */
-				pr_dbg("VMM: Disable long mode");
-				entry_ctrls = exec_vmread32(VMX_ENTRY_CONTROLS);
-				entry_ctrls &= ~VMX_ENTRY_CTLS_IA32E_MODE;
-				exec_vmwrite32(VMX_ENTRY_CONTROLS, entry_ctrls);
+				/** Print a debug message */
+				pr_dbg("This is an invalid case");
 
-				vcpu_set_efer(vcpu, vcpu_get_efer(vcpu) & ~MSR_IA32_EFER_LMA_BIT);
+				/** Set the err_found to be true */
+				err_found = true;
+
+				/** Call vcpu_inject_gp to inject #GP(0) to \a vcpu */
+				vcpu_inject_gp(vcpu, 0U);
 			}
+		/** If no above condition meet */
 		} else {
 			/* do nothing */
 		}
 
+		/** No error is found in previous operations */
 		if (err_found == false) {
-			/* If CR0.CD or CR0.NW get cr0_changed_bits */
+			/** If cr0_changed_bits has CR0.CD or CR0.NW set */
 			if ((cr0_changed_bits & (CR0_CD | CR0_NW)) != 0UL) {
-				/* No action if only CR0.NW is cr0_changed_bits */
+				/** If cr0_changed_bits has CR0.CD set */
 				if ((cr0_changed_bits & CR0_CD) != 0UL) {
+					/** If cr0_mask has CD bit set */
 					if ((cr0_mask & CR0_CD) != 0UL) {
-						/*
-						 * When the guest requests to set CR0.CD, we don't allow
-						 * guest's CR0.CD to be actually set, instead, we write guest
-						 * IA32_PAT with all-UC entries to emulate the cache
-						 * disabled behavior
-						 */
+						/** Configure the vCPU VMCS VMX_GUEST_IA32_PAT_FULL to be PAT_ALL_UC_VALUE.
+						 *  When the guest requests to set CR0.CD, we don't allow guest's CR0.CD
+						 *  to be actually set, instead, we write guest IA32_PAT with all-UC
+						 *  entries to emulate the cache disabled behavior */
 						exec_vmwrite64(VMX_GUEST_IA32_PAT_FULL, PAT_ALL_UC_VALUE);
+					/** cr0_mask has CD bit cleared */
 					} else {
-						/* Restore IA32_PAT to enable cache again */
+						/** Configure the VMX_GUEST_IA32_PAT_FULL in VMCS to be
+						 *  vcpu_get_guest_msr(vcpu, MSR_IA32_PAT) */
 						exec_vmwrite64(VMX_GUEST_IA32_PAT_FULL,
 							vcpu_get_guest_msr(vcpu, MSR_IA32_PAT));
 					}
+					/** Call vcpu_make_request to flush TLB entries derived from the EPT of \a vcpu */
 					vcpu_make_request(vcpu, ACRN_REQUEST_EPT_FLUSH);
 				}
 			}
 
+			/** If \a vcpu attempts to change guest CR0.PG or CR0.WP */
 			if ((cr0_changed_bits & (CR0_PG | CR0_WP)) != 0UL) {
+				/** Call vcpu_make_request to flush TLB entries derived from the EPT of \a vcpu */
 				vcpu_make_request(vcpu, ACRN_REQUEST_EPT_FLUSH);
 			}
 
-			/* CR0 has no always off bits, except the always on bits, and reserved
-			 * bits, allow to set according to guest.
-			 */
+			/** Set the cr0_vmx to be cr0_always_on_mask | cr0_mask */
 			cr0_vmx = cr0_always_on_mask | cr0_mask;
 
-			/* Don't set CD or NW bit to guest */
+			/** Set cr0_vmx to be (cr0_vmx & ~(CR0_CD | CR0_NW)) */
 			cr0_vmx &= ~(CR0_CD | CR0_NW);
+			/** Configure the VMX_GUEST_CR0 in VMCS to be cr0_vmx & 0xFFFFFFFFUL */
 			exec_vmwrite(VMX_GUEST_CR0, cr0_vmx & 0xFFFFFFFFUL);
+			/** Configure the VMX_CR0_READ_SHADOW in VMCS to be cr0_mask & 0xFFFFFFFFUL */
 			exec_vmwrite(VMX_CR0_READ_SHADOW, cr0_mask & 0xFFFFFFFFUL);
 
-			/* clear read cache, next time read should from VMCS */
+			/** Call bitmap_clear_lock(CPU_REG_CR0, &vcpu->reg_cached) to clear read cache of CR0 */
 			bitmap_clear_lock(CPU_REG_CR0, &vcpu->reg_cached);
 
+			/** Print cr0_mask and cr0_vmx for debug */
 			pr_dbg("VMM: Try to write %016lx, allow to write 0x%016lx to CR0", cr0_mask, cr0_vmx);
 		}
 	}
 }
 
+/**
+ * @brief This function checks if writing \a CR4 to the guest CR4 of \a vcpu is valid.
+ *
+ * @param[in] vcpu pointer to the vcpu whose guest CR4 is to be written.
+ *
+ * @param[in] cr4 the value to be written to CR4
+ *
+ * @return true (1) if valid otherwise false (0)
+ *
+ * @pre vcpu != NULL
+ *
+ * @post N/A
+ *
+ * @mode HV_INIT
+ * @mode HV_OPERATIONAL
+ *
+ * @remark N/A
+ *
+ * @reentrancy unspecified
+ * @threadsafety when \a vcpu is different among parallel invocation
+ */
 static bool is_cr4_write_valid(struct acrn_vcpu *vcpu, uint64_t cr4)
 {
+	/** Declare the following local variable of type bool
+         *  - ret representing the return value of this function, initialized as true */
 	bool ret = true;
 
-	/* Check if guest try to set fixed to 0 bits or reserved bits */
+	/** If guest try to set fixed to 0 bits or reserved bits */
 	if ((cr4 & cr4_always_off_mask) != 0U) {
+		/** Set the ret to false */
 		ret = false;
+	/** If no always off bit is set */
 	} else {
-		/* Do NOT support nested guest, nor SMX, nor PKE */
+		/** If CR4 has CR4.VMXE or CR4.SMXE or CR4.PKE set */
 		if (((cr4 & CR4_VMXE) != 0UL) || ((cr4 & CR4_SMXE) != 0UL) || ((cr4 & CR4_PKE) != 0UL)) {
+			/** Set the ret to false */
 			ret = false;
+		/** If the corresponding if condition does not meet */
 		} else {
-			/* Do NOT support PCID in guest */
+			/** If CR4 has CR4.PCIDE set */
 			if ((cr4 & CR4_PCIDE) != 0UL) {
+				/** Set the ret to false */
 				ret = false;
+			/** If the corresponding if condition does not meet */
 			} else {
+				/** If \a vcpu is in long mode */
 				if (is_long_mode(vcpu)) {
+					/** If CR4 does not has CR4.PAE set */
 					if ((cr4 & CR4_PAE) == 0UL) {
+						/** Set the ret to false */
 						ret = false;
 					}
 				}
@@ -277,10 +513,16 @@ static bool is_cr4_write_valid(struct acrn_vcpu *vcpu, uint64_t cr4)
 		}
 	}
 
+	/** Return the result */
 	return ret;
 }
 
-/*
+/**
+ * @brief This function does the write operation to CR4
+ *
+ * This is a helper function for virtual CR4 setting, the public API vcpu_set_cr4
+ * actually call this function to do the set operation.
+ *
  * Handling of CR4:
  * Assume "unrestricted guest" feature is supported by vmx.
  *
@@ -314,168 +556,431 @@ static bool is_cr4_write_valid(struct acrn_vcpu *vcpu, uint64_t cr4)
  *   - SMEP (20) Flexible to guest
  *   - SMAP (21) Flexible to guest
  *   - PKE (22) Flexible to guest
+ *
+ * @param[inout] vcpu pointer to the vcpu whose guest CR4 is to be written.
+ *
+ * @param[in] cr4 the value to be written to CR4
+ *
+ * @return None
+ *
+ * @pre vcpu != NULL
+ *
+ * @post N/A
+ *
+ * @mode HV_INIT
+ * @mode HV_OPERATIONAL
+ *
+ * @remark N/A
+ *
+ * @reentrancy unspecified
+ * @threadsafety when \a vcpu is different among parallel invocation
  */
 static void vmx_write_cr4(struct acrn_vcpu *vcpu, uint64_t cr4)
 {
+	/** Declare the following local variable of type bool
+         *  - err_found representing if error found or not, initialized as false */
 	bool err_found = false;
 
+	/** If the write to CR4 is invalid */
 	if (!is_cr4_write_valid(vcpu, cr4)) {
+		/** Print a debug message */
 		pr_dbg("Invalid cr4 write operation from guest");
+		/** Call vcpu_inject_gp to inject #GP(0) to \a vcpu */
 		vcpu_inject_gp(vcpu, 0U);
+	/** If write to CR4 is valid */
 	} else {
+		/** Declare the following local variable of type uint64_t
+                 *  - cr4_vmx representing the vCPU CR4 value to be set, not initialized
+                 *  - cr4_shadow  representing the vCPU CR4 shadow value to be set, not initialized */
 		uint64_t cr4_vmx, cr4_shadow;
+		/** Declare the following local variable of type uint64_t
+                 *  - old_cr4 representing the old guest CR4 value */
 		uint64_t old_cr4 = vcpu_get_cr4(vcpu);
 
+		/** If any of PGE, PSE, PAE, SMEP or SMAP bit is changed */
 		if (((cr4 ^ old_cr4) & (CR4_PGE | CR4_PSE | CR4_PAE | CR4_SMEP | CR4_SMAP)) != 0UL) {
+			/** If \a cr4 has PAE bit set and \a vcpu has paging enabled while long mode disabled */
 			if (((cr4 & CR4_PAE) != 0UL) && (is_paging_enabled(vcpu)) && (!is_long_mode(vcpu))) {
+				/** If reloading PTPDRs for \a vcpu fails */
 				if (load_pdptrs(vcpu) != 0) {
+					/** Record the error found */
 					err_found = true;
+					/** Call vcpu_inject_gp to inject #GP(0) to \a vcpu */
 					vcpu_inject_gp(vcpu, 0U);
 				}
 			}
+			/** If no error is found in previous operations */
 			if (err_found == false) {
+				/** Call vcpu_make_request to flush TLB entries derived from the EPT of \a vcpu */
 				vcpu_make_request(vcpu, ACRN_REQUEST_EPT_FLUSH);
 			}
 		}
 
+		/** If no error is found in previous operations */
 		if (err_found == false) {
-			/* Clear forced off bits */
+			/** Set cr4_shadow to be (cr4 & ~CR4_MCE) */
 			cr4_shadow = cr4 & ~CR4_MCE;
-
+			/** Set cr4_vmx to cr4_always_on_mask | cr4_shadow */
 			cr4_vmx = cr4_always_on_mask | cr4_shadow;
+			/** Configure VMX_GUEST_CR4 in VMCS to be cr4_vmx & 0xFFFFFFFFUL */
 			exec_vmwrite(VMX_GUEST_CR4, cr4_vmx & 0xFFFFFFFFUL);
+			/** Configure VMX_CR4_READ_SHADOW in VMCS to be cr4_shadow & 0xFFFFFFFFUL */
 			exec_vmwrite(VMX_CR4_READ_SHADOW, cr4_shadow & 0xFFFFFFFFUL);
 
-			/* clear read cache, next time read should from VMCS */
+			/** Call bitmap_clear_lock(CPU_REG_CR4, &vcpu->reg_cached) to clear read cache of CR4 */
 			bitmap_clear_lock(CPU_REG_CR4, &vcpu->reg_cached);
 
+			/** Print cr4 and cr4_vmx for debug */
 			pr_dbg("VMM: Try to write %016lx, allow to write 0x%016lx to CR4", cr4, cr4_vmx);
 		}
 	}
 }
 
+/**
+ * @brief public APIs for VCRs initialization configuration
+ *
+ * Initialize the CR0 Guest/Host Masks and CR4 Guest/Host Masks in the current VMCS.
+ *
+ * @return None
+ *
+ * @pre N/A
+ *
+ * @post N/A
+ *
+ * @mode HV_SUBMODE_INIT_ROOT
+ * @mode HV_OPERATIONAL
+ *
+ * @remark N/A
+ *
+ * @reentrancy unspecified
+ * @threadsafety yes
+ */
 void init_cr0_cr4_host_mask(void)
 {
-	static bool inited = false;
-	static uint64_t cr0_host_owned_bits, cr4_host_owned_bits;
+	/** Declare the following local variables of type uint64_t
+         *  - cr0_host_owned_bits representing the CR0 bits owned by the host, not initialized
+         *  - cr4_host_owned_bits representing the CR4 bits owned by the host, not initialized */
+	uint64_t cr0_host_owned_bits, cr4_host_owned_bits;
+	/** Declare the following local variable of type uint64_t
+         *  - fixed0 representing the temp value read from MSR_IA32_VMX_CR0/CR4_FIXED0, not initialized
+         *  - fixed1 representing the temp value read from MSR_IA32_VMX_CR0/CR4_FIXED1, not initialized */
 	uint64_t fixed0, fixed1;
+	/** Declare the following local variable of type uint64_t
+	 *  - cr0_always_on_bits representing the temp value for calculating cr0_always_on_mask, not initialized
+	 *  - cr0_always_off_bits representing the temp value for calculating cr0_always_off_mask, not initialized
+	 *  - cr4_always_off_bits representing the temp value for calculating cr4_always_off_mask, not initialized */
+	uint64_t cr0_always_on_bits, cr0_always_off_bits, cr4_always_off_bits;
 
-	if (!inited) {
-		/* Read the CR0 fixed0 / fixed1 MSR registers */
-		fixed0 = msr_read(MSR_IA32_VMX_CR0_FIXED0);
-		fixed1 = msr_read(MSR_IA32_VMX_CR0_FIXED1);
+	/** Read the value of MSR_IA32_VMX_CR0_FIXED0 and write it to fixed0 */
+	fixed0 = msr_read(MSR_IA32_VMX_CR0_FIXED0);
+	/** Read the value of MSR_IA32_VMX_CR0_FIXED1 and write it to fixed1 */
+	fixed1 = msr_read(MSR_IA32_VMX_CR0_FIXED1);
 
-		cr0_host_owned_bits = ~(fixed0 ^ fixed1);
-		/* Add the bit hv wants to trap */
-		cr0_host_owned_bits |= CR0_TRAP_MASK;
-		cr0_host_owned_bits &= ~CR0_RESERVED_MASK;
-		/* CR0 clear PE/PG from always on bits due to "unrestructed guest" feature */
-		cr0_always_on_mask = fixed0 & (~(CR0_PE | CR0_PG));
-		cr0_always_off_mask = ~fixed1;
-		/* SDM 2.5
-		 * bit 63:32 of CR0 and CR4 ar reserved and must be written
-		 * zero. We could merge it with always off mask.
-		 */
-		cr0_always_off_mask |= 0xFFFFFFFF00000000UL;
+	/** Set the value of cr0_host_owned_bits to be ~(fixed0 ^ fixed1) */
+	cr0_host_owned_bits = ~(fixed0 ^ fixed1);
+	/** Set cr0_host_owned_bits to be (cr0_host_owned_bits | CR0_TRAP_MASK) */
+	cr0_host_owned_bits |= CR0_TRAP_MASK;
+	/** Set cr0_host_owned_bits to be (cr0_host_owned_bits & ~CR0_RESERVED_MASK) */
+	cr0_host_owned_bits &= ~CR0_RESERVED_MASK;
+	/** Set cr0_always_on_bits to be (fixed0 & (~(CR0_PE | CR0_PG))) */
+	cr0_always_on_bits = fixed0 & (~(CR0_PE | CR0_PG));
+	/** Set cr0_always_on_mask to be cr0_always_on_bits */
+	cr0_always_on_mask = cr0_always_on_bits;
+	/** Set the value of cr0_always_off_bits to be ~fixed1 */
+	cr0_always_off_bits = ~fixed1;
+	/** Set cr0_always_off_bits to be (cr0_always_off_bits | CR0_RESERVED_MASK) */
+	cr0_always_off_bits |= CR0_RESERVED_MASK;
+	/** Set cr0_always_off_mask to be cr0_always_off_bits */
+	cr0_always_off_mask = cr0_always_off_bits;
 
-		/* Read the CR4 fixed0 / fixed1 MSR registers */
-		fixed0 = msr_read(MSR_IA32_VMX_CR4_FIXED0);
-		fixed1 = msr_read(MSR_IA32_VMX_CR4_FIXED1);
+	/** Read the value of MSR_IA32_VMX_CR4_FIXED0 and write it to fixed0 */
+	fixed0 = msr_read(MSR_IA32_VMX_CR4_FIXED0);
+	/** Read the value of MSR_IA32_VMX_CR4_FIXED1 and write it to fixed1 */
+	fixed1 = msr_read(MSR_IA32_VMX_CR4_FIXED1);
 
-		cr4_host_owned_bits = ~(fixed0 ^ fixed1);
-		/* Add the bit hv wants to trap */
-		cr4_host_owned_bits |= CR4_TRAP_MASK;
-		cr4_host_owned_bits &= ~CR4_RESERVED_MASK;
-		cr4_always_on_mask = fixed0;
-		/* Record the bit fixed to 0 for CR4, including reserved bits */
-		cr4_always_off_mask = ~fixed1;
-		/* SDM 2.5
-		 * bit 63:32 of CR0 and CR4 ar reserved and must be written
-		 * zero. We could merge it with always off mask.
-		 */
-		cr4_always_off_mask |= 0xFFFFFFFF00000000UL;
-		cr4_always_off_mask |= CR4_RESERVED_MASK;
-		inited = true;
-	}
+	/** Set the value of cr4_host_owned_bits to be ~(fixed0 ^ fixed1) */
+	cr4_host_owned_bits = ~(fixed0 ^ fixed1);
+	/** Set cr4_host_owned_bits to be (cr4_host_owned_bits | CR4_TRAP_MASK) */
+	cr4_host_owned_bits |= CR4_TRAP_MASK;
+	/** Set cr4_host_owned_bits to be (cr4_host_owned_bits &  ~CR4_RESERVED_MASK) */
+	cr4_host_owned_bits &= ~CR4_RESERVED_MASK;
+	/** Set cr4_always_on_mask to be fixed0 */
+	cr4_always_on_mask = fixed0;
+	/** Set cr4_always_off_bits to be ~fixed1 */
+	cr4_always_off_bits = ~fixed1;
+	/** Set cr4_always_off_bits to be (cr4_always_off_bits | CR4_RESERVED_MASK) */
+	cr4_always_off_bits |= CR4_RESERVED_MASK;
+	/** Set cr4_always_off_mask to be cr4_always_off_bits */
+	cr4_always_off_mask = cr4_always_off_bits;
 
+	/** Configure the VMX_CR0_GUEST_HOST_MASK in VMCS to be cr0_host_owned_bits */
 	exec_vmwrite(VMX_CR0_GUEST_HOST_MASK, cr0_host_owned_bits);
-	/* Output CR0 mask value */
+	/** Print CR0 mask value for debug */
 	pr_dbg("CR0 guest-host mask value: 0x%016lx", cr0_host_owned_bits);
 
+	/** Configure the VMX_CR4_GUEST_HOST_MASK in VMCS to be cr4_host_owned_bits */
 	exec_vmwrite(VMX_CR4_GUEST_HOST_MASK, cr4_host_owned_bits);
-	/* Output CR4 mask value */
+	/** Print CR4 mask value for debug */
 	pr_dbg("CR4 guest-host mask value: 0x%016lx", cr4_host_owned_bits);
 }
 
+/**
+ * @brief public API for get the value of virtual CR0 of \a vcpu.
+ *
+ * @param[inout] vcpu pointer to the vcpu whose guest CR0 is to be read.
+ *
+ * @return the value of CR0
+ *
+ * @pre vcpu != NULL
+ * @pre The host physical address calculated by hva2hpa(vcpu>arch.vmcs) is
+ *      equal to the current-VMCS pointer of the current pcpu.
+ *
+ * @post N/A
+ *
+ * @mode HV_INIT
+ * @mode HV_OPERATIONAL
+ *
+ * @remark N/A
+ *
+ * @reentrancy unspecified
+ * @threadsafety when \a vcpu is different among parallel invocation
+ */
 uint64_t vcpu_get_cr0(struct acrn_vcpu *vcpu)
 {
+	/** Declare the following local variable of type uint64_t
+         *  - mask representing the value read from VMCS VMX_CR0_GUEST_HOST_MASK, not initialized */
 	uint64_t mask;
+	/** Declare the following local variable of type 'struct run_context *'
+         *  - ctx representing the current run_context structure, initialized as
+         *    &vcpu->arch.contexts[vcpu->arch.cur_context].run_ctx */
 	struct run_context *ctx = &vcpu->arch.contexts[vcpu->arch.cur_context].run_ctx;
 
+	/** Set bit CPU_REG_CR0 in vcpu->reg_cached to 1 while check if its old value is 0
+	 *  which means guest CR0 of \a vcpu is not cached in ctx */
 	if (bitmap_test_and_set_lock(CPU_REG_CR0, &vcpu->reg_cached) == 0) {
+		/** Read the value from VMCS VMX_CR0_GUEST_HOST_MASK into mask */
 		mask = exec_vmread(VMX_CR0_GUEST_HOST_MASK);
+		/** Set ctx->cr0 to be (exec_vmread(VMX_CR0_READ_SHADOW) & mask) | (exec_vmread(VMX_GUEST_CR0)
+                 *  & (~mask)) */
 		ctx->cr0 = (exec_vmread(VMX_CR0_READ_SHADOW) & mask) | (exec_vmread(VMX_GUEST_CR0) & (~mask));
 	}
+	/** Return the cr0 value in ctx */
 	return ctx->cr0;
 }
 
+/**
+ * @brief public API for set the value of virtual CR0 of \a vcpu.
+ *
+ * This API call helper function vmx_write_cr0 to do virtual CR0 setting.
+ *
+ * @param[inout] vcpu pointer to the vcpu whose guest CR0 is to be written.
+ * @param[in] val the value to be set to guest CR0 of \a vcpu
+ *
+ * @return None
+ *
+ * @pre vcpu != NULL
+ * @pre vcpu->vm != NULL
+ * @pre The host physical address calculated by hva2hpa(vcpu>arch.vmcs) is
+ *      equal to the current-VMCS pointer of the current pcpu.
+ *
+ * @post N/A
+ *
+ * @mode HV_INIT
+ * @mode HV_OPERATIONAL
+ *
+ * @remark N/A
+ *
+ * @reentrancy unspecified
+ * @threadsafety when \a vcpu is different among parallel invocation
+ */
 void vcpu_set_cr0(struct acrn_vcpu *vcpu, uint64_t val)
 {
+	/** Call vmx_write_cr0 to write the cr0 */
 	vmx_write_cr0(vcpu, val);
 }
 
+/**
+ * @brief public API for set the value of virtual CR2 of \a vcpu.
+ *
+ * @param[inout] vcpu pointer to the vcpu whose guest CR2 is to be written.
+ * @param[in] val the value to be set to guest CR2 of \a vcpu
+ *
+ * @return None
+ *
+ * @pre vcpu != NULL
+ *
+ * @post N/A
+ *
+ * @mode HV_INIT
+ * @mode HV_OPERATIONAL
+ *
+ * @remark N/A
+ *
+ * @reentrancy unspecified
+ * @threadsafety when \a vcpu is different among parallel invocation
+ */
 void vcpu_set_cr2(struct acrn_vcpu *vcpu, uint64_t val)
 {
+	/** Set vcpu->arch.contexts[vcpu->arch.cur_context].run_ctx.cr2 to be @val */
 	vcpu->arch.contexts[vcpu->arch.cur_context].run_ctx.cr2 = val;
 }
 
+/**
+ * @brief public API for get the value of virutal CR4 of \a vcpu.
+ *
+ * @param[inout] vcpu pointer to the vcpu whose guest CR4 is to be read.
+ *
+ * @return the value of CR4
+ *
+ * @pre vcpu != NULL
+ * @pre The host physical address calculated by hva2hpa(vcpu>arch.vmcs) is
+ *      equal to the current-VMCS pointer of the current pcpu.
+ *
+ * @post N/A
+ *
+ * @mode HV_INIT
+ * @mode HV_OPERATIONAL
+ *
+ * @remark N/A
+ *
+ * @reentrancy unspecified
+ * @threadsafety when \a vcpu is different among parallel invocation
+ */
 uint64_t vcpu_get_cr4(struct acrn_vcpu *vcpu)
 {
+	/** Declare the following local variable of type uint64_t
+         *  - mask representing the value read from VMCS VMX_CR4_GUEST_HOST_MASK, not initialized */
 	uint64_t mask;
+	/** Declare the following local variable of type 'struct run_context *'
+         *  - ctx representing the current run_context structure, initialized as
+         *    &vcpu->arch.contexts[vcpu->arch.cur_context].run_ctx */
 	struct run_context *ctx = &vcpu->arch.contexts[vcpu->arch.cur_context].run_ctx;
 
+	/** Set bit CPU_REG_CR4 in vcpu->reg_cached to 1 while check if its old value is 0
+	 *  which means guest CR4 of \a vcpu is not cached in ctx */
 	if (bitmap_test_and_set_lock(CPU_REG_CR4, &vcpu->reg_cached) == 0) {
+		/** Read the value from VMCS VMX_CR4_GUEST_HOST_MASK into mask */
 		mask = exec_vmread(VMX_CR4_GUEST_HOST_MASK);
+		/** Set ctx->cr4 to be (exec_vmread(VMX_CR4_READ_SHADOW) & mask) |
+                 *  (exec_vmread(VMX_GUEST_CR4) & (~mask)) */
 		ctx->cr4 = (exec_vmread(VMX_CR4_READ_SHADOW) & mask) | (exec_vmread(VMX_GUEST_CR4) & (~mask));
 	}
+	/** Return the cr4 value in ctx */
 	return ctx->cr4;
 }
 
+/**
+ * @brief public API for set the value of virutal CR4 of \a vcpu.
+ *
+ * This API call helper function vmx_write_cr4 to do virtual CR4 setting.
+ *
+ * @param[inout] vcpu pointer to the vcpu whose guest CR4 is to be written.
+ * @param[in] val the value to be set to guest CR4 of \a vcpu
+ *
+ * @return None
+ *
+ * @pre vcpu != NULL
+ * @pre The host physical address calculated by hva2hpa(vcpu>arch.vmcs) is
+ *      equal to the current-VMCS pointer of the current pcpu.
+ *
+ * @post N/A
+ *
+ * @mode HV_INIT
+ * @mode HV_OPERATIONAL
+ *
+ * @remark N/A
+ *
+ * @reentrancy unspecified
+ * @threadsafety when \a vcpu is different among parallel invocation
+ */
 void vcpu_set_cr4(struct acrn_vcpu *vcpu, uint64_t val)
 {
+	/** Call vmx_write_cr4 to write the CR4 */
 	vmx_write_cr4(vcpu, val);
 }
 
+/**
+ * @brief VM-Exit handler for VCRs access
+ *
+ * The handler for VM-Exit with the reason "control-register accesses".
+ * Guest software attempted to write CR0, CR3, CR4, or CR8 using CLTS,
+ * LMSW, or MOV CR and the VM-execution control fields indicate that a
+ * VM exit should occur. This function shall be called. Currently, it
+ * only handle the cases of CR0 and CR4, other cases will be treated
+ * as error.
+ *
+ * @param[inout] vcpu pointer to the vcpu which attempts to access a CR
+ *
+ * @return 0 if no error happened, otherwise return -EINVAL (-22)
+ *
+ * @return -EINVAL when the register causes vmexit is not CR0 or CR4
+ * @return 0 otherwise
+ *
+ * @pre vcpu != NULL
+ *
+ * @post N/A
+ *
+ * @mode HV_OPERATIONAL
+ *
+ * @remark N/A
+ *
+ * @reentrancy unspecified
+ * @threadsafety when \a vcpu is different among parallel invocation
+ */
 int32_t cr_access_vmexit_handler(struct acrn_vcpu *vcpu)
 {
+	/** Declare the following local variable of type uint64_t
+         *  - reg representing value to be written to a CR, not initialized */
 	uint64_t reg;
+	/** Declare the following local variable of type uint32_t
+         *  - idx representing the index of the general-purpose register, not initialized */
 	uint32_t idx;
+	/** Declare the following local variable of type uint64_t
+         *  - exit_qual representing the value of vcpu->arch.exit_qualification, not initialized */
 	uint64_t exit_qual;
+	/** Declare the following local variable of type uint32_t
+         *  - ret representing the return value of this function, initialized as 0 */
 	int32_t ret = 0;
 
+	/** Set exit_qual to be vcpu->arch.exit_qualification */
 	exit_qual = vcpu->arch.exit_qualification;
+	/** decode the VM-Exit reason to get the info which general-purpose register is used
+	 *  and assign the result to idx */
 	idx = (uint32_t)vm_exit_cr_access_reg_idx(exit_qual);
 
+	/** The idx should never be bigger than 15 */
 	ASSERT((idx <= 15U), "index out of range");
+	/** For MOV CR, set reg to the value from the general-purpose register indicated by idx */
 	reg = vcpu_get_gpreg(vcpu, idx);
 
+	/** Switch based on the accessed CR and access type */
 	switch ((vm_exit_cr_access_type(exit_qual) << 4U) | vm_exit_cr_access_cr_num(exit_qual)) {
+	/** Move to CR0 */
 	case 0x00UL:
-		/* mov to cr0 */
+		/** Call vcpu_set_cr0 to set reg to the guest CR0 of \a vcpu */
 		vcpu_set_cr0(vcpu, reg);
+		/** go out of the switch */
 		break;
+	/** Move to CR4 */
 	case 0x04UL:
-		/* mov to cr4 */
+		/** Call vcpu_set_cr4 to set reg to the guest CR4 of \a vcpu */
 		vcpu_set_cr4(vcpu, reg);
+		/** go out of the switch */
 		break;
+	/** default branch of the switch */
 	default:
+		/** This is unhandled CR access */
 		ASSERT(false, "Unhandled CR access");
+		/** Set the ret to -EINVAL */
 		ret = -EINVAL;
+		/** go out of the switch */
 		break;
 	}
 
+	/** Print the Exit Qualification field: number of control register and Access type */
 	TRACE_2L(TRACE_VMEXIT_CR_ACCESS, vm_exit_cr_access_type(exit_qual), vm_exit_cr_access_cr_num(exit_qual));
 
+	/** ret as return value */
 	return ret;
 }
 

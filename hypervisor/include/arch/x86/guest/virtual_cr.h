@@ -15,34 +15,31 @@
 
 /**
  * @file
- * @brief {TBD brief description}
+ * @brief This file declares the external APIs of the vp-base.vcr module
  *
- * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ * The guest's control registers (VCRs) are emulated by the hypervisor. This file provides the
+ * public API interfaces for VCRs interception configuration, public APIs for getting or
+ * setting VCRs inside the hypervisor and VM-Exit entry function caused by set to CR0/CR4.
+ *
  */
 
 /**
- * @file virtual_cr.h
+ * @brief public APIs for VCRs initialization configuration
  *
- * @brief public APIs for vCR operations
+ * Initialize the CR0 Guest/Host Masks and CR4 Guest/Host Masks in the current VMCS.
+ *
+ * @return None
  */
-
 void init_cr0_cr4_host_mask(void);
-
-/**
- * @brief vCR from vcpu
- *
- * @defgroup vCR ACRN
- * @{
- */
 
 /**
  * @brief get vcpu CR0 value
  *
  * Get & cache target vCPU's CR0 in run_context.
  *
- * @param[in] vcpu pointer to vcpu data structure
+ * @param[inout] vcpu pointer to vcpu data structure
  *
- * @return the value of CR0.
+ * @return the value of CR0
  */
 uint64_t vcpu_get_cr0(struct acrn_vcpu *vcpu);
 
@@ -53,6 +50,8 @@ uint64_t vcpu_get_cr0(struct acrn_vcpu *vcpu);
  *
  * @param[inout] vcpu pointer to vcpu data structure
  * @param[in] val the value set CR0
+ *
+ * @return None
  */
 void vcpu_set_cr0(struct acrn_vcpu *vcpu, uint64_t val);
 
@@ -63,6 +62,8 @@ void vcpu_set_cr0(struct acrn_vcpu *vcpu, uint64_t val);
  *
  * @param[inout] vcpu pointer to vcpu data structure
  * @param[in] val the value set CR2
+ *
+ * @return None
  */
 void vcpu_set_cr2(struct acrn_vcpu *vcpu, uint64_t val);
 
@@ -71,9 +72,9 @@ void vcpu_set_cr2(struct acrn_vcpu *vcpu, uint64_t val);
  *
  * Get & cache target vCPU's CR4 in run_context.
  *
- * @param[in] vcpu pointer to vcpu data structure
+ * @param[inout] vcpu pointer to vcpu data structure
  *
- * @return the value of CR4.
+ * @return the value of CR4
  */
 uint64_t vcpu_get_cr4(struct acrn_vcpu *vcpu);
 
@@ -84,14 +85,25 @@ uint64_t vcpu_get_cr4(struct acrn_vcpu *vcpu);
  *
  * @param[inout] vcpu pointer to vcpu data structure
  * @param[in] val the value set CR4
+ *
+ * @return None
  */
 void vcpu_set_cr4(struct acrn_vcpu *vcpu, uint64_t val);
 
 /**
- * @}
+ * @brief VM-Exit handler for VCRs access
+ *
+ * The handler for VM-Exit with the reason "control-register accesses".
+ * Guest software attempted to write CR0, CR3, CR4, or CR8 using CLTS,
+ * LMSW, or MOV CR and the VM-execution control fields indicate that a
+ * VM exit should occur. This function shall be called. Currently, it
+ * only handle the cases of CR0 and CR4, other cases will be treated
+ * as error.
+ *
+ * @param[inout] vcpu pointer to vcpu data structure
+ *
+ * @return 0 if no error happened, otherwise return -EINVAL (-22)
  */
-/* End of vCR */
-
 int32_t cr_access_vmexit_handler(struct acrn_vcpu *vcpu);
 
 /**
