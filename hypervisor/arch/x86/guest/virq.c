@@ -319,14 +319,6 @@ int32_t acrn_handle_pending_request(struct acrn_vcpu *vcpu)
 			invept(vcpu->vm->arch_vm.nworld_eptp);
 		}
 
-		if (bitmap_test_and_clear_lock(ACRN_REQUEST_VPID_FLUSH, pending_req_bits)) {
-			flush_vpid_single(arch->vpid);
-		}
-
-		if (bitmap_test_and_clear_lock(ACRN_REQUEST_EOI_EXIT_BITMAP_UPDATE, pending_req_bits)) {
-			vcpu_set_vmcs_eoi_exit(vcpu);
-		}
-
 		/* inject NMI before maskable hardware interrupt */
 		if (bitmap_test_and_clear_lock(ACRN_REQUEST_NMI, pending_req_bits)) {
 			/* Inject NMI vector = 2 */
