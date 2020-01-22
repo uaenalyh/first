@@ -356,22 +356,6 @@ int32_t acrn_handle_pending_request(struct acrn_vcpu *vcpu)
 			/* SDM Vol3 table 6-2, inject lowpri exception */
 			(void)vcpu_inject_lo_exception(vcpu);
 		}
-
-		/*
-		 * If "virtual-interrupt delivered" is enabled, CPU will evaluate
-		 * and automatic inject the virtual interrupts in appropriate time.
-		 * And from SDM Vol3 29.2.1, the apicv only trigger evaluation of
-		 * pending virtual interrupts when "interrupt-window exiting" is 0.
-		 *
-		 * External interrupt(from vpic) can't be delivered by "virtual-
-		 * interrupt delivery", it only deliver interrupt from vlapic.
-		 *
-		 * So need to enable "interrupt-window exiting", when there is
-		 * an ExtInt or there is lapic interrupt and virtual interrupt
-		 * deliver is disabled.
-		 */
-		if (!arch->irq_window_enabled) {
-		}
 	}
 
 	return ret;
