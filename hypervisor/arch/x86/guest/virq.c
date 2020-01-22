@@ -98,26 +98,6 @@ static uint8_t get_exception_type(uint32_t vector)
 	return type;
 }
 
-static bool is_guest_irq_enabled(struct acrn_vcpu *vcpu)
-{
-	uint64_t guest_rflags, guest_state;
-	bool status = false;
-
-	/* Read the RFLAGS of the guest */
-	guest_rflags = vcpu_get_rflags(vcpu);
-	/* Check the RFLAGS[IF] bit first */
-	if ((guest_rflags & HV_ARCH_VCPU_RFLAGS_IF) != 0UL) {
-		/* Interrupts are allowed */
-		/* Check for temporarily disabled interrupts */
-		guest_state = exec_vmread32(VMX_GUEST_INTERRUPTIBILITY_INFO);
-
-		if ((guest_state & (HV_ARCH_VCPU_BLOCKED_BY_STI | HV_ARCH_VCPU_BLOCKED_BY_MOVSS)) == 0UL) {
-			status = true;
-		}
-	}
-	return status;
-}
-
 void vcpu_make_request(struct acrn_vcpu *vcpu, uint16_t eventid)
 {
 	bitmap_set_lock(eventid, &vcpu->arch.pending_req);
