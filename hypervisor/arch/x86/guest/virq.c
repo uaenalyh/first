@@ -228,52 +228,6 @@ void vcpu_inject_ud(struct acrn_vcpu *vcpu)
 	(void)vcpu_queue_exception(vcpu, IDT_UD, 0U);
 }
 
-int32_t interrupt_window_vmexit_handler(struct acrn_vcpu *vcpu)
-{
-	uint32_t value32;
-
-	TRACE_2L(TRACE_VMEXIT_INTERRUPT_WINDOW, 0UL, 0UL);
-
-	/* Disable interrupt-window exiting first.
-	 * acrn_handle_pending_request will continue handle for this vcpu
-	 */
-	vcpu->arch.irq_window_enabled = false;
-	value32 = exec_vmread32(VMX_PROC_VM_EXEC_CONTROLS);
-	value32 &= ~(VMX_PROCBASED_CTLS_IRQ_WIN);
-	exec_vmwrite32(VMX_PROC_VM_EXEC_CONTROLS, value32);
-
-	vcpu_retain_rip(vcpu);
-	return 0;
-}
-
-int32_t external_interrupt_vmexit_handler(struct acrn_vcpu *vcpu)
-{
-	uint32_t intr_info;
-	struct intr_excp_ctx ctx;
-	int32_t ret;
-
-	intr_info = exec_vmread32(VMX_EXIT_INT_INFO);
-	if (((intr_info & VMX_INT_INFO_VALID) == 0U) ||
-		(((intr_info & VMX_INT_TYPE_MASK) >> 8U) != VMX_INT_TYPE_EXT_INT)) {
-		pr_err("Invalid VM exit interrupt info:%x", intr_info);
-		vcpu_retain_rip(vcpu);
-		ret = -EINVAL;
-	} else {
-		ctx.vector = intr_info & 0xFFU;
-		ctx.rip = vcpu_get_rip(vcpu);
-		ctx.rflags = vcpu_get_rflags(vcpu);
-		ctx.cs = exec_vmread32(VMX_GUEST_CS_SEL);
-
-		dispatch_interrupt(&ctx);
-		vcpu_retain_rip(vcpu);
-
-		TRACE_2L(TRACE_VMEXIT_EXTERNAL_INTERRUPT, ctx.vector, 0UL);
-		ret = 0;
-	}
-
-	return ret;
-}
-
 int32_t acrn_handle_pending_request(struct acrn_vcpu *vcpu)
 {
 	bool injected = false;
