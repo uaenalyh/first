@@ -294,8 +294,6 @@ int32_t external_interrupt_vmexit_handler(struct acrn_vcpu *vcpu)
 	return ret;
 }
 
-static inline bool acrn_inject_pending_intr(struct acrn_vcpu *vcpu, uint64_t *pending_req_bits, bool injected);
-
 int32_t acrn_handle_pending_request(struct acrn_vcpu *vcpu)
 {
 	bool injected = false;
@@ -353,7 +351,7 @@ int32_t acrn_handle_pending_request(struct acrn_vcpu *vcpu)
 			}
 		}
 
-		if (!acrn_inject_pending_intr(vcpu, pending_req_bits, injected)) {
+		if (!injected) {
 			/* if there is no eligible vector before this point */
 			/* SDM Vol3 table 6-2, inject lowpri exception */
 			(void)vcpu_inject_lo_exception(vcpu);
@@ -374,21 +372,6 @@ int32_t acrn_handle_pending_request(struct acrn_vcpu *vcpu)
 		 */
 		if (!arch->irq_window_enabled) {
 		}
-	}
-
-	return ret;
-}
-
-/*
- * @retval true 1 when INT is injected to guest.
- * @retval false when there is no eligible pending vector.
- */
-static inline bool acrn_inject_pending_intr(struct acrn_vcpu *vcpu, uint64_t *pending_req_bits, bool injected)
-{
-	bool ret = injected;
-	bool guest_irq_enabled = is_guest_irq_enabled(vcpu);
-
-	if (guest_irq_enabled && (!ret)) {
 	}
 
 	return ret;
