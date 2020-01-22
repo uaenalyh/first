@@ -121,52 +121,42 @@ static int32_t get_excep_class(uint32_t vector)
 	return ret;
 }
 
-int32_t vcpu_queue_exception(struct acrn_vcpu *vcpu, uint32_t vector_arg, uint32_t err_code_arg)
+void vcpu_queue_exception(struct acrn_vcpu *vcpu, uint32_t vector_arg, uint32_t err_code_arg)
 {
 	struct acrn_vcpu_arch *arch = &vcpu->arch;
 	uint32_t vector = vector_arg;
 	uint32_t err_code = err_code_arg;
-	int32_t ret = 0;
 
-	/* VECTOR_INVALID is also greater than 32 */
-	if (vector >= 32U) {
-		pr_err("invalid exception vector %d", vector);
-		ret = -EINVAL;
+	uint32_t prev_vector = arch->exception_info.exception;
+	int32_t new_class, prev_class;
+
+	/* SDM vol3 - 6.15, Table 6-5 - conditions for generating a
+	 * double fault */
+	prev_class = get_excep_class(prev_vector);
+	new_class = get_excep_class(vector);
+	if ((prev_vector == IDT_DF) && (new_class != EXCEPTION_CLASS_BENIGN)) {
+	/* triple fault happen - shutdwon mode */
+		vcpu_make_request(vcpu, ACRN_REQUEST_TRP_FAULT);
 	} else {
-
-		uint32_t prev_vector = arch->exception_info.exception;
-		int32_t new_class, prev_class;
-
-		/* SDM vol3 - 6.15, Table 6-5 - conditions for generating a
-		 * double fault */
-		prev_class = get_excep_class(prev_vector);
-		new_class = get_excep_class(vector);
-		if ((prev_vector == IDT_DF) && (new_class != EXCEPTION_CLASS_BENIGN)) {
-			/* triple fault happen - shutdwon mode */
-			vcpu_make_request(vcpu, ACRN_REQUEST_TRP_FAULT);
+		if (((prev_class == EXCEPTION_CLASS_CONT) && (new_class == EXCEPTION_CLASS_CONT)) ||
+			((prev_class == EXCEPTION_CLASS_PF) && (new_class != EXCEPTION_CLASS_BENIGN))) {
+			/* generate double fault */
+			vector = IDT_DF;
+			err_code = 0U;
 		} else {
-			if (((prev_class == EXCEPTION_CLASS_CONT) && (new_class == EXCEPTION_CLASS_CONT)) ||
-				((prev_class == EXCEPTION_CLASS_PF) && (new_class != EXCEPTION_CLASS_BENIGN))) {
-				/* generate double fault */
-				vector = IDT_DF;
-				err_code = 0U;
-			} else {
-				/* Trigger the given exception instead of override it with
-				 * double/triple fault. */
-			}
-
-			arch->exception_info.exception = vector;
-
-			if ((exception_type[vector] & EXCEPTION_ERROR_CODE_VALID) != 0U) {
-				arch->exception_info.error = err_code;
-			} else {
-				arch->exception_info.error = 0U;
-			}
-			vcpu_make_request(vcpu, ACRN_REQUEST_EXCP);
+			/* Trigger the given exception instead of override it with
+			 * double/triple fault. */
 		}
-	}
 
-	return ret;
+		arch->exception_info.exception = vector;
+
+		if ((exception_type[vector] & EXCEPTION_ERROR_CODE_VALID) != 0U) {
+			arch->exception_info.error = err_code;
+		} else {
+			arch->exception_info.error = 0U;
+		}
+		vcpu_make_request(vcpu, ACRN_REQUEST_EXCP);
+	}
 }
 
 static void vcpu_inject_exception(struct acrn_vcpu *vcpu, uint32_t vector)
@@ -212,20 +202,20 @@ static bool vcpu_inject_lo_exception(struct acrn_vcpu *vcpu)
 /* Inject general protection exception(#GP) to guest */
 void vcpu_inject_gp(struct acrn_vcpu *vcpu, uint32_t err_code)
 {
-	(void)vcpu_queue_exception(vcpu, IDT_GP, err_code);
+	vcpu_queue_exception(vcpu, IDT_GP, err_code);
 }
 
 /* Inject page fault exception(#PF) to guest */
 void vcpu_inject_pf(struct acrn_vcpu *vcpu, uint64_t addr, uint32_t err_code)
 {
 	vcpu_set_cr2(vcpu, addr);
-	(void)vcpu_queue_exception(vcpu, IDT_PF, err_code);
+	vcpu_queue_exception(vcpu, IDT_PF, err_code);
 }
 
 /* Inject invalid opcode exception(#UD) to guest */
 void vcpu_inject_ud(struct acrn_vcpu *vcpu)
 {
-	(void)vcpu_queue_exception(vcpu, IDT_UD, 0U);
+	vcpu_queue_exception(vcpu, IDT_UD, 0U);
 }
 
 int32_t acrn_handle_pending_request(struct acrn_vcpu *vcpu)

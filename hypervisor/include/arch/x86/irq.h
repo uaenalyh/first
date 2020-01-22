@@ -120,12 +120,11 @@ uint32_t alloc_irq_vector(uint32_t irq);
  * @param[in] vector_arg   Vector of the exeception.
  * @param[in] err_code_arg Error Code to be injected.
  *
- * @retval 0 on success
- * @retval -EINVAL on error that vector is invalid.
+ * @return None
  *
  * @pre vcpu != NULL
  */
-int32_t vcpu_queue_exception(struct acrn_vcpu *vcpu, uint32_t vector_arg, uint32_t err_code_arg);
+void vcpu_queue_exception(struct acrn_vcpu *vcpu, uint32_t vector_arg, uint32_t err_code_arg);
 
 /**
  * @brief Inject general protection exeception(GP) to guest.

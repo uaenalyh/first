@@ -332,7 +332,7 @@ void handle_nmi(struct intr_excp_ctx *ctx)
 	/*
 	 * If the NMI happened in root mode, ARCN hypervisor shall inject it to guest vm.
 	 */
-	(void)vcpu_queue_exception(get_cpu_var(ever_run_vcpu), ctx->vector, ctx->error_code);
+	vcpu_queue_exception(get_cpu_var(ever_run_vcpu), ctx->vector, ctx->error_code);
 }
 
 static void init_irq_descs(void)
