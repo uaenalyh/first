@@ -53,11 +53,9 @@ static void clear_lapic_isr(void)
 	 * life, therefore we will ensure all the in-service bits are clear.
 	 */
 	for (isr_reg = MSR_IA32_EXT_APIC_ISR7; isr_reg >= MSR_IA32_EXT_APIC_ISR0; isr_reg--) {
-		for (i = 0U; i < 32U; i++) {
-			if (msr_read(isr_reg) != 0U) {
+		if (msr_read(isr_reg) != 0U) {
+			for (i = 0U; i < 32U; i++) {
 				msr_write(MSR_IA32_EXT_APIC_EOI, 0U);
-			} else {
-				break;
 			}
 		}
 	}
