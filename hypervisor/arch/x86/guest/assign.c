@@ -14,7 +14,11 @@
 #include <ioapic.h>
 
 /**
- * @addtogroup vp-dm_ptirq
+ * @defgroup vp-dm_ptirq vp-dm.ptirq
+ * @ingroup vp-dm
+ * @brief {TBD brief description}
+ *
+ * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
  *
  * @{
  */
