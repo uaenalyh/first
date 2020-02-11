@@ -103,7 +103,13 @@ static inline void pci_vdev_write_cfg_u32(struct pci_vdev *vdev, uint32_t offset
  */
 static inline bool vbar_access(const struct pci_vdev *vdev, uint32_t offset)
 {
-	return is_bar_offset(vdev->nr_bars, offset);
+	bool ret = false;
+
+	if ((offset >= pci_bar_offset(0U)) && (offset < pci_bar_offset(vdev->nr_bars))) {
+		ret = true;
+	}
+
+	return ret;
 }
 
 /**

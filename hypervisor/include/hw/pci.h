@@ -134,19 +134,6 @@ static inline uint32_t pci_bar_offset(uint32_t idx)
 	return PCIR_BARS + (idx << 2U);
 }
 
-static inline bool is_bar_offset(uint32_t nr_bars, uint32_t offset)
-{
-	bool ret;
-
-	if ((offset >= pci_bar_offset(0U)) && (offset < pci_bar_offset(nr_bars))) {
-		ret = true;
-	} else {
-		ret = false;
-	}
-
-	return ret;
-}
-
 uint32_t pci_pdev_read_cfg(union pci_bdf bdf, uint32_t offset, uint32_t bytes);
 void pci_pdev_write_cfg(union pci_bdf bdf, uint32_t offset, uint32_t bytes, uint32_t val);
 
