@@ -185,18 +185,12 @@ static void vcpu_inject_exception(struct acrn_vcpu *vcpu, uint32_t vector)
 	}
 }
 
-static bool vcpu_inject_lo_exception(struct acrn_vcpu *vcpu)
+static void vcpu_inject_lo_exception(struct acrn_vcpu *vcpu)
 {
 	uint32_t vector = vcpu->arch.exception_info.exception;
-	bool injected = false;
 
 	/* high priority exception already be injected */
-	if (vector <= NR_MAX_VECTOR) {
-		vcpu_inject_exception(vcpu, vector);
-		injected = true;
-	}
-
-	return injected;
+	vcpu_inject_exception(vcpu, vector);
 }
 
 /* Inject general protection exception(#GP) to guest */
@@ -270,7 +264,7 @@ int32_t acrn_handle_pending_request(struct acrn_vcpu *vcpu)
 		if (!injected) {
 			/* if there is no eligible vector before this point */
 			/* SDM Vol3 table 6-2, inject lowpri exception */
-			(void)vcpu_inject_lo_exception(vcpu);
+			vcpu_inject_lo_exception(vcpu);
 		}
 	}
 
