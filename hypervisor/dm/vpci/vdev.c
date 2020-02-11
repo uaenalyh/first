@@ -120,13 +120,26 @@ uint32_t pci_vdev_read_bar(const struct pci_vdev *vdev, uint32_t idx)
 	return bar;
 }
 
+/* check the limitation for BAR range */
+#define PCI_VBAR_BASE_LIMIT 0xC0000000UL
+#define PCI_VBAR_TOP_LIMIT  0xE0000000UL
+static bool vbar_base_is_valid(uint64_t bar_base, uint64_t size)
+{
+	bool result = true;
+
+	if ((bar_base < PCI_VBAR_BASE_LIMIT) || ((bar_base + size) > PCI_VBAR_TOP_LIMIT)) {
+		result = false;
+	}
+
+	return result;
+}
+
 static void pci_vdev_update_bar_base(struct pci_vdev *vdev, uint32_t idx)
 {
 	struct pci_bar *vbar;
 	enum pci_bar_type type;
 	uint64_t base = 0UL;
 	uint32_t lo, hi, offset;
-	struct acrn_vm *vm = vdev->vpci->vm;
 
 	vbar = &vdev->bar[idx];
 	offset = pci_bar_offset(idx);
@@ -150,7 +163,7 @@ static void pci_vdev_update_bar_base(struct pci_vdev *vdev, uint32_t idx)
 		}
 	}
 
-	if ((base != 0UL) && !ept_is_mr_valid(vm, base, vdev->bar[idx].size)) {
+	if ((base != 0UL) && !vbar_base_is_valid(base, vdev->bar[idx].size)) {
 		pr_fatal("%s, %x:%x.%x set invalid bar[%d] base: 0x%lx, size: 0x%lx\n", __func__, vdev->bdf.bits.b,
 			vdev->bdf.bits.d, vdev->bdf.bits.f, idx, base, vdev->bar[idx].size);
 		/* If guest set a invalid GPA, ignore it temporarily */
