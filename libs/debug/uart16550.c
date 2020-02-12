@@ -232,16 +232,3 @@ void uart16550_set_property(bool enabled, bool port_mapped, uint64_t base_addr)
 		strncpy_s(pci_bdf_info, MAX_BDF_LEN + 1U, bdf, MAX_BDF_LEN);
 	}
 }
-
-bool is_pci_dbg_uart(union pci_bdf bdf_value)
-{
-	bool ret = false;
-
-	if (uart_enabled && !serial_port_mapped) {
-		if (bdf_value.value == serial_pci_bdf.value) {
-			ret = true;
-		}
-	}
-
-	return ret;
-}

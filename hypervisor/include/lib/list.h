@@ -42,28 +42,6 @@
  * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
  */
 
-struct list_head {
-	struct list_head *next, *prev;
-};
-
-#define INIT_LIST_HEAD(ptr)          \
-	do {                         \
-		(ptr)->next = (ptr); \
-		(ptr)->prev = (ptr); \
-	} while (0)
-
-static inline void list_del_node(struct list_head *prev, struct list_head *next)
-{
-	next->prev = prev;
-	prev->next = next;
-}
-
-static inline void list_del_init(struct list_head *entry)
-{
-	list_del_node(entry->prev, entry->next);
-	INIT_LIST_HEAD(entry);
-}
-
 #define list_entry(ptr, type, member) ((type *)((char *)(ptr) - (uint64_t)(&((type *)0)->member)))
 
 /**
