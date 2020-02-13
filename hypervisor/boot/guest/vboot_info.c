@@ -67,12 +67,10 @@ static void *get_kernel_load_addr(struct acrn_vm *vm)
 		load_addr = (void *)vm_config->os_config.kernel_load_addr;
 		break;
 	default:
-		pr_err("Unsupported Kernel type.");
+		/* kernel type is either KERNEL_BZIMAGE or KERNEL_ZEPHYR, do nothing here */
 		break;
 	}
-	if (load_addr == NULL) {
-		pr_err("Could not get kernel load addr of VM %d .", vm->vm_id);
-	}
+
 	return load_addr;
 }
 
