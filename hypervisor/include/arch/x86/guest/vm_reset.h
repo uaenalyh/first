@@ -8,16 +8,14 @@
 #define VM_RESET_H_
 
 /**
- * @addtogroup vp-base_vm
+ * @addtogroup vp-base_vm-reset
  *
  * @{
  */
 
 /**
  * @file
- * @brief {TBD brief description}
- *
- * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ * @brief This file declares the external APIs of the vp-base.vm-reset
  */
 
 #include <acrn_common.h>
