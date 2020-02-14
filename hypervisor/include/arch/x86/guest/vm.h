@@ -161,7 +161,6 @@ void direct_boot_sw_loader(struct acrn_vm *vm);
 void vrtc_init(struct acrn_vm *vm);
 
 bool is_safety_vm(const struct acrn_vm *vm);
-bool is_rt_vm(const struct acrn_vm *vm);
 #endif /* !ASSEMBLER */
 
 /**

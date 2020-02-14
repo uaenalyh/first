@@ -51,16 +51,6 @@
 
 static struct acrn_vm vm_array[CONFIG_MAX_VM_NUM] __aligned(PAGE_SIZE);
 
-/**
- * @pre vm != NULL && vm_config != NULL && vm->vmid < CONFIG_MAX_VM_NUM
- */
-bool is_rt_vm(const struct acrn_vm *vm)
-{
-	struct acrn_vm_config *vm_config = get_vm_config(vm->vm_id);
-
-	return ((vm_config->guest_flags & GUEST_FLAG_RT) != 0U);
-}
-
 bool is_safety_vm(const struct acrn_vm *vm)
 {
 	return (vm->vm_id == 0U);
@@ -319,20 +309,7 @@ void pause_vm(struct acrn_vm *vm)
 	struct acrn_vcpu *vcpu = NULL;
 
 	if (vm->state != VM_PAUSED) {
-		if (is_rt_vm(vm)) {
-			/**
-			 * For RTVM, we can only pause its vCPUs when it stays at following states:
-			 *  - It is powering off by itself
-			 *  - It is created but doesn't start
-			 */
-			if (vm->state == VM_CREATED) {
-				foreach_vcpu (i, vm, vcpu) {
-					pause_vcpu(vcpu, VCPU_ZOMBIE);
-				}
-
-				vm->state = VM_PAUSED;
-			}
-		} else {
+		if (vm->state == VM_CREATED) {
 			foreach_vcpu (i, vm, vcpu) {
 				pause_vcpu(vcpu, VCPU_ZOMBIE);
 			}

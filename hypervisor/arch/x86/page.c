@@ -192,10 +192,7 @@ void init_ept_mem_ops(struct memory_ops *mem_ops, uint16_t vm_id)
 	if (is_ept_force_4k_ipage()) {
 		mem_ops->tweak_exe_right = ept_tweak_exe_right;
 		mem_ops->recover_exe_right = ept_recover_exe_right;
-		/* For RTVM, build 4KB page mapping in EPT */
-		if (is_rt_vm(get_vm_from_vmid(vm_id))) {
-			mem_ops->large_page_enabled = false;
-		}
+		mem_ops->large_page_enabled = false;
 	} else {
 		mem_ops->tweak_exe_right = nop_tweak_exe_right;
 		mem_ops->recover_exe_right = nop_recover_exe_right;
