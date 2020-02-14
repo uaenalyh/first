@@ -14,9 +14,8 @@
 
 /**
  * @file
- * @brief {TBD brief description}
+ * @brief this file declares the external APIs of the boot module.
  *
- * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
  */
 
 extern void relocate(void);
