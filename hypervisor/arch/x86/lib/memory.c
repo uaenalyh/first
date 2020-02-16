@@ -58,9 +58,7 @@ void *memset(void *base, uint8_t v, size_t n)
 	 * Some CPUs support enhanced REP MOVSB/STOSB feature. It is recommended
 	 * to use it when possible.
 	 */
-	if ((base != NULL) && (n != 0U)) {
-		memset_erms(base, v, n);
-	}
+	memset_erms(base, v, n);
 
 	return base;
 }
