@@ -8,16 +8,16 @@
 #define UCODE_H
 
 /**
- * @addtogroup vp-base_vcpu
+ * @addtogroup vp-base_vmsr
  *
  * @{
  */
 
 /**
  * @file
- * @brief {TBD brief description}
+ * @brief This file declares the function related to the microcode MSR IA32_BIOS_SIGN_ID.
  *
- * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ * This file declares the function related to the microcode MSR IA32_BIOS_SIGN_ID.
  */
 
 uint64_t get_microcode_version(void);

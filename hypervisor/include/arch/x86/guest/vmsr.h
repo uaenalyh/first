@@ -17,9 +17,10 @@
 
 /**
  * @file
- * @brief {TBD brief description}
+ * @brief This file declares all external APIs that shall be provided by the vp-base.vmsr module.
  *
- * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ * This file declares all external functions that shall be provided by the vp-base.vmsr module.
+ *
  */
 
 void init_msr_emulation(struct acrn_vcpu *vcpu);
