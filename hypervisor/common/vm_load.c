@@ -15,11 +15,7 @@
 #include <logmsg.h>
 
 /**
- * @defgroup vp-base_vboot vp-base.vboot
- * @ingroup vp-base
- * @brief {TBD brief description}
- *
- * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ * @addtogroup vp-base_vm
  *
  * @{
  */

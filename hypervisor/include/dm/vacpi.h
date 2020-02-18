@@ -22,7 +22,7 @@
 #define VACPI_H
 
 /**
- * @addtogroup vp-base_vboot
+ * @addtogroup vp-base_vm
  *
  * @{
  */

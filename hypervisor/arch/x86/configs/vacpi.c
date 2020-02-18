@@ -10,7 +10,7 @@
 #include <pgtable.h>
 
 /**
- * @addtogroup vp-base_vboot
+ * @addtogroup vp-base_vm
  *
  * @{
  */

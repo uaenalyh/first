@@ -16,11 +16,11 @@
 #include <mmu.h>
 #include <vm.h>
 #include <logmsg.h>
-#include <deprivilege_boot.h>
 #include <vboot_info.h>
 
 /**
- * @addtogroup vp-base_vboot
+ * @defgroup vp-base_vboot vp-base.vboot
+ * @ingroup vp-base
  *
  * @{
  */
@@ -129,39 +129,28 @@ static uint32_t get_mod_idx_by_tag(const struct multiboot_module *mods, uint32_t
 	return ret;
 }
 
-/* @pre vm != NULL && mbi != NULL
- */
-static void init_vm_sw_load(struct acrn_vm *vm, const struct multiboot_info *mbi)
-{
-	struct acrn_vm_config *vm_config = get_vm_config(vm->vm_id);
-	struct multiboot_module *mods = (struct multiboot_module *)hpa2hva((uint64_t)mbi->mi_mods_addr);
-	uint32_t mod_idx;
-	dev_dbg(ACRN_DBG_BOOT, "mod counts=%d\n", mbi->mi_mods_count);
-
-	mod_idx = get_mod_idx_by_tag(mods, mbi->mi_mods_count, vm_config->os_config.kernel_mod_tag);
-	init_vm_kernel_info(vm, &mods[mod_idx]);
-	init_vm_bootargs_info(vm);
-}
-
-/**
- * @pre vm != NULL
- */
-static void init_general_vm_boot_info(struct acrn_vm *vm)
-{
-	struct multiboot_info *mbi = (struct multiboot_info *)hpa2hva((uint64_t)boot_regs[1]);
-	stac();
-	dev_dbg(ACRN_DBG_BOOT, "Multiboot detected, flag=0x%x", mbi->mi_flags);
-	init_vm_sw_load(vm, mbi);
-	clac();
-}
-
 /**
  * @param[inout] vm pointer to a vm descriptor
  * @pre vm != NULL
  */
 void init_vm_boot_info(struct acrn_vm *vm)
 {
-	init_general_vm_boot_info(vm);
+	struct multiboot_info *mbi = (struct multiboot_info *)hpa2hva((uint64_t)boot_regs[1]);
+	struct acrn_vm_config *vm_config;
+	struct multiboot_module *mods;
+	uint32_t mod_idx;
+
+	stac();
+	dev_dbg(ACRN_DBG_BOOT, "Multiboot detected, flag=0x%x", mbi->mi_flags);
+
+	vm_config = get_vm_config(vm->vm_id);
+	mods = (struct multiboot_module *)hpa2hva((uint64_t)mbi->mi_mods_addr);
+	dev_dbg(ACRN_DBG_BOOT, "mod counts=%d\n", mbi->mi_mods_count);
+
+	mod_idx = get_mod_idx_by_tag(mods, mbi->mi_mods_count, vm_config->os_config.kernel_mod_tag);
+	init_vm_kernel_info(vm, &mods[mod_idx]);
+	init_vm_bootargs_info(vm);
+	clac();
 }
 
 /**
