@@ -59,7 +59,7 @@
  * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
  */
 
-static spinlock_t pci_device_lock;
+static spinlock_t pci_device_lock = {.head = 0U, .tail = 0U};
 
 static uint32_t pci_pdev_calc_address(union pci_bdf bdf, uint32_t offset)
 {
