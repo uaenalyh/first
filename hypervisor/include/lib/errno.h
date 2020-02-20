@@ -15,22 +15,30 @@
 
 /**
  * @file
- * @brief {TBD brief description}
- *
- * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ * @brief This file declares external error codes that shall be provided by the lib.utils module.
  */
 
-/** Indicates Permission denied */
+/** Indicate permission denied */
 #define EACCES 13
-/** Indicates there is fault. */
+/**
+ * @brief Indicate abnormal conditions in guests where exceptions shall be injected
+ */
 #define EFAULT 14
-/** Indicates that target is busy. */
+/**
+ * @brief Indicate that target is busy.
+ */
 #define EBUSY 16
-/** Indicates that no such dev. */
+/**
+ * @brief Indicate that no such device.
+ */
 #define ENODEV 19
-/** Indicates that argument is not valid. */
+/**
+ * @brief Indicate that argument is not valid.
+ */
 #define EINVAL 22
-/** Indicates that timeout occurs. */
+/**
+ * @brief Indicate that timeout occurs.
+ */
 #define ETIMEDOUT 110
 
 /**

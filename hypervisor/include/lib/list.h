@@ -37,11 +37,29 @@
 
 /**
  * @file
- * @brief {TBD brief description}
- *
- * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ * @brief This file declares external list APIs that shall be provided by the lib.utils module.
  */
 
+/**
+ * @brief Return the structure where \a ptr is embedded in.
+ *
+ * @param[in]    ptr An instance which is embedded.
+ * @param[in]    type A struct or union type having \a member as it's field.
+ * @param[in]    member The name of the embedded field in \a type.
+ *
+ * @return A pointer to the instance where the structure pointed to by \a ptr is embedded in.
+ *
+ * @pre \a ptr shall point to the field \a member of an instance of type \a type.
+ * @pre \a ptr != NULL
+ *
+ * @mode HV_INIT, HV_OPERATIONAL, HV_TERMINATION
+ *
+ * @reentrancy Unspecified
+ * @threadsafety Unspecified
+ *
+ * Expand to a pointer calculated by subtracting the offset in byte of \a member within a \a type structure from
+ * \a ptr. The returned pointer points to a structure of \a type.
+ */
 #define list_entry(ptr, type, member) ((type *)((char *)(ptr) - (uint64_t)(&((type *)0)->member)))
 
 /**

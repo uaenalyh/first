@@ -15,9 +15,7 @@
 
 /**
  * @file
- * @brief {TBD brief description}
- *
- * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ * @brief This file declares external string APIs that shall be provided by the lib.utils module.
  */
 
 #include <types.h>
