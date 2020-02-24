@@ -131,13 +131,6 @@ primary_start_long_mode:
     /* 16 = CPU_STACK_ALIGN */
     and     $(~(16 - 1)),%rsp
 
-    /*
-     * Fix up the .rela sections
-     * Notes: this includes the fixup to IDT tables and temporary
-     *     page tables
-     */
-    call relocate
-
     /* Load temportary GDT pointer value */
     lea     cpu_primary32_gdt_ptr(%rip), %rbx
     lgdt    (%ebx)
