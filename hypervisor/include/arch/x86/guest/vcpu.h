@@ -21,9 +21,8 @@
 
 /**
  * @file
- * @brief {TBD brief description}
+ * @brief this file declares the macros, data structure, internal functions and external APIs of the vcpu module.
  *
- * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
  */
 
 #ifndef ASSEMBLER
@@ -36,25 +35,6 @@
 #include <io_req.h>
 #include <msr.h>
 #include <cpu.h>
-
-/**
- * @brief vcpu
- *
- * @defgroup acrn_vcpu ACRN vcpu
- * @{
- */
-
-/*
- * VCPU related APIs
- */
-
-/**
- * @defgroup virt_int_injection Event ID supported for virtual interrupt injection
- *
- * This is a group that includes Event ID supported for virtual interrupt injection.
- *
- * @{
- */
 
 /**
  * @brief Request for exception injection
@@ -97,51 +77,80 @@
 #define ACRN_REQUEST_LAPIC_RESET 9U
 
 /**
- * @}
+ * @brief This macro is used to pre-define load segment function which set selector, base, limit and
+ *  attribute of specified selector.
+ *
+ * @return None
+ *
+ * @pre  None
+ *
+ * @post None
+ *
+ * @mode HV_SUBMODE_INIT_ROOT, HV_OPERATIONAL
+ *
+ * @reentrancy Unspecified
+ *
+ * @ThreadSafety Unspecified
  */
-/* End of virt_int_injection */
-
-#define load_segment(seg, SEG_NAME)                             \
-	{                                                       \
+#define load_segment(seg, SEG_NAME)                     \
+	{                                                   \
 		exec_vmwrite16(SEG_NAME##_SEL, (seg).selector); \
 		exec_vmwrite(SEG_NAME##_BASE, (seg).base);      \
 		exec_vmwrite32(SEG_NAME##_LIMIT, (seg).limit);  \
 		exec_vmwrite32(SEG_NAME##_ATTR, (seg).attr);    \
 	}
 
-/* Define segments constants for guest */
-#define REAL_MODE_BSP_INIT_CODE_SEL (0xf000U)
-#define REAL_MODE_DATA_SEG_AR       (0x0093U)
-#define REAL_MODE_CODE_SEG_AR       (0x009fU)
-#define PROTECTED_MODE_DATA_SEG_AR  (0xc093U)
-#define PROTECTED_MODE_CODE_SEG_AR  (0xc09bU)
-#define REAL_MODE_SEG_LIMIT         (0xffffU)
-#define PROTECTED_MODE_SEG_LIMIT    (0xffffffffU)
-#define DR7_INIT_VALUE              (0x400UL)
-#define LDTR_AR                     (0x0082U) /* LDT, type must be 2, refer to SDM Vol3 26.3.1.2 */
-#define TR_AR                       (0x008bU) /* TSS (busy), refer to SDM Vol3 26.3.1.2 */
+/** Define segments constants for guest */
+#define REAL_MODE_BSP_INIT_CODE_SEL (0xf000U)    /** code segment selector of real mode operation*/
+#define REAL_MODE_DATA_SEG_AR       (0x0093U)    /** data segment attributes of real mode operation*/
+#define REAL_MODE_CODE_SEG_AR       (0x009fU)    /** code segment attributes of real mode operation*/
+#define PROTECTED_MODE_DATA_SEG_AR  (0xc093U)    /** data segment attributes of protected mode operation*/
+#define PROTECTED_MODE_CODE_SEG_AR  (0xc09bU)    /** code segment attributes of protected mode operation*/
+#define REAL_MODE_SEG_LIMIT         (0xffffU)    /** segment limit of real mode operation*/
+#define PROTECTED_MODE_SEG_LIMIT    (0xffffffffU)/** segment limit of protected mode operation*/
+#define DR7_INIT_VALUE              (0x400UL)    /** initial value of DR7*/
+#define LDTR_AR                     (0x0082U)    /** attributes of LDTR */
+#define TR_AR                       (0x008bU)    /** attributes of TR */
 
-#define foreach_vcpu(idx, vm, vcpu)                                                              \
+/**
+ * @brief This macro expands to a for-loop statement with one if statement as loop body. The for-loop
+ * iterates over the vCPUs of @vm in ascending order of the vcpu_id field in each vcpu.
+ * For each idx ranging from 0 to vm->hw.created_vcpus [with a step of 1]. It is used to probe each
+ * vCPU in the given VM.
+ * @return None
+ *
+ * @pre  None
+ *
+ * @post None
+ *
+ * @mode HV_SUBMODE_INIT_ROOT, HV_OPERATIONAL
+ *
+ * @reentrancy Unspecified
+ *
+ * @ThreadSafety Unspecified
+ */
+ #define foreach_vcpu(idx, vm, vcpu)                                                         \
 	for ((idx) = 0U, (vcpu) = &((vm)->hw.vcpu_array[(idx)]); (idx) < (vm)->hw.created_vcpus; \
-		(idx)++, (vcpu) = &((vm)->hw.vcpu_array[(idx)]))                                 \
+		(idx)++, (vcpu) = &((vm)->hw.vcpu_array[(idx)]))                                     \
 		if (vcpu->state != VCPU_OFFLINE)
 
+/** This enum is used to define vcpu state */
 enum vcpu_state {
-	VCPU_INIT,
-	VCPU_RUNNING,
-	VCPU_PAUSED,
-	VCPU_ZOMBIE,
-	VCPU_OFFLINE,
-	VCPU_UNKNOWN_STATE,
+	VCPU_INIT,          /** vCPU under initialization */
+	VCPU_RUNNING,       /** vCPU launched vCPU under initialization */
+	VCPU_PAUSED,        /** vCPU temporarily paused but can be resumed later */
+	VCPU_ZOMBIE,        /** vCPU stopped and wait for being deinitialized */
+	VCPU_OFFLINE,       /** vCPU deinitialized vCPU under initialization */
+	VCPU_UNKNOWN_STATE, /** non-defined vCPU state */
 };
 
+/** This enum is used to define the cpu mode of specified vm */
 enum vm_cpu_mode {
-	CPU_MODE_REAL,
-	CPU_MODE_PROTECTED,
-	CPU_MODE_COMPATIBILITY, /* IA-32E mode (CS.L = 0) */
-	CPU_MODE_64BIT, /* IA-32E mode (CS.L = 1) */
+	CPU_MODE_REAL,          /** CPU real-address mode of operation vCPU under initialization */
+	CPU_MODE_PROTECTED,     /** CPU protected or virtual 8086 mode of operation */
+	CPU_MODE_COMPATIBILITY, /* CPU IA-32e compatibility mode of operation */
+	CPU_MODE_64BIT,         /* CPU IA-32e 64-bit mode of operation */
 };
-
 
 #define NUM_WORLD_MSRS  2U
 #define NUM_COMMON_MSRS 15U
@@ -231,68 +240,109 @@ struct ext_context {
 	uint64_t xss;
 };
 
+/**
+ * @brief This structure is used to store cpu run context and extended context.
+ *
+ * @consistency None
+ *
+ * @remark None
+ */
 struct guest_cpu_context {
-	struct run_context run_ctx;
-	struct ext_context ext_ctx;
+	struct run_context run_ctx;  /** structure which records vcpu run_context */
+	struct ext_context ext_ctx;  /** structure which records vcpu extend context */
 };
 
 /* Intel SDM 24.8.2, the address must be 16-byte aligned */
+/**
+ * @brief An entry in the VM-entry MSR-load area, VM-exit MSR-load area or VM-exit MSRstore area
+ *
+ * @consistency None
+ *
+ * @alignment 16
+ *
+ * @remark None
+ */
 struct msr_store_entry {
-	uint32_t msr_index;
-	uint64_t value;
+	uint32_t msr_index;  /** Index of the MSR to be loaded */
+	uint64_t value;      /** Value to be loaded into the specified MSR during VMentry */
 } __aligned(16);
 
 enum {
-	MSR_AREA_TSC_AUX = 0,
-	MSR_AREA_COUNT,
+	MSR_AREA_TSC_AUX = 0, /** Indicate MSR area of MSR_IA32_TSC_AUX */
+	MSR_AREA_COUNT,       /** The number of MSR area */
 };
 
+/**
+ * @brief The MSR load/store areas used to automatically load/store certain MSRs during VM-entry and VM-exit.
+ *
+ * @consistency None
+ *
+ * @alignment 16
+ *
+ * @remark None
+ */
 struct msr_store_area {
+	/* VM-entry MSR-load area which also acts as the VM-exit MSR-store area */
 	struct msr_store_entry guest[MSR_AREA_COUNT];
-	struct msr_store_entry host[MSR_AREA_COUNT];
+	struct msr_store_entry host[MSR_AREA_COUNT];  /* VM-exit MSR-load area */
 };
 
+/**
+ * @brief This structure is used to store vmcs pagesize, msr bitmap pagesize, vlapic structure,
+ * current context, cpu_context structures, guest msr array, vpid, exception_info structure,
+ * irq_window_enabled flag, nrexit, vcpu context information which including exit_reason,
+ * idt_vector, exit_qualification and inst_len, cpu_mode information, nr_sipi, interrupt injection
+ * information, msr_store_area structure and eoi_exit_bitmap for each vcpu.
+ *
+ * @consistency None
+ *
+ * @alignment 4096
+ *
+ * @remark None
+ */
 struct acrn_vcpu_arch {
-	/* vmcs region for this vcpu, MUST be 4KB-aligned */
+	/** vmcs region for this vcpu, MUST be 4KB-aligned */
 	uint8_t vmcs[PAGE_SIZE];
 
-	/* MSR bitmap region for this vcpu, MUST be 4-Kbyte aligned */
+	/** MSR bitmap region for this vcpu, MUST be 4-Kbyte aligned */
 	uint8_t msr_bitmap[PAGE_SIZE];
 
-	/* per vcpu lapic */
+	/** per vcpu lapic */
 	struct acrn_vlapic vlapic;
 
+	/** the structure records cpu_context information */
 	struct guest_cpu_context context;
 
-	/* common MSRs, world_msrs[] is a subset of it */
+	/* the array records guest msrs */
 	uint64_t guest_msrs[NUM_GUEST_MSRS];
 
+	/* virtual processor identifier */
 	uint16_t vpid;
 
-	/* Holds the information needed for IRQ/exception handling. */
+	/* the structure records exception raise and error numbers. */
 	struct {
-		/* The number of the exception to raise. */
+		/** The number of the exception to raise. */
 		uint32_t exception;
 
-		/* The error number for the exception. */
+		/** The error number for the exception. */
 		uint32_t error;
 	} exception_info;
 
-	bool irq_window_enabled;
-	uint32_t nrexits;
+	bool irq_window_enabled; /** whether the irq window is enabled. */
+	uint32_t nrexits;      /** vmexit number */
 
 	/* VCPU context state information */
-	uint32_t exit_reason;
-	uint32_t idt_vectoring_info;
-	uint64_t exit_qualification;
-	uint32_t inst_len;
+	uint32_t exit_reason;        /** vmexit number */
+	uint32_t idt_vectoring_info; /** idt vector information */
+	uint64_t exit_qualification; /** vmexit qualification information */
+	uint32_t inst_len;           /** length of the instruction which causes vmexit */
 
 	/* Information related to secondary / AP VCPU start-up */
-	enum vm_cpu_mode cpu_mode;
-	uint8_t nr_sipi;
+	enum vm_cpu_mode cpu_mode;   /** mode of vcpu */
+	uint8_t nr_sipi;             /** number of SIPI */
 
-	/* interrupt injection information */
-	uint64_t pending_req;
+	/** interrupt injection information */
+	uint64_t pending_req;        /** id of pending request */
 
 	/* List of MSRS to be stored and loaded on VM exits or VM entries */
 	struct msr_store_area msr_area;
@@ -300,46 +350,127 @@ struct acrn_vcpu_arch {
 } __aligned(PAGE_SIZE);
 
 struct acrn_vm;
+/**
+ * @brief This structure is used to store stack information, vcpu_arch structure, vcpu
+ * prev_state, vcpu current state, sched_object structure, launched flag, io_request
+ * structure, register cached flag and register updated flag for each vcpu.
+ *
+ * @consistency For struct acrn_vcpu p and 0<=i<p.vm->hw.created_vcpus, there exists unique i,
+ *              p.vm->hw.vcpu_array[i] == p and p.vcpu_id == i
+ * @consistency For any struct acrn_vcpu p, p.arch.vlapic.vcpu=p
+ *
+ * @alignment 4096
+ *
+ * @remark None
+ */
 struct acrn_vcpu {
+	/** stack to store the context of the vCPU */
 	uint8_t stack[CONFIG_STACK_SIZE] __aligned(16);
 
-	/* Architecture specific definitions for this VCPU */
+	/* Architecture specific definitions for this vCPU */
 	struct acrn_vcpu_arch arch;
-	uint16_t vcpu_id; /* virtual identifier for VCPU */
-	struct acrn_vm *vm; /* Reference to the VM this VCPU belongs to */
+	/* ID of the virtual CPU which is bound to pcpu identified by acrn_vcpu->pcpu_id */
+	uint16_t vcpu_id;
+	/* ID of virtual machine which may contain one or more vcpus identified by acrn_vcpu->vcpu_id */
+	struct acrn_vm *vm;
 
-	/* State of this VCPU before suspend */
-	volatile enum vcpu_state prev_state;
-	volatile enum vcpu_state state; /* State of this VCPU */
+	/** State of this vCPU before suspend */
+	enum vcpu_state prev_state;
+	enum vcpu_state state; /** State of this vCPU */
 
+	/** structure which records schedule informationd */
 	struct thread_object thread_obj;
-	bool launched; /* Whether the vcpu is launched on target pcpu */
-	volatile bool running; /* vcpu is picked up and run? */
+	bool launched; /** Whether the vcpu is launched on target pcpu */
+	bool running; /** vcpu is picked up and run? */
 
-	struct io_request req; /* used by io/ept emulation */
+	struct io_request req; /** io request structure */
 
-	uint64_t reg_cached;
-	uint64_t reg_updated;
+	uint64_t reg_cached;   /** information which records if register is updated */
+	uint64_t reg_updated;  /** information which records if register is cached */
 } __aligned(PAGE_SIZE);
 
+/**
+ * @brief This function is used to judge if vcpu is bsp.
+ *
+ * @return true when vcpu->vcpu_id == BOOT_CPU_ID, else return false
+ *
+ * @pre vcpu != NULL
+ *
+ * @post None
+ *
+ * @mode HV_OPERATIONAL
+ *
+ * @reentrancy Unspecified
+ *
+ * @ThreadSafety Unspecified
+ */
 static inline bool is_vcpu_bsp(const struct acrn_vcpu *vcpu)
 {
+	/** Return true when vcpu->vcpu_id == BOOT_CPU_ID, else return false */
 	return (vcpu->vcpu_id == BOOT_CPU_ID);
 }
 
+/**
+ * @brief This function is used to get the vCPU mode.
+ *
+ * @return vcpu->arch.cpu_mode
+ *
+ * @pre vcpu != NULL
+ *
+ * @post None
+ *
+ * @mode HV_OPERATIONAL
+ *
+ * @reentrancy Unspecified
+ *
+ * @ThreadSafety Unspecified
+ */
 static inline enum vm_cpu_mode get_vcpu_mode(const struct acrn_vcpu *vcpu)
 {
+	/** Return vcpu->arch.cpu_mode */
 	return vcpu->arch.cpu_mode;
 }
 
-/* do not update Guest RIP for next VM Enter */
+/**
+ * @brief This function is used to retain the vCPU rip.
+ * do not update Guest RIP for next VM Enter
+ *
+ * @return vcpu->arch.cpu_mode
+ *
+ * @pre vcpu != NULL
+ *
+ * @post None
+ *
+ * @mode HV_OPERATIONAL
+ *
+ * @reentrancy Unspecified
+ *
+ * @ThreadSafety Unspecified
+ */
 static inline void vcpu_retain_rip(struct acrn_vcpu *vcpu)
 {
+	/** Set length of instruction which caused vm exit to 0 */
 	(vcpu)->arch.inst_len = 0U;
 }
 
+/**
+ * @brief This function is used to return the vLAPIC structure of a vCPU.
+ *
+ * @return &(vcpu->arch.vlapic)
+ *
+ * @pre vcpu != NULL
+ *
+ * @post None
+ *
+ * @mode HV_OPERATIONAL
+ *
+ * @reentrancy Unspecified
+ *
+ * @ThreadSafety Unspecified
+ */
 static inline struct acrn_vlapic *vcpu_vlapic(struct acrn_vcpu *vcpu)
 {
+	/** Return address of the vlapic */
 	return &(vcpu->arch.vlapic);
 }
 
@@ -351,322 +482,119 @@ int32_t vmx_vmrun(struct run_context *context, int32_t ops);
 
 /* External Interfaces */
 
-/**
- * @brief get vcpu register value
- *
- * Get target vCPU's general purpose registers value in run_context.
- *
- * @param[in] vcpu pointer to vcpu data structure
- * @param[in] reg register of the vcpu
- *
- * @return the value of the register.
- */
 uint64_t vcpu_get_gpreg(const struct acrn_vcpu *vcpu, uint32_t reg);
 
-/**
- * @brief set vcpu register value
- *
- * Set target vCPU's general purpose registers value in run_context.
- *
- * @param[inout] vcpu pointer to vcpu data structure
- * @param[in] reg register of the vcpu
- * @param[in] val the value set the register of the vcpu
- *
- * @return None
- */
 void vcpu_set_gpreg(struct acrn_vcpu *vcpu, uint32_t reg, uint64_t val);
 
-/**
- * @brief get vcpu RIP value
- *
- * Get & cache target vCPU's RIP in run_context.
- *
- * @param[in] vcpu pointer to vcpu data structure
- *
- * @return the value of RIP.
- */
 uint64_t vcpu_get_rip(struct acrn_vcpu *vcpu);
 
-/**
- * @brief set vcpu RIP value
- *
- * Update target vCPU's RIP in run_context.
- *
- * @param[inout] vcpu pointer to vcpu data structure
- * @param[in] val the value set RIP
- *
- * @return None
- */
 void vcpu_set_rip(struct acrn_vcpu *vcpu, uint64_t val);
 
-/**
- * @brief set vcpu RSP value
- *
- * Update target vCPU's RSP in run_context.
- *
- * @param[inout] vcpu pointer to vcpu data structure
- * @param[in] val the value set RSP
- *
- * @return None
- */
 void vcpu_set_rsp(struct acrn_vcpu *vcpu, uint64_t val);
 
-/**
- * @brief get vcpu EFER value
- *
- * Get & cache target vCPU's EFER in run_context.
- *
- * @param[in] vcpu pointer to vcpu data structure
- *
- * @return the value of EFER.
- */
 uint64_t vcpu_get_efer(struct acrn_vcpu *vcpu);
 
-/**
- * @brief set vcpu EFER value
- *
- * Update target vCPU's EFER in run_context.
- *
- * @param[inout] vcpu pointer to vcpu data structure
- * @param[in] val the value set EFER
- *
- * @return None
- */
 void vcpu_set_efer(struct acrn_vcpu *vcpu, uint64_t val);
 
-/**
- * @brief get vcpu RFLAG value
- *
- * Get & cache target vCPU's RFLAGS in run_context.
- *
- * @param[in] vcpu pointer to vcpu data structure
- *
- * @return the value of RFLAGS.
- */
 uint64_t vcpu_get_rflags(struct acrn_vcpu *vcpu);
 
-/**
- * @brief set vcpu RFLAGS value
- *
- * Update target vCPU's RFLAGS in run_context.
- *
- * @param[inout] vcpu pointer to vcpu data structure
- * @param[in] val the value set RFLAGS
- *
- * @return None
- */
 void vcpu_set_rflags(struct acrn_vcpu *vcpu, uint64_t val);
 
-/**
- * @brief get guest emulated MSR
- *
- * Get the content of emulated guest MSR
- *
- * @param[in] vcpu pointer to vcpu data structure
- * @param[in] msr the guest MSR
- *
- * @return the value of emulated MSR.
- */
 uint64_t vcpu_get_guest_msr(const struct acrn_vcpu *vcpu, uint32_t msr);
 
-/**
- * @brief set guest emulated MSR
- *
- * Update the content of emulated guest MSR
- *
- * @param[in] vcpu pointer to vcpu data structure
- * @param[in] msr the guest MSR
- * @param[in] val the value to set the target MSR
- *
- * @return None
- */
 void vcpu_set_guest_msr(struct acrn_vcpu *vcpu, uint32_t msr, uint64_t val);
 
-/**
- * @brief reset all eoi_exit_bitmaps
- *
- * @param[in] vcpu pointer to vcpu data structure
- *
- * @return None
- */
-
-/**
- * @brief set all the vcpu registers
- *
- * Update target vCPU's all registers in run_context.
- *
- * @param[inout] vcpu pointer to vcpu data structure
- * @param[in] vcpu_regs all the registers' value
- *
- * @return None
- */
 void set_vcpu_regs(struct acrn_vcpu *vcpu, struct acrn_vcpu_regs *vcpu_regs);
 
-/**
- * @brief reset all the vcpu registers
- *
- * Reset target vCPU's all registers in run_context to initial values.
- *
- * @param[inout] vcpu pointer to vcpu data structure
- *
- * @return None
- */
 void reset_vcpu_regs(struct acrn_vcpu *vcpu);
 
-/**
- * @brief Initialize the protect mode vcpu registers
- *
- * Initialize vCPU's all registers in run_context to initial protece mode values.
- *
- * @param[inout] vcpu pointer to vcpu data structure
- * @param[in] vgdt_base_gpa guest physical address of gdt for guest
- *
- * @return None
- */
 void init_vcpu_protect_mode_regs(struct acrn_vcpu *vcpu, uint64_t vgdt_base_gpa);
 
-/**
- * @brief set the vCPU startup entry
- *
- * Set target vCPU's startup entry in run_context.
- *
- * @param[inout] vcpu pointer to vCPU data structure
- * @param[in] entry startup entry for the vCPU
- *
- * @return None
- */
 void set_vcpu_startup_entry(struct acrn_vcpu *vcpu, uint64_t entry);
 
+/**
+ * @brief This function is used to judge if the vcpu is long mode .
+ *
+ * @return judgement result
+ *
+ * @pre vcpu != NULL
+ *
+ * @post None
+ *
+ * @mode HV_INIT, HV_OPERATIONAL
+ *
+ * @reentrancy Unspecified
+ *
+ * @ThreadSafety Unspecified
+ */
 static inline bool is_long_mode(struct acrn_vcpu *vcpu)
 {
+	/** Return 1 if LMA bit of EFER in the target vCPU is 1, else return 0 */
 	return (vcpu_get_efer(vcpu) & MSR_IA32_EFER_LMA_BIT) != 0UL;
 }
 
+/**
+ * @brief This function is used to judge if paging is enabled .
+ *
+ * @return judgement result
+ *
+ * @pre vcpu != NULL
+ *
+ * @post None
+ *
+ * @mode HV_INIT, HV_OPERATIONAL
+ *
+ * @reentrancy Unspecified
+ *
+ * @ThreadSafety Unspecified
+ */
 static inline bool is_paging_enabled(struct acrn_vcpu *vcpu)
 {
+	/** Return 1 if PG bit of CR0 in the target vCPU is 1, else return 0 */
 	return (vcpu_get_cr0(vcpu) & CR0_PG) != 0UL;
 }
 
+/**
+ * @brief This function is used to judge if pae is enabled .
+ *
+ * @return judgement result
+ *
+ * @pre vcpu != NULL
+ *
+ * @post None
+ *
+ * @mode HV_INIT, HV_OPERATIONAL
+ *
+ * @reentrancy Unspecified
+ *
+ * @ThreadSafety Unspecified
+ */
 static inline bool is_pae(struct acrn_vcpu *vcpu)
 {
+	/** Return 1 if PAE bit of CR4 in the target vCPU is 1, else return 0 */
 	return (vcpu_get_cr4(vcpu) & CR4_PAE) != 0UL;
 }
 
 void save_xsave_area(struct ext_context *ectx);
 void rstore_xsave_area(const struct ext_context *ectx);
 
-/**
- * @brief create a vcpu for the target vm
- *
- * Creates/allocates a vCPU instance, with initialization for its vcpu_id,
- * vpid, vmcs, vlapic, etc. It sets the init vCPU state to VCPU_INIT
- *
- * @param[in] pcpu_id created vcpu will run on this pcpu
- * @param[in] vm pointer to vm data structure, this vcpu will owned by this vm.
- * @param[out] rtn_vcpu_handle pointer to the created vcpu
- *
- * @retval 0 vcpu created successfully, other values failed.
- */
 int32_t create_vcpu(uint16_t pcpu_id, struct acrn_vm *vm, struct acrn_vcpu **rtn_vcpu_handle);
 
-/**
- * @brief run into non-root mode based on vcpu setting
- *
- * An interface in vCPU thread to implement VM entry and VM exit.
- * A CPU switches between VMX root mode and non-root mode based on it.
- *
- * @param[inout] vcpu pointer to vcpu data structure
- * @pre vcpu != NULL
- *
- * @retval 0 vcpu run successfully, other values failed.
- */
 int32_t run_vcpu(struct acrn_vcpu *vcpu);
 
-/**
- * @brief unmap the vcpu with pcpu and free its vlapic
- *
- * Unmap the vcpu with pcpu and free its vlapic, and set the vcpu state to offline
- *
- * @param[inout] vcpu pointer to vcpu data structure
- * @pre vcpu != NULL
- *
- * @return None
- */
 void offline_vcpu(struct acrn_vcpu *vcpu);
 
-/**
- * @brief reset vcpu state and values
- *
- * Reset all fields in a vCPU instance, the vCPU state is reset to VCPU_INIT.
- *
- * @param[inout] vcpu pointer to vcpu data structure
- *
- * @return None
- */
 void reset_vcpu(struct acrn_vcpu *vcpu);
 
-/**
- * @brief pause the vcpu and set new state
- *
- * Change a vCPU state to VCPU_PAUSED or VCPU_ZOMBIE, and make a reschedule request for it.
- *
- * @param[inout] vcpu pointer to vcpu data structure
- * @param[in] new_state the state to set vcpu
- *
- * @return None
- */
 void pause_vcpu(struct acrn_vcpu *vcpu, enum vcpu_state new_state);
 
-/**
- * @brief set the vcpu to running state, then it will be scheculed.
- *
- * Adds a vCPU into the run queue and make a reschedule request for it. It sets the vCPU state to VCPU_RUNNING.
- *
- * @param[inout] vcpu pointer to vcpu data structure
- *
- * @return None
- */
 void launch_vcpu(struct acrn_vcpu *vcpu);
 
-/**
- * @brief kick the vcpu and let it handle pending events
- *
- * Kick a vCPU to handle the pending events.
- *
- * @param[in] vcpu pointer to vcpu data structure
- *
- * @return None
- */
 void kick_vcpu(const struct acrn_vcpu *vcpu);
 
-/**
- * @brief create a vcpu for the vm and mapped to the pcpu.
- *
- * Create a vcpu for the vm, and mapped to the pcpu.
- *
- * @param[inout] vm pointer to vm data structure
- * @param[in] pcpu_id which the vcpu will be mapped
- *
- * @retval 0 on success
- * @retval -EINVAL if the vCPU ID is invalid
- */
 int32_t prepare_vcpu(struct acrn_vm *vm, uint16_t pcpu_id);
 
-/**
- * @brief get physical destination cpu mask
- *
- * get the corresponding physical destination cpu mask for the vm and virtual destination cpu mask
- *
- * @param[in] vm pointer to vm data structure
- * @param[in] vdmask virtual destination cpu mask
- *
- * @return The physical destination CPU mask
- */
 uint64_t vcpumask2pcpumask(struct acrn_vm *vm, uint64_t vdmask);
-/**
- * @}
- */
-/* End of acrn_vcpu */
 
 #endif /* ASSEMBLER */
 
