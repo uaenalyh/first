@@ -11,7 +11,6 @@
 #include <per_cpu.h>
 #include <lapic.h>
 #include <schedule.h>
-#include <sprintf.h>
 
 /**
  * @defgroup hwmgmt_schedule hwmgmt.schedule

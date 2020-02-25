@@ -15,7 +15,6 @@
 #include <cpuid.h>
 #include <ptdev.h>
 #include <vm.h>
-#include <sprintf.h>
 #include <logmsg.h>
 #include <version.h>
 #include "vuart.h"

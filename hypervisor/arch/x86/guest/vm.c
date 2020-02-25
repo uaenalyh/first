@@ -6,7 +6,6 @@
 
 #include <types.h>
 #include <errno.h>
-#include <sprintf.h>
 #include <per_cpu.h>
 #include <lapic.h>
 #include <vm.h>

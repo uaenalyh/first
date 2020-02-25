@@ -16,7 +16,7 @@
 #define ACRN_HV_DEFS_H
 
 /**
- * @addtogroup lib_utils
+ * @addtogroup lib_public
  *
  * @{
  */

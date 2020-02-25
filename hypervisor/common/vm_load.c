@@ -11,7 +11,6 @@
 #include <mmu.h>
 #include <multiboot.h>
 #include <errno.h>
-#include <sprintf.h>
 #include <logmsg.h>
 
 /**

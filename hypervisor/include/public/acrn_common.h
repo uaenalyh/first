@@ -16,7 +16,8 @@
 #define ACRN_COMMON_H
 
 /**
- * @addtogroup lib_utils
+ * @defgroup lib_public lib.public
+ * @ingroup lib
  *
  * @{
  */

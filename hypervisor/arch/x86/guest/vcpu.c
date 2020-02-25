@@ -17,7 +17,6 @@
 #include <vm.h>
 #include <vmcs.h>
 #include <mmu.h>
-#include <sprintf.h>
 
 /**
  * @defgroup vp-base_vcpu vp-base.vcpu

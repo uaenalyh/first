@@ -20,8 +20,6 @@
  * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
  */
 
-/** Indicates that not enough memory. */
-#define ENOMEM 12
 /** Indicates Permission denied */
 #define EACCES 13
 /** Indicates there is fault. */

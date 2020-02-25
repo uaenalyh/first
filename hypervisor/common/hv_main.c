@@ -11,7 +11,6 @@
 #include <irq.h>
 #include <schedule.h>
 #include <profiling.h>
-#include <sprintf.h>
 #include <trace.h>
 #include <logmsg.h>
 
