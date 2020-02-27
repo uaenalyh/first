@@ -129,7 +129,7 @@ static void pci_cfgdata_io_read(struct acrn_vcpu *vcpu, uint16_t addr, size_t by
 	uint32_t val = ~0U;
 	struct pio_request *pio_req = &vcpu->req.reqs.pio;
 
-	cfg_addr.value = atomic_readandclear32(&vpci->addr.value);
+	cfg_addr.value = atomic_swap32(&vpci->addr.value, 0x00FFFF00U);
 	if (cfg_addr.bits.enable != 0U) {
 		uint32_t target_reg = cfg_addr.bits.reg_num + offset;
 		if (vpci_is_valid_access(target_reg, bytes)) {
@@ -156,7 +156,7 @@ static void pci_cfgdata_io_write(struct acrn_vcpu *vcpu, uint16_t addr, size_t b
 	union pci_bdf bdf;
 	uint32_t offset = addr - PCI_CONFIG_DATA;
 
-	cfg_addr.value = atomic_readandclear32(&vpci->addr.value);
+	cfg_addr.value = atomic_swap32(&vpci->addr.value, 0x00FFFF00U);
 	if (cfg_addr.bits.enable != 0U) {
 		uint32_t target_reg = cfg_addr.bits.reg_num + offset;
 		if (vpci_is_valid_access(target_reg, bytes)) {
@@ -178,6 +178,7 @@ void vpci_init(struct acrn_vm *vm)
 
 	struct vm_io_range pci_cfgdata_range = { .base = PCI_CONFIG_DATA, .len = 4U };
 
+	vm->vpci.addr.value = 0x00FFFF00U;
 	vm->vpci.vm = vm;
 	vm->iommu = create_iommu_domain(vm->vm_id, hva2hpa(vm->arch_vm.nworld_eptp), 48U);
 	/* Build up vdev list for vm */

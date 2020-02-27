@@ -222,12 +222,16 @@ void init_vdev_pt(struct pci_vdev *vdev)
 				hi = (uint32_t)(vdev->pci_dev_config->vbar_base[idx - 1U] >> 32U);
 				pci_vdev_write_bar(vdev, idx - 1U, lo);
 				pci_vdev_write_bar(vdev, idx, hi);
+
+				vdev_pt_map_mem_vbar(vdev, idx - 1U);
 			} else {
 				vbar->size = vbar->size & ~(vbar->size - 1UL);
 				if (type == PCIBAR_MEM32) {
 					vbar->size = round_page_up(vbar->size);
 				}
 				pci_vdev_write_bar(vdev, idx, lo);
+
+				vdev_pt_map_mem_vbar(vdev, idx);
 			}
 		}
 	}
