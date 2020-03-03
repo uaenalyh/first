@@ -36,7 +36,6 @@
 #include <io_req.h>
 #include <msr.h>
 #include <cpu.h>
-#include <instr_emul.h>
 
 /**
  * @brief vcpu
