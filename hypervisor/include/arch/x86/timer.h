@@ -15,70 +15,23 @@
 
 /**
  * @file
- * @brief {TBD brief description}
+ * @brief This file declares all external APIs that shall be provided by the hwmgmt.time module.
  *
- * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ * This file declares all external functions, data structures, and macros that shall be provided by the
+ * hwmgmt.time module.
  */
 
 #include <list.h>
 
-/**
- * @brief Timer
- *
- * @defgroup timer ACRN Timer
- * @{
- */
 
-/**
- * @brief Definition of timer
- */
-struct hv_timer {
-};
-
-/* External Interfaces */
-
-#define CYCLES_PER_MS us_to_ticks(1000U)
+#define CYCLES_PER_MS us_to_ticks(1000U) /**< Pre-defined total ticks per millisecond. */
 
 void udelay(uint32_t us);
-
-/**
- * @brief convert us to ticks.
- *
- * @return ticks
- */
 uint64_t us_to_ticks(uint32_t us);
-
-/**
- * @brief convert ticks to us.
- *
- * @return microsecond
- */
 uint64_t ticks_to_us(uint64_t ticks);
-
-/**
- * @brief read tsc.
- *
- * @return tsc value
- */
 uint64_t rdtsc(void);
-
-/**
- * @brief Calibrate tsc.
- *
- * @return None
- */
 void calibrate_tsc(void);
-
-/**
- * @brief  Get tsc.
- *
- * @return tsc(KHz)
- */
 uint32_t get_tsc_khz(void);
-
-/**
- * @}
- */
 
 /**
  * @}
