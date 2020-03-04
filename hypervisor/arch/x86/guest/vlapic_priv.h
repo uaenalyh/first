@@ -38,17 +38,13 @@
 
 /**
  * @file
- * @brief {TBD brief description}
+ * @brief This file defines offsets of the APIC registers
  *
- * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
  */
 
-/*
- * APIC Register:		Offset	Description
- */
-#define APIC_OFFSET_ID  	0x20U   /* Local APIC ID		*/
-#define APIC_OFFSET_LDR 	0xD0U   /* Logical Destination		*/
-#define APIC_OFFSET_ICR_LOW 	0x300U  /* Interrupt Command Register   */
+#define APIC_OFFSET_ID  	0x20U   /**< offset of Local APIC ID register */
+#define APIC_OFFSET_LDR 	0xD0U   /**< offset of Logical Destination register */
+#define APIC_OFFSET_ICR_LOW 	0x300U  /**< offset of Interrupt Command Register */
 
 /**
  * @}
