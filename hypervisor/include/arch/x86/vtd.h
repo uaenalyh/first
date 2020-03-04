@@ -56,7 +56,6 @@ union source {
 };
 
 struct intr_source {
-	bool is_msi;
 	union source src;
 };
 

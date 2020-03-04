@@ -80,7 +80,6 @@ static void ptirq_build_physical_msi(
 	irte.bits.rh = MSI_ADDR_RH;
 	irte.bits.dest = dest_mask;
 
-	/* Set false since intr_src.is_msi is useless */
 	intr_src.src.msi.value = phys_bdf;
 	index = ((virt_bdf & 0x3FU) | (uint16_t)(vm->vm_id << 0x6U)) & 0xFFU;
 	dmar_assign_irte(intr_src, irte, index);
