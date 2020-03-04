@@ -35,7 +35,7 @@ static uint64_t get_guest_gdt_base_gpa(const struct acrn_vm *vm)
 {
 	uint64_t new_guest_gdt_base_gpa, guest_kernel_end_gpa, guest_bootargs_end_gpa;
 
-	guest_kernel_end_gpa = (uint64_t)vm->sw.kernel_info.kernel_load_addr + vm->sw.kernel_info.kernel_size;
+	guest_kernel_end_gpa = vm->sw.kernel_info.kernel_load_addr + vm->sw.kernel_info.kernel_size;
 	guest_bootargs_end_gpa = (uint64_t)vm->sw.bootargs_info.load_addr + vm->sw.bootargs_info.size;
 
 	new_guest_gdt_base_gpa = max(guest_kernel_end_gpa, guest_bootargs_end_gpa);
@@ -84,7 +84,7 @@ static uint64_t create_zero_page(struct acrn_vm *vm)
 	(void)memset(zeropage, 0U, MEM_2K);
 
 	/* copy part of the header into the zero page */
-	hva = (struct zero_page *)gpa2hva(vm, (uint64_t)sw_kernel->kernel_load_addr);
+	hva = (struct zero_page *)gpa2hva(vm, sw_kernel->kernel_load_addr);
 	(void)memcpy_s(&(zeropage->hdr), sizeof(zeropage->hdr), &(hva->hdr), sizeof(hva->hdr));
 
 	/* Copy bootargs load_addr in zeropage header structure */
@@ -124,7 +124,7 @@ static void prepare_loading_bzimage(struct acrn_vm *vm, struct acrn_vcpu *vcpu)
 		kernel_entry_offset += 512U;
 	}
 
-	sw_kernel->kernel_entry_addr = (void *)((uint64_t)sw_kernel->kernel_load_addr + kernel_entry_offset);
+	sw_kernel->kernel_entry_addr = (void *)(sw_kernel->kernel_load_addr + kernel_entry_offset);
 
 	/* Documentation states: ebx=0, edi=0, ebp=0, esi=ptr to
 	 * zeropage
@@ -173,7 +173,7 @@ void direct_boot_sw_loader(struct acrn_vm *vm)
 
 	/* Copy the guest kernel image to its run-time location */
 	(void)copy_to_gpa(
-		vm, sw_kernel->kernel_src_addr, (uint64_t)sw_kernel->kernel_load_addr, sw_kernel->kernel_size);
+		vm, sw_kernel->kernel_src_addr, sw_kernel->kernel_load_addr, sw_kernel->kernel_size);
 
 	/* Copy Guest OS bootargs to its load location */
 	if (bootargs_info->size != 0U) {

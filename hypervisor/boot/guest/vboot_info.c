@@ -39,9 +39,9 @@
 /**
  * @pre vm != NULL
  */
-static void *get_kernel_load_addr(struct acrn_vm *vm)
+static uint64_t get_kernel_load_addr(struct acrn_vm *vm)
 {
-	void *load_addr = NULL;
+	uint64_t load_addr = 0UL;
 	struct vm_sw_info *sw_info = &vm->sw;
 	struct zero_page *zeropage;
 	struct acrn_vm_config *vm_config = get_vm_config(vm->vm_id);
@@ -57,13 +57,11 @@ static void *get_kernel_load_addr(struct acrn_vm *vm)
 		 * non-relocatable.
 		 */
 		zeropage = (struct zero_page *)sw_info->kernel_info.kernel_src_addr;
-		if (zeropage->hdr.relocatable_kernel != 0U) {
-			zeropage = (struct zero_page *)zeropage->hdr.pref_addr;
-		}
-		load_addr = (void *)zeropage;
+		load_addr = zeropage->hdr.pref_addr;
+
 		break;
 	case KERNEL_ZEPHYR:
-		load_addr = (void *)vm_config->os_config.kernel_load_addr;
+		load_addr = vm_config->os_config.kernel_load_addr;
 		break;
 	default:
 		/* kernel type is either KERNEL_BZIMAGE or KERNEL_ZEPHYR, do nothing here */
