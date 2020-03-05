@@ -13,11 +13,11 @@ TMP_SCAN_OUT := $(shell mktemp /tmp/acrn-clang-tidy.XXXXX)
 TMP_SCAN_ERR := $(shell mktemp /tmp/acrn-clang-tidy.XXXXX)
 
 codescan: $(C_CODESCAN)
-	@if grep -q "warning:" $(TMP_SCAN_OUT); then cat $(TMP_SCAN_OUT); rm $(TMP_SCAN_OUT) $(TMP_SCAN_ERR); exit 1; else rm $(TMP_SCAN_OUT) $(TMP_SCAN_ERR); fi
+	@if egrep -q "(warning|error):" $(TMP_SCAN_OUT); then cat $(TMP_SCAN_OUT); rm $(TMP_SCAN_OUT) $(TMP_SCAN_ERR); exit 1; else rm $(TMP_SCAN_OUT) $(TMP_SCAN_ERR); fi
 
 $(C_CODESCAN): %.c.codescan: %.c $(VERSION) $(HV_OBJDIR)/$(HV_CONFIG_H) $(TARGET_ACPI_INFO_HEADER)
 	@echo "CODESCAN" $*.c
-	@clang-tidy $< -header-filter=.* --checks=-*,acrn-c-* -- $(patsubst %, -I%, $(INCLUDE_PATH)) -I. $(filter-out -m% -f%,$(CFLAGS) $(ARCH_CFLAGS)) >> $(TMP_SCAN_OUT) 2>>$(TMP_SCAN_ERR)
+	@clang-tidy $< -header-filter=.* --checks=-*,acrn-c-* -- $(patsubst %, -I%, $(INCLUDE_PATH)) -I. $(filter-out -m% -f%,$(CFLAGS) $(ARCH_CFLAGS)) >> $(TMP_SCAN_OUT) 2>>$(TMP_SCAN_ERR) | true
 
 ifdef QEMU
 
