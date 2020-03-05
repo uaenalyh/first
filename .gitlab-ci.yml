@@ -78,6 +78,10 @@ test_sas_job:
     - cp ../build/acrn-unit-test/host/bin/hw.32.out ../../acrn-sliced-mainline/image/
     - make clean
     - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
+    - make RELEASE=1 hw MODULE_GROUP_OBJ=HW_CPU_CAPS_GROUP
+    - cp ../build/acrn-unit-test/host/bin/hw.32.out ../../acrn-sliced-mainline/image/hw_cpu_caps.32.out
+    - make clean
+    - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
     - make RELEASE=1 hw MODULE_GROUP_OBJ=HW_APIC_GROUP
     - cp ../build/acrn-unit-test/host/bin/hw.32.out ../../acrn-sliced-mainline/image/hw_apic.32.out
     - make clean
