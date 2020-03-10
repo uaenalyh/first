@@ -67,7 +67,11 @@ test_sas_job:
     - echo "start to test sas build ..."
     - pwd
     - mkdir -p ./image
-    - cd ../acrn-sas-test-code/host/
+    - cd ../acrn-hypervisor/
+    - git reset --hard && git checkout master && git pull
+    - cd ../acrn-sas-test-code/
+    - git reset --hard && git checkout master && git pull
+    - cd host/
     - make clean
     - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
     - make boot RELEASE=1 UT=1
