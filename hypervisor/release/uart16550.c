@@ -14,11 +14,32 @@
 
 /**
  * @file
- * @brief {TBD brief description}
+ * @brief This file implements an 16550 UART initialization API that shall be provided by the debug module.
  *
- * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ * This file is decomposed into the following functions:
+ *
+ * - uart16550_init(early_boot)   Initialize the 16550 UART which is solely for debugging. No operation in release
+ *                                version.
  */
 
+/**
+ * @brief Initialize the 16550 UART which is solely for debugging. No operation in release version.
+ *
+ * @param[in]    early_boot Describes whether hypervisor initializes the PCI memory region once before do
+ *                          initialization for physical UART. The physical UART of target validation platform is
+ *                          accessed by port IO. \a early_boot will be useless in target validation platform.
+ *
+ * @return None
+ *
+ * @pre N/A
+ *
+ * @post N/A
+ *
+ * @mode HV_INIT
+ *
+ * @reentrancy Unspecified
+ * @threadsafety Unspecified
+ */
 void uart16550_init(__unused bool early_boot)
 {
 }

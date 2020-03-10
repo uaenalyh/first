@@ -21,7 +21,6 @@
  */
 
 #include <types.h>
-#include <sbuf.h>
 #include <irq.h>
 #include <page.h>
 #include <timer.h>

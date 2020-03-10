@@ -15,9 +15,8 @@
 
 /**
  * @file
- * @brief {TBD brief description}
- *
- * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ * @brief This file declares the functions related to profiling operations, including saving the information of the
+ * specific virtual CPU, initializing the profiling utility.
  */
 
 void profiling_vmenter_handler(struct acrn_vcpu *vcpu);

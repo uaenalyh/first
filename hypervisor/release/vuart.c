@@ -40,15 +40,57 @@
 
 /**
  * @file
- * @brief {TBD brief description}
+ * @brief This file declares the functions related to virtual UART operations, including initialization and
+ * deinitialization.
  *
- * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ * This file is decomposed into the following functions:
+ *
+ * - init_vuart(vm, vu_config)   Initialize the hypervisor virtual UART which is solely for debugging. No operation in
+ *                               release version.
+ * - deinit_vuart(vm)            Deinitialize the hypervisor virtual UART which is solely for debugging. No operation
+ *                               in release version.
  */
 
+/**
+ * @brief Initialize the hypervisor virtual UART which is solely for debugging. No operation in release version.
+ *
+ * @param[inout]    vm        A pointer to the VM whose virtual UART data structure will be initialized. It will be
+ *                            unused in release version.
+ * @param[in]       vu_config A pointer to virtual UART configuration data structure which is used to configure the
+ *                            vuart.
+ *
+ * @return None
+ *
+ * @pre N/A
+ *
+ * @post N/A
+ *
+ * @mode HV_INIT
+ *
+ * @reentrancy Unspecified
+ * @threadsafety Unspecified
+ */
 void init_vuart(__unused struct acrn_vm *vm, __unused const struct vuart_config *vu_config)
 {
 }
 
+/**
+ * @brief Deinitialize the hypervisor virtual UART which is solely for debugging. No operation in release version.
+ *
+ * @param[inout]    vm A pointer to the VM whose virtual UART data structure will be deinitialized. It will be unused in
+ *                     release version.
+ *
+ * @return None
+ *
+ * @pre N/A
+ *
+ * @post N/A
+ *
+ * @mode HV_TERMINATION
+ *
+ * @reentrancy Unspecified
+ * @threadsafety Unspecified
+ */
 void deinit_vuart(__unused struct acrn_vm *vm)
 {
 }

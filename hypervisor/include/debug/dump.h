@@ -15,9 +15,7 @@
 
 /**
  * @file
- * @brief {TBD brief description}
- *
- * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ * @brief This file declares a function related to exception information dumping.
  */
 
 struct intr_excp_ctx;

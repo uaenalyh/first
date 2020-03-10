@@ -15,9 +15,8 @@
 
 /**
  * @file
- * @brief {TBD brief description}
- *
- * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ * @brief This file declares a function that is used to do initialize the hypervisor shell which is solely for
+ * debugging.
  */
 
 void shell_init(void);

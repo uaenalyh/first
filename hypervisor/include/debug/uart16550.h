@@ -15,17 +15,8 @@
 
 /**
  * @file
- * @brief {TBD brief description}
- *
- * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ * @brief This file declares the 16550 UART initialization API that shall be provided by the debug module.
  */
-
-/* Register / bit definitions for 16c550 uart */
-
-/*enable/disable receive data read request interrupt*/
-
-/* bit definitions for LSR */
-
 void uart16550_init(bool early_boot);
 
 /**

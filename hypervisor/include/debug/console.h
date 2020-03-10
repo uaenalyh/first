@@ -15,9 +15,8 @@
 
 /**
  * @file
- * @brief {TBD brief description}
- *
- * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ * @brief This file declares the functions related to console operations, including initialization, timer set-up, and
+ * task kick-off.
  */
 
 /** Initializes the console module.
