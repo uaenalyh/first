@@ -18,6 +18,7 @@
 #include <vtd.h>
 #include <vcpuid.h>
 #include <trace.h>
+#include <vmsr.h>
 
 /**
  * @addtogroup vp-base_hv_main
