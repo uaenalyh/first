@@ -8,7 +8,7 @@
 #define MISC_CFG_H
 
 /**
- * @addtogroup vp-base_vboot
+ * @addtogroup hwmgmt_configs
  *
  * @{
  */
