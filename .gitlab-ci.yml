@@ -66,7 +66,7 @@ test_srs_job:
     - cd acrn-unit-test/guest/
     - /opt/acrn-ebtool/docker_run.sh clearlinux_acrn:latest "./make_all.sh"
     - cp x86/obj/* /var/lib/tftpboot/acrn_srs/acrn/
-    - cd ../../acrn-sliced-mainline
+    - cd ../../../../acrn-sliced-mainline
     - /opt/fusa_ci.sh launch_acrn_unit_test
   dependencies:
     - build_job
