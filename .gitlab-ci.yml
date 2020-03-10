@@ -53,6 +53,18 @@ test_srs_job:
   script:
     - echo "start to test srs lauching acrn unit test ..."
     - pwd
+    - cd ../acrn-hypervisor/
+    - git reset --hard && git checkout master && git pull
+    - cd hypervisor
+    - make clean
+    - make RELEASE=0
+    - cd ../../acrn-srs-test-code/
+    - git reset --hard && git checkout master && git pull
+    - mkdir github && cd github && git clone https://github.com/projectacrn/acrn-unit-test.git
+    - cp -r ../acrn-unit-test/* acrn-unit-test/
+    - cd acrn-unit-test/guest/
+    - /opt/acrn-ebtool/docker_run.sh clearlinux_acrn:latest "./make_all.sh"
+    - cp x86/obj/* /var/lib/tftpboot/acrn_srs/acrn/
     - /opt/fusa_ci.sh launch_acrn_unit_test
   dependencies:
     - build_job
