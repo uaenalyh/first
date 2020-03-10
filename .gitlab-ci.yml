@@ -59,6 +59,7 @@ test_srs_job:
     - make clean
     - make RELEASE=0
     - cd ../../acrn-srs-test-code/
+    - rm -r github
     - git reset --hard && git checkout master && git pull
     - mkdir github && cd github && git clone https://github.com/projectacrn/acrn-unit-test.git
     - cp -r ../acrn-unit-test/* acrn-unit-test/
