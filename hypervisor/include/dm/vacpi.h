@@ -34,7 +34,7 @@
  * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
  */
 
-#include <acpi.h>
+#include "acpi_def.h"
 
 /*
  *
