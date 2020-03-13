@@ -86,6 +86,7 @@ test_sas_job:
     - cd ../acrn-sas-test-code/
     - git reset --hard && git checkout master && git pull
     - cd host/
+    - sed -i 's/acrn-hypervisor/acrn-sliced-mainline/g' Makefile
     - make clean
     - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
     - make boot RELEASE=1 UT=1
