@@ -138,6 +138,19 @@ test_sas_job:
   only:
     - merge_requests
     - schedules
+    
+
+deploy_sample_case_job:
+  stage: deploy
+  script:
+    - echo "start sample case test ..."
+    - pwd
+    - /opt/fusa_ci.sh sample_case_test
+  dependencies:
+    - build_job
+    - test_sas_job
+  only:
+    - merge_requests
 
 
 deploy_build_job:
