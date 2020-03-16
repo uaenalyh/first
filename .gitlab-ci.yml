@@ -15,6 +15,17 @@ acrn_clang_tidy_job:
   only:
     - merge_requests
 
+sample_case_test_job:
+  stage: test
+  script:
+    - echo "start sample case test ..."
+    - pwd
+    - /opt/fusa_ci.sh sample_case_test
+  dependencies:
+    - build_job
+    - test_sas_job
+  only:
+    - merge_requests
 
 build_job:
   stage: build
@@ -89,11 +100,11 @@ test_sas_job:
     - sed -i 's/acrn-hypervisor/acrn-sliced-mainline/g' Makefile
     - make clean
     - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
-    - make boot RELEASE=1 UT=1
+    - make boot RELEASE=1
     - cp ../build/acrn-unit-test/host/bin/boot.32.out ../../acrn-sliced-mainline/image/
     - make clean
     - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
-    - make hw RELEASE=1 UT=1
+    - make hw RELEASE=1
     - cp ../build/acrn-unit-test/host/bin/hw.32.out ../../acrn-sliced-mainline/image/
     - make clean
     - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
@@ -113,22 +124,22 @@ test_sas_job:
     - cp ../build/acrn-unit-test/host/bin/hw.32.out ../../acrn-sliced-mainline/image/hw_vboot_group.32.out
     - make clean
     - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
-    - make init RELEASE=1 UT=1
+    - make init RELEASE=1
     - cp ../build/acrn-unit-test/host/bin/init.32.out ../../acrn-sliced-mainline/image/
     - make clean
     - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
-    - make lib RELEASE=1 UT=1
+    - make lib RELEASE=1
     - cp ../build/acrn-unit-test/host/bin/lib.32.out ../../acrn-sliced-mainline/image/
     - make clean
     - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
-    - make vp-base RELEASE=0 UT=1
+    - make vp-base RELEASE=0
     - cp ../build/acrn-unit-test/host/bin/vp-base.32.out ../../acrn-sliced-mainline/image/
     - make clean
     - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
-    - make vp-dm RELEASE=0 UT=1
+    - make vp-dm RELEASE=0
     - cp ../build/acrn-unit-test/host/bin/vp-dm.32.out ../../acrn-sliced-mainline/image/
     - cp ../host/guest/x86/stitched.bzimage ../../acrn-sliced-mainline/image/
-    - /opt/fusa_ci.sh sample_case_test
+    - /opt/fusa_ci.sh sas
   dependencies:
     - build_job
   artifacts:
