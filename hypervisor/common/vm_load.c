@@ -35,7 +35,7 @@ static uint64_t get_guest_gdt_base_gpa(const struct acrn_vm *vm)
 	uint64_t new_guest_gdt_base_gpa, guest_kernel_end_gpa, guest_bootargs_end_gpa;
 
 	guest_kernel_end_gpa = vm->sw.kernel_info.kernel_load_addr + vm->sw.kernel_info.kernel_size;
-	guest_bootargs_end_gpa = (uint64_t)vm->sw.bootargs_info.load_addr + vm->sw.bootargs_info.size;
+	guest_bootargs_end_gpa = vm->sw.bootargs_info.load_addr + vm->sw.bootargs_info.size;
 
 	new_guest_gdt_base_gpa = max(guest_kernel_end_gpa, guest_bootargs_end_gpa);
 	new_guest_gdt_base_gpa = (new_guest_gdt_base_gpa + 7UL) & ~(8UL - 1UL);
@@ -74,7 +74,7 @@ static uint64_t create_zero_page(struct acrn_vm *vm)
 	uint64_t gpa, addr;
 
 	/* Set zeropage in Linux Guest RAM region just past boot args */
-	gpa = (uint64_t)bootargs_info->load_addr + MEM_4K;
+	gpa = bootargs_info->load_addr + MEM_4K;
 	hva = (struct zero_page *)gpa2hva(vm, gpa);
 	zeropage = hva;
 
@@ -87,7 +87,7 @@ static uint64_t create_zero_page(struct acrn_vm *vm)
 	(void)memcpy_s(&(zeropage->hdr), sizeof(zeropage->hdr), &(hva->hdr), sizeof(hva->hdr));
 
 	/* Copy bootargs load_addr in zeropage header structure */
-	addr = (uint64_t)bootargs_info->load_addr;
+	addr = bootargs_info->load_addr;
 	zeropage->hdr.bootargs_addr = (uint32_t)addr;
 
 	/* set constant arguments in zero page */
@@ -123,7 +123,7 @@ static void prepare_loading_bzimage(struct acrn_vm *vm, struct acrn_vcpu *vcpu)
 		kernel_entry_offset += 512U;
 	}
 
-	sw_kernel->kernel_entry_addr = (void *)(sw_kernel->kernel_load_addr + kernel_entry_offset);
+	sw_kernel->kernel_entry_addr = sw_kernel->kernel_load_addr + kernel_entry_offset;
 
 	/* Documentation states: ebx=0, edi=0, ebp=0, esi=ptr to
 	 * zeropage
@@ -148,7 +148,7 @@ static void prepare_loading_rawimage(struct acrn_vm *vm)
 	struct sw_kernel_info *sw_kernel = &(vm->sw.kernel_info);
 	const struct acrn_vm_config *vm_config = get_vm_config(vm->vm_id);
 
-	sw_kernel->kernel_entry_addr = (void *)vm_config->os_config.kernel_entry_addr;
+	sw_kernel->kernel_entry_addr = vm_config->os_config.kernel_entry_addr;
 }
 
 /**
@@ -176,7 +176,7 @@ void direct_boot_sw_loader(struct acrn_vm *vm)
 
 	/* Copy Guest OS bootargs to its load location */
 	if (bootargs_info->size != 0U) {
-		(void)copy_to_gpa(vm, bootargs_info->src_addr, (uint64_t)bootargs_info->load_addr,
+		(void)copy_to_gpa(vm, bootargs_info->src_addr, bootargs_info->load_addr,
 			(strnlen_s((char *)bootargs_info->src_addr, MAX_BOOTARGS_SIZE) + 1U));
 	}
 	switch (vm->sw.kernel_type) {
@@ -192,7 +192,7 @@ void direct_boot_sw_loader(struct acrn_vm *vm)
 	}
 
 	/* Set VCPU entry point to kernel entry */
-	vcpu_set_rip(vcpu, (uint64_t)sw_kernel->kernel_entry_addr);
+	vcpu_set_rip(vcpu, sw_kernel->kernel_entry_addr);
 	pr_info("%s, VM %hu VCPU %hu Entry: 0x%016lx ", __func__, vm->vm_id, vcpu->vcpu_id,
 		sw_kernel->kernel_entry_addr);
 }

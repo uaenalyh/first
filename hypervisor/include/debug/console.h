@@ -20,8 +20,6 @@
  * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
  */
 
-#include <vuart.h>
-
 /** Initializes the console module.
  *
  */

@@ -159,7 +159,7 @@ static uint64_t get_kernel_load_addr(struct acrn_vm *vm)
 	/** kernel type is KERNEL_ZEPHYR */
 	case KERNEL_ZEPHYR:
 		/** Set load_addr to the kernel_load_addr field of os_config of vm_config */
-		load_addr = (void *)vm_config->os_config.kernel_load_addr;
+		load_addr = vm_config->os_config.kernel_load_addr;
 		/** End of case */
 		break;
 	/** Otherwise */
@@ -264,7 +264,7 @@ static void init_vm_bootargs_info(struct acrn_vm *vm)
 		vm->sw.bootargs_info.load_addr = vm->sw.kernel_info.kernel_load_addr - (MEM_1K * 8U);
 	} else {
 		/** Set the load_addr field of bootargs_info of vm's sw field to NULL */
-		vm->sw.bootargs_info.load_addr = NULL;
+		vm->sw.bootargs_info.load_addr = 0UL;
 	}
 }
 

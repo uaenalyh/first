@@ -32,7 +32,6 @@
 #include <vioapic.h>
 #include <vpic.h>
 #include <vmx_io.h>
-#include <vuart.h>
 #include <trusty.h>
 #include <vcpuid.h>
 #include <vpci.h>
@@ -49,14 +48,14 @@ struct vm_hw_info {
 struct sw_module_info {
 	/* sw modules like ramdisk, bootargs, firmware, etc. */
 	void *src_addr; /* HVA */
-	void *load_addr; /* GPA */
+	uint64_t load_addr; /* GPA */
 	uint32_t size;
 };
 
 struct sw_kernel_info {
 	void *kernel_src_addr; /* HVA */
 	uint64_t kernel_load_addr; /* GPA */
-	void *kernel_entry_addr; /* GPA */
+	uint64_t kernel_entry_addr; /* GPA */
 	uint32_t kernel_size;
 };
 

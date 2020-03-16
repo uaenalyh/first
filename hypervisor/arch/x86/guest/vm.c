@@ -23,6 +23,7 @@
 #include <pgtable.h>
 #include <mmu.h>
 #include <logmsg.h>
+#include <vuart.h>
 #include <vboot_info.h>
 #include <board.h>
 #include <sgx.h>
