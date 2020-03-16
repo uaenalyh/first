@@ -94,7 +94,6 @@ static inline uint16_t get_vm_bsp_pcpu_id(const struct acrn_vm_config *vm_config
  */
 static void prepare_prelaunched_vm_memmap(struct acrn_vm *vm, const struct acrn_vm_config *vm_config)
 {
-	bool is_hpa1 = true;
 	uint64_t base_hpa = vm_config->memory.start_hpa;
 	uint64_t remaining_hpa_size = vm_config->memory.size;
 	uint32_t i;
@@ -125,12 +124,6 @@ static void prepare_prelaunched_vm_memmap(struct acrn_vm *vm, const struct acrn_
 
 			base_hpa += entry->length;
 			remaining_hpa_size -= entry->length;
-		}
-
-		if ((remaining_hpa_size == 0UL) && (is_hpa1)) {
-			is_hpa1 = false;
-			base_hpa = vm_config->memory.start_hpa2;
-			remaining_hpa_size = vm_config->memory.size_hpa2;
 		}
 	}
 }
