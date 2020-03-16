@@ -142,10 +142,6 @@ enum vm_cpu_mode {
 	CPU_MODE_64BIT, /* IA-32E mode (CS.L = 1) */
 };
 
-/* 2 worlds: 0 for Normal World, 1 for Secure World */
-#define NR_WORLD     2
-#define NORMAL_WORLD 0
-#define SECURE_WORLD 1
 
 #define NUM_WORLD_MSRS  2U
 #define NUM_COMMON_MSRS 15U
@@ -182,8 +178,7 @@ struct acrn_vcpu_arch {
 	/* per vcpu lapic */
 	struct acrn_vlapic vlapic;
 
-	int32_t cur_context;
-	struct guest_cpu_context contexts[NR_WORLD];
+	struct guest_cpu_context context;
 
 	/* common MSRs, world_msrs[] is a subset of it */
 	uint64_t guest_msrs[NUM_GUEST_MSRS];

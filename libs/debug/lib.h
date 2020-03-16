@@ -57,7 +57,7 @@ void shell_kick(void);
 
 static inline uint64_t vcpu_get_cr2(const struct acrn_vcpu *vcpu)
 {
-	return vcpu->arch.contexts[vcpu->arch.cur_context].run_ctx.cr2;
+	return vcpu->arch.context.run_ctx.cr2;
 }
 
 void register_testdev(struct acrn_vm *vm);

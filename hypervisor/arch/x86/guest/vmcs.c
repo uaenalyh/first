@@ -36,7 +36,7 @@
 /* rip, rsp, ia32_efer and rflags are written to VMCS in start_vcpu */
 static void init_guest_vmx(struct acrn_vcpu *vcpu, uint64_t cr0, uint64_t cr3, uint64_t cr4)
 {
-	struct guest_cpu_context *ctx = &vcpu->arch.contexts[vcpu->arch.cur_context];
+	struct guest_cpu_context *ctx = &vcpu->arch.context;
 	struct ext_context *ectx = &ctx->ext_ctx;
 
 	vcpu_set_cr4(vcpu, cr4);
@@ -82,7 +82,7 @@ static void init_guest_vmx(struct acrn_vcpu *vcpu, uint64_t cr0, uint64_t cr3, u
 
 static void init_guest_state(struct acrn_vcpu *vcpu)
 {
-	struct guest_cpu_context *ctx = &vcpu->arch.contexts[vcpu->arch.cur_context];
+	struct guest_cpu_context *ctx = &vcpu->arch.context;
 
 	init_guest_vmx(vcpu, ctx->run_ctx.cr0, ctx->ext_ctx.cr3, ctx->run_ctx.cr4 & ~(CR4_VMXE | CR4_SMXE | CR4_MCE));
 }

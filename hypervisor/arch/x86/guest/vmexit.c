@@ -294,7 +294,6 @@ int32_t cpuid_vmexit_handler(struct acrn_vcpu *vcpu)
  */
 static int32_t xsetbv_vmexit_handler(struct acrn_vcpu *vcpu)
 {
-	int32_t idx;
 	uint64_t val64;
 	int32_t ret = 0;
 
@@ -302,10 +301,6 @@ static int32_t xsetbv_vmexit_handler(struct acrn_vcpu *vcpu)
 	if ((val64 & CR4_OSXSAVE) == 0UL) {
 		vcpu_inject_gp(vcpu, 0U);
 	} else {
-		idx = vcpu->arch.cur_context;
-		if (idx >= NR_WORLD) {
-			ret = -1;
-		} else {
 			/* to access XCR0,'ecx' should be 0 */
 			if ((vcpu_get_gpreg(vcpu, CPU_REG_RCX) & 0xffffffffUL) != 0UL) {
 				vcpu_inject_gp(vcpu, 0U);
@@ -340,7 +335,6 @@ static int32_t xsetbv_vmexit_handler(struct acrn_vcpu *vcpu)
 				}
 			}
 		}
-	}
 
 	return ret;
 }

@@ -753,7 +753,7 @@ uint64_t vcpu_get_cr0(struct acrn_vcpu *vcpu)
 	/** Declare the following local variable of type 'struct run_context *'
          *  - ctx representing the current run_context structure, initialized as
          *    &vcpu->arch.contexts[vcpu->arch.cur_context].run_ctx */
-	struct run_context *ctx = &vcpu->arch.contexts[vcpu->arch.cur_context].run_ctx;
+	struct run_context *ctx = &vcpu->arch.context.run_ctx;
 
 	/** Set bit CPU_REG_CR0 in vcpu->reg_cached to 1 while check if its old value is 0
 	 *  which means guest CR0 of \a vcpu is not cached in ctx */
@@ -822,7 +822,7 @@ void vcpu_set_cr0(struct acrn_vcpu *vcpu, uint64_t val)
 void vcpu_set_cr2(struct acrn_vcpu *vcpu, uint64_t val)
 {
 	/** Set vcpu->arch.contexts[vcpu->arch.cur_context].run_ctx.cr2 to be @val */
-	vcpu->arch.contexts[vcpu->arch.cur_context].run_ctx.cr2 = val;
+	vcpu->arch.context.run_ctx.cr2 = val;
 }
 
 /**
@@ -854,7 +854,7 @@ uint64_t vcpu_get_cr4(struct acrn_vcpu *vcpu)
 	/** Declare the following local variable of type 'struct run_context *'
          *  - ctx representing the current run_context structure, initialized as
          *    &vcpu->arch.contexts[vcpu->arch.cur_context].run_ctx */
-	struct run_context *ctx = &vcpu->arch.contexts[vcpu->arch.cur_context].run_ctx;
+	struct run_context *ctx = &vcpu->arch.context.run_ctx;
 
 	/** Set bit CPU_REG_CR4 in vcpu->reg_cached to 1 while check if its old value is 0
 	 *  which means guest CR4 of \a vcpu is not cached in ctx */
