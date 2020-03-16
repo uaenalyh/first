@@ -128,7 +128,7 @@ test_sas_job:
     - make vp-dm RELEASE=0
     - cp ../build/acrn-unit-test/host/bin/vp-dm.32.out ../../acrn-sliced-mainline/image/
     - cp ../host/guest/x86/stitched.bzimage ../../acrn-sliced-mainline/image/
-    - /opt/fusa_ci.sh sample_case_test
+    - /opt/fusa_ci.sh sas
   dependencies:
     - build_job
   artifacts:
