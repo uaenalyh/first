@@ -15,17 +15,6 @@ acrn_clang_tidy_job:
   only:
     - merge_requests
 
-sample_case_test_job:
-  stage: test
-  script:
-    - echo "start sample case test ..."
-    - pwd
-    - /opt/fusa_ci.sh sample_case_test
-  dependencies:
-    - build_job
-    - test_sas_job
-  only:
-    - merge_requests
 
 build_job:
   stage: build
@@ -149,6 +138,18 @@ test_sas_job:
   only:
     - merge_requests
     - schedules
+
+sample_case_test_job:
+  stage: test
+  script:
+    - echo "start sample case test ..."
+    - pwd
+    - /opt/fusa_ci.sh sample_case_test
+  dependencies:
+    - build_job
+    - test_sas_job
+  only:
+    - merge_requests
 
 
 deploy_build_job:
