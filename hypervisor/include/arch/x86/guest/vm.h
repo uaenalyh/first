@@ -150,9 +150,7 @@ void make_shutdown_vm_request(uint16_t pcpu_id);
 bool need_shutdown_vm(uint16_t pcpu_id);
 int32_t shutdown_vm(struct acrn_vm *vm);
 void pause_vm(struct acrn_vm *vm);
-void start_vm(struct acrn_vm *vm);
-int32_t create_vm(uint16_t vm_id, struct acrn_vm_config *vm_config, struct acrn_vm **rtn_vm);
-void prepare_vm(uint16_t vm_id, struct acrn_vm_config *vm_config);
+void prepare_vm(uint16_t vm_id, const struct acrn_vm_config *vm_config);
 void launch_vms(uint16_t pcpu_id);
 struct acrn_vm *get_vm_from_vmid(uint16_t vm_id);
 

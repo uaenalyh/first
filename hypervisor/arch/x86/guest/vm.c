@@ -153,7 +153,7 @@ static uint64_t lapic_pt_enabled_pcpu_bitmap(struct acrn_vm *vm)
  * @pre vm_id < CONFIG_MAX_VM_NUM && vm_config != NULL && rtn_vm != NULL
  * @pre vm->state == VM_POWERED_OFF
  */
-int32_t create_vm(uint16_t vm_id, struct acrn_vm_config *vm_config, struct acrn_vm **rtn_vm)
+static int32_t create_vm(uint16_t vm_id, const struct acrn_vm_config *vm_config, struct acrn_vm **rtn_vm)
 {
 	struct acrn_vm *vm = NULL;
 	int32_t status = 0;
@@ -220,7 +220,6 @@ int32_t shutdown_vm(struct acrn_vm *vm)
 	uint16_t this_pcpu_id;
 	uint64_t mask;
 	struct acrn_vcpu *vcpu = NULL;
-	struct acrn_vm_config *vm_config = NULL;
 	int32_t ret = 0;
 
 	pause_vm(vm);
@@ -257,9 +256,6 @@ int32_t shutdown_vm(struct acrn_vm *vm)
 			ret = -ETIMEDOUT;
 		}
 
-		vm_config = get_vm_config(vm->vm_id);
-		vm_config->guest_flags &= ~DM_OWNED_GUEST_FLAG_MASK;
-
 		vpci_cleanup(vm);
 
 		deinit_vuart(vm);
@@ -280,7 +276,7 @@ int32_t shutdown_vm(struct acrn_vm *vm)
 /**
  *  * @pre vm != NULL
  */
-void start_vm(struct acrn_vm *vm)
+static void start_vm(struct acrn_vm *vm)
 {
 	struct acrn_vcpu *bsp = NULL;
 
@@ -316,7 +312,7 @@ void pause_vm(struct acrn_vm *vm)
  *
  * @pre vm_id < CONFIG_MAX_VM_NUM && vm_config != NULL
  */
-void prepare_vm(uint16_t vm_id, struct acrn_vm_config *vm_config)
+void prepare_vm(uint16_t vm_id, const struct acrn_vm_config *vm_config)
 {
 	int32_t err = 0;
 	struct acrn_vm *vm = NULL;
