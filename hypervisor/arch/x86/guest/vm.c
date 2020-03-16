@@ -251,11 +251,6 @@ int32_t shutdown_vm(struct acrn_vm *vm)
 
 		wait_pcpus_offline(mask);
 
-		if ((mask != 0UL) && (!start_pcpus(mask))) {
-			pr_fatal("Failed to start all cpus in mask(0x%lx)", mask);
-			ret = -ETIMEDOUT;
-		}
-
 		vpci_cleanup(vm);
 
 		deinit_vuart(vm);
