@@ -399,7 +399,7 @@ static int32_t invd_vmexit_handler(struct acrn_vcpu *vcpu)
 	return 0;
 }
 
-static int32_t movdr_vmexit_handler(struct acrn_vcpu *vcpu)
+static int32_t movdr_vmexit_handler(__unused struct acrn_vcpu *vcpu)
 {
 	/*
 	 * In the current usecase, triple fault will happen if vcpu inject gp during

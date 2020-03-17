@@ -15,18 +15,19 @@ static struct vm_io_range testdev_range = {
 };
 
 static void
-testdev_io_read(__unused struct acrn_vm *vm, __unused struct acrn_vcpu *vcpu, __unused uint16_t port, __unused size_t size)
+testdev_io_read(__unused struct acrn_vcpu *vcpu, __unused uint16_t port, __unused size_t size)
 {
 }
 
 static void
-testdev_io_write(struct acrn_vm *vm, __unused uint16_t port, __unused size_t size, __unused uint32_t val)
+testdev_io_write(struct acrn_vcpu *vcpu, __unused uint16_t port, __unused size_t size, __unused uint32_t vali)
 {
 	uint16_t i;
-	struct acrn_vcpu *vcpu = NULL;
+	struct acrn_vm *vm = vcpu->vm;
+	struct acrn_vcpu *vcpu_tmp = NULL;
 
-	foreach_vcpu(i, vm, vcpu) {
-		pause_vcpu(vcpu, VCPU_PAUSED);
+	foreach_vcpu(i, vm, vcpu_tmp) {
+		pause_vcpu(vcpu_tmp, VCPU_PAUSED);
 	}
 }
 

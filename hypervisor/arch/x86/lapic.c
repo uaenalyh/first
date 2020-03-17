@@ -123,7 +123,7 @@ uint32_t get_cur_lapic_id(void)
 /**
  * @pre cpu_startup_shorthand < INTR_CPU_STARTUP_UNKNOWN
  */
-void send_startup_ipi(enum intr_cpu_startup_shorthand cpu_startup_shorthand, uint16_t dest_pcpu_id,
+void send_startup_ipi(__unused enum intr_cpu_startup_shorthand cpu_startup_shorthand, uint16_t dest_pcpu_id,
 	uint64_t cpu_startup_start_address)
 {
 	union apic_icr icr;
@@ -147,7 +147,7 @@ void send_startup_ipi(enum intr_cpu_startup_shorthand cpu_startup_shorthand, uin
 	msr_write(MSR_IA32_EXT_APIC_ICR, icr.value);
 }
 
-void send_single_ipi(uint16_t pcpu_id, uint32_t vector)
+void send_single_ipi(uint16_t pcpu_id, __unused uint32_t vector)
 {
 	send_single_init(pcpu_id);
 }

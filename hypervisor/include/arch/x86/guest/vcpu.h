@@ -404,15 +404,6 @@ uint64_t vcpu_get_guest_msr(const struct acrn_vcpu *vcpu, uint32_t msr);
 void vcpu_set_guest_msr(struct acrn_vcpu *vcpu, uint32_t msr, uint64_t val);
 
 /**
- * @brief write eoi_exit_bitmap to VMCS fields
- *
- * @param[in] vcpu pointer to vcpu data structure
- *
- * @return None
- */
-void vcpu_set_vmcs_eoi_exit(const struct acrn_vcpu *vcpu);
-
-/**
  * @brief reset all eoi_exit_bitmaps
  *
  * @param[in] vcpu pointer to vcpu data structure

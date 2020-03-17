@@ -143,14 +143,6 @@ void vcpu_set_guest_msr(struct acrn_vcpu *vcpu, uint32_t msr, uint64_t val)
 	}
 }
 
-/*
- * Write the eoi_exit_bitmaps to VMCS fields
- */
-void vcpu_set_vmcs_eoi_exit(const struct acrn_vcpu *vcpu)
-{
-	pr_dbg("%s", __func__);
-}
-
 static void set_vcpu_mode(struct acrn_vcpu *vcpu, uint32_t cs_attr, uint64_t ia32_efer, uint64_t cr0)
 {
 	if ((ia32_efer & MSR_IA32_EFER_LMA_BIT) != 0UL) {
@@ -169,7 +161,6 @@ static void set_vcpu_mode(struct acrn_vcpu *vcpu, uint32_t cs_attr, uint64_t ia3
 
 static void init_xsave(struct acrn_vcpu *vcpu)
 {
-	struct cpuinfo_x86 *cpu_info = get_pcpu_info();
 	struct ext_context *ectx = &(vcpu->arch.contexts[vcpu->arch.cur_context].ext_ctx);
 
 	/* Get user state components */

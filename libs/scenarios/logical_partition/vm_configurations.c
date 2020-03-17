@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <vm.h>
 #include <vm_config.h>
 #include <vuart.h>
 

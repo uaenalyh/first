@@ -17,6 +17,7 @@
 #include <trace.h>
 #include <logmsg.h>
 #include <vm_reset.h>
+#include <console.h>
 
 /**
  * @defgroup vp-base_virq vp-base.virq

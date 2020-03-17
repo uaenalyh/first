@@ -152,7 +152,7 @@ struct acrn_vuart *find_vuart_by_port(struct acrn_vm *vm, uint16_t offset)
  * Toggle the COM port's intr pin depending on whether or not we have an
  * interrupt condition to report to the processor.
  */
-void vuart_toggle_intr(const struct acrn_vuart *vu)
+void vuart_toggle_intr(__unused const struct acrn_vuart *vu)
 {
 }
 
@@ -315,7 +315,7 @@ static void write_reg(struct acrn_vuart *vu, uint16_t reg, uint8_t value_u8)
 	vuart_unlock(vu);
 }
 
-static bool vuart_write(struct acrn_vcpu *vcpu, uint16_t offset_arg,
+static void vuart_write(struct acrn_vcpu *vcpu, uint16_t offset_arg,
 			__unused size_t width, uint32_t value)
 {
 	struct acrn_vm *vm = vcpu->vm;
@@ -335,7 +335,6 @@ static bool vuart_write(struct acrn_vcpu *vcpu, uint16_t offset_arg,
 			write_reg(vu, offset, value_u8);
 		}
 	}
-	return true;
 }
 
 static void vuart_read(struct acrn_vcpu *vcpu, uint16_t offset_arg,

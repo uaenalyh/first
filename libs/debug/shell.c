@@ -41,7 +41,6 @@ static int32_t shell_list_vcpu(__unused int32_t argc, __unused char **argv);
 static int32_t shell_vcpu_dumpreg(int32_t argc, char **argv);
 static int32_t shell_dumpmem(int32_t argc, char **argv);
 static int32_t shell_to_vm_console(int32_t argc, char **argv);
-static int32_t shell_show_cpu_int(__unused int32_t argc, __unused char **argv);
 static int32_t shell_show_ptdev_info(__unused int32_t argc, __unused char **argv);
 static int32_t shell_loglevel(int32_t argc, char **argv);
 static int32_t shell_cpuid(int32_t argc, char **argv);
@@ -934,13 +933,10 @@ static int32_t shell_trigger_reboot(int32_t argc, char **argv)
 
 static int32_t shell_rdmsr(int32_t argc, char **argv)
 {
-	uint16_t pcpu_id = 0;
 	int32_t ret = 0;
 	uint32_t msr_index = 0;
 	uint64_t val = 0;
 	char str[MAX_STR_SIZE] = {0};
-
-	pcpu_id = get_pcpu_id();
 
 	switch (argc) {
 	case 2:
@@ -962,7 +958,6 @@ static int32_t shell_rdmsr(int32_t argc, char **argv)
 
 static int32_t shell_wrmsr(int32_t argc, char **argv)
 {
-	uint16_t pcpu_id = 0;
 	int32_t ret = 0;
 	uint32_t msr_index = 0;
 	uint64_t val = 0;

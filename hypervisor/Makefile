@@ -176,7 +176,6 @@ HW_C_SRCS += arch/x86/mmu.c
 HW_C_SRCS += arch/x86/e820.c
 HW_C_SRCS += arch/x86/pagetable.c
 HW_C_SRCS += arch/x86/page.c
-HW_C_SRCS += arch/x86/notify.c
 HW_C_SRCS += arch/x86/vtd.c
 HW_C_SRCS += arch/x86/gdt.c
 HW_C_SRCS += arch/x86/irq.c

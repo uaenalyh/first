@@ -13,6 +13,7 @@
 #include <profiling.h>
 #include <trace.h>
 #include <logmsg.h>
+#include <console.h>
 
 /**
  * @defgroup vp-base_hv_main vp-base.hv_main

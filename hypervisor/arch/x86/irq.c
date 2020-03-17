@@ -305,7 +305,7 @@ uint32_t irq_to_vector(uint32_t irq)
 }
 
 /* do_IRQ() */
-void dispatch_interrupt(const struct intr_excp_ctx *ctx)
+void dispatch_interrupt(__unused const struct intr_excp_ctx *ctx)
 {
 	panic("Unexpected external interrupt.");
 }
