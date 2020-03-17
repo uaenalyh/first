@@ -34,7 +34,7 @@
  * @brief Implementation of all external APIs to VM operations.
  *
  * This module implements the VM operations executed from other modules. It offers APIs to launch
- * all guest VMs, to shutdown/pause one specific VM. The main part is focused on implementation of how
+ * all guest VMs and to shutdown or pause one specific VM. The main part is focused on implementation of how
  * to create and boot a VM.
  *
  * Usage:
