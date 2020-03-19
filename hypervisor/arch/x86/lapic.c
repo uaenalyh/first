@@ -147,11 +147,6 @@ void send_startup_ipi(__unused enum intr_cpu_startup_shorthand cpu_startup_short
 	msr_write(MSR_IA32_EXT_APIC_ICR, icr.value);
 }
 
-void send_single_ipi(uint16_t pcpu_id, __unused uint32_t vector)
-{
-	send_single_init(pcpu_id);
-}
-
 /**
  * @pre pcpu_id < MAX_PCPU_NUM
  *

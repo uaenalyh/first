@@ -127,14 +127,6 @@ void send_startup_ipi(enum intr_cpu_startup_shorthand cpu_startup_shorthand, uin
 	uint64_t cpu_startup_start_address);
 
 /**
- * @brief Send an IPI to a single pCPU
- *
- * @param[in]	pcpu_id The id of destination physical cpu
- * @param[in]	vector The vector of interrupt
- */
-void send_single_ipi(uint16_t pcpu_id, uint32_t vector);
-
-/**
  * @}
  */
 /* End of ipi_ext_apis */

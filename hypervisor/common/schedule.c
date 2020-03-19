@@ -118,7 +118,7 @@ void init_thread_data(struct thread_object *obj)
 }
 
 /**
- * @pre delmode == DEL_MODE_IPI || delmode == DEL_MODE_INIT
+ * @pre delmode == DEL_MODE_INIT
  */
 void make_reschedule_request(uint16_t pcpu_id, uint16_t delmode)
 {
@@ -127,9 +127,6 @@ void make_reschedule_request(uint16_t pcpu_id, uint16_t delmode)
 	bitmap_set_lock(NEED_RESCHEDULE, &ctl->flags);
 	if (get_pcpu_id() != pcpu_id) {
 		switch (delmode) {
-		case DEL_MODE_IPI:
-			send_single_ipi(pcpu_id, VECTOR_NOTIFY_VCPU);
-			break;
 		case DEL_MODE_INIT:
 			send_single_init(pcpu_id);
 			break;
@@ -226,7 +223,7 @@ void kick_thread(const struct thread_object *obj)
 	obtain_schedule_lock(pcpu_id, &rflag);
 	if (is_running(obj)) {
 		if (get_pcpu_id() != pcpu_id) {
-			send_single_ipi(pcpu_id, VECTOR_NOTIFY_VCPU);
+			send_single_init(pcpu_id);
 		}
 	} else if (is_runnable(obj)) {
 		make_reschedule_request(pcpu_id, DEL_MODE_IPI);
