@@ -450,9 +450,7 @@ int32_t run_vcpu(struct acrn_vcpu *vcpu)
 		/* Set vcpu launched */
 		vcpu->launched = true;
 
-#ifdef CONFIG_L1D_FLUSH_VMENTRY_ENABLED
 		cpu_l1d_flush();
-#endif
 
 		/*Mitigation for MDS vulnerability, overwrite CPU internal buffers */
 		cpu_internal_buffers_clear();
@@ -473,9 +471,7 @@ int32_t run_vcpu(struct acrn_vcpu *vcpu)
 		instlen = vcpu->arch.inst_len;
 		rip = vcpu_get_rip(vcpu);
 		exec_vmwrite(VMX_GUEST_RIP, ((rip + (uint64_t)instlen) & 0xFFFFFFFFFFFFFFFFUL));
-#ifdef CONFIG_L1D_FLUSH_VMENTRY_ENABLED
 		cpu_l1d_flush();
-#endif
 
 		/* Mitigation for MDS vulnerability, overwrite CPU internal buffers */
 		cpu_internal_buffers_clear();

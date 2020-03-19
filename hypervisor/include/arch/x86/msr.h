@@ -175,6 +175,9 @@
 #define IA32_ARCH_CAP_MDS_NO             (1UL << 5U)
 #define IA32_ARCH_CAP_IF_PSCHANGE_MC_NO  (1UL << 6U)
 
+/* Flush L1 D-cache */
+#define IA32_L1D_FLUSH			(1UL << 0U)
+
 /**
  * @}
  */

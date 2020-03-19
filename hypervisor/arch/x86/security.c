@@ -43,6 +43,10 @@
  *				    - get_random_value()
  *				    - msr_write()
  *
+ *  - cpu_l1d_flush()              This function flushes L1 data cache if it is required on VM entry.
+ *				   Depends on:
+ *				    - msr_write()
+ *
  * Internal functions that are wrappers of inline assembly required by the coding guideline:
  *  - verw_buffer_overwriting()    Wrapper of inline assembly to overwrite CPU internal buffers
  *				   with VERW instruction.
@@ -90,7 +94,7 @@ static bool cpu_md_clear;
  *
  * @post n/a
  *
- * @mode HV_INIT
+ * @mode HV_SUBMODE_INIT_PRE_SMP
  *
  * @remark n/a
  *
@@ -167,7 +171,6 @@ bool check_cpu_security_cap(void)
 			 *  flush shall be required on VM entry.
 			 */
 			cpu_md_clear = true;
-#ifdef CONFIG_L1D_FLUSH_VMENTRY_ENABLED
 			/** If the hypervisor need flush the L1D on VM entry */
 			if (!skip_l1dfl_vmentry) {
 				/** L1D cache flush will also overwrite CPU internal buffers,
@@ -177,7 +180,6 @@ bool check_cpu_security_cap(void)
 				 */
 				cpu_md_clear = false;
 			}
-#endif
 		} else {
 			/** Processor is affected by MDS but no mitigation software
 			 *  interface is enumerated, CPU microcode need to be udpated.
@@ -189,6 +191,44 @@ bool check_cpu_security_cap(void)
 
 	/** Return the qualification of CPU ucode */
 	return ret;
+}
+
+ /**
+  * @brief Flush L1 data cache if it is required on VM entry.
+  *
+  * This function flushes L1 data cache if such flush is required on VM entry(current processor is
+  * potentially affected by L1TF CPU vulnerability),and flushing L1 data cache also clears CPU
+  * internal buffers if this processor is affected by MDS vulnerability.
+  *
+  *
+  * @return None
+  *
+  * @pre None
+  *
+  * @post None
+  *
+  * @mode HV_OPERATIONAL
+  *
+  * @reentrancy unspecified
+  *
+  * @threadsafety yes
+  */
+void cpu_l1d_flush(void)
+{
+	/** If the hypervisor need flush the L1D on VM entry */
+	if (!skip_l1dfl_vmentry) {
+		/** If L1D_FLUSH is supported by physical platform. */
+		if (pcpu_has_cap(X86_FEATURE_L1D_FLUSH)) {
+			/**
+			 * Call msr_write() with the following parameters,
+			 * in order to flush L1D cache.
+			 *  - MSR_IA32_FLUSH_CMD
+			 *  - IA32_L1D_FLUSH
+			 */
+			msr_write(MSR_IA32_FLUSH_CMD, IA32_L1D_FLUSH);
+		}
+	}
+
 }
 
  /**
@@ -223,7 +263,7 @@ bool check_cpu_security_cap(void)
  *
  * @reentrancy unspecified
  *
- * @threadsafety unspecified
+ * @threadsafety yes
  */
 static inline void verw_buffer_overwriting(void)
 {
@@ -242,7 +282,7 @@ static inline void verw_buffer_overwriting(void)
 /**
  * @brief Clear CPU internal buffers.
  *
- *  This function clear CPU internal buffers if it is required, by calling
+ *  This function clears CPU internal buffers if it is required, by calling
  *  verw_buffer_overwriting().
  *
  * @return None
