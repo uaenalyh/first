@@ -31,17 +31,6 @@ typedef void (*pge_handler)(uint64_t *pgentry, uint64_t size);
 #define INVALID_HPA (0x1UL << 52U)
 /* External Interfaces */
 /**
- * @brief Check guest-physical memory region mapping valid
- *
- * @param[in] vm the pointer that points to VM data structure
- * @param[in] base The specified start guest physical address of guest
- *		physical memory region
- * @param[in] size The size of guest physical memory region
- *
- * @retval true if the guest-physical memory region mapping valid, false otherwise.
- */
-bool ept_is_mr_valid(const struct acrn_vm *vm, uint64_t base, uint64_t size);
-/**
  * @brief EPT page tables destroy
  *
  * @param[inout] vm the pointer that points to VM data structure
@@ -151,16 +140,6 @@ void *get_ept_entry(struct acrn_vm *vm);
  * @return None
  */
 void walk_ept_table(struct acrn_vm *vm, pge_handler cb);
-
-/**
- * @brief EPT misconfiguration handling
- *
- * @param[in] vcpu the pointer that points to vcpu data structure
- *
- * @retval -EINVAL fail to handle the EPT misconfig
- * @retval 0 Success to handle the EPT misconfig
- */
-int32_t ept_misconfig_vmexit_handler(__unused struct acrn_vcpu *vcpu);
 
 /**
  * @}

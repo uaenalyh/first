@@ -31,21 +31,8 @@
 
 #define ACRN_DBG_EPT 6U
 
-bool ept_is_mr_valid(const struct acrn_vm *vm, uint64_t base, uint64_t size)
-{
-	bool valid = true;
-	uint64_t end = base + size;
-	uint64_t top_address_space = vm->arch_vm.ept_mem_ops.info->ept.top_address_space;
-	if ((end <= base) || (end > top_address_space)) {
-		valid = false;
-	}
-
-	return valid;
-}
-
 void destroy_ept(struct acrn_vm *vm)
 {
-
 	if (vm->arch_vm.nworld_eptp != NULL) {
 		(void)memset(vm->arch_vm.nworld_eptp, 0U, PAGE_SIZE);
 	}
@@ -84,24 +71,6 @@ uint64_t local_gpa2hpa(struct acrn_vm *vm, uint64_t gpa, uint32_t *size)
 uint64_t gpa2hpa(struct acrn_vm *vm, uint64_t gpa)
 {
 	return local_gpa2hpa(vm, gpa, NULL);
-}
-
-int32_t ept_misconfig_vmexit_handler(__unused struct acrn_vcpu *vcpu)
-{
-	int32_t status;
-
-	status = -EINVAL;
-
-	/* TODO - EPT Violation handler */
-	pr_fatal("%s, Guest linear address: 0x%016lx ", __func__, exec_vmread(VMX_GUEST_LINEAR_ADDR));
-
-	pr_fatal("%s, Guest physical address: 0x%016lx ", __func__, exec_vmread64(VMX_GUEST_PHYSICAL_ADDR_FULL));
-
-	ASSERT(status == 0, "EPT Misconfiguration is not handled.\n");
-
-	TRACE_2L(TRACE_VMEXIT_EPT_MISCONFIGURATION, 0UL, 0UL);
-
-	return status;
 }
 
 void ept_add_mr(struct acrn_vm *vm, uint64_t *pml4_page, uint64_t hpa, uint64_t gpa, uint64_t size, uint64_t prot_orig)
