@@ -3,11 +3,6 @@
  *
  * SPDX-License-Identifier: BSD-3-Clause
  */
-/**
- * @file guest_memory.h
- *
- * @brief ACRN Memory Management
- */
 #ifndef GUEST_H
 #define GUEST_H
 
@@ -19,9 +14,9 @@
 
 /**
  * @file
- * @brief {TBD brief description}
+ * @brief This file declares external APIs for memory operations between HV and VM.
  *
- * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ * The memory operations contain copy from/to VM and address translation from VM to HV.
  */
 
 #ifndef ASSEMBLER
@@ -31,56 +26,14 @@
 struct acrn_vcpu;
 struct acrn_vm;
 
-/* gpa --> hpa -->hva */
+int32_t copy_from_gpa(struct acrn_vm *vm, void *h_ptr, uint64_t gpa, uint32_t size);
+
+int32_t copy_to_gpa(struct acrn_vm *vm, void *h_ptr, uint64_t gpa, uint32_t size);
+
 void *gpa2hva(struct acrn_vm *vm, uint64_t x);
 
-/**
- * @brief Data transfering between hypervisor and VM
- *
- * @defgroup acrn_mem ACRN Memory Management
- * @{
- */
-/**
- * @brief Copy data from VM GPA space to HV address space
- *
- * @param[in] vm The pointer that points to VM data structure
- * @param[in] h_ptr The pointer that points the start HV address
- *		  of HV memory region which data is stored in
- * @param[out] gpa The start GPA address of GPA memory region which data
- *		 will be copied into
- * @param[in] size The size (bytes) of GPA memory region which data is
- *		 stored in
- *
- * @pre Caller(Guest) should make sure gpa is continuous.
- * - gpa from hypercall input which from kernel stack is gpa continuous, not
- *   support kernel stack from vmap
- * - some other gpa from hypercall parameters, VHM should make sure it's
- *   continuous
- * @pre Pointer vm is non-NULL
- */
-int32_t copy_from_gpa(struct acrn_vm *vm, void *h_ptr, uint64_t gpa, uint32_t size);
-/**
- * @brief Copy data from HV address space to VM GPA space
- *
- * @param[in] vm The pointer that points to VM data structure
- * @param[in] h_ptr The pointer that points the start HV address
- *		  of HV memory region which data is stored in
- * @param[out] gpa The start GPA address of GPA memory region which data
- *		 will be copied into
- * @param[in] size The size (bytes) of GPA memory region which data will be
- *		 copied into
- *
- * @pre Caller(Guest) should make sure gpa is continuous.
- * - gpa from hypercall input which from kernel stack is gpa continuous, not
- *   support kernel stack from vmap
- * - some other gpa from hypercall parameters, VHM should make sure it's
- *   continuous
- * @pre Pointer vm is non-NULL
- */
-int32_t copy_to_gpa(struct acrn_vm *vm, void *h_ptr, uint64_t gpa, uint32_t size);
-/**
- * @}
- */
+uint64_t gpa2hpa(struct acrn_vm *vm, uint64_t gpa);
+
 #endif /* !ASSEMBLER */
 
 /**
