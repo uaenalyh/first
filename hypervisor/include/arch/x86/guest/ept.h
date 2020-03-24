@@ -120,16 +120,6 @@ void ept_del_mr(struct acrn_vm *vm, uint64_t *pml4_page, uint64_t gpa, uint64_t 
 void ept_flush_leaf_page(uint64_t *pge, uint64_t size);
 
 /**
- * @brief Get EPT pointer of the vm
- *
- * @param[in] vm the pointer that points to VM data structure
- *
- * @retval If the current context of vm is SECURE_WORLD, return EPT pointer of
- *	    secure world, otherwise return EPT pointer of normal world.
- */
-void *get_ept_entry(struct acrn_vm *vm);
-
-/**
  * @brief Walking through EPT table
  *
  * @param[in] vm the pointer that points to VM data structure

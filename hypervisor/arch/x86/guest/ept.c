@@ -31,6 +31,21 @@
 
 #define ACRN_DBG_EPT 6U
 
+/**
+ * @pre: vm != NULL.
+ */
+static void *get_ept_entry(struct acrn_vm *vm)
+{
+	void *eptp = NULL;
+	struct acrn_vcpu *vcpu = vcpu_from_pid(vm, get_pcpu_id());
+
+	if (vcpu != NULL) {
+		eptp = vm->arch_vm.nworld_eptp;
+	}
+
+	return eptp;
+}
+
 void destroy_ept(struct acrn_vm *vm)
 {
 	if (vm->arch_vm.nworld_eptp != NULL) {
@@ -148,21 +163,6 @@ void ept_flush_leaf_page(uint64_t *pge, uint64_t size)
 		flush_address_space(hva, size);
 		clac();
 	}
-}
-
-/**
- * @pre: vm != NULL.
- */
-void *get_ept_entry(struct acrn_vm *vm)
-{
-	void *eptp = NULL;
-	struct acrn_vcpu *vcpu = vcpu_from_pid(vm, get_pcpu_id());
-
-	if (vcpu != NULL) {
-		eptp = vm->arch_vm.nworld_eptp;
-	}
-
-	return eptp;
 }
 
 /**
