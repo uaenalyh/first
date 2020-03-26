@@ -16,6 +16,16 @@ acrn_clang_tidy_job:
     - merge_requests
 
 
+checkpatch_job:
+  stage: scan
+  script:
+    - echo "start to check code styles and typos ..."
+    - pwd
+    - git rev-list `git merge-base HEAD origin/master`..HEAD | xargs -n 1 checkpatch.pl --notree --codespell -g
+  only:
+    - merge_requests
+
+
 build_job:
   stage: build
   script:
