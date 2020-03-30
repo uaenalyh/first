@@ -13,7 +13,6 @@
 #include <bits.h>
 #include <e820.h>
 #include <multiboot.h>
-#include <vtd.h>
 #include <reloc.h>
 #include <ept.h>
 #include <guest_pm.h>
@@ -186,7 +185,6 @@ static int32_t create_vm(uint16_t vm_id, const struct acrn_vm_config *vm_config,
 	vrtc_init(vm);
 
 	vpci_init(vm);
-	enable_iommu();
 
 	/* Populate return VM handle */
 	*rtn_vm = vm;

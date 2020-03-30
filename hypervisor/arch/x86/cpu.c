@@ -200,6 +200,7 @@ void init_pcpu_post(uint16_t pcpu_id)
 		init_interrupt(BOOT_CPU_ID);
 
 		init_iommu();
+		enable_iommu();
 
 		/* Start all secondary cores */
 		if (!start_pcpus(AP_MASK)) {
