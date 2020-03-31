@@ -131,7 +131,8 @@ void make_reschedule_request(uint16_t pcpu_id, uint16_t delmode)
 			send_single_init(pcpu_id);
 			break;
 		default:
-			ASSERT(false, "Unknown delivery mode %u for pCPU%u", delmode, pcpu_id);
+			/* Only DEL_MODE_INIT is supported */
+			pr_err("Err: Delivery mode %u for pCPU%u is not support.", delmode, pcpu_id);
 			break;
 		}
 	}
@@ -191,7 +192,7 @@ void sleep_thread(struct thread_object *obj)
 		scheduler->sleep(obj);
 	}
 	if (is_running(obj)) {
-		make_reschedule_request(pcpu_id, DEL_MODE_IPI);
+		make_reschedule_request(pcpu_id, DEL_MODE_INIT);
 	}
 	set_thread_status(obj, THREAD_STS_BLOCKED);
 	release_schedule_lock(pcpu_id, rflag);
@@ -210,7 +211,7 @@ void wake_thread(struct thread_object *obj)
 			scheduler->wake(obj);
 		}
 		set_thread_status(obj, THREAD_STS_RUNNABLE);
-		make_reschedule_request(pcpu_id, DEL_MODE_IPI);
+		make_reschedule_request(pcpu_id, DEL_MODE_INIT);
 	}
 	release_schedule_lock(pcpu_id, rflag);
 }
@@ -226,7 +227,7 @@ void kick_thread(const struct thread_object *obj)
 			send_single_init(pcpu_id);
 		}
 	} else if (is_runnable(obj)) {
-		make_reschedule_request(pcpu_id, DEL_MODE_IPI);
+		make_reschedule_request(pcpu_id, DEL_MODE_INIT);
 	} else {
 		/* do nothing */
 	}

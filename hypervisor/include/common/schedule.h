@@ -26,7 +26,6 @@
 #define NEED_RESCHEDULE (1U)
 
 #define DEL_MODE_INIT (1U)
-#define DEL_MODE_IPI  (2U)
 
 enum thread_object_state { THREAD_STS_RUNNING = 1, THREAD_STS_RUNNABLE, THREAD_STS_BLOCKED };
 
