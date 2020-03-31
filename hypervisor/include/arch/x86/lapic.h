@@ -15,129 +15,96 @@
 
 /**
  * @file
- * @brief {TBD brief description}
- *
- * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ * @brief This file declares the external data structures and APIs for local APIC in hwmgmt.apic module.
  */
 
 #include <types.h>
 #include <apicreg.h>
 
-#define INTR_LAPIC_ICR_INIT    0x5U
-#define INTR_LAPIC_ICR_STARTUP 0x6U
+#define INTR_LAPIC_ICR_INIT    0x5U	/**< Delivery Mode for INIT */
+#define INTR_LAPIC_ICR_STARTUP 0x6U	/**< Delivery Mode for SIPI */
 
 /* intr_lapic_icr_dest_mode */
-#define INTR_LAPIC_ICR_PHYSICAL 0x0U
+#define INTR_LAPIC_ICR_PHYSICAL 0x0U	/**< Physical destination mode */
 
 /* intr_lapic_icr_level */
-#define INTR_LAPIC_ICR_DEASSERT 0x0U
-#define INTR_LAPIC_ICR_ASSERT   0x1U
-
-#define INTR_LAPIC_ICR_LEVEL 0x1U
+#define INTR_LAPIC_ICR_DEASSERT 0x0U	/**< Level for De-assert */
+#define INTR_LAPIC_ICR_ASSERT   0x1U	/**< Level for Assert */
 
 /* intr_lapic_icr_shorthand */
-#define INTR_LAPIC_ICR_USE_DEST_ARRAY 0x0U
-#define INTR_LAPIC_ICR_ALL_EX_SELF    0x3U
+#define INTR_LAPIC_ICR_USE_DEST_ARRAY 0x0U /**< No shorthand */
 
 /* LAPIC register bit and bitmask definitions */
-#define LAPIC_SVR_VECTOR           0x000000FFU
-#define LAPIC_SVR_APIC_ENABLE_MASK 0x00000100U
+#define LAPIC_SVR_VECTOR           0x000000FFU	/**< Spurious interrupt vector */
 
-#define LAPIC_LVT_MASK 0x00010000U
+#define LAPIC_LVT_MASK 0x00010000U	/**< Local APIC LVT mask */
 
+/**
+ * @brief Enumeration type definition for SIPI IPI message.
+ *
+ */
 enum intr_cpu_startup_shorthand {
-	INTR_CPU_STARTUP_USE_DEST,
-	INTR_CPU_STARTUP_ALL_EX_SELF,
-	INTR_CPU_STARTUP_UNKNOWN,
+	INTR_CPU_STARTUP_USE_DEST,	/**< No shorthand used */
+	INTR_CPU_STARTUP_ALL_EX_SELF,	/**< Shorthand for all excluding self  */
+	INTR_CPU_STARTUP_UNKNOWN,	/**< Invalid shorthand type */
 };
 
-/* x2APIC Interrupt Command Register (ICR) structure */
+/**
+ * @brief Union definition presenting layout of x2APIC Interrupt Command Register (ICR).
+ *
+ * @consistency N/A
+ *
+ * @alignment 8
+ *
+ */
 union apic_icr {
-	uint64_t value;
+	uint64_t value;		/**<  Value of ICR value */
+	/**
+	 * @brief Structure definition presenting layout of x2APIC ICR,
+	 *		  including low 32-bits and high 32-bits value.
+	 *
+	 * @consistency N/A
+	 *
+	 * @alignment 8
+	 *
+	 */
 	struct {
-		uint32_t lo_32;
-		uint32_t hi_32;
+		uint32_t lo_32;	/**< Low 32-bits of ICR value */
+		uint32_t hi_32;	/**<  High 32-bits of ICR value*/
 	} value_32;
+
+	/**
+	 * @brief Structure definition presenting bitmap layout of x2APIC ICR register.
+	 *
+	 * @consistency N/A
+	 *
+	 * @alignment 8
+	 *
+	 */
 	struct {
-		uint32_t vector : 8;
-		uint32_t delivery_mode : 3;
-		uint32_t destination_mode : 1;
-		uint32_t rsvd_1 : 2;
-		uint32_t level : 1;
-		uint32_t trigger_mode : 1;
-		uint32_t rsvd_2 : 2;
-		uint32_t shorthand : 2;
-		uint32_t rsvd_3 : 12;
-		uint32_t dest_field : 32;
+		uint32_t vector : 8;		/**< The vector number of the interrupt being sent */
+		uint32_t delivery_mode : 3;	/**< IPI message type */
+		uint32_t destination_mode : 1;	/**< physical (0) or logical (1) destination mode */
+		uint32_t rsvd_1 : 2;		/**< Reserved */
+		uint32_t level : 1;		/**< De-assert(0) or Assert(1) */
+		uint32_t trigger_mode : 1;	/**< Trigger Mode, edge (0) or level(1) */
+		uint32_t rsvd_2 : 2;		/**< Reserved */
+		uint32_t shorthand : 2;		/**< Shorthand notation for the destination of the interrupt */
+		uint32_t rsvd_3 : 12;		/**< Reserved */
+		uint32_t dest_field : 32;	/**< Target processor or processors */
 	} bits;
 };
 
-/**
- * @defgroup lapic_ext_apis LAPIC External Interfaces
- *
- * This is a group that includes LAPIC External Interfaces.
- *
- * @{
- */
 
-/**
- * @brief Enable LAPIC in x2APIC mode
- *
- * Enable LAPIC in x2APIC mode via MSR writes.
- *
- */
 void early_init_lapic(void);
 
-/**
- * @brief Get the LAPIC ID
- *
- * Get the LAPIC ID via MSR read.
- *
- * @return LAPIC ID
- */
 uint32_t get_cur_lapic_id(void);
-
-/**
- * @}
- */
-/* End of lapic_ext_apis */
 
 void init_lapic(uint16_t pcpu_id);
 
-/**
- * @defgroup ipi_ext_apis IPI External Interfaces
- *
- * This is a group that includes IPI External Interfaces.
- *
- * @{
- */
-
-/**
- * @brief Send an SIPI to a specific cpu
- *
- * Send an Startup IPI to a specific cpu, to notify the cpu to start booting.
- *
- * @param[in]	cpu_startup_shorthand The startup_shorthand
- * @param[in]	dest_pcpu_id The id of destination physical cpu
- * @param[in]	cpu_startup_start_address The address for the dest pCPU to start running
- *
- * @pre cpu_startup_shorthand < INTR_CPU_STARTUP_UNKNOWN
- */
 void send_startup_ipi(enum intr_cpu_startup_shorthand cpu_startup_shorthand, uint16_t dest_pcpu_id,
 	uint64_t cpu_startup_start_address);
 
-/**
- * @}
- */
-/* End of ipi_ext_apis */
-
-/**
- * @brief Send an INIT signal to a single pCPU
- *
- * @param[in] pcpu_id The id of destination physical cpu
- *
- * @return None
- */
 void send_single_init(uint16_t pcpu_id);
 
 /**

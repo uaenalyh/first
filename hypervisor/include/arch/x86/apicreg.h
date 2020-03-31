@@ -37,140 +37,151 @@
 
 /**
  * @file
- * @brief {TBD brief description}
- *
- * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ * @brief This file declares the external data structures and MACROs for local APIC and IOAPIC in hwmgmt.apic module.
  */
+
 
 #include <page.h>
 
-/*
- * Local && I/O APIC definitions.
- */
 
-/******************************************************************************
- * global defines, etc.
- */
-
-/******************************************************************************
- * LOCAL APIC structure
+/**
+ * @brief Structure definition presenting one local APIC register.
+ *
+ * @consistency N/A
+ *
+ * @alignment 4
+ *
  */
 struct lapic_reg {
-	uint32_t v;
+	uint32_t v;	/**<  Value of a local APIC register */
 };
 
-struct lapic_regs { /*OFFSET(Hex)*/
-	struct lapic_reg rsv0[2];
-	struct lapic_reg id; /*020*/
-	struct lapic_reg version; /*030*/
-	struct lapic_reg rsv1[4];
-	struct lapic_reg tpr; /*080*/
-	struct lapic_reg apr; /*090*/
-	struct lapic_reg ppr; /*0A0*/
-	struct lapic_reg eoi; /*0B0*/
-	struct lapic_reg rrd; /*0C0*/
-	struct lapic_reg ldr; /*0D0*/
-	struct lapic_reg dfr; /*0EO*/
-	struct lapic_reg svr; /*0F0*/
-	struct lapic_reg isr[8]; /*100 -- 170*/
-	struct lapic_reg tmr[8]; /*180 -- 1F0*/
-	struct lapic_reg irr[8]; /*200 -- 270*/
-	struct lapic_reg esr; /*280*/
-	struct lapic_reg rsv2[6];
-	struct lapic_reg lvt_cmci; /*2F0*/
-	struct lapic_reg icr_lo; /*300*/
-	struct lapic_reg icr_hi; /*310*/
-	struct lapic_reg lvt[6]; /*320 -- 370*/
-	struct lapic_reg icr_timer; /*380*/
-	struct lapic_reg ccr_timer; /*390*/
-	struct lapic_reg rsv3[4];
-	struct lapic_reg dcr_timer; /*3E0*/
-	struct lapic_reg self_ipi; /*3F0*/
+/**
+ * @brief Structure definition presenting one local APIC register.
+ *
+ * @consistency N/A
+ *
+ * @alignment 4096
+ *
+ */
+struct lapic_regs {
+	struct lapic_reg rsv0[2]; /**< Reserved */
+	struct lapic_reg id;	  /**< Local APIC ID Register */
+	struct lapic_reg version; /**< Local APIC Version Register */
+	struct lapic_reg rsv1[4]; /**< Reserved */
+	struct lapic_reg tpr; /**< Task Priority Register (TPR) */
+	struct lapic_reg apr; /**< Arbitration Priority Register (APR) */
+	struct lapic_reg ppr; /**< Processor Priority Register (PPR) */
+	struct lapic_reg eoi; /**< EOI Register */
+	struct lapic_reg rrd; /**< Remote Read Register (RRD) */
+	struct lapic_reg ldr; /**< Logical Destination Register */
+	struct lapic_reg dfr; /**< Destination Format Register */
+	struct lapic_reg svr; /**< Spurious Interrupt Vector Register */
+	struct lapic_reg isr[8]; /**< In-Service Registers (ISR) */
+	struct lapic_reg tmr[8]; /**< Trigger Mode Registers (TMR)*/
+	struct lapic_reg irr[8]; /**< Interrupt Request Registers (IRR) */
+	struct lapic_reg esr;	 /**< Error Status Register */
+	struct lapic_reg rsv2[6]; /**< Reserved */
+	struct lapic_reg lvt_cmci; /**< LVT Corrected Machine Check Interrupt (CMCI) Register */
+	struct lapic_reg icr_lo;   /**< Interrupt Command Register (ICR); bits 0-31 */
+	struct lapic_reg icr_hi;   /**< Interrupt Command Register (ICR); bits 32-63 */
+	struct lapic_reg lvt[6];   /**< LVT Registers */
+	struct lapic_reg icr_timer; /**< Initial Count Register (for Timer) */
+	struct lapic_reg ccr_timer; /**< Current Count Register (for Timer) */
+	struct lapic_reg rsv3[4];   /**< Reserved */
+	struct lapic_reg dcr_timer; /**< Divide Configuration Register (for Timer) */
+	struct lapic_reg self_ipi;  /**< SELF IPI Register, Available only in x2APIC mode */
 
-	/*roundup sizeof current struct to 4KB*/
-	struct lapic_reg rsv5[192]; /*400 -- FF0*/
+	struct lapic_reg rsv5[192]; /**< Reserved, roundup sizeof current struct to 4KB */
 } __aligned(PAGE_SIZE);
 
-/******************************************************************************
- * I/O APIC structure
+
+#define IOAPIC_RTE_MASK_SET 0x1U /**< Set IOAPIC interrupt mask */
+
+#define IOAPIC_RTE_TRGRMODE_EDGE  0x0U /**< IOAPIC edge trigger mode */
+#define IOAPIC_RTE_TRGRMODE_LEVEL 0x1U /**< IOAPIC Level Trigger Mode */
+
+#define IOAPIC_RTE_INTPOL_AHI 0x0U /**< IOAPIC interrupt active high polarity */
+
+#define IOAPIC_RTE_DESTMODE_LOGICAL 0x1U /**< IOAPIC logical destination mode */
+
+#define IOAPIC_RTE_DELMODE_LOPRI 0x1U /**< IOAPIC lowest priority delivery mode */
+
+/**
+ * @brief Union definition presenting layout IOAPIC Redirection Table (RTE) Entry .
+ *
+ * @consistency N/A
+ *
+ * @alignment 8
+ *
  */
-
-#define IOAPIC_RTE_MASK_SET 0x1U /* Interrupt Mask: Set */
-
-#define IOAPIC_RTE_TRGRMODE_EDGE  0x0U /* Trigger Mode: Edge */
-#define IOAPIC_RTE_TRGRMODE_LEVEL 0x1U /* Trigger Mode: Level */
-
-#define IOAPIC_RTE_INTPOL_AHI 0x0U /* Interrupt Polarity: active high */
-
-#define IOAPIC_RTE_DESTMODE_LOGICAL 0x1U /* Destination Mode: Logical */
-
-#define IOAPIC_RTE_DELMODE_LOPRI 0x1U /* Delivery Mode: Lowest priority */
-
-/* IOAPIC Redirection Table (RTE) Entry structure */
 union ioapic_rte {
-	uint64_t full;
+	uint64_t full; /**< Value of a IOAPIC RTE entry */
+
+	/**
+	 * @brief Structure definition presenting layout IOAPIC RTE Entry,
+	 *		  including low 32-bits and high 32-bits value.
+	 *
+	 * @consistency N/A
+	 *
+	 * @alignment 8
+	 *
+	 */
 	struct {
-		uint32_t lo_32;
-		uint32_t hi_32;
+		uint32_t lo_32; /**< Value of low 32 bits of IOAPIC RTE entry */
+		uint32_t hi_32; /**< Value of high 32 bits IOAPIC RTE entry */
 	} u;
+
+	/**
+	 * @brief Structure definition presenting bitmap layout IOAPIC RTE Entry.
+	 *
+	 * @consistency N/A
+	 *
+	 * @alignment 8
+	 *
+	 * @remark This structure shall be packed.
+	 */
 	struct {
-		uint8_t vector : 8;
-		uint64_t delivery_mode : 3;
-		uint64_t dest_mode : 1;
-		uint64_t delivery_status : 1;
-		uint64_t intr_polarity : 1;
-		uint64_t remote_irr : 1;
-		uint64_t trigger_mode : 1;
-		uint64_t intr_mask : 1;
-		uint64_t rsvd_1 : 39;
-		uint8_t dest_field : 8;
+		uint8_t vector : 8; /**< The interrupt vector for this interrupt */
+		uint64_t delivery_mode : 3; /**< Delivery mode */
+		uint64_t dest_mode : 1; /**< Determines the interpretation of the destination field */
+		uint64_t delivery_status : 1; /**< Current status of the delivery of this interrupt */
+		uint64_t intr_polarity : 1; /**< Interrupt input pin polarity, 0=High active, 1=Low active. */
+		uint64_t remote_irr : 1; /**< Remote IRR */
+		uint64_t trigger_mode : 1; /**< Trigger mode, 1=Level sensitive, 0=Edge sensitive */
+		uint64_t intr_mask : 1; /**< Interrupt mask, When this bit is 1, the interrupt signal is masked */
+		uint64_t rsvd_1 : 39; /**< Reserved */
+		uint8_t dest_field : 8;/**< Destination field */
 	} bits __packed;
 };
 
-/******************************************************************************
- * various code 'logical' values
- */
 
-/******************************************************************************
- * LOCAL APIC defines
- */
+#define DEFAULT_APIC_BASE 0xfee00000UL /**< Default physical address of local APICs */
 
-/* default physical locations of LOCAL (CPU) APICs */
-#define DEFAULT_APIC_BASE 0xfee00000UL
+#define APIC_ID_MASK  0xff000000U /**< Mask of APIC ID register */
+#define APIC_ID_SHIFT 24U /**< Shift of bits of APIC ID register */
 
-/* constants relating to APIC ID registers */
-#define APIC_ID_MASK  0xff000000U
-#define APIC_ID_SHIFT 24U
+#define APIC_VECTOR_MASK 0x000000ffU /**< Mask of vector in local APIC ICR register */
 
-/* fields in ICR_LOW */
-#define APIC_VECTOR_MASK 0x000000ffU
+#define APIC_DELMODE_MASK    0x00000700U /**< Mask of delivery mode in local APIC ICR register */
+#define APIC_DELMODE_INIT    0x00000500U /**< Delivery mode of INIT in local APIC ICR register */
+#define APIC_DELMODE_STARTUP 0x00000600U /**< Delivery mode of STARTUP in local APIC ICR register */
 
-#define APIC_DELMODE_MASK    0x00000700U
-#define APIC_DELMODE_INIT    0x00000500U
-#define APIC_DELMODE_STARTUP 0x00000600U
+#define APIC_DESTMODE_LOG 0x00000800U /**< Destination mode of logical mode in local APIC ICR register */
 
-#define APIC_DESTMODE_LOG 0x00000800U
+#define APIC_LEVEL_MASK     0x00004000U /**< Mask of trigger level in local APIC ICR register */
 
-#define APIC_LEVEL_MASK     0x00004000U
-#define APIC_LEVEL_DEASSERT 0x00000000U
+#define APIC_TRIGMOD_MASK 0x00008000U /**< Mask of trigger mode in local APIC ICR register */
+#define APIC_DEST_MASK    0x000c0000U /**< Mask of destination mode in local APIC ICR register */
+#define APIC_DEST_DESTFLD 0x00000000U /**< Mask of destination field in local APIC ICR register */
 
-#define APIC_TRIGMOD_MASK 0x00008000U
-#define APIC_DEST_MASK    0x000c0000U
-#define APIC_DEST_DESTFLD 0x00000000U
+#define IOAPIC_REGSEL 0x00U /**< IOAPIC I/O register select register */
+#define IOAPIC_WINDOW 0x10U /**< IOAPIC I/O window register */
 
-/******************************************************************************
- * I/O APIC defines
- */
+#define IOAPIC_VER 0x01U /**< Version of IOAPIC */
 
-/* window register offset */
-#define IOAPIC_REGSEL 0x00U
-#define IOAPIC_WINDOW 0x10U
-
-#define IOAPIC_VER 0x01U
-
-/* fields in VER, for redirection entry */
-#define IOAPIC_MAX_RTE_MASK 0x00ff0000U
-#define MAX_RTE_SHIFT       16U
+#define IOAPIC_MAX_RTE_MASK 0x00ff0000U /**< Mask of maximum redirection entry in IOAPIC version register */
+#define MAX_RTE_SHIFT       16U /**< Shift of bits of maximum redirection entry in IOAPIC version register */
 
 /**
  * @}

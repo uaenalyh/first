@@ -15,37 +15,36 @@
 
 /**
  * @file
- * @brief {TBD brief description}
- *
- * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ * @brief this file declares the external data structures and API to mask all IOAPIC interrupts in hwmgmt.apic module.
  */
 
 #include <apicreg.h>
 
 #define NR_LEGACY_IRQ 16U
 
+/**
+ * @brief Definition of IOAPIC information
+ *
+ * @consistency N/A
+ *
+ * @alignment 1
+ *
+ * @remark N/A
+ */
 struct ioapic_info {
-	uint8_t id; /* IOAPIC ID as indicated in ACPI MADT */
-	uint32_t addr; /* IOAPIC Register address */
-	uint32_t gsi_base; /* Global System Interrupt where this IO-APIC's interrupt input start */
-	uint32_t nr_pins; /* Number of Interrupt inputs as determined by Max. Redir Entry Register */
+	uint8_t id; /**< IOAPIC ID as indicated in ACPI MADT */
+	uint32_t addr; /**< IOAPIC Register address */
+	uint32_t gsi_base; /**< Global System Interrupt where this IO-APIC's interrupt input start */
+	uint32_t nr_pins; /**< Number of interrupt inputs as determined by Max. Redirection Entry Register */
 };
+
 
 void ioapic_setup_irqs(void);
 
 bool ioapic_irq_is_gsi(uint32_t irq);
 
 /**
- * @defgroup ioapic_ext_apis IOAPIC External Interfaces
- *
- * This is a group that includes IOAPIC External Interfaces.
- *
- * @{
- */
-
-/**
  * @}
  */
-/* End of ioapic_ext_apis */
 
 #endif /* IOAPIC_H */
