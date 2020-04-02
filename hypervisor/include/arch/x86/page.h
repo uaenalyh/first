@@ -44,15 +44,6 @@
  */
 #define EPT_ADDRESS_SPACE(size) (((size) != 0UL) ? ((size) + PLATFORM_LO_MMIO_SIZE + PLATFORM_HI_MMIO_SIZE) : 0UL)
 
-#define TRUSTY_PML4_PAGE_NUM(size) (1UL)
-#define TRUSTY_PDPT_PAGE_NUM(size) (1UL)
-#define TRUSTY_PD_PAGE_NUM(size)   (PD_PAGE_NUM(size))
-#define TRUSTY_PT_PAGE_NUM(size)   (PT_PAGE_NUM(size))
-#define TRUSTY_PGTABLE_PAGE_NUM(size) \
-	(TRUSTY_PML4_PAGE_NUM(size) + TRUSTY_PDPT_PAGE_NUM(size) + TRUSTY_PD_PAGE_NUM(size) + TRUSTY_PT_PAGE_NUM(size))
-
-struct acrn_vm;
-
 struct page {
 	uint8_t contents[PAGE_SIZE];
 } __aligned(PAGE_SIZE);
@@ -65,7 +56,6 @@ union pgtable_pages_info {
 		struct page *pt_base;
 	} ppt;
 	struct {
-		uint64_t top_address_space;
 		struct page *nworld_pml4_base;
 		struct page *nworld_pdpt_base;
 		struct page *nworld_pd_base;

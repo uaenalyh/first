@@ -4,6 +4,7 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
+#include <acrn_hv_defs.h>
 #include <types.h>
 #include <errno.h>
 #include <vm.h>

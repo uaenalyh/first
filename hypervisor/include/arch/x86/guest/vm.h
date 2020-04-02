@@ -32,7 +32,6 @@
 #include <vioapic.h>
 #include <vpic.h>
 #include <vmx_io.h>
-#include <trusty.h>
 #include <vcpuid.h>
 #include <vpci.h>
 #include <cpu_caps.h>

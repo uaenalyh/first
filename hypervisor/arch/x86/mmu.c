@@ -27,6 +27,7 @@
  * $FreeBSD$
  */
 
+#include <acrn_hv_defs.h>
 #include <types.h>
 #include <atomic.h>
 #include <page.h>

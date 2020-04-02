@@ -8,7 +8,6 @@
 #include <pgtable.h>
 #include <page.h>
 #include <mmu.h>
-#include <trusty.h>
 #include <vtd.h>
 #include <vm_configurations.h>
 #include <security.h>
@@ -136,10 +135,7 @@ static inline struct page *ept_get_pdpt_page(const union pgtable_pages_info *inf
 
 static inline struct page *ept_get_pd_page(const union pgtable_pages_info *info, uint64_t gpa)
 {
-	struct page *pd_page;
-	if (gpa < TRUSTY_EPT_REBASE_GPA) {
-		pd_page = info->ept.nworld_pd_base + (gpa >> PDPTE_SHIFT);
-	}
+	struct page *pd_page = info->ept.nworld_pd_base + (gpa >> PDPTE_SHIFT);
 
 	(void)memset(pd_page, 0U, PAGE_SIZE);
 	return pd_page;
@@ -147,10 +143,7 @@ static inline struct page *ept_get_pd_page(const union pgtable_pages_info *info,
 
 static inline struct page *ept_get_pt_page(const union pgtable_pages_info *info, uint64_t gpa)
 {
-	struct page *pt_page;
-	if (gpa < TRUSTY_EPT_REBASE_GPA) {
-		pt_page = info->ept.nworld_pt_base + (gpa >> PDE_SHIFT);
-	}
+	struct page *pt_page = info->ept.nworld_pt_base + (gpa >> PDE_SHIFT);
 
 	(void)memset(pt_page, 0U, PAGE_SIZE);
 	return pt_page;
@@ -172,7 +165,6 @@ static inline void ept_recover_exe_right(uint64_t *entry)
 
 void init_ept_mem_ops(struct memory_ops *mem_ops, uint16_t vm_id)
 {
-	ept_pages_info[vm_id].ept.top_address_space = EPT_ADDRESS_SPACE(CONFIG_UOS_RAM_SIZE);
 	ept_pages_info[vm_id].ept.nworld_pml4_base = uos_nworld_pml4_pages[vm_id];
 	ept_pages_info[vm_id].ept.nworld_pdpt_base = uos_nworld_pdpt_pages[vm_id];
 	ept_pages_info[vm_id].ept.nworld_pd_base = uos_nworld_pd_pages[vm_id];
