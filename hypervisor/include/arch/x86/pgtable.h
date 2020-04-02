@@ -124,10 +124,79 @@
 #define PTRS_PER_PTE 512UL
 #define PTE_SIZE     (1UL << PTE_SHIFT)
 
-/* TODO: PAGE_MASK & PHYSICAL_MASK */
-#define PML4E_PFN_MASK 0x0000FFFFFFFFF000UL
-#define PDPTE_PFN_MASK 0x0000FFFFFFFFF000UL
-#define PDE_PFN_MASK   0x0000FFFFFFFFF000UL
+/**
+ * @brief The physical-address width supported by the processor on the physical platform.
+ *
+ * According to SDM, MAXPHYADDR is determined by CPUID.80000008H:EAX[7:0]. It is 39 on KBL NUC.
+ */
+#define MAXPHYADDR 39UL
+
+/**
+ * @brief Mask to clear [bit 63:M] of a paging-structure entry, where M is an abbreviation for MAXPHYADDR.
+ */
+#define MAXPHYADDR_MASK ((1UL << MAXPHYADDR) - 1UL)
+
+/**
+ * @brief Mask to determine the physical address of the page-directory-pointer table referenced by a PML4E.
+ *
+ * According to SDM, for a PML4E that references a page-directory-pointer table,
+ * physical address of 4-KByte aligned page-directory-pointer table referenced by this entry are specified in
+ * [bit M-1:12], where M is an abbreviation for MAXPHYADDR.
+ */
+#define PML4E_PFN_MASK (MAXPHYADDR_MASK & PAGE_MASK)
+
+/**
+ * @brief Mask to determine the physical address of the page directory referenced by a PDPTE.
+ *
+ * According to SDM, for a PDPTE that references a page directory,
+ * physical address of 4-KByte aligned page directory referenced by this entry are specified in
+ * [bit M-1:12], where M is an abbreviation for MAXPHYADDR.
+ */
+#define PDPTE_PFN_MASK (MAXPHYADDR_MASK & PAGE_MASK)
+
+/**
+ * @brief Mask to determine the physical address of the page table referenced by a PDE.
+ *
+ * According to SDM, for a PDE that references a page table,
+ * physical address of 4-KByte aligned page table referenced by this entry are specified in
+ * [bit M-1:12], where M is an abbreviation for MAXPHYADDR.
+ */
+#define PDE_PFN_MASK (MAXPHYADDR_MASK & PAGE_MASK)
+
+/**
+ * @brief Mask to determine the physical address of the 1-GByte page mapped by a PDPTE.
+ *
+ * According to SDM, for a PDPTE that maps a 1-GByte page,
+ * physical address of the 1-GByte page mapped by this entry are specified in [bit M-1:30],
+ * where M is an abbreviation for MAXPHYADDR.
+ */
+#define PDPTE_PADDR_MASK (MAXPHYADDR_MASK & PDPTE_MASK)
+
+/**
+ * @brief Mask to determine the physical address of the 2-MByte page mapped by a PDE.
+ *
+ * According to SDM, for a PDE that maps a 2-MByte page,
+ * physical address of the 2-MByte page mapped by this entry are specified in [bit M-1:21],
+ * where M is an abbreviation for MAXPHYADDR.
+ */
+#define PDE_PADDR_MASK (MAXPHYADDR_MASK & PDE_MASK)
+
+/**
+ * @brief Mask to determine the properties of a PDPTE.
+ *
+ * According to SDM, for a PDPTE that maps a 1-GByte page,
+ * properties of this entry are specified in [bit 63:59] and [bit 11:0].
+ */
+#define PDPTE_PROT_MASK 0xF800000000000FFFUL
+
+/**
+ * @brief Mask to determine the properties of a PDE.
+ *
+ * According to SDM, for a PDE that maps a 2-MByte page,
+ * properties of this entry are specified in [bit 63:59] and [bit 11:0].
+ */
+#define PDE_PROT_MASK  0xF800000000000FFFUL
+
 /**
  * @brief Address space translation
  *

@@ -40,15 +40,15 @@ static void split_large_page(
 
 	switch (level) {
 	case IA32E_PDPT:
-		ref_paddr = (*pte) & PDPTE_PFN_MASK;
+		ref_paddr = (*pte) & PDPTE_PADDR_MASK;
 		paddrinc = PDE_SIZE;
-		ref_prot = (*pte) & ~PDPTE_PFN_MASK;
+		ref_prot = (*pte) & PDPTE_PROT_MASK;
 		pbase = (uint64_t *)mem_ops->get_pd_page(mem_ops->info, vaddr);
 		break;
 	default: /* IA32E_PD */
-		ref_paddr = (*pte) & PDE_PFN_MASK;
+		ref_paddr = (*pte) & PDE_PADDR_MASK;
 		paddrinc = PTE_SIZE;
-		ref_prot = (*pte) & ~PDE_PFN_MASK;
+		ref_prot = (*pte) & PDE_PROT_MASK;
 		ref_prot &= ~PAGE_PS;
 		mem_ops->recover_exe_right(&ref_prot);
 		pbase = (uint64_t *)mem_ops->get_pt_page(mem_ops->info, vaddr);
