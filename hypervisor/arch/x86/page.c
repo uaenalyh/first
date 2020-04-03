@@ -30,7 +30,7 @@
  * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
  */
 
-static struct page ppt_pml4_pages[PML4_PAGE_NUM(CONFIG_PLATFORM_RAM_SIZE + PLATFORM_LO_MMIO_SIZE)];
+static struct page ppt_pml4_pages[PML4_PAGE_NUM];
 static struct page ppt_pdpt_pages[PDPT_PAGE_NUM(CONFIG_PLATFORM_RAM_SIZE + PLATFORM_LO_MMIO_SIZE)];
 static struct page ppt_pd_pages[PD_PAGE_NUM(CONFIG_PLATFORM_RAM_SIZE + PLATFORM_LO_MMIO_SIZE)];
 
@@ -97,7 +97,7 @@ const struct memory_ops ppt_mem_ops = {
 };
 
 /* uos_nworld_pml4_pages[i] is ...... of UOS i (whose vm_id = i +1) */
-static struct page uos_nworld_pml4_pages[CONFIG_MAX_VM_NUM][PML4_PAGE_NUM(EPT_ADDRESS_SPACE(CONFIG_UOS_RAM_SIZE))];
+static struct page uos_nworld_pml4_pages[CONFIG_MAX_VM_NUM][PML4_PAGE_NUM];
 static struct page uos_nworld_pdpt_pages[CONFIG_MAX_VM_NUM][PDPT_PAGE_NUM(EPT_ADDRESS_SPACE(CONFIG_UOS_RAM_SIZE))];
 static struct page uos_nworld_pd_pages[CONFIG_MAX_VM_NUM][PD_PAGE_NUM(EPT_ADDRESS_SPACE(CONFIG_UOS_RAM_SIZE))];
 static struct page uos_nworld_pt_pages[CONFIG_MAX_VM_NUM][PT_PAGE_NUM(EPT_ADDRESS_SPACE(CONFIG_UOS_RAM_SIZE))];
