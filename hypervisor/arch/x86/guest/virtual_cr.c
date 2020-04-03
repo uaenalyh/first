@@ -392,14 +392,41 @@ static void vmx_write_cr0(struct acrn_vcpu *vcpu, uint64_t cr0)
 		} else if (old_paging_enabled && ((cr0_mask & CR0_PG) == 0UL)) {
 			/** If \a vcpu has long mode enabled */
 			if ((vcpu_get_efer(vcpu) & MSR_IA32_EFER_LME_BIT) != 0UL) {
-				/** Print a debug message */
-				pr_dbg("This is an invalid case");
-
-				/** Set the err_found to be true */
-				err_found = true;
-
-				/** Call vcpu_inject_gp to inject #GP(0) to \a vcpu */
-				vcpu_inject_gp(vcpu, 0U);
+				/** If the vcpu is running in the 64BIT mode */
+				if (get_vcpu_mode(vcpu) == CPU_MODE_64BIT) {
+					/** Print a debug message */
+					pr_dbg("This is an invalid case");
+					/** Set the err_found to be true */
+					err_found = true;
+					/** Call vcpu_inject_gp to inject #GP(0) to \a vcpu */
+					vcpu_inject_gp(vcpu, 0U);
+				/** If the vcpu is running in the compatibility mode */
+				} else {
+					/** Call exec_vmread32 with the following parameters,
+					 *  in order to get the value of VMX_ENTRY_CONTROLS in
+					 *  VMCS and assign it to entry_ctrls.
+					 *  - VMX_ENTRY_CONTROLS
+					 */
+					entry_ctrls = exec_vmread32(VMX_ENTRY_CONTROLS);
+					/** Clear the VMX_ENTRY_CTLS_IA32E_MODE bit in
+					 *  entry_ctrls.
+					 */
+					entry_ctrls &= ~VMX_ENTRY_CTLS_IA32E_MODE;
+					/** Call exec_vmwrite32 with the following parameters,
+					 *  in order to set the value of VMX_ENTRY_CONTROLS in
+					 *  VMCS.
+					 *  - VMX_ENTRY_CONTROLS
+					 *  - entry_ctrls
+					 */
+					exec_vmwrite32(VMX_ENTRY_CONTROLS, entry_ctrls);
+					/** Call vcpu_set_efer with the following parameters,
+					 *  in order to clear the long mode active bit in the
+					 *  guest EFER of \a vcpu.
+					 *  - vcpu
+					 *  - vcpu_get_efer(vcpu) & ~MSR_IA32_EFER_LMA_BIT
+					 */
+					vcpu_set_efer(vcpu, vcpu_get_efer(vcpu) & ~MSR_IA32_EFER_LMA_BIT);
+				}
 			}
 		/** If no above condition meet */
 		} else {
