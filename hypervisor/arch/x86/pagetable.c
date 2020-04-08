@@ -32,7 +32,7 @@
  * @pre: level could only IA32E_PDPT or IA32E_PD
  */
 static void split_large_page(
-	uint64_t *pte, enum _page_table_level level, uint64_t vaddr, const struct memory_ops *mem_ops)
+	uint64_t *pte, enum page_table_level level, uint64_t vaddr, const struct memory_ops *mem_ops)
 {
 	uint64_t *pbase;
 	uint64_t ref_paddr, paddr, paddrinc;

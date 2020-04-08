@@ -71,7 +71,7 @@ static inline uint64_t round_pde_down(uint64_t val)
 /**
  * @brief Page tables level in IA32 paging mode
  */
-enum _page_table_level {
+enum page_table_level {
 	/**
 	 * @brief The PML4 level in the page tables
 	 */
