@@ -139,24 +139,24 @@
 /**
  * @brief Translate host-physical address to host-virtual address
  *
- * @param[in] x The specified host-physical address
+ * @param[in] hpa The specified host-physical address
  *
  * @return The translated host-virtual address
  */
-static inline void *hpa2hva(uint64_t x)
+static inline void *hpa2hva(uint64_t hpa)
 {
-	return (void *)x;
+	return (void *)hpa;
 }
 /**
  * @brief Translate host-virtual address to host-physical address
  *
- * @param[in] x The specified host-virtual address
+ * @param[in] hva The specified host-virtual address
  *
  * @return The translated host-physical address
  */
-static inline uint64_t hva2hpa(const void *x)
+static inline uint64_t hva2hpa(const void *hva)
 {
-	return (uint64_t)x;
+	return (uint64_t)hva;
 }
 
 static inline uint64_t pml4e_index(uint64_t address)
