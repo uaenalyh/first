@@ -37,8 +37,6 @@
 /* TODO: add more capability per requirement */
 
 static struct cpu_capability {
-	uint8_t ept_features;
-
 	uint32_t vmx_ept;
 	uint32_t vmx_vpid;
 } cpu_caps;
@@ -88,49 +86,6 @@ bool has_monitor_cap(void)
 	return ret;
 }
 
-/*check allowed ONEs setting in vmx control*/
-static bool is_ctrl_setting_allowed(uint64_t msr_val, uint32_t ctrl)
-{
-	/*
-	 * Intel SDM Appendix A.3
-	 * - bitX in ctrl can be set 1
-	 *   only if bit 32+X in msr_val is 1
-	 */
-	return ((((uint32_t)(msr_val >> 32UL)) & ctrl) == ctrl);
-}
-
-static void detect_ept_cap(void)
-{
-	uint64_t msr_val;
-
-	cpu_caps.ept_features = 0U;
-
-	/* Read primary processor based VM control. */
-	msr_val = msr_read(MSR_IA32_VMX_PROCBASED_CTLS);
-
-	/*
-	 * According to SDM A.3.2 Primary Processor-Based VM-Execution Controls:
-	 * The IA32_VMX_PROCBASED_CTLS MSR (index 482H) reports on the allowed
-	 * settings of most of the primary processor-based VM-execution controls
-	 * (see Section 24.6.2):
-	 * Bits 63:32 indicate the allowed 1-settings of these controls.
-	 * VM entry allows control X to be 1 if bit 32+X in the MSR is set to 1;
-	 * if bit 32+X in the MSR is cleared to 0, VM entry fails if control X
-	 * is 1.
-	 */
-	msr_val = msr_val >> 32U;
-
-	/* Check if secondary processor based VM control is available. */
-	if ((msr_val & VMX_PROCBASED_CTLS_SECONDARY) != 0UL) {
-		/* Read secondary processor based VM control. */
-		msr_val = msr_read(MSR_IA32_VMX_PROCBASED_CTLS2);
-
-		if (is_ctrl_setting_allowed(msr_val, VMX_PROCBASED_CTLS2_EPT)) {
-			cpu_caps.ept_features = 1U;
-		}
-	}
-}
-
 static void detect_vmx_mmu_cap(void)
 {
 	uint64_t val;
@@ -153,7 +108,6 @@ static void detect_xsave_cap(void)
 
 static void detect_pcpu_cap(void)
 {
-	detect_ept_cap();
 	detect_vmx_mmu_cap();
 	detect_xsave_cap();
 }
