@@ -352,9 +352,12 @@ static void vmx_write_cr0(struct acrn_vcpu *vcpu, uint64_t cr0)
 		 *  - cr0_changed_bits representing the vCPU CR0 changed bits, initialized as
                  *    vcpu_get_cr0(vcpu) ^ cr0 */
 		uint64_t cr0_changed_bits = vcpu_get_cr0(vcpu) ^ cr0;
-		/** Declare the following local variable of  type uint64_t
-                  * - cr0_mask representing the the vCPU CR0 shadow value */
+		/** Declare the following local variable of type uint64_t
+		 *  - cr0_mask representing the vCPU CR0 shadow value */
 		uint64_t cr0_mask = cr0;
+		/** Declare the following local variable of type uint32_t
+		 *  - cs_attr representing the vCPU CS attribute */
+		uint32_t cs_attr;
 
 		/** Clear the reserved bits in cr0_mask, When loading a control register,
 		 *  reserved bit should always set to the value previously read. */
@@ -366,15 +369,34 @@ static void vmx_write_cr0(struct acrn_vcpu *vcpu, uint64_t cr0)
 			if ((vcpu_get_efer(vcpu) & MSR_IA32_EFER_LME_BIT) != 0UL) {
 				/** Print a debug message */
 				pr_dbg("VMM: Enable long mode");
-				/** Set entry_ctrls to the value of VMCS VM-entry controls
-                                 *  field on the current physical cpu */
-				entry_ctrls = exec_vmread32(VMX_ENTRY_CONTROLS);
-				/** Set the IA32E mode bit in the entry_ctrls */
-				entry_ctrls |= VMX_ENTRY_CTLS_IA32E_MODE;
-				/** Configure the VMX_ENTRY_CONTROLS in the VMCS to be entry_ctrls */
-				exec_vmwrite32(VMX_ENTRY_CONTROLS, entry_ctrls);
-				/** Set the long mode active bit in the guest EFER of \a vcpu */
-				vcpu_set_efer(vcpu, vcpu_get_efer(vcpu) | MSR_IA32_EFER_LMA_BIT);
+
+				/** Call exec_vmread32 with following parameters, in order to read
+				 *  VMX_GUEST_CS_ATTR from VMCS and assign it to cs_attr.
+				 *  - VMX_GUEST_CS_ATTR
+				 */
+				cs_attr = exec_vmread32(VMX_GUEST_CS_ATTR);
+				/** If \a vcpu has PAE enabled and guest CS.L set */
+				if (is_pae(vcpu) && ((cs_attr & 0x2000U) != 0U)) {
+					/** Record the error found by setting the err_found to be true */
+					err_found = true;
+					/** Call vcpu_inject_gp with following parameters, in order to
+					 *  inject #GP(0) to \a vcpu.
+					 *  - vcpu
+					 *  - 0H
+					 */
+					vcpu_inject_gp(vcpu, 0U);
+				/** Otherwise */
+				} else {
+					/** Set entry_ctrls to the value of VMCS VM-entry controls
+					 *  field on the current physical cpu */
+					entry_ctrls = exec_vmread32(VMX_ENTRY_CONTROLS);
+					/** Set the IA32E mode bit in the entry_ctrls */
+					entry_ctrls |= VMX_ENTRY_CTLS_IA32E_MODE;
+					/** Configure the VMX_ENTRY_CONTROLS in the VMCS to be entry_ctrls */
+					exec_vmwrite32(VMX_ENTRY_CONTROLS, entry_ctrls);
+					/** Set the long mode active bit in the guest EFER of \a vcpu */
+					vcpu_set_efer(vcpu, vcpu_get_efer(vcpu) | MSR_IA32_EFER_LMA_BIT);
+				}
 			/** \a vcpu has PAE mode enabled */
 			} else if (is_pae(vcpu)) {
 				/** If reloading PTPDRs for \a vcpu fails */
