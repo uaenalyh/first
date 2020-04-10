@@ -135,7 +135,7 @@ test_sas_job:
     - cp ../build/acrn-unit-test/host/bin/lib.32.out ../../acrn-sliced-mainline/image/
     - make clean
     - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
-    - make vp-base RELEASE=0
+    - make vp-base RELEASE=1
     - cp ../build/acrn-unit-test/host/bin/vp-base.32.out ../../acrn-sliced-mainline/image/
     - make clean
     - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
@@ -202,7 +202,7 @@ test_build_job:
     - cp ../build/acrn-unit-test/host/bin/lib.32.out ../../acrn-sliced-mainline/image/
     - make clean
     - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
-    - make vp-base RELEASE=0
+    - make vp-base RELEASE=1
     - cp ../build/acrn-unit-test/host/bin/vp-base.32.out ../../acrn-sliced-mainline/image/
     - make clean
     - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
