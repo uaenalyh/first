@@ -31,7 +31,7 @@
 #define PAGE_USER    (1UL << 2U)
 #define PAGE_PWT     (1UL << 3U)
 #define PAGE_PCD     (1UL << 4U)
-#define PAGE_PSE     (1UL << 7U)
+#define PAGE_PS      (1UL << 7U)
 #define PAGE_NX      (1UL << 63U)
 
 #define PAGE_CACHE_MASK (PAGE_PCD | PAGE_PWT)
@@ -225,12 +225,12 @@ static inline void set_pgentry(uint64_t *ptep, uint64_t pte, const struct memory
 
 static inline uint64_t pde_large(uint64_t pde)
 {
-	return pde & PAGE_PSE;
+	return pde & PAGE_PS;
 }
 
 static inline uint64_t pdpte_large(uint64_t pdpte)
 {
-	return pdpte & PAGE_PSE;
+	return pdpte & PAGE_PS;
 }
 
 /**

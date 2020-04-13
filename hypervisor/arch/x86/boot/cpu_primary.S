@@ -202,7 +202,7 @@ cpu_primary32_pdpt_addr:
 cpu_primary32_pdt_addr:
     address = 0
     .rept  2048
-    /* 0x83 = (PAGE_PSE | PAGE_PRESENT | PAGE_RW) */
+    /* 0x83 = (PAGE_PS | PAGE_PRESENT | PAGE_RW) */
     .quad  address + 0x83
     address = address + 0x200000
     .endr

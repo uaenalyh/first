@@ -197,7 +197,7 @@ cpu_boot_page_tables_start:
 trampoline_pdpt_addr:
     address = 0
     .rept   4
-    /* 0x83 = (PAGE_PRESENT | PAGE_PSE | PAGE_RW) */
+    /* 0x83 = (PAGE_PRESENT | PAGE_PS | PAGE_RW) */
     .quad   address + 0x83
     address = address + 0x40000000
     .endr

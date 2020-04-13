@@ -49,7 +49,7 @@ static void split_large_page(
 		ref_paddr = (*pte) & PDE_PFN_MASK;
 		paddrinc = PTE_SIZE;
 		ref_prot = (*pte) & ~PDE_PFN_MASK;
-		ref_prot &= ~PAGE_PSE;
+		ref_prot &= ~PAGE_PS;
 		mem_ops->recover_exe_right(&ref_prot);
 		pbase = (uint64_t *)mem_ops->get_pt_page(mem_ops->info, vaddr);
 		break;
@@ -308,7 +308,7 @@ static void add_pde(const uint64_t *pdpte, uint64_t paddr_start, uint64_t vaddr_
 				if (mem_ops->large_page_enabled && mem_aligned_check(paddr, PDE_SIZE) &&
 					mem_aligned_check(vaddr, PDE_SIZE) && (vaddr_next <= vaddr_end)) {
 					mem_ops->tweak_exe_right(&prot);
-					set_pgentry(pde, paddr | (prot | PAGE_PSE), mem_ops);
+					set_pgentry(pde, paddr | (prot | PAGE_PS), mem_ops);
 					if (vaddr_next < vaddr_end) {
 						paddr += (vaddr_next - vaddr);
 						vaddr = vaddr_next;
@@ -354,7 +354,7 @@ static void add_pdpte(const uint64_t *pml4e, uint64_t paddr_start, uint64_t vadd
 				if (mem_ops->large_page_enabled && mem_aligned_check(paddr, PDPTE_SIZE) &&
 					mem_aligned_check(vaddr, PDPTE_SIZE) && (vaddr_next <= vaddr_end)) {
 					mem_ops->tweak_exe_right(&prot);
-					set_pgentry(pdpte, paddr | (prot | PAGE_PSE), mem_ops);
+					set_pgentry(pdpte, paddr | (prot | PAGE_PS), mem_ops);
 					if (vaddr_next < vaddr_end) {
 						paddr += (vaddr_next - vaddr);
 						vaddr = vaddr_next;
