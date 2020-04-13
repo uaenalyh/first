@@ -33,22 +33,32 @@
 /**
  * @defgroup lib_lock lib.lock
  * @ingroup lib
- * @brief {TBD brief description}
+ * @brief The definition and implementation of atomic and spinlock infrastructures.
  *
- * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ * Usage:
+ * - 'vp-dm.vperipheral' depends on this module for atomic operation and spinlock operation.
+ * - 'hwmgmt.irq' depends on this module for spinlock operation.
+ * - 'hwmgmt.vtd' depends on this module for spinlock operation.
+ * - 'hwmgmt.pci' depends on this module for spinlock operation.
+ * - 'hwmgmt.schedule' depends on this module for spinlock operation.
+ * - 'hwmgmt.apic' depends on this module for spinlock operation.
+ *
+ * Dependency:
+ * - This module depends on 'lib.utils' module to use memset.
+ * - This module depends on 'hwmgmt.cpu' module to disable/restore CPU interrupts.
  *
  * @{
  */
 
 /**
  * @file
- * @brief {TBD brief description}
+ * @brief The definition and implementation of atomic infrastructures.
  *
- * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ * It provides external APIs for atomically exchanging register/memory with register.
  */
 #include <types.h>
 
-#define BUS_LOCK "lock ; "
+#define BUS_LOCK "lock ; " /**< Lock prefix for instructions */
 
 #define build_atomic_swap(name, size, type)                                                           \
 	static inline type name(type *ptr, type v)                                                    \
@@ -56,16 +66,41 @@
 		asm volatile(BUS_LOCK "xchg" size " %1,%0" : "+m"(*ptr), "+r"(v) : : "cc", "memory"); \
 		return v;                                                                             \
 	}
-build_atomic_swap(atomic_swap32, "l", uint32_t)
-
-/*
- * #define atomic_readandclear32(P) \
- * (return (*(uint32_t *)(P)); *(uint32_t *)(P) = 0U;)
+/**
+ * @brief Declare a function named atomic_swap32 by using build_atomic_swap.
+ *        This function writes the \a v into the specified address \a ptr and
+ *        returns the original content in the address pointed by \a ptr.
+ *
+ * It does following things:
+ *
+ * Execute inline assembly ("xchg")
+ *  with following parameters, in order to exchanging a memory with a register
+ *  - Instruction template: BUS_LOCK "xchg" size " %1,%0".
+ *  - Input operands: None
+ *  - Output operands:
+ *	- Memory pointed to by ptr holds a value to be exchanged.
+ *	- A general register holds a value to be exchanged.
+ *  - Clobbers: "cc", "memory"
+ *
+ * Return the original content in the address pointed by \a ptr.
+ *
+ * @param[inout] ptr The address where to be written.
+ * @param[in] v The value to be written to the address ptr.
+ *
+ * @return The original content in the address pointed by \a ptr.
+ *
+ * @pre ptr != NULL
+ *
+ * @post N/A
+ *
+ * @mode N/A
+ *
+ * @remark N/A
+ *
+ * @reentrancy Unspecified
+ * @threadsafety Unspecified
  */
-static inline uint32_t atomic_readandclear32(uint32_t *p)
-{
-	return atomic_swap32(p, 0U);
-}
+build_atomic_swap(atomic_swap32, "l", uint32_t)
 
 /**
  * @}
