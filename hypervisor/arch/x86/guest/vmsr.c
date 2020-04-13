@@ -101,6 +101,16 @@
 #define MSR_IA32_SPEC_CTRL_STIBP	(1UL << 1U)
 
 /**
+ * @brief Bit indicator for ADDRV (IA32_MCi_ADDR register valid) Bit in MSR IA32_MCi_STATUS.
+ */
+#define MSR_IA32_MC_STATUS_ADDRV	(1UL << 58U)
+
+/**
+ * @brief Bit indicator for MISCV (IA32_MCi_MISC register valid) Bit in MSR IA32_MCi_STATUS.
+ */
+#define MSR_IA32_MC_STATUS_MISCV	(1UL << 59U)
+
+/**
  * @brief The contents of guest MSR IA32_MCG_CAP for the safety VM. This value is defined in SRS.
  */
 #define MCG_CAP_FOR_SAFETY_VM		0x040AUL
@@ -708,12 +718,12 @@ void init_msr_emulation(struct acrn_vcpu *vcpu)
 		 *  [with a step of 4] */
 		for (msr = MSR_IA32_MC0_STATUS; msr < (MSR_IA32_MC0_STATUS + 4U * NUM_MC_BANKS); msr = msr + 4U) {
 			/** Call enable_msr_interception with the following parameters, in order to update 'msr_bitmap'
-			 *  according to the specified MSR 'msr' and the specified mode INTERCEPT_DISABLE.
+			 *  according to the specified MSR 'msr' and the specified mode INTERCEPT_READ.
 			 *  - msr_bitmap
 			 *  - msr
-			 *  - INTERCEPT_DISABLE
+			 *  - INTERCEPT_READ
 			 */
-			enable_msr_interception(msr_bitmap, msr, INTERCEPT_DISABLE);
+			enable_msr_interception(msr_bitmap, msr, INTERCEPT_READ);
 		}
 	}
 
@@ -1097,7 +1107,7 @@ int32_t rdmsr_vmexit_handler(struct acrn_vcpu *vcpu)
 	}
 	/** 'msr' is MSR_IA32_SPEC_CTRL */
 	case MSR_IA32_SPEC_CTRL: {
-		/** Set 'v' to the contents of the native guest MSR IA32_SPEC_CTRL with STIBP bit being cleared */
+		/** Set 'v' to the contents of the native MSR IA32_SPEC_CTRL with STIBP bit being cleared */
 		v = msr_read(MSR_IA32_SPEC_CTRL) & (~MSR_IA32_SPEC_CTRL_STIBP);
 		/** End of case */
 		break;
@@ -1125,8 +1135,8 @@ int32_t rdmsr_vmexit_handler(struct acrn_vcpu *vcpu)
 
 	/** Otherwise */
 	default: {
-		/** If 'msr' is a valid IA32_MCi_CTL2 MSR, or IA32_MCi_CTL MSR, or IA32_MCi_STATUS MSR */
-		if (is_mc_ctl2_msr(msr) || is_mc_ctl_msr(msr) || is_mc_status_msr(msr)) {
+		/** If 'msr' is a valid IA32_MCi_CTL2 MSR, or IA32_MCi_CTL MSR */
+		if (is_mc_ctl2_msr(msr) || is_mc_ctl_msr(msr)) {
 			/* handle Machine Check related MSRs */
 			/** If 'vcpu->vm' is a safety VM */
 			if (is_safety_vm(vcpu->vm)) {
@@ -1136,6 +1146,18 @@ int32_t rdmsr_vmexit_handler(struct acrn_vcpu *vcpu)
 					v = 0UL;
 				}
 				/* Otherwise, it's not trapped. */
+			} else {
+				/** Set 'err' to -EACCES, which indicates that an exception needs to be injected
+				 *  to guest software by the caller */
+				err = -EACCES;
+			}
+		/** If 'msr' is a valid IA32_MCi_STATUS MSR */
+		} else if (is_mc_status_msr(msr)) {
+			/** If 'vcpu->vm' is a safety VM */
+			if (is_safety_vm(vcpu->vm)) {
+				/** Set 'v' to the contents of the native MSR IA32_MCi_STATUS 'msr' with
+				 *  ADDRV bit and MISCV bit being cleared */
+				v = msr_read(msr) & (~MSR_IA32_MC_STATUS_ADDRV) & (~MSR_IA32_MC_STATUS_MISCV);
 			} else {
 				/** Set 'err' to -EACCES, which indicates that an exception needs to be injected
 				 *  to guest software by the caller */
