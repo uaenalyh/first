@@ -295,6 +295,7 @@ static void add_pde(const uint64_t *pdpte, uint64_t paddr_start, uint64_t vaddr_
 	uint64_t vaddr = vaddr_start;
 	uint64_t paddr = paddr_start;
 	uint64_t index = pde_index(vaddr);
+	uint64_t effective_prot = prot;
 
 	dev_dbg(ACRN_DBG_MMU, "%s, paddr: 0x%lx, vaddr: [0x%lx - 0x%lx]\n", __func__, paddr, vaddr, vaddr_end);
 	for (; index < PTRS_PER_PDE; index++) {
@@ -307,8 +308,8 @@ static void add_pde(const uint64_t *pdpte, uint64_t paddr_start, uint64_t vaddr_
 			if (mem_ops->pgentry_present(*pde) == 0UL) {
 				if (mem_ops->large_page_enabled && mem_aligned_check(paddr, PDE_SIZE) &&
 					mem_aligned_check(vaddr, PDE_SIZE) && (vaddr_next <= vaddr_end)) {
-					mem_ops->tweak_exe_right(&prot);
-					set_pgentry(pde, paddr | (prot | PAGE_PS), mem_ops);
+					mem_ops->tweak_exe_right(&effective_prot);
+					set_pgentry(pde, paddr | (effective_prot | PAGE_PS), mem_ops);
 					if (vaddr_next < vaddr_end) {
 						paddr += (vaddr_next - vaddr);
 						vaddr = vaddr_next;
@@ -320,7 +321,7 @@ static void add_pde(const uint64_t *pdpte, uint64_t paddr_start, uint64_t vaddr_
 					construct_pgentry(pde, pt_page, mem_ops->get_default_access_right(), mem_ops);
 				}
 			}
-			add_pte(pde, paddr, vaddr, vaddr_end, prot, mem_ops);
+			add_pte(pde, paddr, vaddr, vaddr_end, effective_prot, mem_ops);
 		}
 		if (vaddr_next >= vaddr_end) {
 			break; /* done */
@@ -341,6 +342,7 @@ static void add_pdpte(const uint64_t *pml4e, uint64_t paddr_start, uint64_t vadd
 	uint64_t vaddr = vaddr_start;
 	uint64_t paddr = paddr_start;
 	uint64_t index = pdpte_index(vaddr);
+	uint64_t effective_prot = prot;
 
 	dev_dbg(ACRN_DBG_MMU, "%s, paddr: 0x%lx, vaddr: [0x%lx - 0x%lx]\n", __func__, paddr, vaddr, vaddr_end);
 	for (; index < PTRS_PER_PDPTE; index++) {
@@ -353,8 +355,8 @@ static void add_pdpte(const uint64_t *pml4e, uint64_t paddr_start, uint64_t vadd
 			if (mem_ops->pgentry_present(*pdpte) == 0UL) {
 				if (mem_ops->large_page_enabled && mem_aligned_check(paddr, PDPTE_SIZE) &&
 					mem_aligned_check(vaddr, PDPTE_SIZE) && (vaddr_next <= vaddr_end)) {
-					mem_ops->tweak_exe_right(&prot);
-					set_pgentry(pdpte, paddr | (prot | PAGE_PS), mem_ops);
+					mem_ops->tweak_exe_right(&effective_prot);
+					set_pgentry(pdpte, paddr | (effective_prot | PAGE_PS), mem_ops);
 					if (vaddr_next < vaddr_end) {
 						paddr += (vaddr_next - vaddr);
 						vaddr = vaddr_next;
@@ -366,7 +368,7 @@ static void add_pdpte(const uint64_t *pml4e, uint64_t paddr_start, uint64_t vadd
 					construct_pgentry(pdpte, pd_page, mem_ops->get_default_access_right(), mem_ops);
 				}
 			}
-			add_pde(pdpte, paddr, vaddr, vaddr_end, prot, mem_ops);
+			add_pde(pdpte, paddr, vaddr, vaddr_end, effective_prot, mem_ops);
 		}
 		if (vaddr_next >= vaddr_end) {
 			break; /* done */
