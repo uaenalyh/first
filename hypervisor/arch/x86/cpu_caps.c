@@ -58,32 +58,9 @@ bool pcpu_has_cap(uint32_t bit)
 	return ret;
 }
 
-bool monitor_cap_buggy(void)
-{
-	bool buggy = false;
-
-	if ((boot_cpu_data.family == 0x6U) && (boot_cpu_data.model == 0x5cU)) {
-		buggy = true;
-	}
-
-	return buggy;
-}
-
 bool has_monitor_cap(void)
 {
-	bool ret = false;
-
-	if (pcpu_has_cap(X86_FEATURE_MONITOR)) {
-		/* don't use monitor for CPU (family: 0x6 model: 0x5c)
-		 * in hypervisor, but still expose it to the guests and
-		 * let them handle it correctly
-		 */
-		if (!monitor_cap_buggy()) {
-			ret = true;
-		}
-	}
-
-	return ret;
+	return pcpu_has_cap(X86_FEATURE_MONITOR);
 }
 
 static void detect_vmx_mmu_cap(void)
