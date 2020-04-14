@@ -76,10 +76,10 @@ static inline struct page *ppt_get_pd_page(const union pgtable_pages_info *info,
 	return pd_page;
 }
 
-static inline void nop_tweak_exe_right(uint64_t *entry __attribute__((unused)))
+static inline void nop_tweak_exe_right(uint64_t *prot __attribute__((unused)))
 {
 }
-static inline void nop_recover_exe_right(uint64_t *entry __attribute__((unused)))
+static inline void nop_recover_exe_right(uint64_t *prot __attribute__((unused)))
 {
 }
 
@@ -114,9 +114,9 @@ static inline uint64_t ept_pgentry_present(uint64_t pte)
 	return pte & EPT_RWX;
 }
 
-static inline void ept_clflush_pagewalk(const void *etry)
+static inline void ept_clflush_pagewalk(const void *entry)
 {
-	iommu_flush_cache(etry, sizeof(uint64_t));
+	iommu_flush_cache(entry, sizeof(uint64_t));
 }
 
 static inline struct page *ept_get_pml4_page(const union pgtable_pages_info *info)
@@ -150,17 +150,17 @@ static inline struct page *ept_get_pt_page(const union pgtable_pages_info *info,
 }
 
 /* The function is used to disable execute right for (2MB / 1GB)large pages in EPT */
-static inline void ept_tweak_exe_right(uint64_t *entry)
+static inline void ept_tweak_exe_right(uint64_t *prot)
 {
-	*entry &= ~EPT_EXE;
+	*prot &= ~EPT_EXE;
 }
 
 /* The function is used to recover the execute right when large pages are breaking into 4KB pages
  * Hypervisor doesn't control execute right for guest memory, recovers execute right by default.
  */
-static inline void ept_recover_exe_right(uint64_t *entry)
+static inline void ept_recover_exe_right(uint64_t *prot)
 {
-	*entry |= EPT_EXE;
+	*prot |= EPT_EXE;
 }
 
 void init_ept_mem_ops(struct memory_ops *mem_ops, uint16_t vm_id)
