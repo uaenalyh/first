@@ -297,7 +297,7 @@ int32_t exception_vmexit_handler(struct acrn_vcpu *vcpu)
 		vcpu_inject_gp(vcpu, 0U);
 		break;
 	default:
-		if(is_safety_vm(vcpu->vm)) {
+		if (is_safety_vm(vcpu->vm)) {
 			panic("Unexpected Exception from guest, vector: 0x%x!", exception_vector);
 		} else {
 			fatal_error_shutdown_vm(vcpu);

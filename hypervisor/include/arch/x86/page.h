@@ -78,7 +78,7 @@ struct memory_ops {
 };
 
 extern const struct memory_ops ppt_mem_ops;
-void init_ept_mem_ops(struct memory_ops *mem_ops, uint16_t vm_id);
+void init_ept_mem_ops(struct memory_ops *mem_ops, uint16_t vm_id, bool enforce_4k_ipage);
 
 /**
  * @}

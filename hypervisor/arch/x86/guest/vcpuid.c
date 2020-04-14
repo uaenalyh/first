@@ -860,7 +860,7 @@ static void guest_cpuid_01h(struct acrn_vcpu *vcpu, uint32_t *eax, uint32_t *ebx
 	*edx &= ~CPUID_EDX_PBE;
 
 	/** If 'vcpu->vm' is a safety VM */
-	if(is_safety_vm(vcpu->vm)) {
+	if (is_safety_vm(vcpu->vm)) {
 		/** Clear HTT Bit (Bit 28) in guest CPUID.1H:EDX */
 		*edx &= ~CPUID_EDX_HTT;
 	} else {

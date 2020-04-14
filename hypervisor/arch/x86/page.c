@@ -163,7 +163,7 @@ static inline void ept_recover_exe_right(uint64_t *prot)
 	*prot |= EPT_EXE;
 }
 
-void init_ept_mem_ops(struct memory_ops *mem_ops, uint16_t vm_id)
+void init_ept_mem_ops(struct memory_ops *mem_ops, uint16_t vm_id, bool enforce_4k_ipage)
 {
 	ept_pages_info[vm_id].ept.nworld_pml4_base = uos_nworld_pml4_pages[vm_id];
 	ept_pages_info[vm_id].ept.nworld_pdpt_base = uos_nworld_pdpt_pages[vm_id];
@@ -184,7 +184,9 @@ void init_ept_mem_ops(struct memory_ops *mem_ops, uint16_t vm_id)
 	if (is_ept_force_4k_ipage()) {
 		mem_ops->tweak_exe_right = ept_tweak_exe_right;
 		mem_ops->recover_exe_right = ept_recover_exe_right;
-		mem_ops->large_page_enabled = false;
+		if (enforce_4k_ipage) {
+			mem_ops->large_page_enabled = false;
+		}
 	} else {
 		mem_ops->tweak_exe_right = nop_tweak_exe_right;
 		mem_ops->recover_exe_right = nop_recover_exe_right;

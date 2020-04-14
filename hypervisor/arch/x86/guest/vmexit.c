@@ -254,9 +254,9 @@ static int32_t unexpected_vmexit_handler(struct acrn_vcpu *vcpu)
 
 	TRACE_2L(TRACE_VMEXIT_UNEXPECTED, vcpu->arch.exit_reason, 0UL);
 
-	if(is_safety_vm(vcpu->vm)) {
+	if (is_safety_vm(vcpu->vm)) {
 		panic("Error: Unexpected VM exit!");
-	}else {
+	} else {
 		fatal_error_shutdown_vm(vcpu);
 	}
 

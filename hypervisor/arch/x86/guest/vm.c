@@ -159,6 +159,7 @@ static int32_t create_vm(uint16_t vm_id, const struct acrn_vm_config *vm_config,
 	int32_t status = 0;
 	uint32_t i;
 	uint16_t pcpu_id;
+	bool enforce_4k_ipage = false;
 
 	/* Allocate memory for virtual machine */
 	vm = &vm_array[vm_id];
@@ -166,7 +167,11 @@ static int32_t create_vm(uint16_t vm_id, const struct acrn_vm_config *vm_config,
 	vm->vm_id = vm_id;
 	vm->hw.created_vcpus = 0U;
 
-	init_ept_mem_ops(&vm->arch_vm.ept_mem_ops, vm->vm_id);
+	if (is_safety_vm(vm)) {
+		enforce_4k_ipage = true;
+	}
+
+	init_ept_mem_ops(&vm->arch_vm.ept_mem_ops, vm->vm_id, enforce_4k_ipage);
 	vm->arch_vm.nworld_eptp = vm->arch_vm.ept_mem_ops.get_pml4_page(vm->arch_vm.ept_mem_ops.info);
 	sanitize_pte((uint64_t *)vm->arch_vm.nworld_eptp, &vm->arch_vm.ept_mem_ops);
 
