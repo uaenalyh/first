@@ -8,35 +8,28 @@
  * @{
  */
 
-/**
+ /**
  * @file
- * @brief {TBD brief description}
- *
- * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ * @brief This file defines macros for hypervisor configurations.
  */
-#define CONFIG_LOGICAL_PARTITION         1
-#define CONFIG_SCHED_NOOP                1
-#define CONFIG_BOARD                     "nuc7i7dnb"
-#define CONFIG_RELEASE                   1
-#define CONFIG_MAX_EMULATED_MMIO_REGIONS 16U
-#define CONFIG_MAX_PT_IRQ_ENTRIES        64U
-#define CONFIG_STACK_SIZE                0x2000U
-#define CONFIG_LOG_BUF_SIZE              0x40000U
-#define CONFIG_LOG_DESTINATION           7U
-#define CONFIG_LOW_RAM_SIZE              0x00010000U
-#define CONFIG_HV_RAM_START              0x00400000UL
-#define CONFIG_HV_RAM_SIZE               0x0b800000UL
-#define CONFIG_PLATFORM_RAM_SIZE         0x400000000UL
-#define CONFIG_SOS_RAM_SIZE              0x400000000UL
-#define CONFIG_UOS_RAM_SIZE              0x200000000UL
-#define CONFIG_MAX_IOAPIC_NUM            1U
-#define CONFIG_MAX_IOAPIC_LINES          120U
-#define CONFIG_MAX_IR_ENTRIES            256U
-#define CONFIG_IOMMU_BUS_NUM             0x100U
-#define CONFIG_MAX_PCI_DEV_NUM           96U
-#define CONFIG_MAX_MSIX_TABLE_NUM        16U
-#define CONFIG_MAX_KATA_VM_NUM           0U
-#define CONFIG_UEFI_OS_LOADER_NAME       "\\EFI\\org.clearlinux\\bootloaderx64.efi"
+
+#define CONFIG_LOGICAL_PARTITION         1 /**< Set hypervisor to logical partition mode */
+#define CONFIG_SCHED_NOOP                1 /**< Set NOOP attribute for CPU scheduling */
+#define CONFIG_BOARD                     "nuc7i7dnb" /**< Set string name of board */
+#define CONFIG_RELEASE                   1 /**< Set release version when compiling */
+#define CONFIG_STACK_SIZE                0x2000U /**< Stack size in bytes */
+#define CONFIG_LOG_DESTINATION           7U /**< Bitmap setting for destination of log messages */
+#define CONFIG_LOW_RAM_SIZE              0x00010000U /**< Memory size of low memory */
+#define CONFIG_HV_RAM_START              0x00400000UL /**< Start memory address of hypervisor */
+#define CONFIG_HV_RAM_SIZE               0x0b800000UL /**< Size of the memory allocated to hypervisor */
+#define CONFIG_PLATFORM_RAM_SIZE         0x400000000UL /**< Memory size of platform */
+#define CONFIG_UOS_RAM_SIZE              0x200000000UL /**< Size of the memory allocated to a User VM */
+#define CONFIG_MAX_IOAPIC_NUM            1U /**< Number of physical IOAPICs on current platform */
+#define CONFIG_MAX_IOAPIC_LINES          120U /**< Number of input line of IOAPICs */
+#define CONFIG_MAX_IR_ENTRIES            256U /**< Maximum number of Interrupt Remapping entries */
+#define CONFIG_IOMMU_BUS_NUM             0x100U /**< Maximum PCI bus number supported by IOMMU */
+#define CONFIG_MAX_PCI_DEV_NUM           96U /**< Maximum PCI device number supported by hypervisor */
+#define CONFIG_UEFI_OS_LOADER_NAME       "\\EFI\\org.clearlinux\\bootloaderx64.efi" /**< Name of bootloader */
 
 /**
  * @}

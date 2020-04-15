@@ -13,15 +13,14 @@
  * @{
  */
 
-/**
+ /**
  * @file
- * @brief {TBD brief description}
- *
- * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ * @brief This file defines MACROs of maximum number of physical CPU and path of root file-system.
  */
 
-#define MAX_PCPU_NUM 4U
-#define ROOTFS_0            "root=/dev/sda3 "
+#define MAX_PCPU_NUM 4U /**< Maximum number of physical CPUs on the platform. */
+
+#define ROOTFS_0            "root=/dev/sda3 " /**< Path of root file-system. */
 
 #ifndef CONFIG_RELEASE
 #define SOS_BOOTARGS_DIFF      \

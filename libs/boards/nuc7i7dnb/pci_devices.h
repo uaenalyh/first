@@ -13,15 +13,22 @@
  * @{
  */
 
-/**
+ /**
  * @file
- * @brief {TBD brief description}
- *
- * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ * @brief This file defines MACROs of configurations for PCI devices, includes physical address of
+ *	PCI devices and base address of virtual BARs of PCI devices.
  */
 
+/**
+ * @brief Physical PCI address (BDF) and base address of virtual BAR for USB controller.
+ *
+ */
 #define USB_CONTROLLER .pbdf.bits = { .b = 0x00U, .d = 0x14U, .f = 0x00U }, .vbar_base[0] = 0xdf230000UL
 
+/**
+ * @brief Physical PCI address (BDF) and base address of virtual BAR for network controller.
+ *
+ */
 #define ETHERNET_CONTROLLER .pbdf.bits = { .b = 0x00U, .d = 0x1fU, .f = 0x06U }, .vbar_base[0] = 0xdf200000UL
 
 /**

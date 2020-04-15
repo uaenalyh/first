@@ -15,47 +15,55 @@
 
 /**
  * @file
- * @brief {TBD brief description}
- *
- * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ * @brief this file declares the external data structures and APIs provided by
+ *	  hwmgmt.configs module for E820 operations.
  */
+
 #include <types.h>
 
-/* E820 memory types */
-#define E820_TYPE_RAM      1U /* EFI 1, 2, 3, 4, 5, 6, 7 */
-#define E820_TYPE_RESERVED 2U
+#define E820_TYPE_RAM      1U	/**< RAM memory type for E820 entry */
+#define E820_TYPE_RESERVED 2U	/**< RESERVED memory type for E820 entry */
 
-#define E820_MAX_ENTRIES 32U
+#define E820_MAX_ENTRIES 32U	/**< Maximum number of E820 entries supported by hypervisor */
 
-/** Defines a single entry in an E820 memory map. */
+/**
+ * @brief Definition of a single entry in an E820 memory map.
+ *
+ * @consistency N/A
+ *
+ * @alignment 8
+ *
+ * @remark N/A
+ */
 struct e820_entry {
-	/** The base address of the memory range. */
-	uint64_t baseaddr;
-	/** The length of the memory range. */
-	uint64_t length;
-	/** The type of memory region. */
-	uint32_t type;
+	uint64_t baseaddr;/**< Base address of the memory range for this entry. */
+	uint64_t length;  /**< Length of the memory range */
+	uint32_t type;	  /**< Type of memory region */
 } __packed;
 
+/**
+ * @brief Definition of memory range information.
+ *
+ * @consistency N/A
+ *
+ * @alignment 8
+ *
+ * @remark N/A
+ */
 struct mem_range {
-	uint64_t mem_bottom;
-	uint64_t mem_top;
-	uint64_t total_mem_size;
+	uint64_t mem_bottom;	/**< Bottom address of memory range */
+	uint64_t mem_top;	/**< Top address of memory range */
+	uint64_t total_mem_size;/**< Bytes size of memory range */
 };
 
-/* HV read multiboot header to get e820 entries info and calc total RAM info */
 void init_e820(void);
 
-/* get some RAM below 1MB in e820 entries, hide it from sos_vm, return its start address */
 uint64_t e820_alloc_low_memory(uint32_t size_arg);
 
-/* get total number of the e820 entries */
 uint32_t get_e820_entries_count(void);
 
-/* get the e802 entiries */
 const struct e820_entry *get_e820_entry(void);
 
-/* get the e820 total memory info */
 const struct mem_range *get_mem_range_info(void);
 
 /**
