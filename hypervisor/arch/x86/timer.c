@@ -11,7 +11,6 @@
 #include <apicreg.h>
 #include <cpuid.h>
 #include <cpu_caps.h>
-#include <softirq.h>
 #include <trace.h>
 
 /**
