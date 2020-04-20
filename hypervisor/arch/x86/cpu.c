@@ -24,8 +24,6 @@
 #include <ptdev.h>
 #include <ld_sym.h>
 #include <logmsg.h>
-#include <cat.h>
-#include <sgx.h>
 #include <uart16550.h>
 
 /**

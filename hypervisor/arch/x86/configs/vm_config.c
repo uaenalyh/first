@@ -7,7 +7,6 @@
 #include <bits.h>
 #include <vm_config.h>
 #include <logmsg.h>
-#include <cat.h>
 #include <pgtable.h>
 
 /**

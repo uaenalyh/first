@@ -25,7 +25,6 @@
 #include <vuart.h>
 #include <vboot_info.h>
 #include <board.h>
-#include <sgx.h>
 #include <sbuf.h>
 #include <vacpi.h>
 

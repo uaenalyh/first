@@ -21,7 +21,6 @@
 
 #include <types.h>
 #include <misc_cfg.h>
-#include <host_pm.h>
 
 /* forward declarations */
 struct acrn_vm;

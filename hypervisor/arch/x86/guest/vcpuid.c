@@ -12,7 +12,6 @@
 #include <cpuid.h>
 #include <cpufeatures.h>
 #include <vmx.h>
-#include <sgx.h>
 #include <logmsg.h>
 
 /**

@@ -382,21 +382,6 @@ static inline uint64_t sidt(void)
 	return idtb.base;
 }
 
-/* Read MSR */
-static inline uint64_t cpu_msr_read(uint32_t reg)
-{
-	uint32_t msrl, msrh;
-
-	asm volatile(" rdmsr " : "=a"(msrl), "=d"(msrh) : "c"(reg));
-	return (((uint64_t)msrh << 32U) | msrl);
-}
-
-/* Write MSR */
-static inline void cpu_msr_write(uint32_t reg, uint64_t msr_val)
-{
-	asm volatile(" wrmsr " : : "c"(reg), "a"((uint32_t)msr_val), "d"((uint32_t)(msr_val >> 32U)));
-}
-
 static inline void asm_pause(void)
 {
 	asm volatile("pause" ::: "memory");
@@ -422,7 +407,7 @@ static inline void asm_hlt(void)
 /* Synchronizes all write accesses to memory */
 static inline void cpu_write_memory_barrier(void)
 {
-	asm volatile("sfence\n" : : : "memory");
+	asm volatile("mfence\n" : : : "memory");
 }
 
 /* Write the task register */
@@ -486,14 +471,19 @@ static inline uint16_t get_pcpu_id(void)
 	return (uint16_t)cpu_id;
 }
 
+/* Read MSR */
 static inline uint64_t msr_read(uint32_t reg_num)
 {
-	return cpu_msr_read(reg_num);
+	uint32_t msrl, msrh;
+
+	asm volatile(" rdmsr " : "=a"(msrl), "=d"(msrh) : "c"(reg_num));
+	return (((uint64_t)msrh << 32U) | msrl);
 }
 
+/* Write MSR */
 static inline void msr_write(uint32_t reg_num, uint64_t value64)
 {
-	cpu_msr_write(reg_num, value64);
+	asm volatile(" wrmsr " : : "c"(reg_num), "a"((uint32_t)value64), "d"((uint32_t)(value64 >> 32U)));
 }
 
 static inline void write_xcr(int32_t reg, uint64_t val)

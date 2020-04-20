@@ -390,7 +390,7 @@ static void init_exec_ctrl(struct acrn_vcpu *vcpu)
 	/* Setup Time stamp counter offset - pg 2902 24.6.5
 	 * VMCS.OFFSET = vAdjust - pAdjust
 	 */
-	value64 = vcpu_get_guest_msr(vcpu, MSR_IA32_TSC_ADJUST) - cpu_msr_read(MSR_IA32_TSC_ADJUST);
+	value64 = vcpu_get_guest_msr(vcpu, MSR_IA32_TSC_ADJUST) - msr_read(MSR_IA32_TSC_ADJUST);
 	exec_vmwrite64(VMX_TSC_OFFSET_FULL, value64);
 
 	/* Set up the link pointer */

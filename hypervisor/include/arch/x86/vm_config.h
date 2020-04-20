@@ -25,7 +25,6 @@
 #include <multiboot.h>
 #include <acrn_common.h>
 #include <vm_configurations.h>
-#include <sgx.h>
 
 #define AFFINITY_CPU(n)      (1U << (n))
 #define MAX_VCPUS_PER_VM     MAX_PCPU_NUM
