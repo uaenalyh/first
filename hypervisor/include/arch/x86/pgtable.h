@@ -307,6 +307,11 @@ static inline uint64_t pdpte_large(uint64_t pdpte)
  */
 const uint64_t *lookup_address(uint64_t *pml4_page, uint64_t addr, uint64_t *pg_size, const struct memory_ops *mem_ops);
 
+void mmu_add(uint64_t *pml4_page, uint64_t paddr_base, uint64_t vaddr_base, uint64_t size, uint64_t prot,
+	const struct memory_ops *mem_ops);
+void mmu_modify_or_del(uint64_t *pml4_page, uint64_t vaddr_base, uint64_t size, uint64_t prot_set, uint64_t prot_clr,
+	const struct memory_ops *mem_ops, uint32_t type);
+
 /**
  * @}
  */
