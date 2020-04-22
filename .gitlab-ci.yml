@@ -169,51 +169,51 @@ test_build_job:
     - git reset --hard && git checkout master && git pull
     - cd host/
     - make clean
-    - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
+    - cd ../../acrn-hypervisor && git reset --hard && cd ../acrn-sas-test-code/host
     - make boot RELEASE=1
     - cp ../build/acrn-unit-test/host/bin/boot.32.out ../../acrn-sliced-mainline/image/
     - make clean
-    - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
+    - cd ../../acrn-hypervisor && git reset --hard && cd ../acrn-sas-test-code/host
     - make hw RELEASE=1
     - cp ../build/acrn-unit-test/host/bin/hw.32.out ../../acrn-sliced-mainline/image/
     - make clean
-    - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
+    - cd ../../acrn-hypervisor && git reset --hard && cd ../acrn-sas-test-code/host
     - make RELEASE=1 hw MODULE_GROUP_OBJ=HW_VTD_GROUP
     - cp ../build/acrn-unit-test/host/bin/hw.32.out ../../acrn-sliced-mainline/image/hw_vtd.32.out
     - make clean
-    - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
+    - cd ../../acrn-hypervisor && git reset --hard && cd ../acrn-sas-test-code/host
     - make RELEASE=1 hw MODULE_GROUP_OBJ=HW_CPU_CAPS_GROUP
     - cp ../build/acrn-unit-test/host/bin/hw.32.out ../../acrn-sliced-mainline/image/hw_cpu_caps.32.out
     - make clean
-    - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
+    - cd ../../acrn-hypervisor && git reset --hard && cd ../acrn-sas-test-code/host
     - make RELEASE=1 hw MODULE_GROUP_OBJ=HW_CPU_GROUP
     - cp ../build/acrn-unit-test/host/bin/hw.32.out ../../acrn-sliced-mainline/image/hw_cpu.32.out
     - make clean
-    - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
+    - cd ../../acrn-hypervisor && git reset --hard && cd ../acrn-sas-test-code/host
     - make RELEASE=1 hw MODULE_GROUP_OBJ=HW_MMU_GROUP
     - cp ../build/acrn-unit-test/host/bin/hw.32.out ../../acrn-sliced-mainline/image/hw_mmu.32.out
     - make clean
-    - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
+    - cd ../../acrn-hypervisor && git reset --hard && cd ../acrn-sas-test-code/host
     - make RELEASE=1 hw MODULE_GROUP_OBJ=HW_APIC_GROUP
     - cp ../build/acrn-unit-test/host/bin/hw.32.out ../../acrn-sliced-mainline/image/hw_apic.32.out
     - make clean
-    - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
+    - cd ../../acrn-hypervisor && git reset --hard && cd ../acrn-sas-test-code/host
     - make RELEASE=1 hw MODULE_GROUP_OBJ=HW_VBOOT_GROUP 
     - cp ../build/acrn-unit-test/host/bin/hw.32.out ../../acrn-sliced-mainline/image/hw_vboot_group.32.out
     - make clean
-    - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
+    - cd ../../acrn-hypervisor && git reset --hard && cd ../acrn-sas-test-code/host
     - make init RELEASE=1
     - cp ../build/acrn-unit-test/host/bin/init.32.out ../../acrn-sliced-mainline/image/
     - make clean
-    - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
+    - cd ../../acrn-hypervisor && git reset --hard && cd ../acrn-sas-test-code/host
     - make lib RELEASE=1
     - cp ../build/acrn-unit-test/host/bin/lib.32.out ../../acrn-sliced-mainline/image/
     - make clean
-    - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
+    - cd ../../acrn-hypervisor && git reset --hard && cd ../acrn-sas-test-code/host
     - make vp-base RELEASE=1
     - cp ../build/acrn-unit-test/host/bin/vp-base.32.out ../../acrn-sliced-mainline/image/
     - make clean
-    - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
+    - cd ../../acrn-hypervisor && git reset --hard && cd ../acrn-sas-test-code/host
     - make vp-dm RELEASE=0
     - cp ../build/acrn-unit-test/host/bin/vp-dm.32.out ../../acrn-sliced-mainline/image/
     - cp ../host/guest/x86/stitched.bzimage ../../acrn-sliced-mainline/image/
