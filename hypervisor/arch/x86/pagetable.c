@@ -142,6 +142,7 @@ static void modify_or_del_pde(const uint64_t *pdpte, uint64_t vaddr_start, uint6
 	uint64_t *pd_page = pdpte_page_vaddr(*pdpte);
 	uint64_t vaddr = vaddr_start;
 	uint64_t index = pde_index(vaddr);
+	uint64_t vaddr_end_each_iter;
 
 	dev_dbg(ACRN_DBG_MMU, "%s, vaddr: [0x%lx - 0x%lx]\n", __func__, vaddr, vaddr_end);
 	for (; index < PTRS_PER_PDE; index++) {
@@ -165,7 +166,8 @@ static void modify_or_del_pde(const uint64_t *pdpte, uint64_t vaddr_start, uint6
 					break; /* done */
 				}
 			}
-			modify_or_del_pte(pde, vaddr, vaddr_end, prot_set, prot_clr, mem_ops, type);
+			vaddr_end_each_iter = (vaddr_next < vaddr_end) ? vaddr_next : vaddr_end;
+			modify_or_del_pte(pde, vaddr, vaddr_end_each_iter, prot_set, prot_clr, mem_ops, type);
 		}
 		if (vaddr_next >= vaddr_end) {
 			break; /* done */
@@ -187,6 +189,7 @@ static void modify_or_del_pdpte(const uint64_t *pml4e, uint64_t vaddr_start, uin
 	uint64_t *pdpt_page = pml4e_page_vaddr(*pml4e);
 	uint64_t vaddr = vaddr_start;
 	uint64_t index = pdpte_index(vaddr);
+	uint64_t vaddr_end_each_iter;
 
 	dev_dbg(ACRN_DBG_MMU, "%s, vaddr: [0x%lx - 0x%lx]\n", __func__, vaddr, vaddr_end);
 	for (; index < PTRS_PER_PDPTE; index++) {
@@ -210,7 +213,8 @@ static void modify_or_del_pdpte(const uint64_t *pml4e, uint64_t vaddr_start, uin
 					break; /* done */
 				}
 			}
-			modify_or_del_pde(pdpte, vaddr, vaddr_end, prot_set, prot_clr, mem_ops, type);
+			vaddr_end_each_iter = (vaddr_next < vaddr_end) ? vaddr_next : vaddr_end;
+			modify_or_del_pde(pdpte, vaddr, vaddr_end_each_iter, prot_set, prot_clr, mem_ops, type);
 		}
 		if (vaddr_next >= vaddr_end) {
 			break; /* done */
@@ -238,6 +242,7 @@ void mmu_modify_or_del(uint64_t *pml4_page, uint64_t vaddr_base, uint64_t size, 
 	uint64_t vaddr = round_page_up(vaddr_base);
 	uint64_t vaddr_next, vaddr_end;
 	uint64_t *pml4e;
+	uint64_t vaddr_end_each_iter;
 
 	vaddr_end = vaddr + round_page_down(size);
 	dev_dbg(ACRN_DBG_MMU, "%s, vaddr: 0x%lx, size: 0x%lx\n", __func__, vaddr, size);
@@ -248,7 +253,8 @@ void mmu_modify_or_del(uint64_t *pml4_page, uint64_t vaddr_base, uint64_t size, 
 		if ((mem_ops->pgentry_present(*pml4e) == 0UL) && (type == MR_MODIFY)) {
 			ASSERT(false, "invalid op, pml4e not present");
 		} else {
-			modify_or_del_pdpte(pml4e, vaddr, vaddr_end, prot_set, prot_clr, mem_ops, type);
+			vaddr_end_each_iter = (vaddr_next < vaddr_end) ? vaddr_next : vaddr_end;
+			modify_or_del_pdpte(pml4e, vaddr, vaddr_end_each_iter, prot_set, prot_clr, mem_ops, type);
 			vaddr = vaddr_next;
 		}
 	}
@@ -296,6 +302,7 @@ static void add_pde(const uint64_t *pdpte, uint64_t paddr_start, uint64_t vaddr_
 	uint64_t paddr = paddr_start;
 	uint64_t index = pde_index(vaddr);
 	uint64_t effective_prot = prot;
+	uint64_t vaddr_end_each_iter;
 
 	dev_dbg(ACRN_DBG_MMU, "%s, paddr: 0x%lx, vaddr: [0x%lx - 0x%lx]\n", __func__, paddr, vaddr, vaddr_end);
 	for (; index < PTRS_PER_PDE; index++) {
@@ -321,7 +328,8 @@ static void add_pde(const uint64_t *pdpte, uint64_t paddr_start, uint64_t vaddr_
 					construct_pgentry(pde, pt_page, mem_ops->get_default_access_right(), mem_ops);
 				}
 			}
-			add_pte(pde, paddr, vaddr, vaddr_end, effective_prot, mem_ops);
+			vaddr_end_each_iter = (vaddr_next < vaddr_end) ? vaddr_next : vaddr_end;
+			add_pte(pde, paddr, vaddr, vaddr_end_each_iter, effective_prot, mem_ops);
 		}
 		if (vaddr_next >= vaddr_end) {
 			break; /* done */
@@ -343,6 +351,7 @@ static void add_pdpte(const uint64_t *pml4e, uint64_t paddr_start, uint64_t vadd
 	uint64_t paddr = paddr_start;
 	uint64_t index = pdpte_index(vaddr);
 	uint64_t effective_prot = prot;
+	uint64_t vaddr_end_each_iter;
 
 	dev_dbg(ACRN_DBG_MMU, "%s, paddr: 0x%lx, vaddr: [0x%lx - 0x%lx]\n", __func__, paddr, vaddr, vaddr_end);
 	for (; index < PTRS_PER_PDPTE; index++) {
@@ -368,7 +377,8 @@ static void add_pdpte(const uint64_t *pml4e, uint64_t paddr_start, uint64_t vadd
 					construct_pgentry(pdpte, pd_page, mem_ops->get_default_access_right(), mem_ops);
 				}
 			}
-			add_pde(pdpte, paddr, vaddr, vaddr_end, effective_prot, mem_ops);
+			vaddr_end_each_iter = (vaddr_next < vaddr_end) ? vaddr_next : vaddr_end;
+			add_pde(pdpte, paddr, vaddr, vaddr_end_each_iter, effective_prot, mem_ops);
 		}
 		if (vaddr_next >= vaddr_end) {
 			break; /* done */
@@ -389,6 +399,7 @@ void mmu_add(uint64_t *pml4_page, uint64_t paddr_base, uint64_t vaddr_base, uint
 	uint64_t vaddr, vaddr_next, vaddr_end;
 	uint64_t paddr;
 	uint64_t *pml4e;
+	uint64_t vaddr_end_each_iter;
 
 	dev_dbg(ACRN_DBG_MMU, "%s, paddr 0x%lx, vaddr 0x%lx, size 0x%lx\n", __func__, paddr_base, vaddr_base, size);
 
@@ -404,7 +415,8 @@ void mmu_add(uint64_t *pml4_page, uint64_t paddr_base, uint64_t vaddr_base, uint
 			void *pdpt_page = mem_ops->get_pdpt_page(mem_ops->info, vaddr);
 			construct_pgentry(pml4e, pdpt_page, mem_ops->get_default_access_right(), mem_ops);
 		}
-		add_pdpte(pml4e, paddr, vaddr, vaddr_end, prot, mem_ops);
+		vaddr_end_each_iter = (vaddr_next < vaddr_end) ? vaddr_next : vaddr_end;
+		add_pdpte(pml4e, paddr, vaddr, vaddr_end_each_iter, prot, mem_ops);
 
 		paddr += (vaddr_next - vaddr);
 		vaddr = vaddr_next;
