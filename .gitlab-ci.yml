@@ -147,6 +147,10 @@ test_sas_job:
     - cp ../build/acrn-unit-test/host/bin/vp-base.32.out ../../acrn-sliced-mainline/image/
     - make clean
     - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
+    - make vp-base RELEASE=1 MODULE_GROUP_OBJ=VP_BASE_CPU_GROUP_PENDING_REQUEST
+    - cp ../build/acrn-unit-test/host/bin/vp-base.32.out ../../acrn-sliced-mainline/image/vp-base_pending_request.32.out
+    - make clean
+    - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
     - make vp-dm RELEASE=0
     - cp ../build/acrn-unit-test/host/bin/vp-dm.32.out ../../acrn-sliced-mainline/image/
     - cp ../host/guest/x86/stitched.bzimage ../../acrn-sliced-mainline/image/
@@ -220,6 +224,10 @@ test_build_job:
     - cd ../../acrn-hypervisor && git reset --hard && cd ../acrn-sas-test-code/host
     - make vp-base RELEASE=1
     - cp ../build/acrn-unit-test/host/bin/vp-base.32.out ../../acrn-sliced-mainline/image/
+    - make clean
+    - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
+    - make vp-base RELEASE=1 MODULE_GROUP_OBJ=VP_BASE_CPU_GROUP_PENDING_REQUEST
+    - cp ../build/acrn-unit-test/host/bin/vp-base.32.out ../../acrn-sliced-mainline/image/vp-base_pending_request.32.out
     - make clean
     - cd ../../acrn-hypervisor && git reset --hard && cd ../acrn-sas-test-code/host
     - make vp-dm RELEASE=0
