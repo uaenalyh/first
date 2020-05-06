@@ -11,7 +11,6 @@
 #include <vm.h>
 #include <cpuid.h>
 #include <cpufeatures.h>
-#include <vmx.h>
 #include <logmsg.h>
 
 /**
@@ -33,7 +32,7 @@
  * - This module depends on 'vp-base.vlapic' module to get the APIC ID associated with the specified vCPU.
  * - This module depends on 'vp-base.vcpu' module to access guest states, such as MSR, and vLAPIC of the specified vCPU.
  * - This module depends on 'vp-base.vm' module to check if the specified VM is a safety VM or not.
- * - This module depends on 'hwmgmt.vmx' module to access specified field in VMCS, such as guest CR4.
+ * - This module depends on 'vp-base.vcr' module to get guest CR4.
  * - This module depends on 'hwmgmt.cpu_caps' module to get the native processor information regarding to CPUID
  * instruction.
  * - This module depends on 'lib.bits' module to find the most significant bit set in specified value.
@@ -827,8 +826,8 @@ static void guest_cpuid_01h(struct acrn_vcpu *vcpu, uint32_t *eax, uint32_t *ebx
 	/** Clear Virtual Machine Extensions Bit (Bit 5) in guest CPUID.1H:ECX */
 	*ecx &= ~CPUID_ECX_VMX;
 
-	/** Set 'cr4' to the return value of 'exec_vmread(VMX_GUEST_CR4)', which is guest CR4 */
-	cr4 = exec_vmread(VMX_GUEST_CR4);
+	/** Set 'cr4' to the return value of 'vcpu_get_cr4(vcpu)', which is guest CR4 */
+	cr4 = vcpu_get_cr4(vcpu);
 	/** Clear OSXSAVE Bit (Bit 27) in guest CPUID.1H:ECX */
 	*ecx &= ~CPUID_ECX_OSXSAVE;
 	/** If OSXSAVE Bit (Bit 18) in guest CR4 is equal to 1 */
