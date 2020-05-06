@@ -14,12 +14,12 @@
 
 /**
  * @file
- * @brief {TBD brief description}
- *
- * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ * @brief This file declares all the interfaces that will be used at boot up time.
  */
 
-/* hypervisor stack bottom magic('intl') */
+/**
+ * @brief Magic number used as a guard on the stack to prevent stack corruption.
+ */
 #define SP_BOTTOM_MAGIC 0x696e746cUL
 
 void init_primary_pcpu(void);
