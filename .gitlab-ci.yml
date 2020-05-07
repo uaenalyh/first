@@ -31,6 +31,7 @@ build_job:
   script:
     - echo "start to build ..."
     - pwd
+    - hostname -I
     - cd hypervisor
     - make clean
     - make RELEASE=0
