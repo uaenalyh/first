@@ -11,6 +11,7 @@
 #include <trampoline.h>
 #include <reloc.h>
 #include <ld_sym.h>
+#include <acrn_hv_defs.h>
 
 /**
  * @addtogroup hwmgmt_cpu
@@ -33,6 +34,10 @@ static uint64_t get_ap_trampoline_buf(void)
         uint32_t size = CONFIG_LOW_RAM_SIZE;
         uint64_t ret = e820_alloc_low_memory(size);
         uint64_t end = ret + size;
+
+	if (ret == ACRN_INVALID_HPA) {
+		panic("invalid hpa");
+	}
 
         mbi = (struct multiboot_info *)hpa2hva((uint64_t)boot_regs[1]);
         if ((end > mbi->mi_mmap_addr) && (ret < (mbi->mi_mmap_addr + mbi->mi_mmap_length))) {

@@ -147,6 +147,90 @@ enum vm_cpu_mode {
 #define NUM_COMMON_MSRS 15U
 #define NUM_GUEST_MSRS  (NUM_WORLD_MSRS + NUM_COMMON_MSRS)
 
+struct segment_sel {
+	uint16_t selector;
+	uint64_t base;
+	uint32_t limit;
+	uint32_t attr;
+};
+
+/**
+ * @brief registers info saved for vcpu running context
+ */
+struct run_context {
+	/* Contains the guest register set.
+	 * NOTE: This must be the first element in the structure, so that the offsets
+	 * in vmx_asm.S match
+	 */
+	union cpu_regs_t {
+		struct acrn_gp_regs regs;
+		uint64_t longs[NUM_GPRS];
+	} cpu_regs;
+
+	/** The guests CR registers 0, 2, 3 and 4. */
+	uint64_t cr0;
+
+	/* CPU_CONTEXT_OFFSET_CR2 =
+	 * offsetof(struct run_context, cr2) = 136
+	 */
+	uint64_t cr2;
+	uint64_t cr4;
+
+	uint64_t rip;
+	uint64_t rflags;
+
+	/* CPU_CONTEXT_OFFSET_IA32_SPEC_CTRL =
+	 * offsetof(struct run_context, ia32_spec_ctrl) = 168
+	 */
+	uint64_t ia32_spec_ctrl;
+	uint64_t ia32_efer;
+};
+
+union xsave_header {
+	uint64_t value[XSAVE_HEADER_AREA_SIZE / sizeof(uint64_t)];
+	struct {
+		/* bytes 7:0 */
+		uint64_t xstate_bv;
+		/* bytes 15:8 */
+		uint64_t xcomp_bv;
+	} hdr;
+};
+
+struct xsave_area {
+	uint64_t legacy_region[XSAVE_LEGACY_AREA_SIZE / sizeof(uint64_t)];
+	union xsave_header xsave_hdr;
+	uint64_t extend_region[XSAVE_EXTEND_AREA_SIZE / sizeof(uint64_t)];
+} __aligned(64);
+
+/*
+ * extended context does not save/restore during vm exit/entry, it's mainly
+ * used in trusty world switch
+ */
+struct ext_context {
+	uint64_t cr3;
+
+	/* segment registers */
+	struct segment_sel idtr;
+	struct segment_sel ldtr;
+	struct segment_sel gdtr;
+	struct segment_sel tr;
+	struct segment_sel cs;
+	struct segment_sel ss;
+	struct segment_sel ds;
+	struct segment_sel es;
+	struct segment_sel fs;
+	struct segment_sel gs;
+
+	uint64_t ia32_star;
+	uint64_t ia32_lstar;
+	uint64_t ia32_fmask;
+	uint64_t ia32_kernel_gs_base;
+
+	struct xsave_area xs_area;
+	uint64_t xcr0;
+	uint64_t xss;
+};
+
 struct guest_cpu_context {
 	struct run_context run_ctx;
 	struct ext_context ext_ctx;

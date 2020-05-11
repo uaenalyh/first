@@ -140,8 +140,6 @@ void init_pcpu_pre(bool is_bsp)
 		if (!init_percpu_lapic_id()) {
 			panic("failed to init_percpu_lapic_id!");
 		}
-
-		ioapic_setup_irqs();
 	} else {
 		bsp_init();
 
@@ -375,10 +373,6 @@ void cpu_do_idle(void)
  */
 void cpu_dead(void)
 {
-	/* For debug purposes, using a stack variable in the while loop enables
-	 * us to modify the value using a JTAG probe and resume if needed.
-	 */
-	int32_t halt = 1;
 	uint16_t pcpu_id = get_pcpu_id();
 
 	deinit_sched(pcpu_id);
@@ -393,7 +387,7 @@ void cpu_dead(void)
 		/* Halt the CPU */
 		do {
 			asm_hlt();
-		} while (halt != 0);
+		} while (1);
 	} else {
 		pr_err("pcpu%hu already dead", pcpu_id);
 	}
