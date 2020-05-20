@@ -75,7 +75,7 @@ test_srs_job:
     - mkdir github && cd github && git clone https://github.com/projectacrn/acrn-unit-test.git
     - cp -r ../acrn-unit-test/* acrn-unit-test/
     - cd acrn-unit-test/guest/
-    - /opt/acrn-ebtool/docker_run.sh clearlinux_acrn:latest "./make_all.sh"
+    - ./make_all.sh
     - cp x86/obj/* /var/lib/tftpboot/acrn_srs/acrn/
     - cd ../../../../acrn-sliced-mainline
     - /opt/fusa_ci.sh launch_acrn_unit_test
