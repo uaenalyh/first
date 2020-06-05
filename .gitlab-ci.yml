@@ -69,15 +69,16 @@ test_srs_job:
     - cd hypervisor
     - make clean
     - make RELEASE=0
-    - mv build/acrn.32.out build/acrn_pci_vm1.32.out
+    - mv build/acrn.32.out /var/lib/tftpboot/acrn_srs/srs/acrn_pci_vm1.32.out
     - git reset --hard && git checkout master && git pull
     - python3 /opt/modify_script.py vm0
     - make clean
     - make RELEASE=0
-    - mv build/acrn.32.out build/acrn_pci_vm0.32.out
+    - mv build/acrn.32.out /var/lib/tftpboot/acrn_srs/srs/acrn_pci_vm0.32.out
     - git reset --hard && git checkout master && git pull
     - make clean
     - make RELEASE=0
+    - mv build/acrn.32.out /var/lib/tftpboot/acrn_srs/srs/acrn.32.out
     - cd ../../acrn-srs-test-code/
     - rm -r github
     - git reset --hard && git checkout master && git pull
