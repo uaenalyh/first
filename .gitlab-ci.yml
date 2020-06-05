@@ -31,7 +31,6 @@ build_job:
   script:
     - echo "start to build ..."
     - pwd
-    - hostname -I
     - cd hypervisor
     - make clean
     - make RELEASE=0
@@ -66,7 +65,17 @@ test_srs_job:
     - pwd
     - cd ../acrn-hypervisor/
     - git reset --hard && git checkout master && git pull
+    - python3 /opt/modify_script.py vm1
     - cd hypervisor
+    - make clean
+    - make RELEASE=0
+    - mv build/acrn.32.out build/acrn_pci_vm1.32.out
+    - git reset --hard && git checkout master && git pull
+    - python3 /opt/modify_script.py vm0
+    - make clean
+    - make RELEASE=0
+    - mv build/acrn.32.out build/acrn_pci_vm0.32.out
+    - git reset --hard && git checkout master && git pull
     - make clean
     - make RELEASE=0
     - cd ../../acrn-srs-test-code/
