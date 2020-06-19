@@ -201,6 +201,10 @@ test_build_job:
     - cp ../build/acrn-unit-test/host/bin/hw.32.out ../../acrn-sliced-mainline/image/hw_vtd.32.out
     - make clean
     - cd ../../acrn-hypervisor && git reset --hard && cd ../acrn-sas-test-code/host
+    - make RELEASE=1 hw MODULE_GROUP_OBJ=HW_PCI_GROUP
+    - cp ../build/acrn-unit-test/host/bin/hw.32.out ../../acrn-sliced-mainline/image/hw_pci.32.out
+    - make clean
+    - cd ../../acrn-hypervisor && git reset --hard && cd ../acrn-sas-test-code/host
     - make RELEASE=1 hw MODULE_GROUP_OBJ=HW_CPU_CAPS_GROUP
     - cp ../build/acrn-unit-test/host/bin/hw.32.out ../../acrn-sliced-mainline/image/hw_cpu_caps.32.out
     - make clean
