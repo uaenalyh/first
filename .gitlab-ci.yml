@@ -185,7 +185,7 @@ test_build_job:
     - cd ../acrn-hypervisor/
     - git reset --hard && git checkout master && git pull
     - cd ../acrn-sas-test-code/
-    - git reset --hard && git checkout master && git checkout d322560fba03be06308d24b5b2242deff2c5d406
+    - git reset --hard && git checkout master && git pull
     - cd host/
     - make clean
     - cd ../../acrn-hypervisor && git reset --hard && cd ../acrn-sas-test-code/host
