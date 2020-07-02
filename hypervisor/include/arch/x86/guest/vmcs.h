@@ -15,19 +15,20 @@
 
 /**
  * @file
- * @brief {TBD brief description}
+ * @brief this file declares the relevant macros, internal and external APIs
+ *  for VMCS operation.
  *
- * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
  */
 
-#define VM_SUCCESS 0
-#define VM_FAIL    -1
+#define VM_SUCCESS 0    /**< A pre-defined value to indicate the success of VMX instruction executions. */
+#define VM_FAIL    -1   /**< A pre-defined value to indicate the fail of VMX instruction executions. */
 
 #ifndef ASSEMBLER
 #include <types.h>
 #include <vcpu.h>
 
-#define VMX_VMENTRY_FAIL 0x80000000U
+
+#define VMX_VMENTRY_FAIL 0x80000000U  /**< Indicating that the VM exit is caused by VM-entry failure. */
 
 void init_vmcs(struct acrn_vcpu *vcpu);
 void load_vmcs(const struct acrn_vcpu *vcpu);
