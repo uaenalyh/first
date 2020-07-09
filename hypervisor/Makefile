@@ -217,13 +217,13 @@ VP_BASE_C_SRCS += arch/x86/guest/ept.c
 VP_BASE_C_SRCS += arch/x86/guest/ucode.c
 VP_BASE_C_SRCS += arch/x86/guest/vlapic.c
 VP_BASE_C_SRCS += arch/x86/guest/vm_reset.c
+VP_BASE_C_SRCS += arch/x86/guest/ve820.c
 ifeq ($(CONFIG_HYPERV_ENABLED),y)
 endif
 VP_BASE_C_SRCS += boot/guest/vboot_info.c
 VP_BASE_C_SRCS += common/hv_main.c
 VP_BASE_C_SRCS += common/vm_load.c
 VP_BASE_C_SRCS += arch/x86/configs/vacpi.c
-VP_BASE_C_SRCS += arch/x86/configs/$(CONFIG_BOARD)/ve820.c
 
 # virtual platform device model
 VP_DM_C_SRCS += dm/vrtc.c
