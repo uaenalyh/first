@@ -36,7 +36,7 @@
 #include <vm_config.h>
 
 #define RX_BUF_SIZE		256U
-#define TX_BUF_SIZE		8192U
+#define TX_BUF_SIZE		65536U
 #define INVAILD_VUART_IDX	0xFFU
 
 #define INVALID_COM_BASE	0U
