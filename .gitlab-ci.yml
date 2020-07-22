@@ -30,12 +30,12 @@ build_job:
   stage: build
   script:
     - echo "start to build ..."
-    - exit 1
     - pwd
+    - cd acrn
+    - if [ $? -ne 0 ]; then exit 1; fi
     - cd hypervisor
     - make clean
     - make RELEASE=0
-    - [[ $? -eq 0 ]] && echo "build success" || exit 1
   dependencies:
     - acrn_clang_tidy_job
   artifacts:
