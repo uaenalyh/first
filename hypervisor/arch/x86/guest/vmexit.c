@@ -572,14 +572,8 @@ int32_t vmexit_handler(struct acrn_vcpu *vcpu)
 				 *  exec_vmread(VMX_EXIT_QUALIFICATION). */
 				vcpu->arch.exit_qualification = exec_vmread(VMX_EXIT_QUALIFICATION);
 			}
-			/** If basic_exit_reason is equals to VMX_EXIT_REASON_EXTERNAL_INTERRUPT */
-			if (basic_exit_reason == VMX_EXIT_REASON_EXTERNAL_INTERRUPT) {
-				/** Set ret to the return value of dispatch->handler(vcpu) */
-				ret = dispatch->handler(vcpu);
-			} else {
-				/** Set ret to the return value of dispatch->handler(vcpu) */
-				ret = dispatch->handler(vcpu);
-			}
+			/** Set ret to the return value of dispatch->handler(vcpu) */
+			ret = dispatch->handler(vcpu);
 		}
 	}
 
