@@ -88,6 +88,7 @@ test_srs_job:
     - mkdir github && cd github && git clone https://github.com/projectacrn/acrn-unit-test.git
     - cp -r ../acrn-unit-test/* acrn-unit-test/
     - cd acrn-unit-test/guest/
+    - sed -i 's/O1/O0/g' x86/Makefile.common
     - ./make_all.sh
     - if [ $? -ne 0 ]; then exit 1; fi
     - cp x86/obj/* /var/lib/tftpboot/acrn_srs/acrn/
