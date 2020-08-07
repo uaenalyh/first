@@ -36,11 +36,6 @@
 
 /* TODO: add more capability per requirement */
 
-static struct cpu_capability {
-	uint32_t vmx_ept;
-	uint32_t vmx_vpid;
-} cpu_caps;
-
 static struct cpuinfo_x86 boot_cpu_data;
 
 bool pcpu_has_cap(uint32_t bit)
@@ -61,37 +56,6 @@ bool pcpu_has_cap(uint32_t bit)
 bool has_monitor_cap(void)
 {
 	return pcpu_has_cap(X86_FEATURE_MONITOR);
-}
-
-static void detect_vmx_mmu_cap(void)
-{
-	uint64_t val;
-
-	/* Read the MSR register of EPT and VPID Capability -  SDM A.10 */
-	val = msr_read(MSR_IA32_VMX_EPT_VPID_CAP);
-	cpu_caps.vmx_ept = (uint32_t)val;
-	cpu_caps.vmx_vpid = (uint32_t)(val >> 32U);
-}
-
-static void detect_xsave_cap(void)
-{
-	uint32_t unused;
-
-	cpuid_subleaf(CPUID_XSAVE_FEATURES, 0U, &boot_cpu_data.cpuid_leaves[FEAT_D_0_EAX], &unused, &unused,
-		&boot_cpu_data.cpuid_leaves[FEAT_D_0_EDX]);
-	cpuid_subleaf(CPUID_XSAVE_FEATURES, 1U, &boot_cpu_data.cpuid_leaves[FEAT_D_1_EAX], &unused,
-		&boot_cpu_data.cpuid_leaves[FEAT_D_1_ECX], &boot_cpu_data.cpuid_leaves[FEAT_D_1_EDX]);
-}
-
-static void detect_pcpu_cap(void)
-{
-	detect_vmx_mmu_cap();
-	detect_xsave_cap();
-}
-
-static uint64_t get_address_mask(uint8_t limit)
-{
-	return ((1UL << limit) - 1UL) & PAGE_MASK;
 }
 
 void init_pcpu_capabilities(void)
@@ -120,33 +84,18 @@ void init_pcpu_capabilities(void)
 
 	cpuid(CPUID_MAX_EXTENDED_FUNCTION, &boot_cpu_data.extended_cpuid_level, &unused, &unused, &unused);
 
-	if (boot_cpu_data.extended_cpuid_level >= CPUID_EXTEND_FUNCTION_1) {
-		cpuid(CPUID_EXTEND_FUNCTION_1, &unused, &unused, &boot_cpu_data.cpuid_leaves[FEAT_8000_0001_ECX],
-			&boot_cpu_data.cpuid_leaves[FEAT_8000_0001_EDX]);
-	}
+	cpuid(CPUID_EXTEND_FUNCTION_1, &unused, &unused, &boot_cpu_data.cpuid_leaves[FEAT_8000_0001_ECX],
+		&boot_cpu_data.cpuid_leaves[FEAT_8000_0001_EDX]);
 
-	if (boot_cpu_data.extended_cpuid_level >= CPUID_EXTEND_INVA_TSC) {
-		cpuid(CPUID_EXTEND_INVA_TSC, &eax, &unused, &unused, &boot_cpu_data.cpuid_leaves[FEAT_8000_0007_EDX]);
-	}
+	cpuid(CPUID_EXTEND_INVA_TSC, &eax, &unused, &unused, &boot_cpu_data.cpuid_leaves[FEAT_8000_0007_EDX]);
 
-	if (boot_cpu_data.extended_cpuid_level >= CPUID_EXTEND_ADDRESS_SIZE) {
-		cpuid(CPUID_EXTEND_ADDRESS_SIZE, &eax, &boot_cpu_data.cpuid_leaves[FEAT_8000_0008_EBX], &unused,
+	cpuid(CPUID_EXTEND_ADDRESS_SIZE, &eax, &boot_cpu_data.cpuid_leaves[FEAT_8000_0008_EBX], &unused,
 			&unused);
-
-		/* EAX bits 07-00: #Physical Address Bits
-		 *     bits 15-08: #Linear Address Bits
-		 */
-		boot_cpu_data.virt_bits = (uint8_t)((eax >> 8U) & 0xffU);
-		boot_cpu_data.phys_bits = (uint8_t)(eax & 0xffU);
-		boot_cpu_data.physical_address_mask = get_address_mask(boot_cpu_data.phys_bits);
-	}
-
-	detect_pcpu_cap();
-}
-
-bool pcpu_has_vmx_ept_cap(uint32_t bit_mask)
-{
-	return ((cpu_caps.vmx_ept & bit_mask) != 0U);
+	/* EAX bits 07-00: #Physical Address Bits
+	 *     bits 15-08: #Linear Address Bits
+	 */
+	boot_cpu_data.virt_bits = (uint8_t)((eax >> 8U) & 0xffU);
+	boot_cpu_data.phys_bits = (uint8_t)(eax & 0xffU);
 }
 
 void init_pcpu_model_name(void)

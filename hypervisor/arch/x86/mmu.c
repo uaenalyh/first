@@ -136,14 +136,8 @@ void invept(const void *eptp)
 {
 	struct invept_desc desc = { 0 };
 
-	if (pcpu_has_vmx_ept_cap(VMX_EPT_INVEPT_SINGLE_CONTEXT)) {
-		desc.eptp = hva2hpa(eptp) | (3UL << 3U) | 6UL;
-		local_invept(INVEPT_TYPE_SINGLE_CONTEXT, desc);
-	} else if (pcpu_has_vmx_ept_cap(VMX_EPT_INVEPT_GLOBAL_CONTEXT)) {
-		local_invept(INVEPT_TYPE_ALL_CONTEXTS, desc);
-	} else {
-		/* Neither type of INVEPT is supported. Skip. */
-	}
+	desc.eptp = hva2hpa(eptp) | (3UL << 3U) | 6UL;
+	local_invept(INVEPT_TYPE_SINGLE_CONTEXT, desc);
 }
 
 static inline uint64_t get_sanitized_page(void)
