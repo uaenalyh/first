@@ -66,6 +66,7 @@ test_srs_job:
     - pwd
     - cd ../acrn-hypervisor/
     - git reset --hard && git checkout master && git pull
+    - cd hypervisor
     - make clean
     - /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0 "make RELEASE=0"
     - if [ $? -ne 0 ]; then exit 1; fi
