@@ -840,7 +840,7 @@ static int32_t write_pat_msr(struct acrn_vcpu *vcpu, uint64_t value)
 
 	/** For each 'i' ranging from 0H to 7H [with a step of 1] */
 	for (i = 0U; i < 8U; i++) {
-		/** Set 'field' to the i-th 8-bit field in \a value */
+		/** Set 'field' to the (i+1)-th 8-bit field in \a value */
 		field = (value >> (i * 8U)) & 0xffUL;
 		/** If 'field' indicates an invalid memory type */
 		if (is_pat_mem_type_invalid(field)) {

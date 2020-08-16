@@ -7,20 +7,15 @@
 #define TRAMPOLINE_H
 
 /**
- * @addtogroup hwmgmt_cpu
+ * @addtogroup boot
  *
  * @{
  */
 
 /**
  * @file
- * @brief {TBD brief description}
- *
- * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ * @brief Declare trampoline APIs used to initialize the environment before start APs.
  */
-
-extern void write_trampoline_stack_sym(uint16_t pcpu_id);
-extern uint64_t prepare_trampoline(void);
 
 /* external symbols that are helpful for relocation */
 extern uint8_t trampoline_fixup_cs;
