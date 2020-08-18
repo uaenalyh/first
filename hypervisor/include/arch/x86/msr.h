@@ -466,6 +466,13 @@
 #define MSR_IA32_TSC_AUX              0xC0000103U
 
 /**
+ * @brief The register address of TSX_FORCE_ABORT MSR.
+ *
+ * Used to enable RTM force abort mode.
+ */
+#define MSR_TSX_FORCE_ABORT           0x0000010FU
+
+/**
  * @brief The LME bit of IA32_EFER.
  *
  * IA32e mode enable.

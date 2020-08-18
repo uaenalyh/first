@@ -178,6 +178,10 @@
  */
 #define CPUID_EBX_SGX			(1U << 2U)
 /**
+ * @brief A flag used to check whether the processor supports the TSX HLE feature.
+ */
+#define CPUID_EBX_HLE			(1U << 4U)
+/**
  * @brief A bit representing whether the processor supports intel Memory Protection Extensions.
  *
  * This bit is fetched from CPUID(EAX=7H,ECX=0H):EBX[14].
