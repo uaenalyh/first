@@ -53,7 +53,7 @@
  *  - offline_vcpu()   This function is used to reset all fields in a vCPU instance, the vCPU state
  *					   is reset to VCPU_INIT.
  *				   Depends on:
- *				    - n/a
+ *				    - N/A
  *  - pause_vcpu()    This function is used to pause the dedicated vCPU.
  *				   Depends on:
  *				    - get_schedule_lock()
@@ -81,9 +81,9 @@
  *                     CR3 and CR4 registers, and set mode of the vCPU.
  *				   Depends on:
  *				    - memcpy_s()
- *  - set_vcpu_startup_entry()   This This function is used to set the startup related state of the target vcpu.
+ *  - set_vcpu_startup_entry()   This function is used to set the startup related state of the target vcpu.
  *				   Depends on:
- *				    - n/a
+ *				    - N/A
  *  - vcpu_get_efer()    This function is to get the value of IA32_EFER register
  *				   Depends on:
  *				    - bitmap_test()
@@ -103,14 +103,14 @@
  *				    - exec_vmread64()
  *  - vcpu_retain_rip()    This function is used to retain the guest RIP in the VMCS.
  *				   Depends on:
- *				    - n/a
+ *				    - N/A
  *  - vcpu_set_efer()    This function is used to set guest IA32_EFER of current vCPU.
  *				   Depends on:
  *				    - bitmap_set_lock()
  *  - vcpu_set_gpreg()    This function is used to set value of guest general purpose registers such as rax, rbx,
  *						  etc with specified value.
  *				   Depends on:
- *				    - n/a
+ *				    - N/A
  *  - vcpu_set_guest_msr()    This function is used to set specified value of msr to guest vCPU if the msr is valid.
  *				   Depends on:
  *				    - vmsr_get_guest_msr_index()
@@ -156,8 +156,8 @@
  *				   Depends on:
  *				    - read_xcr()
  *				    - msr_read()
- *  - rstore_xsave_area()    The function is used to restore the physical state-component bitmaps and XSAVE-managed.
- *                         user and supervisor state components from the given extended context
+ *  - rstore_xsave_area()   The function is used to restore the physical state-component bitmaps and XSAVE-managed
+ *                          user and supervisor state components from the given extended context.
  *				   Depends on:
  *				    - read_xcr()
  *				    - msr_write()
@@ -188,11 +188,11 @@
  *
  * The stack_frame is linked with the sequence of stack operation.
  *
- * @consistency n/a
+ * @consistency N/A
  *
  * @alignment 8
  *
- * @remark n/a
+ * @remark N/A
  */
 struct stack_frame {
 	uint64_t rdi;	/** rdi register */
@@ -210,7 +210,7 @@ struct stack_frame {
 /**
  * @brief This function is used to get the value of the target general purpose register.
  *
- * @param[in] vcpu A pointer which points to the target vpu structure to get the guest general purpose registers.
+ * @param[in] vcpu A pointer which points to the target vcpu structure to get the guest general purpose registers.
  * @param[in] reg The index of the target general purpose register
  *
  * @return the value of the target gpreg
@@ -242,11 +242,11 @@ uint64_t vcpu_get_gpreg(const struct acrn_vcpu *vcpu, uint32_t reg)
  * @brief This function is used to set value of a specific guest general purpose register such as rax, rbx,
  *	etc with specified value.
  *
- * @param[inout] vcpu A pointer which points to the target vpu structure to set the general purpose registers to.
+ * @param[inout] vcpu A pointer which points to the target vcpu structure to set the general purpose registers to.
  * @param[in] reg The index of the target general purpose register
  * @param[in] val The value which will be set to the target register
  *
- * @return n/a
+ * @return N/A
  *
  * @pre vcpu != NULL
  * @pre reg < NUM_GPRS
@@ -263,7 +263,7 @@ void vcpu_set_gpreg(struct acrn_vcpu *vcpu, uint32_t reg, uint64_t val)
 {
 	/** Declare the following local variables of type struct run_context *.
 	 *  - ctx representing a pointer which points to vCPU running context, initialized
-	 *	as &vcpu->arch.context.run_ctx.
+	 *  as &vcpu->arch.context.run_ctx.
 	 */
 	struct run_context *ctx = &vcpu->arch.context.run_ctx;
 
@@ -274,7 +274,7 @@ void vcpu_set_gpreg(struct acrn_vcpu *vcpu, uint32_t reg, uint64_t val)
 /**
  * @brief This function is used to get RIP of the target vCPU.
  *
- * @param[inout] vcpu A pointer which points to the target vpu structure to get the guest RIP.
+ * @param[inout] vcpu A pointer which points to the target vcpu structure to get the guest RIP.
  *
  * @return RIP of the given vCPU
  *
@@ -336,18 +336,18 @@ void vcpu_set_rip(struct acrn_vcpu *vcpu, uint64_t val)
 	/** Set rip of the running context of the target vcpu to input parameter value */
 	vcpu->arch.context.run_ctx.rip = val;
 	/** Call bitmap_set_lock with the following parameters, in order to set the target bit CPU_REG_RIP to 1.
-	 *  - CPU_REG_RIP: layout of the guest rip register
-	 *	- &vcpu->reg_updated */
+	 *  - CPU_REG_RIP: index to the bit in vcpu->reg_updated which stands for guest RIP
+	 *  - &vcpu->reg_updated */
 	bitmap_set_lock(CPU_REG_RIP, &vcpu->reg_updated);
 }
 
 /**
- * @brief This function is used to set value of updated rsp to guest vcpu.
+ * @brief This function is used to set value of updated RSP to guest vcpu.
  *
- * @param[inout] vcpu A pointer which points to the target vpu structure to set the guest RSP to.
+ * @param[inout] vcpu A pointer which points to the target vcpu structure to set the guest RSP to.
  * @param[in] val The value which will be set to the guest RSP
  *
- * @return n/a
+ * @return N/A
  *
  * @pre vcpu != NULL
  *
@@ -363,21 +363,21 @@ void vcpu_set_rsp(struct acrn_vcpu *vcpu, uint64_t val)
 {
 	/** Declare the following local variables of type struct run_context *.
 	 *  - ctx representing pointer which points to vcpu running context, initialized
-	 *	as &vcpu->arch.context.run_ctx. */
+	 *    as &vcpu->arch.context.run_ctx. */
 	struct run_context *ctx = &vcpu->arch.context.run_ctx;
 
 	/** Set rsp of the vcpu running context to the inputparameter val */
 	ctx->cpu_regs.regs.rsp = val;
 	/** Call bitmap_set_lock with the following parameters, in order to set bit CPU_REG_RSP to 1.
-	 *  - CPU_REG_RSP: index of the rsp bit to be set
-	 *	- &vcpu->reg_updated: address of the integer where the bit is to be set */
+	 *  - CPU_REG_RSP: index to the bit in vcpu->reg_updated which stands for guest RSP
+	 *  - &vcpu->reg_updated: address of the integer where the bit is to be set */
 	bitmap_set_lock(CPU_REG_RSP, &vcpu->reg_updated);
 }
 
 /**
- * @brief This function is used to set value of updated rsp to guest vcpu.
+ * @brief This function is used to set value of updated EFER to guest vcpu.
  *
- * @param[inout] vcpu A pointer which points to the target vpu structure to get the guest IA32_EFER.
+ * @param[inout] vcpu A pointer which points to the target vcpu structure to get the guest IA32_EFER.
  *
  * @return IA32_EFER of the vCPU
  *
@@ -398,7 +398,10 @@ uint64_t vcpu_get_efer(struct acrn_vcpu *vcpu)
 	 *	as &vcpu->arch.context.run_ctx. */
 	struct run_context *ctx = &vcpu->arch.context.run_ctx;
 
-	/** If vcpu->reg_updated[bit CPU_REG_EFER] == 0 && vcpu->reg_cached[bit CPU_REG_EFER] == 0. */
+	/** If calls to bitmap_test and bitmap_test_and_set_lock with CPU_REG_EFER and
+	 *  &vcpu->reg_updated (for bitmap_test) or &vcpu->reg_cached (for the other)
+	 *  being parameters both returns 0.
+	 */
 	if (!bitmap_test(CPU_REG_EFER, &vcpu->reg_updated) &&
 		!bitmap_test_and_set_lock(CPU_REG_EFER, &vcpu->reg_cached)) {
 		/** Set IA32_EFER of the vcpu running context to exec_vmread64(VMX_GUEST_IA32_EFER_FULL) */
@@ -411,7 +414,7 @@ uint64_t vcpu_get_efer(struct acrn_vcpu *vcpu)
 /**
  * @brief This function is used to set guest IA32_EFER of current vcpu.
  *
- * @param[inout] vcpu A pointer which points to the target vpu structure to set the guest IA32_EFER to.
+ * @param[inout] vcpu A pointer which points to the target vcpu structure to set the guest IA32_EFER to.
  * @param[in] val The value which will be set to the guest IA32_EFER
  *
  * @return None
@@ -431,8 +434,8 @@ void vcpu_set_efer(struct acrn_vcpu *vcpu, uint64_t val)
 	/** Set IA32_EFER of the running context of the target vcpu to input parameter val */
 	vcpu->arch.context.run_ctx.ia32_efer = val;
 	/** Call bitmap_set_lock() with the following parameters, in order to set bit CPU_REG_EFER to 1.
-	 *  - CPU_REG_EFER: index of the IA32_EFER bit to be set
-	 *	- &vcpu->reg_updated: address of the integer where the bit is to be set
+	 *  - CPU_REG_EFER: index to the bit in vcpu->reg_updated which stands for guest EFER
+	 *  - &vcpu->reg_updated: address of the integer where the bit is to be set
 	 */
 	bitmap_set_lock(CPU_REG_EFER, &vcpu->reg_updated);
 }
@@ -440,7 +443,7 @@ void vcpu_set_efer(struct acrn_vcpu *vcpu, uint64_t val)
 /**
  * @brief This function is used to get RFLAGS of the target vcpu.
  *
- * @param[inout] vcpu A pointer which points to the target vpu structure to get the guest RFLAGS.
+ * @param[inout] vcpu A pointer which points to the target vcpu structure to get the guest RFLAGS.
  *
  * @return  vcpu->arch.context.run_ctx->rflags
  *
@@ -464,7 +467,10 @@ uint64_t vcpu_get_rflags(struct acrn_vcpu *vcpu)
 	 */
 	struct run_context *ctx = &vcpu->arch.context.run_ctx;
 
-	/** If vcpu->reg_updated[bit CPU_REG_RFLAGS] == 0 && vcpu->reg_cached[bit CPU_REG_RFLAGS] == 0 */
+	/** If calls to bitmap_test and bitmap_test_and_set_lock with CPU_REG_RFLAGS and
+	 *  &vcpu->reg_updated (for bitmap_test) or &vcpu->reg_cached (for the other)
+	 *  being parameters both returns 0.
+	 */
 	if (!bitmap_test(CPU_REG_RFLAGS, &vcpu->reg_updated) &&
 		!bitmap_test_and_set_lock(CPU_REG_RFLAGS, &vcpu->reg_cached) && vcpu->launched) {
 		/** Set rflags of the vcpu running context to exec_vmread(VMX_GUEST_RFLAGS) */
@@ -477,14 +483,14 @@ uint64_t vcpu_get_rflags(struct acrn_vcpu *vcpu)
 /**
  * @brief This function is used to set rflags to the target vcpu.
  *
- * @param[inout] vcpu A pointer which points to the target vpu structure to set the guest IA32_EFER to.
+ * @param[inout] vcpu A pointer which points to the target vcpu structure to set the guest IA32_EFER to.
  * @param[in] val The value which will be set to the guest RFLAGS
  *
- * @return n/a
+ * @return N/A
  *
  * @pre vcpu != NULL
  * @pre the host physical address calculated by hva2hpa(vcpu->arch.vmcs) is equal
- *		to the vmcs pointer of the current pcpu.
+ *	to the vmcs pointer of the current pcpu.
  *
  * @post None
  *
@@ -498,9 +504,9 @@ void vcpu_set_rflags(struct acrn_vcpu *vcpu, uint64_t val)
 {
 	/** Set rflags if the vcpu running context to the input val of type unit64_t */
 	vcpu->arch.context.run_ctx.rflags = val;
-	/** Call bitmap_set_lock with the following parameters, in order to set bit CPU_REG_RFLAGS to 1.	` .
-	 *  - CPU_REG_RFLAGS: index of the rflags bit to be set
-	 *	- &vcpu->reg_updated: address of the integer where the bit is to be set
+	/** Call bitmap_set_lock with the following parameters, in order to set bit CPU_REG_RFLAGS to 1.
+	 *  - CPU_REG_RFLAGS: index to the bit in vcpu->reg_updated which stands for guest RFLAGS
+	 *  - &vcpu->reg_updated: address of the integer where the bit is to be set
 	 */
 	bitmap_set_lock(CPU_REG_RFLAGS, &vcpu->reg_updated);
 }
@@ -508,7 +514,7 @@ void vcpu_set_rflags(struct acrn_vcpu *vcpu, uint64_t val)
 /**
  * @brief This function is used to get the guest msr from the vcpu structure.
  *
- * @return vcpu->arch.guest_msrs[index]
+ * @return Value in the specified guest MSR of the given vCPU.
  *
  * @pre vcpu != NULL
  * @pre vmsr_get_guest_msr_index(msr) < NUM_GUEST_MSRS
@@ -545,11 +551,11 @@ uint64_t vcpu_get_guest_msr(const struct acrn_vcpu *vcpu, uint32_t msr)
 /**
  * @brief This function is used to set specified value of msr to guest vcpu if the msr is valid.
  *
- * @param[inout] vcpu A pointer which points to the target vpu structure to set the guest MSR to.
+ * @param[inout] vcpu A pointer which points to the target vcpu structure to set the guest MSR to.
  * @param[in] msr The index of the guest MSRs.
  * @param[in] val The value which will be set to the guest MSR
  *
- * @return n/a
+ * @return N/A
  *
  * @pre vcpu != NULL
  * @pre vmsr_get_guest_msr_index(msr) < NUM_GUEST_MSRS
@@ -580,7 +586,7 @@ void vcpu_set_guest_msr(struct acrn_vcpu *vcpu, uint32_t msr, uint64_t val)
 /**
  * @brief This function is dead code in fusa scenario.
  *
- * @return n/a
+ * @return N/A
  *
  * @pre None
  *
@@ -603,14 +609,15 @@ void vcpu_set_vmcs_eoi_exit(const struct acrn_vcpu *vcpu)
 }
 
 /**
- * @brief This function is used to the target vcpu to relevant mode according to the cs attributes, IA32_EFER and cr0.
+ * @brief This function is to determine the vCPU mode of operation according to the guest cs
+ * attributes, IA32_EFER and cr0, and save the result to the given vCPU data structure.
  *
- * @param[inout] vcpu A pointer which points to the target vpu structure to set the cpu_mode.
+ * @param[inout] vcpu A pointer which points to the target vcpu structure to set the cpu_mode.
  * @param[in] cs_attr The value of guesr CS attributes
  * @param[in] ia32_efer The value of guest IA32_EFER
  * @param[in] cr0 The value of guest CR0
  *
- * @return n/a
+ * @return N/A
  *
  * @pre vcpu != NULL
  *
@@ -620,7 +627,7 @@ void vcpu_set_vmcs_eoi_exit(const struct acrn_vcpu *vcpu)
  *
  * @reentrancy Unspecified
  *
- * @threadsafety Unspecified
+ * @threadsafety when \a vcpu is different among parallel invocation
  *
  */
 static void set_vcpu_mode(struct acrn_vcpu *vcpu, uint32_t cs_attr, uint64_t ia32_efer, uint64_t cr0)
@@ -637,20 +644,20 @@ static void set_vcpu_mode(struct acrn_vcpu *vcpu, uint32_t cs_attr, uint64_t ia3
 		}
 	/** If CR0.PE is 1 */
 	} else if ((cr0 & CR0_PE) != 0UL) {
-			/** Set cpu mode of the target vcpu to CPU_MODE_PROTECTED */
+		/** Set cpu mode of the target vcpu to CPU_MODE_PROTECTED */
 		vcpu->arch.cpu_mode = CPU_MODE_PROTECTED;
 	} else {
-			/** Set cpu mode of the target vcpu to CPU_MODE_REAL */
+		/** Set cpu mode of the target vcpu to CPU_MODE_REAL */
 		vcpu->arch.cpu_mode = CPU_MODE_REAL;
 	}
 }
 
 /**
- * @brief This function is used to initial the xsave componentsof the target vcpu.
+ * @brief This function is used to initialize the xsave components of the target vcpu.
  *
- * @param[inout] vcpu A pointer which points to the target vpu structure
+ * @param[inout] vcpu A pointer which points to the target vcpu structure
  *
- * @return n/a
+ * @return N/A
  *
  * @pre vcpu != NULL
  *
@@ -660,7 +667,7 @@ static void set_vcpu_mode(struct acrn_vcpu *vcpu, uint32_t cs_attr, uint64_t ia3
  *
  * @reentrancy Unspecified
  *
- * @threadsafety Unspecified
+ * @threadsafety when \a vcpu is different among parallel invocation.
  *
  */
 static void init_xsave(struct acrn_vcpu *vcpu)
@@ -670,7 +677,7 @@ static void init_xsave(struct acrn_vcpu *vcpu)
 	struct cpuinfo_x86 *cpu_info = get_pcpu_info();
 	/** Declare the following local variables of type struct ext_context *.
 	 *  - ectx representing pointer which points to extend context of the running vcpu, initialized
-	 *	as vcpu->arch.context.ext_ctx. */
+	 *	as &vcpu->arch.context.ext_ctx. */
 	struct ext_context *ectx = &(vcpu->arch.context.ext_ctx);
 
 	/* Get user state components */
@@ -682,27 +689,27 @@ static void init_xsave(struct acrn_vcpu *vcpu)
 	ectx->xss = XSS_INIT;
 
 	/** Bitwise OR XCOMP_BV field of the extend context by XSAVE_COMPACTED_FORMAT
-	 * xsaves only support compacted format, so set it in xcomp_bv[63],
-	 * keep the reset area in header area as zero.
-	 * With this config, the first time a vcpu is scheduled in, it will
-	 * initiate all the xsave componets
+	 *  xsaves only support compacted format, so set it in xcomp_bv[63],
+	 *  keep the reset area in header area as zero.
+	 *  With this config, the first time a vcpu is scheduled in, it will
+	 *  initialize all the xsave componets.
 	 */
 	ectx->xs_area.xsave_hdr.hdr.xcomp_bv |= XSAVE_COMPACTED_FORMAT;
 }
 
 /**
  * @brief This function set the value of GDTR, IDTR, LDTR, TR, CS, IA32_EFER, RFLAGS, RIP, RSP, CR0,
- *        CR3 and CR4 regiters, and set mode of the vCPU.
+ *        CR3 and CR4 registers, and set mode of the vCPU.
  *
- * @param[inout] vcpu A pointer which points to a target vpu structure whose contexts are set.
+ * @param[inout] vcpu A pointer which points to a target vcpu structure whose contexts are set.
  * @param[in] vcpu_regs A pointer which points to a target acrn_vcpu_regs structure whose registers are set to
  *
- * @return n/a
+ * @return N/A
  *
  * @pre vcpu != NULL
  * @pre vmsr_get_guest_msr_index(msr) < NUM_GUEST_MSRS
  * @pre the host physical address calculated by hva2hpa(vcpu->arch.vmcs) is equal to the
- *		vmcs pointer of the current pcpu.
+ *	vmcs pointer of the current pcpu.
  *
  * @post None
  *
@@ -710,7 +717,7 @@ static void init_xsave(struct acrn_vcpu *vcpu)
  *
  * @reentrancy Unspecified
  *
- * @threadsafety when vcpu is different among parallel invocation.
+ * @threadsafety when \a vcpu is different among parallel invocation.
  */
 void set_vcpu_regs(struct acrn_vcpu *vcpu, struct acrn_vcpu_regs *vcpu_regs)
 {
@@ -721,14 +728,16 @@ void set_vcpu_regs(struct acrn_vcpu *vcpu, struct acrn_vcpu_regs *vcpu_regs)
 	 *  - ctx representing pointer which points to the running context of vcpu */
 	struct run_context *ctx;
 	/** Declare the following local variables of type uint16_t *.
-	 *  - sel representing a pointer points to cs selector of the target vcpu, initialized as vcpu_regs->cs_sel. */
+	 *  - sel representing a pointer to a segment selector of the target vcpu,
+	 *  initialized as &vcpu_regs->cs_sel.
+	 */
 	uint16_t *sel = &(vcpu_regs->cs_sel);
 	/** Declare the following local variables of type struct segment_sel *.
 	 *  - seg representing a pointer which points to the segment register */
 	struct segment_sel *seg;
 	/** Declare the following local variables of type uint32_t.
 	 *  - limit representing the hidden part limit.
-	 *	- attr representing the hidden part attributes. */
+	 *  - attr representing the hidden part attributes. */
 	uint32_t limit, attr;
 
 	/** Set ectx to &(vcpu->arch.context.ext_ctx) */
@@ -736,11 +745,6 @@ void set_vcpu_regs(struct acrn_vcpu *vcpu, struct acrn_vcpu_regs *vcpu_regs)
 	/** Set ctx to &(vcpu->arch.context.run_ctx) */
 	ctx = &(vcpu->arch.context.run_ctx);
 
-	/* NOTE:
-	 * This is to set the attr and limit to default value.
-	 * If the set_vcpu_regs is used not only for vcpu state
-	 * initialization, this part of code needs be revised.
-	 */
 	/** If vcpu is in protected mode */
 	if ((vcpu_regs->cr0 & CR0_PE) != 0UL) {
 		/** Set attr to PROTECTED_MODE_DATA_SEG_AR */
@@ -768,7 +772,6 @@ void set_vcpu_regs(struct acrn_vcpu *vcpu, struct acrn_vcpu_regs *vcpu_regs)
 		sel++;
 	}
 
-	/* override cs attr/base/limit */
 	/** Set segment register attributes of the extend context to vcpu_regs->cs_ar */
 	ectx->cs.attr = vcpu_regs->cs_ar;
 	/** Set segment register base address of the extend context to vcpu_regs->cs_base */
@@ -791,10 +794,6 @@ void set_vcpu_regs(struct acrn_vcpu *vcpu, struct acrn_vcpu_regs *vcpu_regs)
 	/** Set TR segment selector of the extend context to vcpu_regs->tr_sel */
 	ectx->tr.selector = vcpu_regs->tr_sel;
 
-	/** NOTE:This is to set the ldtr and tr to default value.
-	  * If the set_vcpu_regs is used not only for vcpu state
-	  * initialization, this part of code needs be revised.
-	  */
 	/** Set IDTR base address of the extend context to 0 */
 	ectx->ldtr.base = 0UL;
 	/** Set TR base address of the extend context to 0 */
@@ -809,38 +808,37 @@ void set_vcpu_regs(struct acrn_vcpu *vcpu, struct acrn_vcpu_regs *vcpu_regs)
 	ectx->tr.attr = TR_AR;
 	/** Call memcpy_s() with the following parameters, in order to copy the cpu_regs of extend context
 	 *  to the target vcpu.
-	 *  - &(ctx->cpu_regs): address of the extend context
-	 *	- sizeof(struct acrn_gp_regs): size of the struct acrn_gp_regs
-	 *	- &(vcpu_regs->gprs): address of the first byte of struct vcpu_regs->gprs
-	 *	- sizeof(struct acrn_gp_regs): size of the struct acrn_gp_regs */
+	 *  - &(ctx->cpu_regs): address of cpu_regs in the extend context
+	 *  - sizeof(struct acrn_gp_regs): size of the struct acrn_gp_regs
+	 *  - &(vcpu_regs->gprs): address of the first byte of struct vcpu_regs->gprs
+	 *  - sizeof(struct acrn_gp_regs): size of the struct acrn_gp_regs */
 	(void)memcpy_s((void *)&(ctx->cpu_regs), sizeof(struct acrn_gp_regs), (void *)&(vcpu_regs->gprs),
 		sizeof(struct acrn_gp_regs));
 	/** Call vcpu_set_rip() with the following parameters, in order to set the rip to the target vcpu.
 	 *  - vcpu: the target vcpu
-	 *	- vcpu_regs->rip: the rip to set */
+	 *  - vcpu_regs->rip: the rip to set */
 	vcpu_set_rip(vcpu, vcpu_regs->rip);
 	/** Call vcpu_set_efer() with the following parameters, in order to set the IA32_EFER to the target vcpu.
 	 *  - vcpu: the target vcpu
-	 *	- vcpu_regs->ia32_efer: the IA32_EFER to set */
+	 *  - vcpu_regs->ia32_efer: the IA32_EFER to set */
 	vcpu_set_efer(vcpu, vcpu_regs->ia32_efer);
-	/* Call vcpu_set_rsp(vcpu, vcpu_regs->gprs.rsp) once. */
 	/** Call vcpu_set_rsp() with the following parameters, in order to set the rsp to the target vcpu.
 	 *  - vcpu: the target vcpu
-	 *	- vcpu_regs->gprs.rsp: the rsp to set */
+	 *  - vcpu_regs->gprs.rsp: the rsp to set */
 	vcpu_set_rsp(vcpu, vcpu_regs->gprs.rsp);
 
-	/** If vcpu_regs->rflags is nevered initialized */
+	/** If vcpu_regs->rflags is 0h, meaning a value for RFLAGS is not given */
 	if (vcpu_regs->rflags == 0UL) {
 		/** Call vcpu_set_rflags() with the following parameters, in order to set the rflags to 02h.
 		 *  - vcpu: the target vcpu
-		 *	- 0x02UL: the value of the rflags
+		 *  - 0x02UL: the value of the rflags
 		 */
 		vcpu_set_rflags(vcpu, 0x02UL);
 	} else {
 		/** Call vcpu_set_rflags() with the following parameters, in order to clear bit CF(0),
 		 *  PF(2), AF(4), ZF(6), SF(7) and OF(11).
 		 *  - vcpu: the target vcpu
-		 *	- vcpu_regs->rflags & ~(0x8d5UL): the value of the rflags to set */
+		 *  - vcpu_regs->rflags & ~(0x8d5UL): the value of the rflags to set */
 		vcpu_set_rflags(vcpu, vcpu_regs->rflags & ~(0x8d5UL));
 	}
 
@@ -853,50 +851,121 @@ void set_vcpu_regs(struct acrn_vcpu *vcpu, struct acrn_vcpu_regs *vcpu_regs)
 
 	/** Call set_vcpu_mode() with the following parameters, in order to set the relevant vcpu mode.
 	 *  - vcpu: the target vcpu
-	 *	- vcpu_regs->cs_ar: attributes of the cs register
-	 *	- vcpu_regs->ia32_efer: IA32_EFER of the vcpu
-	 *	- vcpu_regs->cr0: CR0 of the vcpu */
+	 *  - vcpu_regs->cs_ar: attributes of the cs register
+	 *  - vcpu_regs->ia32_efer: IA32_EFER of the vcpu
+	 *  - vcpu_regs->cr0: CR0 of the vcpu */
 	set_vcpu_mode(vcpu, vcpu_regs->cs_ar, vcpu_regs->ia32_efer, vcpu_regs->cr0);
 }
 
-static struct acrn_vcpu_regs realmode_init_vregs = {   /* initial values of vCPU registers for real mode */
+/**
+ * @brief This structure realmode_init_vregs is used to store initial state of vCPU registers for real mode.
+ */
+static struct acrn_vcpu_regs realmode_init_vregs = {
 	.gdt = {
-		.limit = 0xFFFFU,                   /* set limit of guest GDTR to FFFFh */
-		.base = 0UL,                        /* set base address of guest GDTR to 0 */
+		/**
+		 * @brief The initial value for limit of guest GDTR in real mode is FFFFh.
+		 */
+		.limit = 0xFFFFU,
+		/**
+		 * @brief The initial value for base address of guest GDTR in real mode is 0.
+		 */
+		.base = 0UL,
 	},
 	.idt = {
-		.limit = 0xFFFFU,                   /* set limit of guest IDTR to FFFFh */
-		.base = 0UL,                        /* set base address of guest IDTR to FFFFh */
+		/**
+		 * @brief The initial value for limit of guest IDTR in real mode is FFFFh.
+		 */
+		.limit = 0xFFFFU,
+		/**
+		 * @brief The initial value for base address of guest IDTR in real mode is 0.
+		 */
+		.base = 0UL,
 	},
-	.cs_ar = REAL_MODE_CODE_SEG_AR,         /* set attributes of guest CS to REAL_MODE_CODE_SEG_AR */
-	.cs_sel = REAL_MODE_BSP_INIT_CODE_SEL,  /* set selector of guest CS to REAL_MODE_BSP_INIT_CODE_SEL */
-	.cs_base = 0xFFFF0000UL,                /* set base address of guest CS to FFFF0000h */
-	.cs_limit = 0xFFFFU,                    /* set limit of guest CS to FFFFh */
-	.rip = 0xFFF0UL,                        /* set guest RIP to FFF0h */
-	.cr0 = CR0_ET | CR0_NE,                 /* set guest CR0 to CR0_ET | CR0_NE */
-	.cr3 = 0UL,                             /* set guest CR3 to 0 */
-	.cr4 = 0UL,                             /* set guest CR4 to 0 */
+	/**
+	 * @brief The initial value for attributes of guest CS in real mode is REAL_MODE_CODE_SEG_AR.
+	 */
+	.cs_ar = REAL_MODE_CODE_SEG_AR,
+	/**
+	 * @brief The initial value for selector of guest CS in real mode is REAL_MODE_BSP_INIT_CODE_SEL.
+	 */
+	.cs_sel = REAL_MODE_BSP_INIT_CODE_SEL,
+	/**
+	 * @brief The initial value for base address of guest CS in real mode is FFFF0000h.
+	 */
+	.cs_base = 0xFFFF0000UL,
+	/**
+	 * @brief The initial value for limit of guest CS in real mode is FFFFh.
+	 */
+	.cs_limit = 0xFFFFU,
+	/**
+	 * @brief The initial value for guest RIP in real mode is FFF0h.
+	 */
+	.rip = 0xFFF0UL,
+	/**
+	 * @brief The initial value for guest CR0 in real mode is CR0 to CR0_ET | CR0_NE.
+	 */
+	.cr0 = CR0_ET | CR0_NE,
+	/**
+	 * @brief The initial value for guest CR3 in real mode is 0.
+	 */
+	.cr3 = 0UL,
+	/**
+	 * @brief The initial value for attributes of guest CR4 in real mode is 0.
+	 */
+	.cr4 = 0UL,
 };
 
+/**
+ * @brief This array presents the host virtual start address of internal array.
+ *
+ * Its size is 32 bytes, and stores 4 consecutive 8-byte values with zero
+ * extension (0H,0H,00CF9B000000FFFFH,00CF93000000FFFFH) in little endian order;
+ *
+ */
 static uint64_t init_vgdt[] = {
-	0x0UL, 0x0UL, 0x00CF9B000000FFFFUL, /* Linear Code */
-	0x00CF93000000FFFFUL, /* Linear Data */
+	0x0UL, 0x0UL, 0x00CF9B000000FFFFUL,
+	0x00CF93000000FFFFUL,
 };
 
+/**
+ * @brief This structure protect_mode_init_vregs is used to store initial state of vCPU registers
+ *        for protected mode.
+ */
 static struct acrn_vcpu_regs protect_mode_init_vregs = {  /* initial values of vCPU registers for protected mode */
-	.cs_ar = PROTECTED_MODE_CODE_SEG_AR,   /* set attributes of guest CS to PROTECTED_MODE_CODE_SEG_AR */
-	.cs_limit = PROTECTED_MODE_SEG_LIMIT,  /* set limit of guest CS to PROTECTED_MODE_SEG_LIMIT */
-	.cs_sel = 0x10U,					   /* set selector of guest CS to 10h */
-	.cr0 = CR0_ET | CR0_NE | CR0_PE,	   /* set guest CR0 to CR0_ET | CR0_NE | CR0_PE */
-	.ds_sel = 0x18U,					   /* set selector of guest DS to 18h */
-	.ss_sel = 0x18U,					   /* set selector of guest SS to 18h */
-	.es_sel = 0x18U,                       /* set selector of guest ES to 18h */
+	/**
+	 * @brief The initial value for attributes of guest CS in protected mode is PROTECTED_MODE_CODE_SEG_AR.
+	 */
+	.cs_ar = PROTECTED_MODE_CODE_SEG_AR,
+	/**
+	 * @brief The initial value for limit of guest CS in protected mode is PROTECTED_MODE_SEG_LIMIT.
+	 */
+	.cs_limit = PROTECTED_MODE_SEG_LIMIT,
+	/**
+	 * @brief The initial value for selector of guest CS in protected mode is 10h.
+	 */
+	.cs_sel = 0x10U,
+	/**
+	 * @brief The initial value for guest CR0 in protected mode is CR0_ET | CR0_NE | CR0_PE.
+	 */
+	.cr0 = CR0_ET | CR0_NE | CR0_PE,
+	/**
+	 * @brief The initial value for selector of guest DS in protected mode is 18h.
+	 */
+	.ds_sel = 0x18U,
+	/**
+	 * @brief The initial value for selector of guest SS in protected mode is 18h.
+	 */
+	.ss_sel = 0x18U,
+	/**
+	 * @brief The initial value for selector of guest ES in protected mode is 18h.
+	 */
+	.es_sel = 0x18U,
 };
 
 /**
  * @brief This function is used to reset vcpu registers of the target vcpu.
  *
- * @param[inout] vcpu A pointer which points to the target vpu structure whose registers are reset.
+ * @param[inout] vcpu A pointer which points to the target vcpu structure whose registers are reset.
  *
  * @return None
  *
@@ -908,7 +977,7 @@ static struct acrn_vcpu_regs protect_mode_init_vregs = {  /* initial values of v
  *
  * @reentrancy Unspecified
  *
- * @threadsafety Unspecified
+ * @threadsafety When \a vcpu is different among parallel invocation.
  *
  */
 void reset_vcpu_regs(struct acrn_vcpu *vcpu)
@@ -916,14 +985,14 @@ void reset_vcpu_regs(struct acrn_vcpu *vcpu)
 	/** Call set_vcpu_regs() with the following parameters, in order to set the
 	 *  vcpu registers to the relevant states.
 	 *  - vcpu: the target vcpu
-	 *	- &realmode_init_vregs: the address of the initial register state to set */
+	 *  - &realmode_init_vregs: the address of the initial register state to set */
 	set_vcpu_regs(vcpu, &realmode_init_vregs);
 }
 
 /**
  * @brief This function is used to initialize the registers of protected mode of the target vcpu.
  *
- * @param[inout] vcpu A pointer which points to the target vpu structure whose registers are initialized.
+ * @param[inout] vcpu A pointer which points to the target vcpu structure whose registers are initialized.
  * @param[in] vgdt_base_gpa The value of the guest GDTR base address.
  *
  * @return None
@@ -936,7 +1005,7 @@ void reset_vcpu_regs(struct acrn_vcpu *vcpu)
  *
  * @reentrancy Unspecified
  *
- * @threadsafety Unspecified
+ * @threadsafety When \a vcpu is different among parallel invocation.
  *
  */
 void init_vcpu_protect_mode_regs(struct acrn_vcpu *vcpu, uint64_t vgdt_base_gpa)
@@ -948,9 +1017,9 @@ void init_vcpu_protect_mode_regs(struct acrn_vcpu *vcpu, uint64_t vgdt_base_gpa)
 	/** Call memcpy_s() with the following parameters, in order to copy the protect mode init register states
 	 *  to the target vcpu.
 	 *  - &vcpu_regs: address of the vcpu_regs struct
-	 *	- sizeof(struct acrn_vcpu_regs): size of the struct acrn_vcpu_regs
-	 *	- &protect_mode_init_vregs: address of the first byte of struct protect_mode_init_vregs
-	 *	- sizeof(struct acrn_vcpu_regs): size of the struct acrn_vcpu_regs */
+	 *  - sizeof(struct acrn_vcpu_regs): size of the struct acrn_vcpu_regs
+	 *  - &protect_mode_init_vregs: address of the first byte of struct protect_mode_init_vregs
+	 *  - sizeof(struct acrn_vcpu_regs): size of the struct acrn_vcpu_regs */
 	(void)memcpy_s((void *)&vcpu_regs, sizeof(struct acrn_vcpu_regs), (void *)&protect_mode_init_vregs,
 		sizeof(struct acrn_vcpu_regs));
 
@@ -959,8 +1028,8 @@ void init_vcpu_protect_mode_regs(struct acrn_vcpu *vcpu, uint64_t vgdt_base_gpa)
 	/** Set GDTR limit of the vcpu to (sizeof(init_vgdt) - 1) */
 	vcpu_regs.gdt.limit = sizeof(init_vgdt) - 1U;
 	/** Call copy_to_gpa() with the following parameters, in order to copy data in the host virtual memory region
-	 * [&init_vgdt, &init_vgdt + sizeof(init_vgdt)) into the guest physical memory region [&init_vgdt, &init_vgdt
-	 * + sizeof(init_vgdt)).
+	 *  [&init_vgdt, &init_vgdt + sizeof(init_vgdt)) into the guest physical memory region [&init_vgdt, &init_vgdt
+	 *  + sizeof(init_vgdt)).
 	 *  - vcpu->vm: pointer that points to VM data structure
 	 *  - &init_vgdt: start virtual linear address of HV memory region which data is stored in
 	 *  - vgdt_base_gpa: start guest physical address of guest memory region which data will be copied into
@@ -969,17 +1038,18 @@ void init_vcpu_protect_mode_regs(struct acrn_vcpu *vcpu, uint64_t vgdt_base_gpa)
 
 	/** Call set_vcpu_regs() with the following parameters, in order to set the registers of the target vcpu.
 	 *  - vcpu: target vcpu to set
-	 *	- &vcpu_regs: address of the vcpu_reg struct*/
+	 *  - &vcpu_regs: address of the vcpu_reg structure */
 	set_vcpu_regs(vcpu, &vcpu_regs);
 }
 
 /**
- * @brief This function is used to set the startup related state of the target vcpu.
+ * @brief This function is used to to set the address of the first instruction \a vcpu will
+ *        execute in real-address mode once it is launched.
  *
- * @param[inout] vcpu A pointer which points to the target vpu structure
- * @param[in] entry The value where the ap will start from.
+ * @param[inout] vcpu A pointer which points to the target vcpu structure
+ * @param[in] entry The guest physical address where the AP will start fetching instructions.
  *
- * @return n/a
+ * @return N/A
  *
  * @pre vcpu != NULL
  *
@@ -989,13 +1059,13 @@ void init_vcpu_protect_mode_regs(struct acrn_vcpu *vcpu, uint64_t vgdt_base_gpa)
  *
  * @reentrancy Unspecified
  *
- * @threadsafety Unspecified
+ * @threadsafety When \a vcpu is different among parallel invocation.
  *
  */
 void set_vcpu_startup_entry(struct acrn_vcpu *vcpu, uint64_t entry)
 {
-	/** Declare the following local variables of type struct ext_context.
-	 *  - *ectx representing extend context struct. */
+	/** Declare the following local variables of type struct ext_context *.
+	 *  - ectx representing extend context struct. */
 	struct ext_context *ectx;
 
 	/** Set extend context struct to &(vcpu->arch.context.ext_ctx) */
@@ -1016,11 +1086,11 @@ void set_vcpu_startup_entry(struct acrn_vcpu *vcpu, uint64_t entry)
  *
  * @param[in] vm A pointer which points to the target vm structure which is bound with the guest vCPU
  * @param[in] pcpu_id The id of the pcpu
- * @param[in] *rtn_vcpu_handle A pointer which points to the pointer points to vcpu structure.
+ * @param[out] rtn_vcpu_handle A pointer which points to the pointer points to vcpu structure.
  *
- * @return n/a
+ * @return N/A
  *
- * @pre vm != NULL
+ * @pre vm != NULL && rtn_vcpu_handle != NULL
  *
  * @post None
  *
@@ -1028,15 +1098,16 @@ void set_vcpu_startup_entry(struct acrn_vcpu *vcpu, uint64_t entry)
  *
  * @reentrancy Unspecified
  *
- * @threadsafety Unspecified
+ * @threadsafety When \a vcpu is different among parallel invocation.
  *
  */
 int32_t create_vcpu(uint16_t pcpu_id, struct acrn_vm *vm, struct acrn_vcpu **rtn_vcpu_handle)
 {
-	/** Declare the following local variables of type struct acrn_vcpu.
-	 *  - *vcpu representing the pointer which points to the vcpu data structure which stores all the vcpu states */
+	/** Declare the following local variables of type struct acrn_vcpu *.
+	 *  - vcpu representing the pointer to the next fresh vCPU data
+	 *         structure of \a vm. */
 	struct acrn_vcpu *vcpu;
-	/** Declare the following local variables of type uint16_t vcpu_id.
+	/** Declare the following local variables of type uint16_t.
 	 *  - vcpu_id representing the id of the vcpu. */
 	uint16_t vcpu_id;
 	/** Declare the following local variables of type int32_t.
@@ -1056,53 +1127,36 @@ int32_t create_vcpu(uint16_t pcpu_id, struct acrn_vm *vm, struct acrn_vcpu **rtn
 		/** Set vcpu to &(vm->hw.vcpu_array[vcpu_id]) */
 		vcpu = &(vm->hw.vcpu_array[vcpu_id]);
 		/** Call memset() with the following parameters, in order to set
-		 *  sizeof(struct acrn_vcpu) bytes starting from @vcpu to 0.
-		 *  - *vcpu: The address of the memory block to fill
+		 *  sizeof(struct acrn_vcpu) bytes starting from \a vcpu to 0.
+		 *  - vcpu: The address of the memory block to fill
 		 *  - 0: The value to be set to each byte of the specified memory block.
-		 *  - sizeof(struct acrn_vcpu: The number of bytes to be set */
+		 *  - sizeof(struct acrn_vcpu): The number of bytes to be set */
 		(void)memset((void *)vcpu, 0U, sizeof(struct acrn_vcpu));
 
 		/* Initialize CPU ID for this VCPU */
-		/** Set vcpu id of the target vcpu to vcpu_id */
+		/** Set id of the target vcpu to vcpu_id */
 		vcpu->vcpu_id = vcpu_id;
 		/** Set ever_run_vcpu of the per_cpu_data[(pcpu_id)] to vcpu */
 		per_cpu(ever_run_vcpu, pcpu_id) = vcpu;
 
-		/* Initialize the parent VM reference */
 		/** Set vm of the vcpu to the input parameter vm */
 		vcpu->vm = vm;
-
-		/* Initialize the virtual ID for this VCPU */
-		/* FIXME:
-		 * We have assumption that we always destroys vcpus in one
-		 * shot (like when vm is destroyed). If we need to support
-		 * specific vcpu destroy on fly, this vcpu_id assignment
-		 * needs revise.
-		 */
 
 		/** Logging the following information with a log level of LOG_INFO.
 		 *  - vcpu->vm->vm_id: created vm id information
 		 *  - vcpu->vcpu_id: created vcpu id information
-		 *	- "PRIMARY" when is_vcpu_bsp(vcpu) is true, else "SECONDARY" : Role information*/
+		 *  - "PRIMARY" when is_vcpu_bsp(vcpu) is true, else "SECONDARY" : Role information*/
 		pr_info("Create VM%d-VCPU%d, Role: %s", vcpu->vm->vm_id, vcpu->vcpu_id,
 			is_vcpu_bsp(vcpu) ? "PRIMARY" : "SECONDARY");
 
-		/*
-		 * If the logical processor is in VMX non-root operation and
-		 * the "enable VPID" VM-execution control is 1, the current VPID
-		 * is the value of the VPID VM-execution control field in the VMCS.
-		 *
-		 * This assignment guarantees a unique non-zero per vcpu vpid in runtime.
-		 */
-		/** Set vpid of the vcpu to 1U + (vm->vm_id * MAX_VCPUS_PER_VM) + vcpu->vcpu_id */
+		/** Set vpid of the vcpu->arch to 1U + (vm->vm_id * MAX_VCPUS_PER_VM) + vcpu->vcpu_id */
 		vcpu->arch.vpid = 1U + (vm->vm_id * MAX_VCPUS_PER_VM) + vcpu->vcpu_id;
 
-		/* Initialize exception field in VCPU context */
 		/** Set exception information of the vcpu to VECTOR_INVALID */
 		vcpu->arch.exception_info.exception = VECTOR_INVALID;
 
 		/* Create per vcpu vlapic */
-		/** Call vlapic_create() with the following parameters, in order to creat vlapic related states.
+		/** Call vlapic_create() with the following parameters, in order to initialize vlapic related states.
 		 *  - vcpu: the target vcpu
 		 */
 		vlapic_create(vcpu);
@@ -1115,12 +1169,12 @@ int32_t create_vcpu(uint16_t pcpu_id, struct acrn_vm *vm, struct acrn_vcpu **rtn
 		vcpu->launched = false;
 		/** Set running state of vcpu to false */
 		vcpu->running = false;
-		/** Set nr_sipi of the vcpu to 0 */
+		/** Set nr_sipi of the vcpu->arch to 0 */
 		vcpu->arch.nr_sipi = 0U;
 		/** Set state of the vcpu to VCPU_INIT */
 		vcpu->state = VCPU_INIT;
 
-		/** Call init_xsave() with the following parameters, in order to initial
+		/** Call init_xsave() with the following parameters, in order to initialize
 		 *  the xsave area of the target vcpu.
 		 *  - vcpu : the vcpu to set */
 		init_xsave(vcpu);
@@ -1129,12 +1183,12 @@ int32_t create_vcpu(uint16_t pcpu_id, struct acrn_vm *vm, struct acrn_vcpu **rtn
 		 *  - vcpu : the vcpu to reset */
 		reset_vcpu_regs(vcpu);
 		/** Call memset() with the following parameters, in order to set
-		 *  sizeof(struct io_request) bytes starting from @vcpu to 0.
+		 *  sizeof(struct io_request) bytes starting from &vcpu->req to 0.
 		 *  - &vcpu->req: The address of the memory block to fill
 		 *  - 0: The value to be set to each byte of the specified memory block.
-		 *  - sizeof(struct io_request: The number of bytes to be set */
+		 *  - sizeof(struct io_request): The number of bytes to be set */
 		(void)memset((void *)&vcpu->req, 0U, sizeof(struct io_request));
-		/** Increment created_vcpus number of the vm by 1 */
+		/** Increment created_vcpus number of the vm->hw by 1 */
 		vm->hw.created_vcpus++;
 		/** Set return value to 0 */
 		ret = 0;
@@ -1156,7 +1210,7 @@ int32_t create_vcpu(uint16_t pcpu_id, struct acrn_vm *vm, struct acrn_vcpu **rtn
  *
  * @param[inout] vcpu A pointer which points to the target vcpu structure which will be run
  *
- * @return n/a
+ * @return N/A
  *
  * @pre vcpu != NULL
  *
@@ -1173,44 +1227,52 @@ int32_t run_vcpu(struct acrn_vcpu *vcpu)
 {
 	/** Declare the following local variables of type uint32_t.
 	 *  - instlen representing the instruction length
-	 *	- cs_attr representing the attributes of cs */
+	 *  - cs_attr representing the attributes of cs */
 	uint32_t instlen, cs_attr;
 	/** Declare the following local variables of type uint64_t.
 	 *  - rip representing rip of the vcpu.
 	 *  - ia32_efer representing IA32_EFER of the vcpu.
 	 *  - cr0 representing cr0 of the vcpu. */
 	uint64_t rip, ia32_efer, cr0;
-	/** Declare the following local variables of type struct run_context.
-	 *  - *ctx representing pointer which points to the running context, initialized
-	 *	as vcpu->arch.context.run_ctx.
+	/** Declare the following local variables of type struct run_context *.
+	 *  - ctx representing pointer which points to the running context, initialized
+	 *  as &(vcpu->arch.context.run_ctx).
 	 */
 	struct run_context *ctx = &vcpu->arch.context.run_ctx;
 	/** Declare the following local variables of type int32_t.
 	 *  - status representing vmx running status, initialized as zero. */
 	int32_t status = 0;
 
-	/** If rip of the vcpu register updated */
+	/** If calls to bitmap_test_and_set_lock with CPU_REG_RIP and &vcpu->reg_updated
+	 *  being parameters returns true.
+	 */
 	if (bitmap_test_and_clear_lock(CPU_REG_RIP, &vcpu->reg_updated)) {
-		/** Call exec_vmwrite() with the following parameters, in order to write rip to vmcs field .
+		/** Call exec_vmwrite() with the following parameters, in order to write rip to vmcs field.
 		 *  - VMX_GUEST_RIP: address of GUEST RIP in VMCS field
 		 *  - ctx->rip:  rip in the context*/
 		exec_vmwrite(VMX_GUEST_RIP, ctx->rip);
 	}
-	/** If rip of the vcpu register updated */
+	/** If calls to bitmap_test_and_set_lock with CPU_REG_RSP and &vcpu->reg_updated
+	 *  being parameters returns true.
+	 */
 	if (bitmap_test_and_clear_lock(CPU_REG_RSP, &vcpu->reg_updated)) {
-		/** Call exec_vmwrite() with the following parameters, in order to write rsp to vmcs field .
+		/** Call exec_vmwrite() with the following parameters, in order to write rsp to vmcs field.
 		 *  - VMX_GUEST_RSP: address of GUEST RSP in VMCS field
 		 *  - ctx->cpu_regs.regs.rsp:  rsp in the context*/
 		exec_vmwrite(VMX_GUEST_RSP, ctx->cpu_regs.regs.rsp);
 	}
-	/** If IA32_EFER of the vcpu register updated */
+	/** If calls to bitmap_test_and_set_lock with CPU_REG_EFER and &vcpu->reg_updated
+	 *  being parameters returns true.
+	 */
 	if (bitmap_test_and_clear_lock(CPU_REG_EFER, &vcpu->reg_updated)) {
 		/** Call exec_vmwrite() with the following parameters, in order to write rsp to vmcs field .
 		 *  - VMX_GUEST_IA32_EFER_FULL: address of GUEST EFER in VMCS field
 		 *  - ctx->ia32_efer:  IA32_EFER in the context*/
 		exec_vmwrite64(VMX_GUEST_IA32_EFER_FULL, ctx->ia32_efer);
 	}
-	/** If rflags of the vcpu register updated */
+	/** If calls to bitmap_test_and_set_lock with CPU_REG_RFLAGS and &vcpu->reg_updated
+	 *  being parameters returns true.
+	 */
 	if (bitmap_test_and_clear_lock(CPU_REG_RFLAGS, &vcpu->reg_updated)) {
 		/** Call exec_vmwrite() with the following parameters, in order to write rsp to vmcs field .
 		 *  - VMX_GUEST_RFLAGS: address of GUEST RFLAGS in VMCS field
@@ -1218,12 +1280,9 @@ int32_t run_vcpu(struct acrn_vcpu *vcpu)
 		exec_vmwrite(VMX_GUEST_RFLAGS, ctx->rflags);
 	}
 
-	/*
-	 * Currently, updating CR0/CR4 here is only designed for world
-	 * switching. There should no other module request updating
-	 * CR0/CR4 here.
+	/** If calls to bitmap_test_and_set_lock with CPU_REG_CR0 and &vcpu->reg_updated
+	 *  being parameters returns true.
 	 */
-	/** If cr0 of the vcpu register updated */
 	if (bitmap_test_and_clear_lock(CPU_REG_CR0, &vcpu->reg_updated)) {
 		/** Call vcpu_set_cr0() with the following parameters, in order to set cr0 to the vcpu.
 		 *  - vcpu: the target vcpu to set
@@ -1231,11 +1290,13 @@ int32_t run_vcpu(struct acrn_vcpu *vcpu)
 		vcpu_set_cr0(vcpu, ctx->cr0);
 	}
 
-	/** If cr4 of the vcpu register updated */
+	/** If calls to bitmap_test_and_set_lock with CPU_REG_CR4 and &vcpu->reg_updated
+	 *  being parameters returns true.
+	 */
 	if (bitmap_test_and_clear_lock(CPU_REG_CR4, &vcpu->reg_updated)) {
 		/** Call vcpu_set_cr4() with the following parameters, in order to set cr4 to the vcpu.
 		 *  - vcpu: the target vcpu to set
-		 *  - ctx->cr4:  cr4 to set*/
+		 *  - ctx->cr4:  cr4 to set */
 		vcpu_set_cr4(vcpu, ctx->cr4);
 	}
 
@@ -1246,7 +1307,7 @@ int32_t run_vcpu(struct acrn_vcpu *vcpu)
 		 *  - vcpu->vcpu_id: vcpu id */
 		pr_info("VM %d Starting VCPU %hu", vcpu->vm->vm_id, vcpu->vcpu_id);
 
-		/** If vpid of the vcpu exists */
+		/** If vpid of the vcpu->arch is not 0 */
 		if (vcpu->arch.vpid != 0U) {
 			/** Call exec_vmwrite16 with the following parameters, in order to set vpid to vmcs field.
 			 *  - VMX_VPID: address of VPID in VMCS field
@@ -1255,10 +1316,6 @@ int32_t run_vcpu(struct acrn_vcpu *vcpu)
 			exec_vmwrite16(VMX_VPID, vcpu->arch.vpid);
 		}
 
-		/*
-		 * A power-up or a reset invalidates all linear mappings,
-		 * guest-physical mappings, and combined mappings
-		 */
 		/** Call flush_vpid_global(), in order to invalidate all mappings (linear mappings,
 		 *  guest-physical mappings and combined mappings) in the TLBs and paging-structure
 		 *  caches that are tagged with all VPIDs.
@@ -1268,25 +1325,23 @@ int32_t run_vcpu(struct acrn_vcpu *vcpu)
 		/** Set launched status of the vcpu to true */
 		vcpu->launched = true;
 
+		/** Call cpu_l1d_flush(), in order to Flush L1 data cache.
+		 */
 		cpu_l1d_flush();
 
-		/*Mitigation for MDS vulnerability, overwrite CPU internal buffers */
-		/** Call cpu_internal_buffers_clear() with the following parameters, in order to
-		 *  clear CPU internal buffers.
+		/** Call cpu_internal_buffers_clear() in order to clear CPU internal buffers.
 		 */
 		cpu_internal_buffers_clear();
 
-		/* Launch the VM */
-		/** Call vmx_vmrun() with the following parameters, in order to clear CPU internal buffers.
-		 *  - ctx: vcpu running context
-		 *  - VM_LAUNCH:  state of vm
+		/** Call vmx_vmrun with ctx and VM_LAUNCH being the parameters, in order to
+		 *  save running context of the vcpu, execute a VM launch, and then set
+		 *  status to its return value.
 		 */
-		/** Set status to return value of vmx_run(ctx, VM_LAUNCH) */
 		status = vmx_vmrun(ctx, VM_LAUNCH);
 
-		/** If VM launched successfully */
+		/** If the VMX running status is 0 */
 		if (status == 0) {
-			/** If the target vcpu is bsp */
+			/** If the return value of is_vcpu_bsp() with vcpu as parameter is true*/
 			if (is_vcpu_bsp(vcpu)) {
 				/** Logging the following information with a log level of LOG_INFO.
 				 *  - vcpu->vm->vm_id: vm id
@@ -1300,25 +1355,32 @@ int32_t run_vcpu(struct acrn_vcpu *vcpu)
 		 */
 		/** Set instruction length to vcpu->arch.inst_len */
 		instlen = vcpu->arch.inst_len;
-		/** Set rip to vcpu_get_rip(vcpu) */
+		/** Call vcpu_get_rip with vcpu being the parameter, in order to
+		 *  get current guest RIP, and set rip to its return value.
+		 */
 		rip = vcpu_get_rip(vcpu);
 		/** Call exec_vmwrite() with the following parameters, in order to write rip
 		 *  value to VMCS field.
 		 *  - VMX_GUEST_RIP: address of GUEST RIP in VMCS field
-		 *  - ((rip + (uint64_t)instlen) & 0xFFFFFFFFFFFFFFFFUL)):  current rip add
-		 *  the instruction length to set.
+		 *  - ((rip + (uint64_t)instlen) & 0xFFFFFFFFFFFFFFFFUL)):  guest address
+		 *  of the next instruction to be executed.
 		 */
 		exec_vmwrite(VMX_GUEST_RIP, ((rip + (uint64_t)instlen) & 0xFFFFFFFFFFFFFFFFUL));
+
+		/** Call cpu_l1d_flush(), in order to Flush L1 data cache.
+		 */
 		cpu_l1d_flush();
 
 		/* Mitigation for MDS vulnerability, overwrite CPU internal buffers */
-		/** Call cpu_internal_buffers_clear() with the following parameters, in order to
+		/** Call cpu_internal_buffers_clear(), in order to
 		 *  clear CPU internal buffers.
 		 */
 		cpu_internal_buffers_clear();
 
-		/* Resume the VM */
-		/** Set status to return value of vmx run status */
+		/** Call vmx_vmrun with ctx and VM_RESUME being the parameters, in order to
+		 *  save running context of the vcpu, execute a VM resume, and then set
+		 *  status to its return value.
+		 */
 		status = vmx_vmrun(ctx, VM_RESUME);
 	}
 
@@ -1327,31 +1389,29 @@ int32_t run_vcpu(struct acrn_vcpu *vcpu)
 
 	/** Set cs register attributes to exec_vmread32(VMX_GUEST_CS_ATTR) */
 	cs_attr = exec_vmread32(VMX_GUEST_CS_ATTR);
-	/** Set efer to vcpu_get_efer(vcpu) */
+	/** Set ia32_efer to vcpu_get_efer(vcpu) */
 	ia32_efer = vcpu_get_efer(vcpu);
 	/** Set cr0 to vcpu_get_cr0(vcpu) */
 	cr0 = vcpu_get_cr0(vcpu);
 	/** Call set_vcpu_mode() with the following parameters, in order to set the relevant vcpu mode.
 	 *  - vcpu: the target vcpu
-	 *	- cs_attr: attributes of the cs register
-	 *	- ia32_efer: IA32_EFER of the vcpu
-	 *	- cr0: CR0 of the vcpu */
+	 *  - cs_attr: attributes of the cs register
+	 *  - ia32_efer: IA32_EFER of the vcpu
+	 *  - cr0: CR0 of the vcpu
+	 */
 	set_vcpu_mode(vcpu, cs_attr, ia32_efer, cr0);
 
-	/* Obtain current VCPU instruction length */
-	/** Set instruction length of the vcpu to exec_vmread32(VMX_EXIT_INSTR_LEN) */
+	/** Set inst_len of vcpu->arch to exec_vmread32(VMX_EXIT_INSTR_LEN) */
 	vcpu->arch.inst_len = exec_vmread32(VMX_EXIT_INSTR_LEN);
 
-	/** Set rsp of the vcpu to exec_vmread32(VMX_GUEST_RSP) */
+	/** Set rsp of ctx->cpu_regs.regs to exec_vmread32(VMX_GUEST_RSP) */
 	ctx->cpu_regs.regs.rsp = exec_vmread(VMX_GUEST_RSP);
 
-	/* Obtain VM exit reason */
-	/** Set vm exit reason to exec_vmread32(VMX_EXIT_REASON) */
+	/** Set exit_reason of vcpu->arch to exec_vmread32(VMX_EXIT_REASON) */
 	vcpu->arch.exit_reason = exec_vmread32(VMX_EXIT_REASON);
 
-	/** If vm run fail */
+	/** If status is not 0 */
 	if (status != 0) {
-		/* refer to 64-ia32 spec section 24.9.1 volume#3 */
 		/** If vm entry failed */
 		if ((vcpu->arch.exit_reason & VMX_VMENTRY_FAIL) != 0U) {
 			/** Logging the following information with a log level of LOG_FATAL.
@@ -1363,20 +1423,21 @@ int32_t run_vcpu(struct acrn_vcpu *vcpu)
 			pr_fatal("vmexit fail err_inst=%x", exec_vmread32(VMX_INSTR_ERROR));
 		}
 
-		/** While <TBD: meaning of the controlling expression> */
+
+		/** Assert that status is not equal to 0. */
 		ASSERT(status == 0, "vm fail");
 	}
 
-	/** Return vm running status */
+	/** Return status */
 	return status;
 }
 
 /**
  * @brief This function is used to offline the target vcpu.
  *
- * @param[inout] vcpu A pointer which points to the target vpu structure which will be offline
+ * @param[inout] vcpu A pointer which points to the target vcpu structure which will be offline
  *
- * @return n/a
+ * @return N/A
  *
  * @pre vcpu != NULL
  *
@@ -1386,23 +1447,23 @@ int32_t run_vcpu(struct acrn_vcpu *vcpu)
  *
  * @reentrancy Unspecified
  *
- * @threadsafety Unspecified
+ * @threadsafety When \a vcpu is different among parallel invocation
  *
  */
 void offline_vcpu(struct acrn_vcpu *vcpu)
 {
 	/** Set per_cpu_data[pcpuid_from_vcpu(vcpu)].ever_run_vcpu to NULL */
 	per_cpu(ever_run_vcpu, pcpuid_from_vcpu(vcpu)) = NULL;
-	/** state of the vcpu to VCPU_OFFLINE */
+	/** Set state of the vcpu to VCPU_OFFLINE */
 	vcpu->state = VCPU_OFFLINE;
 }
 
 /**
  * @brief This function is used to notify a vCPU of pending requests that it must handle immediately.
  *
- * @param[inout] vcpu A pointer which points to the target vpu structure which will be notified
+ * @param[inout] vcpu A pointer which points to the target vcpu structure which will be notified
  *
- * @return n/a
+ * @return N/A
  *
  * @pre vcpu != NULL
  *
@@ -1412,22 +1473,22 @@ void offline_vcpu(struct acrn_vcpu *vcpu)
  *
  * @reentrancy Unspecified
  *
- * @threadsafety Unspecified
+ * @threadsafety Yes
  *
  */
 void kick_vcpu(const struct acrn_vcpu *vcpu)
 {
 	/** Call kick_thread with the following parameters, in order to kick the thread of the vcpu.
-	 *  - vcpu->thread_obj: thread of the vcpu */
+	 *  - &(vcpu->thread_obj): thread of the vcpu */
 	kick_thread(&vcpu->thread_obj);
 }
 
 /**
  * @brief This function is used to build the stack frame of the target vcpu.
  *
- * @param[inout] vcpu A pointer which points to the target vpu structure which will be run
+ * @param[inout] vcpu A pointer which points to the target vcpu structure which will be run
  *
- * @return n/a
+ * @return N/A
  *
  * @pre vcpu != NULL
  * @pre (&vcpu->stack[CONFIG_STACK_SIZE] & (CPU_STACK_ALIGN - 1UL)) == 0
@@ -1438,7 +1499,7 @@ void kick_vcpu(const struct acrn_vcpu *vcpu)
  *
  * @reentrancy Unspecified
  *
- * @threadsafety Unspecified
+ * @threadsafety When \a vcpu is different among parallel invocation
  *
  */
 static uint64_t build_stack_frame(struct acrn_vcpu *vcpu)
@@ -1448,11 +1509,11 @@ static uint64_t build_stack_frame(struct acrn_vcpu *vcpu)
 	 *  (uint64_t)&vcpu->stack[CONFIG_STACK_SIZE]
 	 */
 	uint64_t stacktop = (uint64_t)&vcpu->stack[CONFIG_STACK_SIZE];
-	/** Declare the following local variables of type struct stack_frame.
+	/** Declare the following local variables of type struct stack_frame *.
 	 *  - frame representing the stack frame. */
 	struct stack_frame *frame;
-	/** Declare the following local variables of type uint64_t.
-	 *  - *ret representing pointer that points to the return value. */
+	/** Declare the following local variables of type uint64_t *.
+	 *  - ret representing pointer that points to the return value. */
 	uint64_t *ret;
 
 	/** Set frame to (struct stack_frame *)stacktop */
@@ -1460,7 +1521,7 @@ static uint64_t build_stack_frame(struct acrn_vcpu *vcpu)
 	/** Decrement frame by 1 */
 	frame -= 1;
 
-	/** Set magic number to SP_BOTTOM_MAGIC */
+	/** Set magic number of the frame stack to SP_BOTTOM_MAGIC */
 	frame->magic = SP_BOTTOM_MAGIC;
 	/** Set rip of the frame to (uint64_t)vcpu->thread_obj.thread_entry. */
 	frame->rip = (uint64_t)vcpu->thread_obj.thread_entry; /*return address*/
@@ -1478,10 +1539,10 @@ static uint64_t build_stack_frame(struct acrn_vcpu *vcpu)
 	frame->r14 = 0UL;
 	/** Set r15 of the frame to zero. */
 	frame->r15 = 0UL;
-	/** Set rdi of the frame to address of the vcpu thread. */
+	/** Set rdi of the frame to address of vcpu->thread_obj. */
 	frame->rdi = (uint64_t)&vcpu->thread_obj;
 
-	/** Set ret of the frame to rdi. */
+	/** Set ret to address of frame->rdi. */
 	ret = &frame->rdi;
 
 	/** Return (uint64_t)ret */
@@ -1491,9 +1552,9 @@ static uint64_t build_stack_frame(struct acrn_vcpu *vcpu)
 /**
  * @brief This function is used to reset the target vcpu.
  *
- * @param[inout] vcpu A pointer which points to the target vpu structure which will be reset
+ * @param[inout] vcpu A pointer which points to the target vcpu structure which will be reset
  *
- * @return n/a
+ * @return N/A
  *
  * @pre vcpu != NULL
  *
@@ -1503,25 +1564,23 @@ static uint64_t build_stack_frame(struct acrn_vcpu *vcpu)
  *
  * @reentrancy Unspecified
  *
- * @threadsafety Unspecified
+ * @threadsafety When \a vcpu is different among parallel invocation
  *
- */
- /* NOTE:
- * vcpu should be paused before call this function.
  */
 void reset_vcpu(struct acrn_vcpu *vcpu)
 {
 	/** Declare the following local variables of type int32_t.
 	 *  - i representing counter for loop. */
 	int32_t i;
-	/** Declare the following local variables of type struct acrn_vlapic.
-	 *  - *vlapic representing pointer that points to vlapic of the vcpu. */
+	/** Declare the following local variables of type struct acrn_vlapic *.
+	 *  - vlapic representing pointer that points to vlapic of the vcpu. */
 	struct acrn_vlapic *vlapic;
 
 	/** Logging the following information with a log level of LOG_DEBUG.
 	 *  - vcpu->vcpu_id: vcpu id to reset */
 	pr_dbg("vcpu%hu reset", vcpu->vcpu_id);
-	/** While state of vcpu is RUNNING, report "reset vcpu when it's running" */
+	/** Assert state of vcpu is VCPU_RUNNING.
+	 */
 	ASSERT(vcpu->state != VCPU_RUNNING, "reset vcpu when it's running");
 
 	/** If state of vcpu is not VCPU_INIT */
@@ -1533,13 +1592,13 @@ void reset_vcpu(struct acrn_vcpu *vcpu)
 		vcpu->launched = false;
 		/** Set running state of vcpu to false */
 		vcpu->running = false;
-		/** Set nr_sipi state of vcpu to false */
+		/** Set nr_sipi state of vcpu->arch to false */
 		vcpu->arch.nr_sipi = 0U;
 
-		/** Set exception information to VECTOR_INVALID */
+		/** Set exception information of vcpu->arch to VECTOR_INVALID */
 		vcpu->arch.exception_info.exception = VECTOR_INVALID;
 
-		/** Set irq_window_enabled to false */
+		/** Set irq_window_enabled of vcpu->arch to false */
 		vcpu->arch.irq_window_enabled = false;
 		/** Call memset() with the following parameters, in order to set PAGE_SIZE bytes
 		 *  starting from &vcpu->arch.vmcs to 0.
@@ -1553,13 +1612,13 @@ void reset_vcpu(struct acrn_vcpu *vcpu)
 		 *  - (void *)&vcpu->arch.contexts[i]: The address of the memory block to fill
 		 *  - 0: The value to be set to each byte of the specified memory block.
 		 *  - sizeof(struct run_context): The number of bytes to be set */
-			(void)memset((void *)(&vcpu->arch.context), 0U, sizeof(struct run_context));
+		(void)memset((void *)(&vcpu->arch.context), 0U, sizeof(struct run_context));
 
-		/* TODO: we may need to add one scheduler->reset_data to reset the thread_obj */
-		/** Set notify mode to SCHED_NOTIFY_IPI */
+		/** Set notify mode of vcpu->thread_obj to SCHED_NOTIFY_IPI. */
 		vcpu->thread_obj.notify_mode = SCHED_NOTIFY_IPI;
 
-		/** Set vlapic to vlapic of the target vcpu */
+		/** Call vcpu_vlapic() with vcpu as parameter in order to get address of the
+		 *  vlapic structure associated with the vcpu and set vlapic to its return value. */
 		vlapic = vcpu_vlapic(vcpu);
 		/** Call vlapic_reset() with the following parameters, in order to reset the target vlapic.
 		 *  - vlapic: the target vlapic to reset */
@@ -1574,11 +1633,12 @@ void reset_vcpu(struct acrn_vcpu *vcpu)
 
 /**
  * @brief This function is used to pause the target vcpu.
- * Change a vCPU state to VCPU_PAUSED or VCPU_ZOMBIE, and make a reschedule request for it
  *
- * @param[inout] vcpu A pointer which points to the target vpu structure which will be paused
+ * Change a vCPU state to VCPU_PAUSED or VCPU_ZOMBIE, and make a reschedule request for it.
  *
- * @return n/a
+ * @param[inout] vcpu A pointer which points to the target vcpu structure which will be paused
+ *
+ * @return N/A
  *
  * @pre vcpu != NULL
  *
@@ -1588,11 +1648,8 @@ void reset_vcpu(struct acrn_vcpu *vcpu)
  *
  * @reentrancy Unspecified
  *
- * @threadsafety Unspecified
+ * @threadsafety When \a vcpu is different among parallel invocation
  *
- */
- /* NOTE:
- * vcpu should be paused before call this function.
  */
 void pause_vcpu(struct acrn_vcpu *vcpu, enum vcpu_state new_state)
 {
@@ -1600,38 +1657,39 @@ void pause_vcpu(struct acrn_vcpu *vcpu, enum vcpu_state new_state)
 	 *  - pcpu_id representing id of the pcpu, initialized as pcpuid_from_vcpu(vcpu). */
 	uint16_t pcpu_id = pcpuid_from_vcpu(vcpu);
 
-	/** Logging the following information with a log level of <TBD>.
+	/** Logging the following information with a log level of LOG_DEBUG.
 	 *  - vcpu->vcpu_id: id of the vcpu
 	 *  - new_state new state of the vcpu*/
 	pr_dbg("vcpu%hu paused, new state: %d", vcpu->vcpu_id, new_state);
 
-	/** Set pre_state of the vcpu to vcpu->state */
+	/** Set prev_state of the vcpu to vcpu->state */
 	vcpu->prev_state = vcpu->state;
 	/** Set vcpu->state to the input new_state */
 	vcpu->state = new_state;
 
-	/** If pre status is VCPU_RUNNING */
+	/** If vcpu->prev_state is VCPU_RUNNING */
 	if (vcpu->prev_state == VCPU_RUNNING) {
 		/** Call sleep_thread() with the following parameters, in order to sleep the target thread.
-		 *  - &vcpu->thread_obj: address of the target thread */
+		 *  - &vcpu->thread_obj: address of the target thread. */
 		sleep_thread(&vcpu->thread_obj);
 	}
-	/** If pcpuid_Id_from(vcpu) is different with get_cpu_id() */
+	/** If pcpu_id is different with return value of get_cpu_id(). */
 	if (pcpu_id != get_pcpu_id()) {
 		/** Until vcpu->running is false */
 		while (vcpu->running) {
-			/** Call asm_pause() with the following parameters, in order to pause the vcpu. */
+			/** Call asm_pause(), in order to pause current physical CPU. */
 			asm_pause();
 		}
 	}
 }
 
 /**
- * @brief This function is used to save extend state components to xsave area.
+ * @brief This function is used to save the physical state-component bitmaps and XSAVE-managed
+ * user and supervisor state components to the given extended context.
  *
  * @param[inout] ectx A pointer which points to the target ext_context structure
  *
- * @return n/a
+ * @return N/A
  *
  * @pre ectx != NULL
  *
@@ -1641,28 +1699,31 @@ void pause_vcpu(struct acrn_vcpu *vcpu, enum vcpu_state new_state)
  *
  * @reentrancy Unspecified
  *
- * @threadsafety Unspecified
+ * @threadsafety When \a ectx is different among parallel invocation
  *
  */
 void save_xsave_area(struct ext_context *ectx)
 {
-	/** Set xcr0 in the extend context to read_xcr0() */
+	/** Call read_xcr() with 0 being parameter, in order to read host CR0,
+	 *  and set ectx->xcr0 to its return value */
 	ectx->xcr0 = read_xcr(0);
-	/** Set xss of the extend context to msr_read(MSR_IA32_XSS) */
+	/** Call msr_read() with MSR_IA32_XSS being parameter, in order to read host
+	 *  MSR with index of MSR_IA32_XSS and set ectx->xss to its return value */
 	ectx->xss = msr_read(MSR_IA32_XSS);
 	/** Execute xsaves in order to save extend state components to the xsave area located at target memory address.
-	 *  - Input operands: ectx->xs_area: destination operand which specify the located memory address
-	 *  - Output operands: n/a
-	 *  - Clobbers: n/a */
+	 *  - Input operands: ectx->xs_area, RDX holds UINT32_MAX, RAX holds UINT32_MAX.
+	 *  - Output operands: N/A
+	 *  - Clobbers: memory */
 	asm volatile("xsaves %0" : : "m"(ectx->xs_area), "d"(UINT32_MAX), "a"(UINT32_MAX) : "memory");
 }
 
 /**
- * @brief This function is used to restore of processor state components from the XSAVE area.
+ * @brief This function is used to restore the physical state-component bitmaps and XSAVE-managed
+ * user and supervisor state components from the given extended context.
  *
  * @param[inout] ectx A pointer which points to the target ext_context structure
  *
- * @return n/a
+ * @return N/A
  *
  * @pre ectx != NULL
  *
@@ -1672,7 +1733,7 @@ void save_xsave_area(struct ext_context *ectx)
  *
  * @reentrancy Unspecified
  *
- * @threadsafety Unspecified
+ * @threadsafety When \a ectx is different among parallel invocation
  *
  */
 void rstore_xsave_area(const struct ext_context *ectx)
@@ -1681,15 +1742,15 @@ void rstore_xsave_area(const struct ext_context *ectx)
 	 *  - 0: number of xcr
 	 *  - ectx->xcr0: value to write to the xcr0 */
 	write_xcr(0, ectx->xcr0);
-	/** Call msr_write() with the following parameters, in order to write xss of extend context to MSMR_IA32_XSS.
+	/** Call msr_write() with the following parameters, in order to write xss of extend context to MSR_IA32_XSS.
 	 *  - MSR_IA32_XSS: target MSR to write
 	 *  - ectx->xss: value to write to the msr */
 	msr_write(MSR_IA32_XSS, ectx->xss);
 	/** Execute xrstors in order to restore of processor state components from the XSAVE area located at the
 	 * memory address.
-	 *  - Input operands: ectx->xs_area: the source operand which specify the located memory address
-	 *  - Output operands: n/a
-	 *  - Clobbers n/a */
+	 *  - Input operands: ectx->xs_area, RDX holds UINT32_MAX, RAX holds UINT32_MAX.
+	 *  - Output operands: N/A
+	 *  - Clobbers memory */
 	asm volatile("xrstors %0" : : "m"(ectx->xs_area), "d"(UINT32_MAX), "a"(UINT32_MAX) : "memory");
 }
 
@@ -1698,7 +1759,7 @@ void rstore_xsave_area(const struct ext_context *ectx)
  *
  * @param[inout] prev A pointer which points to the target thread_object structure
  *
- * @return n/a
+ * @return N/A
  *
  * @pre prev != NULL
  *
@@ -1708,28 +1769,22 @@ void rstore_xsave_area(const struct ext_context *ectx)
  *
  * @reentrancy Unspecified
  *
- * @threadsafety Unspecified
+ * @threadsafety When \a prev is different among parallel invocation
  *
- */
- /* TODO:
- * Now we have switch_out and switch_in callbacks for each thread_object, and schedule
- * will call them every thread switch. We can implement lazy context swtich , which
- * only do context swtich when really need.
  */
 static void context_switch_out(struct thread_object *prev)
 {
-	/** Declare the following local variables of type struct acrn_vcpu.
-	 *  - *vcpu representing the pointer which points to vcpu, initialized as
+	/** Declare the following local variables of type struct acrn_vcpu *.
+	 *  - vcpu representing the pointer which points to vcpu, initialized as
 	 *  list_entry(prev, struct acrn_vcpu, thread_obj).
 	 */
 	struct acrn_vcpu *vcpu = list_entry(prev, struct acrn_vcpu, thread_obj);
-	/** Declare the following local variables of type struct ext_context.
-	 *  - *ectx representing the pointer that points to the extend context, initialized
+	/** Declare the following local variables of type struct ext_context *.
+	 *  - ectx representing the pointer that points to the extend context, initialized
 	 *  as &(vcpu->arch.context.ext_ctx).
 	 */
 	struct ext_context *ectx = &(vcpu->arch.context.ext_ctx);
 
-	/* We don't flush TLB as we assume each vcpu has different vpid */
 	/** Set ia32_star of the extend context to msr_read(MSR_IA32_STAR) */
 	ectx->ia32_star = msr_read(MSR_IA32_STAR);
 	/** Set ia32_lstar of the extend context to msr_read(MSR_IA32_LSTAR) */
@@ -1739,20 +1794,20 @@ static void context_switch_out(struct thread_object *prev)
 	/** Set ia32_kernel_gs_base of the extend context to msr_read(MSR_IA32_KERNEL_GS_BASE) */
 	ectx->ia32_kernel_gs_base = msr_read(MSR_IA32_KERNEL_GS_BASE);
 
-	/** Call save_xsave_area() with the following parameters, in order to save the xsave compinent.
+	/** Call save_xsave_area() with the following parameters, in order to save the xsave component.
 	 *  - ectx: extend context of the vcpu */
 	save_xsave_area(ectx);
 
-	/** Set running state of the vcpu to false */
+	/** Set vcpu->running to false */
 	vcpu->running = false;
 }
 
 /**
- * @brief he function is used to restore the extend context for target thread.
+ * @brief The function is used to restore the extend context for target thread.
  *
  * @param[inout] prev A pointer which points to the target thread_object structure
  *
- * @return n/a
+ * @return N/A
  *
  * @pre vcpu != NULL
  *
@@ -1762,19 +1817,19 @@ static void context_switch_out(struct thread_object *prev)
  *
  * @reentrancy Unspecified
  *
- * @threadsafety Unspecified
+ * @threadsafety When \a next is different among parallel invocation
  *
  */
 static void context_switch_in(struct thread_object *next)
 {
-	/** Declare the following local variables of type struct acrn_vcpu.
-	 *  - *vcpu representing pointer which point to the vcpu, initialized
-	 *	list_entry(next, struct acrn_vcpu, thread_obj).
+	/** Declare the following local variables of type struct acrn_vcpu *.
+	 *  - vcpu representing pointer which point to the vcpu, initialized as
+	 *  list_entry(next, struct acrn_vcpu, thread_obj).
 	 */
 	struct acrn_vcpu *vcpu = list_entry(next, struct acrn_vcpu, thread_obj);
-	/** Declare the following local variables of type struct ext_context.
-	 *  - *ectx representing pointer which points to the extend context of vcpu, initialized
-	 *	&(vcpu->arch.context.ext_ctx)
+	/** Declare the following local variables of type struct ext_context *.
+	 *  - ectx representing pointer which points to the extend context of vcpu, initialized as
+	 *  &(vcpu->arch.context.ext_ctx)
 	 */
 	struct ext_context *ectx = &(vcpu->arch.context.ext_ctx);
 
@@ -1814,17 +1869,17 @@ static void context_switch_in(struct thread_object *next)
  *
  * @param[inout] vcpu A pointer which points to a vcpu structure representing the vCPU which will be launched
  *
- * @return n/a
+ * @return N/A
  *
  * @pre vcpu != NULL
  *
  * @post None
  *
- * @mode HV_OPERATIONAL
+ * @mode HV_OPERATIONAL, HV_SUBMODE_INIT_ROOT
  *
  * @reentrancy Unspecified
  *
- * @threadsafety Unspecified
+ * @threadsafety Yes
  *
  */
 void launch_vcpu(struct acrn_vcpu *vcpu)
@@ -1850,47 +1905,49 @@ void launch_vcpu(struct acrn_vcpu *vcpu)
  *
  * @param[inout] vcpu A pointer which points to a vcpu structure representing the vCPU which will be launched
  *
- * @return 0 on success
- * @return -EINVAL if the vCPU ID is invalid
+ * @return An error code indicating if the vCPU creation succeeds or not.
  *
- * @pre vcpu != NULL
+ * @retval 0 on success
+ * @retval -EINVAL if the vCPU ID is invalid
+ *
+ * @pre vm != NULL
  *
  * @post None
  *
- * @mode HV_OPERATIONAL
+ * @mode HV_OPERATIONAL, HV_SUBMODE_INIT_ROOT
  *
  * @reentrancy Unspecified
  *
  * @threadsafety when vcpu is different among parallel invocation.
  *
  */
- /* help function for vcpu create */
 int32_t prepare_vcpu(struct acrn_vm *vm, uint16_t pcpu_id)
 {
 	/** Declare the following local variables of type int32_t.
 	 *  - ret representing the return value. */
 	int32_t ret;
-	/** Declare the following local variables of type struct acrn_vcpu.
-	 *  - *vcpu representing pointer which points to the vcpu, initialized as NULL. */
+	/** Declare the following local variables of type struct acrn_vcpu *.
+	 *  - vcpu representing pointer which points to the vcpu, initialized as NULL. */
 	struct acrn_vcpu *vcpu = NULL;
 
 	/** Set ret to return value of create_vcpu(pcpu_id, vm, &vcpu) */
 	ret = create_vcpu(pcpu_id, vm, &vcpu);
-	/** If vcpu is successfully created */
+	/** If ret equals to 0 */
 	if (ret == 0) {
-		/** Set sched_ctrl of the vcpu thread to &per_cpu(sched_ctl, pcpu_id) */
+		/** Set sched_ctrl of the vcpu->thread_obj to &per_cpu(sched_ctl, pcpu_id) */
 		vcpu->thread_obj.sched_ctl = &per_cpu(sched_ctl, pcpu_id);
-		/** Set thread_entry of the vcpu thread to vcpu_thread */
+		/** Set thread_entry of the vcpu->thread_obj to vcpu_thread */
 		vcpu->thread_obj.thread_entry = vcpu_thread;
-		/** Set pcpu_id of the vcpu thread to pcpu_id */
+		/** Set pcpu_id of the vcpu->thread_obj to pcpu_id */
 		vcpu->thread_obj.pcpu_id = pcpu_id;
-		/** Set notify_mode of the vcpu thread to SCHED_NOTIFY_IPI */
+		/** Set notify_mode of the vcpu->thread_obj to SCHED_NOTIFY_IPI */
 		vcpu->thread_obj.notify_mode = SCHED_NOTIFY_IPI;
-		/** Set host_sp of the vcpu thread to SCHED_NOTIFY_IPI */
+		/** Set host_sp of the vcpu->thread_obj to return value of build_stack_frame()
+		 *  with vcpu being parameter */
 		vcpu->thread_obj.host_sp = build_stack_frame(vcpu);
-		/** Set switch_out of the vcpu thread to context_switch_out */
+		/** Set switch_out of the vcpu->thread_obj to context_switch_out */
 		vcpu->thread_obj.switch_out = context_switch_out;
-		/** Set switch_in of the vcpu thread to context_switch_in */
+		/** Set switch_in of the vcpu->thread_obj to context_switch_in */
 		vcpu->thread_obj.switch_in = context_switch_in;
 		/** Call init_thread_data() with the following parameters, in order to initial the target thread.
 		 *  - &vcpu->thread_obj: address of the target thread */
@@ -1906,17 +1963,17 @@ int32_t prepare_vcpu(struct acrn_vm *vm, uint16_t pcpu_id)
  *
  * @param[inout] vcpu A pointer which points to a vcpu structure representing the vCPU which will be launched
  *
- * @return n/a
+ * @return N/A
  *
  * @pre vcpu != NULL
  *
  * @post None
  *
- * @mode HV_OPERATIONAL
+ * @mode HV_OPERATIONAL, HV_SUBMODE_INIT_ROOT
  *
  * @reentrancy Unspecified
  *
- * @threadsafety Unspecified
+ * @threadsafety Yes
  *
  */
 uint16_t pcpuid_from_vcpu(const struct acrn_vcpu *vcpu)
@@ -1930,7 +1987,7 @@ uint16_t pcpuid_from_vcpu(const struct acrn_vcpu *vcpu)
  *
  * @param[inout] vcpu A pointer which points to a vcpu structure representing the vCPU which will be launched
  *
- * @return n/a
+ * @return N/A
  *
  * @pre vcpu != NULL
  *
@@ -1940,7 +1997,7 @@ uint16_t pcpuid_from_vcpu(const struct acrn_vcpu *vcpu)
  *
  * @reentrancy Unspecified
  *
- * @threadsafety Unspecified
+ * @threadsafety Yes
  *
  */
 uint64_t vcpumask2pcpumask(struct acrn_vm *vm, uint64_t vdmask)
@@ -1949,15 +2006,15 @@ uint64_t vcpumask2pcpumask(struct acrn_vm *vm, uint64_t vdmask)
 	 *  - vcpu_id representing id of the vcpu */
 	uint16_t vcpu_id;
 	/** Declare the following local variables of type uint64_t.
-	 *  - dmask representing destination cpu mask */
+	 *  - dmask representing destination cpu mask, initialized as 0 */
 	uint64_t dmask = 0UL;
-	/** Declare the following local variables of type struct vcpu.
-	 *  - *vcpu representing pointer which points to the vcpu */
+	/** Declare the following local variables of type struct vcpu *.
+	 *  - vcpu representing pointer which points to the vcpu */
 	struct acrn_vcpu *vcpu;
 
 	/** For each vcpu_id ranging from 0 to (vm->hw.created_vcpus - 1) [with a step of 1] */
 	for (vcpu_id = 0U; vcpu_id < vm->hw.created_vcpus; vcpu_id++) {
-		/** If the virtual destination cpu is masked */
+		/** If bit[vcpu_id] of vdmask is 1H */
 		if ((vdmask & (1UL << vcpu_id)) != 0UL) {
 			/** Set vcpu to vcpu_from_vid(vm, vcpu_id) */
 			vcpu = vcpu_from_vid(vm, vcpu_id);

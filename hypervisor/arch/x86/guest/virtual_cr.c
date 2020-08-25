@@ -813,7 +813,7 @@ uint64_t vcpu_get_cr0(struct acrn_vcpu *vcpu)
 	struct run_context *ctx = &vcpu->arch.context.run_ctx;
 
 	/** Set bit CPU_REG_CR0 in vcpu->reg_cached to 1 while check if its old value is 0
-	 *  which means guest CR0 of a vcpu is not cached in ctx */
+	 *  which means guest CR0 of \a vcpu is not cached in ctx */
 	if (bitmap_test_and_set_lock(CPU_REG_CR0, &vcpu->reg_cached) == 0) {
 		/** Read the value from VMCS VMX_CR0_GUEST_HOST_MASK into mask */
 		mask = exec_vmread(VMX_CR0_GUEST_HOST_MASK);
