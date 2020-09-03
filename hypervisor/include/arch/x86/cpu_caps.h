@@ -22,6 +22,8 @@
  *
  */
 
+#include <types.h>
+
 /* CPUID feature words */
 #define FEAT_1_ECX         0U /**< ECX register returned from the CPUID instruction CPUID.1H */
 #define FEAT_1_EDX         1U /**< EDX register returned from the CPUID instruction CPUID.1H */

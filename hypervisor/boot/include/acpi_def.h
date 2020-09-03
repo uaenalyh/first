@@ -21,6 +21,7 @@
  *
  */
 
+#include <types.h>
 #include <vm_configurations.h>
 
 #define ACPI_RSDP_CHECKSUM_LENGTH  20U /**< Pre-defined length of RSDP table to calculate checksum value */

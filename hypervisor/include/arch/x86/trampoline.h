@@ -17,6 +17,8 @@
  * @brief Declare trampoline APIs used to initialize the environment before start APs.
  */
 
+#include <types.h>
+
 /* external symbols that are helpful for relocation */
 extern uint8_t trampoline_fixup_cs;
 extern uint8_t trampoline_fixup_ip;

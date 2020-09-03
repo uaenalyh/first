@@ -18,6 +18,8 @@
  * @brief This file declares a function related to exception information dumping.
  */
 
+#include <types.h>
+
 struct intr_excp_ctx;
 
 void dump_exception(struct intr_excp_ctx *ctx, uint16_t pcpu_id);

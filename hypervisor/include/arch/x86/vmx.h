@@ -20,6 +20,8 @@
  * This file declares all external functions and MACROS that shall be provided by the hwmgmt.vmx module.
  */
 
+#include <types.h>
+
 /**
  * @brief Address of guest's ES segment register control field in the VMCS.
  */

@@ -20,6 +20,8 @@
  * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
  */
 
+#include <types.h>
+
 struct vm_exit_dispatch {
 	int32_t (*handler)(struct acrn_vcpu *);
 	uint32_t need_exit_qualification;

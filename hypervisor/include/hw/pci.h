@@ -51,6 +51,8 @@
  * - PCIS_xxx: device subclass
  */
 
+#include <types.h>
+
 #define PCI_BAR_COUNT 0x6U /**< Pre-defined PCI devices BAR count. */
 #define PCI_REGMAX    0xFFU /**< Pre-defined the MAX offset of the PCI configuration space registers. */
 

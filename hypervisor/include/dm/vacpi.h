@@ -41,6 +41,7 @@
  *       MADT  ->   0xf2500  (depends on #CPUs)
  */
 
+#include <types.h>
 #include "acpi_def.h"
 #include <acpi.h>
 

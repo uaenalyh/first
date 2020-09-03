@@ -22,6 +22,8 @@
  *
  */
 
+#include <types.h>
+
 #define MAX_VM_VCPUID_ENTRIES 64U /**< Pre-defined maximum number of virtual CPUID entries. */
 
 /**

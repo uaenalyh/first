@@ -18,6 +18,7 @@
  * @brief This file declares the APIs of the hwmgmt.acpi module.
  */
 
+#include <types.h>
 #include <vm_configurations.h>
 
 struct ioapic_info;

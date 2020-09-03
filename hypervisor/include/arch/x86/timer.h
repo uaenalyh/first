@@ -21,6 +21,7 @@
  * hwmgmt.time module.
  */
 
+#include <types.h>
 #include <list.h>
 
 

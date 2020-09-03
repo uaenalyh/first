@@ -7,6 +7,8 @@
 #ifndef PAGE_H
 #define PAGE_H
 
+#include <types.h>
+
 /**
  * @addtogroup hwmgmt_page
  *

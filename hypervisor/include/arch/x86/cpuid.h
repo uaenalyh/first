@@ -29,6 +29,8 @@
  *                                                        \a subleaf.
  */
 
+#include <types.h>
+
 /**
  * @brief A bit representing whether the processor supports SSE3.
  *

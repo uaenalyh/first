@@ -23,6 +23,8 @@
  *
  */
 
+#include <types.h>
+
 /**
  * @brief public APIs for VCRs initialization configuration
  *

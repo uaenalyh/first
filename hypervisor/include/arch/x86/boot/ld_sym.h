@@ -18,6 +18,8 @@
  * @brief This file declares all global variables that shall be provided by the boot module.
  */
 
+#include <types.h>
+
 /**
  * @brief Global uint8_t variable whose address is the host virtual address of the first byte after the .bss
  * segment in the loaded hypervisor image.

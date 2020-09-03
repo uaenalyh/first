@@ -18,6 +18,8 @@
  * @brief this file declares the external data structures and APIs of the hwmgmt.security module.
  */
 
+#include <types.h>
+
 #ifndef ASSEMBLER
 
 /**

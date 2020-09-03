@@ -17,6 +17,9 @@
  * @file
  * @brief This file declares the 16550 UART initialization API that shall be provided by the debug module.
  */
+
+#include <types.h>
+
 void uart16550_init(bool early_boot);
 
 /**

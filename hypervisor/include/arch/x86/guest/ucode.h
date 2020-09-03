@@ -20,6 +20,8 @@
  * This file declares the function related to the microcode MSR IA32_BIOS_SIGN_ID.
  */
 
+#include <types.h>
+
 uint64_t get_microcode_version(void);
 
 /**

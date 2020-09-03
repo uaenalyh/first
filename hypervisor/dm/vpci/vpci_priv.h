@@ -44,7 +44,9 @@
  * within vPCI component.
  */
 
+#include <types.h>
 #include <pci.h>
+#include <vpci.h>
 
 /**
  * @brief Check whether a number is within a specific range
