@@ -1024,6 +1024,17 @@ int32_t cr_access_vmexit_handler(struct acrn_vcpu *vcpu)
 		vcpu_set_cr4(vcpu, reg);
 		/** go out of the switch */
 		break;
+	/** LMSW access type */
+	case 0x30UL:
+		/** Call vcpu_set_cr0() with the following parameters, in order to set
+		 * (vcpu_get_cr0(vcpu) & (~0x0eUL)) | ((exit_qual >> 16UL) & 0x0fUL)
+		 *  to the guest CR0 of \a vcpu.
+		 *  - vcpu
+		 *  - (vcpu_get_cr0(vcpu) & (~0x0eUL)) | ((exit_qual >> 16UL) & 0x0fUL)
+		 */
+		vcpu_set_cr0(vcpu, (vcpu_get_cr0(vcpu) & (~0x0eUL)) | ((exit_qual >> 16UL) & 0x0fUL));
+		/** go out of the switch */
+		break;
 	/** default branch of the switch */
 	default:
 		/** This is unhandled CR access */
