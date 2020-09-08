@@ -56,7 +56,6 @@ test_launch_cl_zephyr_job:
     - build_job
   only:
     - merge_requests
-    - schedules
 
 
 test_srs_job:
