@@ -9,8 +9,8 @@ ALL_C_SRCS += $(SYS_INIT_C_SRCS)
 ALL_C_SRCS += $(wildcard release/*.c)
 
 C_CODESCAN := $(patsubst %.c,%.c.codescan,$(ALL_C_SRCS))
-TMP_SCAN_OUT := $(shell mktemp /tmp/acrn-clang-tidy.XXXXX)
-TMP_SCAN_ERR := $(shell mktemp /tmp/acrn-clang-tidy.XXXXX)
+TMP_SCAN_OUT := $(shell mktemp -u /tmp/acrn-clang-tidy.XXXXX)
+TMP_SCAN_ERR := $(shell mktemp -u /tmp/acrn-clang-tidy.XXXXX)
 
 codescan: $(C_CODESCAN)
 	@if egrep -q "(warning|error):" $(TMP_SCAN_OUT); then cat $(TMP_SCAN_OUT); rm $(TMP_SCAN_OUT) $(TMP_SCAN_ERR); exit 1; else rm $(TMP_SCAN_OUT) $(TMP_SCAN_ERR); fi
