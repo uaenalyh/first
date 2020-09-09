@@ -20,6 +20,7 @@
  */
 
 #include <types.h>
+#include <vcpu.h>
 
 /**
 * @brief  Index to the port I/O handler descriptor for the registers of the

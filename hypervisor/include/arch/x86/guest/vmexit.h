@@ -21,6 +21,7 @@
  */
 
 #include <types.h>
+#include <vcpu.h>
 
 struct vm_exit_dispatch {
 	int32_t (*handler)(struct acrn_vcpu *);

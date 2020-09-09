@@ -45,6 +45,7 @@
 #include <types.h>
 #include <spinlock.h>
 #include <vm_config.h>
+#include <vm.h>
 
 #define COM1_BASE 0x3F8U
 #define COM2_BASE 0x2F8U

@@ -20,6 +20,7 @@
 
 #include <types.h>
 #include <ptdev.h>
+#include <vm.h>
 
 /**
  * @brief This function is used to build the MSI remapping for a given virtual machine's

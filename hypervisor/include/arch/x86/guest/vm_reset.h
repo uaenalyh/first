@@ -19,6 +19,7 @@
  */
 
 #include <acrn_common.h>
+#include <vcpu.h>
 
 void shutdown_vm_from_idle(uint16_t pcpu_id);
 void fatal_error_shutdown_vm(struct acrn_vcpu *vcpu);

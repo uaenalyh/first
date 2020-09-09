@@ -19,6 +19,8 @@
  * specific virtual CPU, initializing the profiling utility.
  */
 
+#include <vcpu.h>
+
 void profiling_vmenter_handler(struct acrn_vcpu *vcpu);
 void profiling_pre_vmexit_handler(struct acrn_vcpu *vcpu);
 void profiling_post_vmexit_handler(struct acrn_vcpu *vcpu);

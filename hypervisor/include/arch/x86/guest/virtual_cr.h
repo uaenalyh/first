@@ -25,6 +25,8 @@
 
 #include <types.h>
 
+struct acrn_vcpu;
+
 /**
  * @brief public APIs for VCRs initialization configuration
  *

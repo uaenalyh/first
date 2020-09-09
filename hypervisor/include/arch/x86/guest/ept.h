@@ -21,6 +21,7 @@
  * a macro for invalid host physical address.
  */
 #include <types.h>
+#include <vm.h>
 
 /**
  * @brief The callback function type for walking through EPT, it will be called on every table entry.

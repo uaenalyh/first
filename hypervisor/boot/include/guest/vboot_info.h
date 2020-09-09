@@ -19,6 +19,9 @@
  *
  * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
  */
+
+#include <vm.h>
+
 #define VBOOT_INFO_H
 
 void init_vm_boot_info(struct acrn_vm *vm);
