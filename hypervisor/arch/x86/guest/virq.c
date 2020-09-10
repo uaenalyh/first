@@ -7,7 +7,7 @@
 #include <types.h>
 #include <errno.h>
 #include <bits.h>
-#include <irq.h>
+#include <virq.h>
 #include <lapic.h>
 #include <mmu.h>
 #include <vmx.h>

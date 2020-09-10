@@ -41,8 +41,6 @@ struct ioapic_info {
 
 void ioapic_setup_irqs(void);
 
-bool ioapic_irq_is_gsi(uint32_t irq);
-
 /**
  * @}
  */

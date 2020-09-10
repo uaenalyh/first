@@ -69,8 +69,6 @@
  *				 - dev_dbg()
  */
 
-static uint32_t ioapic_nr_gsi;
-
 /**
  * @brief The global spinlock that ACRN hypervisor shall acquire before accessing any
  *	  IOAPIC register and release after the access.
@@ -299,12 +297,6 @@ static void ioapic_set_routing(void *addr, uint32_t gsi)
 	dev_dbg(ACRN_DBG_IRQ, "GSI: irq:%d pin:%hhu rte:%lx", gsi, gsi, rte.full);
 }
 
-bool ioapic_irq_is_gsi(uint32_t irq)
-{
-	/** Return <TBD: meaning of variable> */
-	return irq < ioapic_nr_gsi;
-}
-
 /**
  * @brief This function gets the number of physical IOAPIC pins.
  *
@@ -421,9 +413,6 @@ void ioapic_setup_irqs(void)
 			ioapic_set_routing(addr, gsi);
 		}
 	}
-
-	/** Set ioapic_nr_gsi to gsi, which means the system maximum GSI number. */
-	ioapic_nr_gsi = gsi;
 }
 
 /**

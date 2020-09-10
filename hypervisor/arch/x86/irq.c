@@ -18,397 +18,354 @@
 #include <logmsg.h>
 #include <vcpu.h>
 
-/**
- * @defgroup hwmgmt hwmgmt
- * @brief {TBD brief description}
- *
- * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
- */
 
 /**
  * @defgroup hwmgmt_irq hwmgmt.irq
  * @ingroup hwmgmt
- * @brief {TBD brief description}
+ * @brief  The hwmgmt.irq module implements functions to initialize interrupt handling facilities of
+ *         the physical processor and implementing interrupt handlers.
  *
- * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ * The hwmgmt.irq module mainly contains two files: irq.c which implements initialization of host IDT,
+ * idt.S which implements handler of all these interrupts and exceptions.
+ * TBD: Currently idt.S is not covered in this module design.
+ *
+ * Dependency:
+ * - This module depends on 'hwmgmt.apic' module to initialize the LAPIC.
+ *
+ * Usage:
+ * - 'hwmgmt.cpu' module depends on this module to initialize the host IDT and relevant handlers.
  *
  * @{
  */
 
 /**
  * @file
- * @brief {TBD brief description}
+ * @brief This file implements all functions and global variable that shall be provided
+ *        by the hwmgmt.irq module.
  *
- * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ * It also defines some helper functions to implement internal initialization for IDT and IRQ.
+ *
+ * Helper functions include: fixup_idt, set_idt, disable_pic_irqs, and init_default_irqs.
+ *
+ * Decomposed functions include: dispatch_interrupt, dispatch_exception and handle_nmi.
  */
 
+/**
+ * @brief This structure exception_spinlock is used to protect the operations on the
+ * context of the exception.
+ */
 static spinlock_t exception_spinlock = {
-	.head = 0U,
-	.tail = 0U,
-};
-static spinlock_t irq_alloc_spinlock = {
-	.head = 0U,
-	.tail = 0U,
+	.head = 0U,   /**< head of the LinkedList */
+	.tail = 0U,   /**< tail of the LinkedList */
 };
 
-uint64_t irq_alloc_bitmap[IRQ_ALLOC_BITMAP_SIZE];
-struct irq_desc irq_desc_array[NR_IRQS];
-static uint32_t vector_to_irq[NR_MAX_VECTOR + 1U];
-
-struct static_mapping_table {
-	uint32_t irq;
-	uint32_t vector;
-};
-
-static struct static_mapping_table irq_static_mappings[NR_STATIC_MAPPINGS] = {
-	{ TIMER_IRQ, VECTOR_TIMER },
-	{ NOTIFY_IRQ, VECTOR_NOTIFY_VCPU },
-	{ POSTED_INTR_NOTIFY_IRQ, VECTOR_POSTED_INTR },
-	{ PMI_IRQ, VECTOR_PMI },
-};
-
-/*
- * alloc an free irq if req_irq is IRQ_INVALID, or else set assigned
- * return: irq num on success, IRQ_INVALID on failure
- */
-uint32_t alloc_irq_num(uint32_t req_irq)
-{
-	uint32_t irq = req_irq;
-	uint64_t rflags;
-	uint32_t ret;
-
-	if ((irq >= NR_IRQS) && (irq != IRQ_INVALID)) {
-		pr_err("[%s] invalid req_irq %u", __func__, req_irq);
-		ret = IRQ_INVALID;
-	} else {
-		spinlock_irqsave_obtain(&irq_alloc_spinlock, &rflags);
-		if (irq == IRQ_INVALID) {
-			/* if no valid irq num given, find a free one */
-			irq = (uint32_t)ffz64_ex(irq_alloc_bitmap, NR_IRQS);
-		}
-
-		if (irq >= NR_IRQS) {
-			irq = IRQ_INVALID;
-		} else {
-			bitmap_set_nolock((uint16_t)(irq & 0x3FU), irq_alloc_bitmap + (irq >> 6U));
-		}
-		spinlock_irqrestore_release(&irq_alloc_spinlock, rflags);
-		ret = irq;
-	}
-	return ret;
-}
-
-/*
- * @pre: irq is not in irq_static_mappings
- * free irq num allocated via alloc_irq_num()
- */
-static void free_irq_num(uint32_t irq)
-{
-	uint64_t rflags;
-
-	if (irq < NR_IRQS) {
-		if (!ioapic_irq_is_gsi(irq)) {
-			spinlock_irqsave_obtain(&irq_alloc_spinlock, &rflags);
-			(void)bitmap_test_and_clear_nolock((uint16_t)(irq & 0x3FU), irq_alloc_bitmap + (irq >> 6U));
-			spinlock_irqrestore_release(&irq_alloc_spinlock, rflags);
-		}
-	}
-}
-
-/*
- * alloc an vectror and bind it to irq
- * for legacy_irq (irq num < 16) and static mapped ones, do nothing
- * if mapping is correct.
- * retval: valid vector num on susccess, VECTOR_INVALID on failure.
- */
-uint32_t alloc_irq_vector(uint32_t irq)
-{
-	uint32_t vr;
-	struct irq_desc *desc;
-	uint64_t rflags;
-	uint32_t ret;
-
-	if (irq < NR_IRQS) {
-		desc = &irq_desc_array[irq];
-
-		if (desc->vector != VECTOR_INVALID) {
-			if (vector_to_irq[desc->vector] == irq) {
-				/* statically binded */
-				vr = desc->vector;
-			} else {
-				pr_err("[%s] irq[%u]:vector[%u] mismatch", __func__, irq, desc->vector);
-				vr = VECTOR_INVALID;
-			}
-		} else {
-			/* alloc a vector between:
-			 *   VECTOR_DYNAMIC_START ~ VECTOR_DYNAMC_END
-			 */
-			spinlock_irqsave_obtain(&irq_alloc_spinlock, &rflags);
-
-			for (vr = VECTOR_DYNAMIC_START; vr <= VECTOR_DYNAMIC_END; vr++) {
-				if (vector_to_irq[vr] == IRQ_INVALID) {
-					desc->vector = vr;
-					vector_to_irq[vr] = irq;
-					break;
-				}
-			}
-			vr = (vr > VECTOR_DYNAMIC_END) ? VECTOR_INVALID : vr;
-
-			spinlock_irqrestore_release(&irq_alloc_spinlock, rflags);
-		}
-		ret = vr;
-	} else {
-		pr_err("invalid irq[%u] to alloc vector", irq);
-		ret = VECTOR_INVALID;
-	}
-	return ret;
-}
-
-/* free the vector allocated via alloc_irq_vector() */
-static void free_irq_vector(uint32_t irq)
-{
-	struct irq_desc *desc;
-	uint32_t vr;
-	uint64_t rflags;
-
-	if (irq < NR_IRQS) {
-		desc = &irq_desc_array[irq];
-
-		if ((irq >= NR_LEGACY_IRQ) && (desc->vector < VECTOR_FIXED_START)) {
-			/* do nothing for LEGACY_IRQ and static allocated ones */
-
-			spinlock_irqsave_obtain(&irq_alloc_spinlock, &rflags);
-			vr = desc->vector;
-			desc->vector = VECTOR_INVALID;
-
-			vr &= NR_MAX_VECTOR;
-			if (vector_to_irq[vr] == irq) {
-				vector_to_irq[vr] = IRQ_INVALID;
-			}
-			spinlock_irqrestore_release(&irq_alloc_spinlock, rflags);
-		}
-	}
-}
-
-/*
- * There are four cases as to irq/vector allocation:
- * case 1: req_irq = IRQ_INVALID
- *      caller did not know which irq to use, and want system to
- *      allocate available irq for it. These irq are in range:
- *      nr_gsi ~ NR_IRQS
- *      an irq will be allocated and a vector will be assigned to this
- *      irq automatically.
- * case 2: req_irq >= NR_LAGACY_IRQ and irq < nr_gsi
- *      caller want to add device ISR handler into ioapic pins.
- *      a vector will automatically assigned.
- * case 3: req_irq >=0 and req_irq < NR_LEGACY_IRQ
- *      caller want to add device ISR handler into ioapic pins, which
- *      is a legacy irq, vector already reserved.
- *      Nothing to do in this case.
- * case 4: irq with speical type (not from IOAPIC/MSI)
- *      These irq value are pre-defined for Timer, IPI, Spurious etc,
- *      which is listed in irq_static_mappings[].
- *	Nothing to do in this case.
+/**
+ * @brief This function is used to handle the interrupt in root mode.
  *
- * return value: valid irq (>=0) on success, otherwise errno (< 0).
+ * @param[in] ctx A pointer points to a structure intr_excp_ctx which containing
+ * the information of the to-be-handled external interrupt.
+ *
+ * @return None
+ *
+ * @pre None
+ *
+ * @post None
+ *
+ * @mode HV_SUBMODE_INIT_PRE_SMP, HV_SUBMODE_INIT_POST_SMP, HV_SUBMODE_INIT_ROOT, HV_OPERATIONAL
+ *
+ * @remark None
+ *
+ * @reentrancy Unspecified
+ *
+ * @threadsafety when \a ctx is different among parallel invocation.
  */
-int32_t request_irq(uint32_t req_irq, irq_action_t action_fn, void *priv_data, uint32_t flags)
+void dispatch_interrupt(const struct intr_excp_ctx *ctx)
 {
-	struct irq_desc *desc;
-	uint32_t irq, vector;
-	uint64_t rflags;
-	int32_t ret;
-
-	irq = alloc_irq_num(req_irq);
-	if (irq == IRQ_INVALID) {
-		pr_err("[%s] invalid irq num", __func__);
-		ret = -EINVAL;
-	} else {
-		vector = alloc_irq_vector(irq);
-
-		if (vector == VECTOR_INVALID) {
-			pr_err("[%s] failed to alloc vector for irq %u", __func__, irq);
-			free_irq_num(irq);
-			ret = -EINVAL;
-		} else {
-			desc = &irq_desc_array[irq];
-			spinlock_irqsave_obtain(&desc->lock, &rflags);
-			if (desc->action == NULL) {
-				desc->flags = flags;
-				desc->priv_data = priv_data;
-				desc->action = action_fn;
-				spinlock_irqrestore_release(&desc->lock, rflags);
-
-				ret = (int32_t)irq;
-				dev_dbg(ACRN_DBG_IRQ, "[%s] irq%d vr:0x%x", __func__, irq, desc->vector);
-			} else {
-				spinlock_irqrestore_release(&desc->lock, rflags);
-
-				ret = -EBUSY;
-				pr_err("%s: request irq(%u) vr(%u) failed, already requested", __func__, irq,
-					irq_to_vector(irq));
-			}
-		}
-	}
-
-	return ret;
-}
-
-void free_irq(uint32_t irq)
-{
-	uint64_t rflags;
-	struct irq_desc *desc;
-
-	if (irq < NR_IRQS) {
-		desc = &irq_desc_array[irq];
-		dev_dbg(ACRN_DBG_IRQ, "[%s] irq%d vr:0x%x", __func__, irq, irq_to_vector(irq));
-
-		free_irq_vector(irq);
-		free_irq_num(irq);
-
-		spinlock_irqsave_obtain(&desc->lock, &rflags);
-		desc->action = NULL;
-		desc->priv_data = NULL;
-		desc->flags = IRQF_NONE;
-		spinlock_irqrestore_release(&desc->lock, rflags);
-	}
-}
-
-void set_irq_trigger_mode(uint32_t irq, bool is_level_triggered)
-{
-	uint64_t rflags;
-	struct irq_desc *desc;
-
-	if (irq < NR_IRQS) {
-		desc = &irq_desc_array[irq];
-		spinlock_irqsave_obtain(&desc->lock, &rflags);
-		if (is_level_triggered == true) {
-			desc->flags |= IRQF_LEVEL;
-		} else {
-			desc->flags &= ~IRQF_LEVEL;
-		}
-		spinlock_irqrestore_release(&desc->lock, rflags);
-	}
-}
-
-uint32_t irq_to_vector(uint32_t irq)
-{
-	uint32_t ret;
-	if (irq < NR_IRQS) {
-		ret = irq_desc_array[irq].vector;
-	} else {
-		ret = VECTOR_INVALID;
-	}
-
-	return ret;
-}
-
-/* do_IRQ() */
-void dispatch_interrupt(__unused const struct intr_excp_ctx *ctx)
-{
+	/** Call panic with the following parameters, in order to output fatal failure log and could halt
+	 *  current physical CPU.
+	 *  - "Unexpected external interrupt."
+	 */
 	panic("Unexpected external interrupt.");
 }
 
+/**
+ * @brief This function is used to handle the exceptions in root mode.
+ *
+ * @param[in] ctx A pointer points to a structure intr_excp_ctx which containing
+ * the information of the to-be-handled exception.
+ *
+ * @return None
+ *
+ * @pre ctx != NULL
+ *
+ * @post None
+ *
+ * @mode HV_SUBMODE_INIT_PRE_SMP, HV_SUBMODE_INIT_POST_SMP, HV_SUBMODE_INIT_ROOT, HV_OPERATIONAL
+ *
+ * @remark None
+ *
+ * @reentrancy Unspecified
+ *
+ * @threadsafety when \a ctx is different among parallel invocation.
+ */
 void dispatch_exception(struct intr_excp_ctx *ctx)
 {
+	/** Declare the following local variables of type uint16_t.
+	 *  - pcpu_id representing id of the current running physical CPU,
+	 *  initialized as get_pcpu_id(). */
 	uint16_t pcpu_id = get_pcpu_id();
 
-	/* Obtain lock to ensure exception dump doesn't get corrupted */
+	/** Call spinlock_obtain() with the following parameters, in order to obtain the spin lock that is used to
+	 *  protect the operations on exception.
+	 *  - &exception_spinlock */
 	spinlock_obtain(&exception_spinlock);
 
-	/* Dump exception context */
+	/** Call dump_exception() with the following parameters, in order to print the exception content of
+	 *  the given physical cpu.
+	 *  - ctx
+	 *  - pcpu_id */
 	dump_exception(ctx, pcpu_id);
 
-	/* Release lock to let other CPUs handle exception */
+	/** Call spinlock_release() with the following parameters, in order to release the spin lock that is used to
+	 *  protect the operations on exception.
+	 *  - &exception_spinlock */
 	spinlock_release(&exception_spinlock);
 
-	/* panic the CPU */
-	panic("Unexpected expection.");
+	/** Call panic() with the following parameters, in order to output fatal failure log and could halt
+	 *  current physical CPU.
+	 *  - "Unexpected exception."
+	 */
+	panic("Unexpected exception.");
 }
 
+/**
+ * @brief This function is used to handle the NMI.
+ *
+ * @param[in] ctx A pointer points to a structure intr_excp_ctx which containing
+ * the information of the to-be-handled NMI.
+ *
+ * @return None
+ *
+ * @pre ctx != NULL
+ *
+ * @post None
+ *
+ * @mode HV_SUBMODE_INIT_PRE_SMP, HV_SUBMODE_INIT_POST_SMP, HV_SUBMODE_INIT_ROOT, HV_OPERATIONAL
+ *
+ * @remark None
+ *
+ * @reentrancy Unspecified
+ *
+ * @threadsafety when \a ctx is different among parallel invocation.
+ */
 void handle_nmi(struct intr_excp_ctx *ctx)
 {
-	/*
-	 * If the NMI happened in root mode, ARCN hypervisor shall inject it to guest vm.
+	/** Call vcpu_queue_exception() with the following parameters, in order to
+	 *  inject the exception to the guest vcpu.
+	 *  - get_cpu_var(ever_run_vcpu)
+	 *  - ctx->vector
+	 *  - ctx->error_code
 	 */
 	vcpu_queue_exception(get_cpu_var(ever_run_vcpu), ctx->vector, ctx->error_code);
 }
 
-static void init_irq_descs(void)
-{
-	uint32_t i;
-
-	for (i = 0U; i < NR_IRQS; i++) {
-		irq_desc_array[i].irq = i;
-		irq_desc_array[i].vector = VECTOR_INVALID;
-		spinlock_init(&irq_desc_array[i].lock);
-	}
-
-	for (i = 0U; i <= NR_MAX_VECTOR; i++) {
-		vector_to_irq[i] = IRQ_INVALID;
-	}
-
-	/* init fixed mapping for specific irq and vector */
-	for (i = 0U; i < NR_STATIC_MAPPINGS; i++) {
-		uint32_t irq = irq_static_mappings[i].irq;
-		uint32_t vr = irq_static_mappings[i].vector;
-
-		irq_desc_array[irq].vector = vr;
-		vector_to_irq[vr] = irq;
-		bitmap_set_nolock((uint16_t)(irq & 0x3FU), irq_alloc_bitmap + (irq >> 6U));
-	}
-}
-
+/**
+ * @brief This function is used to disable the PIC interrupts.
+ *
+ * @return None
+ *
+ * @pre None
+ *
+ * @post None
+ *
+ * @mode HV_SUBMODE_INIT_PRE_SMP
+ *
+ * @remark None
+ *
+ * @reentrancy Unspecified
+ *
+ * @threadsafety Unspecified
+ */
 static void disable_pic_irqs(void)
 {
+	/** Call pio_write8() with the following parameters, in order to write FFH
+	 *  to the I/O port A1H to disable PIC interrupts.
+	 *  - 0xffU
+	 *  - 0xA1U
+	 */
 	pio_write8(0xffU, 0xA1U);
+	/** Call pio_write8() with the following parameters, in order write FFH
+	 *  to the I/O port 21H to disable PIC interrupts.
+	 *  - 0xffU
+	 *  - 0x21U
+	 */
 	pio_write8(0xffU, 0x21U);
 }
 
+/**
+ * @brief This function is used to disable the PIC interrupt and mask all IOAPIC pins.
+ *
+ * @param[in] cpu_id The ID of the physical CPU whose interrupt resources are to be initialized.
+ *
+ * @return None
+ *
+ * @pre None
+ *
+ * @post None
+ *
+ * @mode HV_SUBMODE_INIT_PRE_SMP, HV_SUBMODE_INIT_POST_SMP
+ *
+ * @remark None
+ *
+ * @reentrancy Unspecified
+ *
+ * @threadsafety Yes
+ */
 void init_default_irqs(uint16_t cpu_id)
 {
+	/** If cpu_id equals to BOOT_CPU_ID */
 	if (cpu_id == BOOT_CPU_ID) {
-		init_irq_descs();
-
-		/* we use ioapic only, disable legacy PIC */
+		/** Call disable_pic_irqs() to disable PIC interrupts.
+		 */
 		disable_pic_irqs();
+		/** Call ioapic_setup_irqs() to write to every pin's RTE in the IOAPIC to mask pin.
+		 */
 		ioapic_setup_irqs();
 	}
 }
 
+/**
+ * @brief This function is used to modify the given table to let it be a valid IDT.
+ *
+ * @param[in] idtd A pointer points to a structure host_idt_descriptor to be fixed
+ *
+ * @return None
+ *
+ * @pre idtd != NULL
+ *
+ * @post None
+ *
+ * @mode HV_SUBMODE_INIT_PRE_SMP
+ *
+ * @remark None
+ *
+ * @reentrancy Unspecified
+ * @threadsafety Unspecified
+ */
 static inline void fixup_idt(const struct host_idt_descriptor *idtd)
 {
+	/** Declare the following local variables of type 'uint32_t'.
+	 *  - i representing the loop counter as array index, not initialized. */
 	uint32_t i;
+	/** Declare the following local variables of type 'union idt_64_descriptor *'.
+	 *  - idt_desc representing a pointer which points to a union idt_64_descriptor which
+	 *  recording the 64-bit MODE IDT information, initialized as idtd->idt.
+	 */
 	union idt_64_descriptor *idt_desc = (union idt_64_descriptor *)idtd->idt;
+	/** Declare the following local variables of type 'uint32_t'.
+	 *  - entry_hi_32 representing the bits 32-63 of the 64 bit IDT descriptor, not initialized.
+	 *  - entry_lo_32 representing the low 32 bits of the 64 bit IDT descriptor, not initialized.
+	 */
 	uint32_t entry_hi_32, entry_lo_32;
 
+	/** For each i ranging from 0H to (HOST_IDT_ENTRIES-1) [with a step of 1] */
 	for (i = 0U; i < HOST_IDT_ENTRIES; i++) {
+		/** Set 'entry_lo_32' to idt_desc[i].fields.offset_63_32 */
 		entry_lo_32 = idt_desc[i].fields.offset_63_32;
+		/** Set 'entry_hi_32' to idt_desc[i].fields.rsvd */
 		entry_hi_32 = idt_desc[i].fields.rsvd;
+		/** Set 'idt_desc[i].fields.rsvd' to 0 */
 		idt_desc[i].fields.rsvd = 0U;
+		/** Set 'idt_desc[i].fields.offset_63_32' to entry_hi_32 */
 		idt_desc[i].fields.offset_63_32 = entry_hi_32;
+		/** Set 'idt_desc[i].fields.high32.bits.offset_31_16' to entry_lo_32 >> 16H */
 		idt_desc[i].fields.high32.bits.offset_31_16 = entry_lo_32 >> 16U;
+		/** Set 'idt_desc[i].fields.low32.bits.offset_15_0' to entry_lo_32 & ffffH */
 		idt_desc[i].fields.low32.bits.offset_15_0 = entry_lo_32 & 0xffffUL;
 	}
 }
 
+/**
+ * @brief This function is used to load the specified IDT into the host IDTR.
+ *
+ * @param[in] idtd a pointer points to a structure which stores the IDT to be loaded to IDTR.
+ *
+ * @return None
+ *
+ * @pre idtd != NULL
+ *
+ * @post None
+ *
+ * @mode HV_SUBMODE_INIT_PRE_SMP, HV_SUBMODE_INIT_POST_SMP
+ *
+ * @remark None
+ *
+ * @reentrancy Unspecified
+ * @threadsafety Yes
+ */
 static inline void set_idt(struct host_idt_descriptor *idtd)
 {
+	/** Execute lidtq instruction in order to load IDT pointed by \a idtd into the host IDTR.
+	 * - input operands: *idtd which is the source operand of lidtq instruction
+	 * - output operands: none
+	 * - clobbers: none
+	 */
 	asm volatile("   lidtq %[idtd]\n"
 		     : /* no output parameters */
 		     : /* input parameters */
 		     [ idtd ] "m"(*idtd));
 }
 
+/**
+ * @brief This function is used to initialize interrupt related resource before usage.
+ *
+ * This function initializes the host IDTR, the LAPIC and these IRQs of the target pCPU.
+ *
+ * @param[in] pcpu_id The ID of the physical CPU whose interrupt resources are to be initialized.
+ *
+ * @return None
+ *
+ * @pre None
+ *
+ * @post None
+ *
+ * @mode HV_SUBMODE_INIT_PRE_SMP, HV_SUBMODE_INIT_POST_SMP
+ *
+ * @remark None
+ *
+ * @reentrancy Unspecified
+ *
+ * @threadsafety when pcpu_id is different among parallel invocation
+ */
 void init_interrupt(uint16_t pcpu_id)
 {
+	/** Declare the following local variables of type 'struct host_idt_descriptor *'.
+	 *  - idtd representing a pointer which points to the host IDT to be filled,
+	 *  initialized as address of HOST_IDTR */
 	struct host_idt_descriptor *idtd = &HOST_IDTR;
 
+	/** If pcpu_id equals to BOOT_CPU_ID */
 	if (pcpu_id == BOOT_CPU_ID) {
+		/** Call fixup_idt() with the following parameters, in order to modify
+		 *  the table pointed by idtd to be a valid IDT.
+		 *  - idtd
+		 */
 		fixup_idt(idtd);
 	}
+	/** Call set_idt() with the following parameters, in order to load the IDT information pointed
+	 *  by 'idtd' into the host IDTR.
+	 *  - idtd
+	 */
 	set_idt(idtd);
+	/** Call init_lapic() with the following parameters, in order to initialize the LAPIC
+	 *  of the physical processor whose ID is \a pcpu_id.
+	 *  - pcpu_id
+	 */
 	init_lapic(pcpu_id);
+	/** Call init_default_irqs() with the following parameters, in order to initialize the IRQs
+	 *  of the physical processor whose ID is \a pcpu_id.
+	 *  - pcpu_id
+	 */
 	init_default_irqs(pcpu_id);
 }
 
