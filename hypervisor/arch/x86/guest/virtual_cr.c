@@ -358,6 +358,9 @@ static void vmx_write_cr0(struct acrn_vcpu *vcpu, uint64_t cr0)
 		/** Declare the following local variable of type uint32_t
 		 *  - cs_attr representing the vCPU CS attribute */
 		uint32_t cs_attr;
+		/** Declare the following local variable of type uint32_t
+		 *  - tr_attr representing the vCPU TR attribute */
+		uint32_t tr_attr;
 
 		/** Clear the reserved bits in cr0_mask, When loading a control register,
 		 *  reserved bit should always set to the value previously read. */
@@ -375,8 +378,13 @@ static void vmx_write_cr0(struct acrn_vcpu *vcpu, uint64_t cr0)
 				 *  - VMX_GUEST_CS_ATTR
 				 */
 				cs_attr = exec_vmread32(VMX_GUEST_CS_ATTR);
-				/** If \a vcpu has PAE enabled and guest CS.L set */
-				if (is_pae(vcpu) && ((cs_attr & 0x2000U) != 0U)) {
+				/** Call exec_vmread32 with following parameters, in order to read
+				 *  VMX_GUEST_TR_ATTR from VMCS and assign it to tr_attr.
+				 *  - VMX_GUEST_TR_ATTR
+				 */
+				tr_attr = exec_vmread32(VMX_GUEST_TR_ATTR);
+				/** If guest CS.L is 1H  or the segment type of guest TR is 16 bit busy TSS */
+				if (((cs_attr & 0x2000U) != 0U) || ((tr_attr & 0xfU) == 3U)) {
 					/** Record the error found by setting the err_found to be true */
 					err_found = true;
 					/** Call vcpu_inject_gp with following parameters, in order to
