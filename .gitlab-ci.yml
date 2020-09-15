@@ -249,7 +249,7 @@ test_sas_job:
     - cp ../build/acrn-unit-test/host/bin/vp-base.32.out ../../acrn-sliced-mainline/image/vp-base_guestmem.32.out
     - make clean
     - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
-    - make vp-base RELEASE=1 MODULE_GROUP_OBJ=VP_BASE_VP_BASE_HVMAIN_GROUP
+    - make vp-base RELEASE=1 MODULE_GROUP_OBJ=VP_BASE_HVMAIN_GROUP
     - if [ $? -ne 0 ]; then exit 1; fi
     - cp ../build/acrn-unit-test/host/bin/vp-base.32.out ../../acrn-sliced-mainline/image/vp-base_hvmain.32.out
     - make clean
@@ -367,7 +367,7 @@ test_build_job:
     - cp ../build/acrn-unit-test/host/bin/vp-base.32.out ../../acrn-sliced-mainline/image/vp-base_guestmem.32.out
     - make clean
     - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
-    - /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0 "make vp-base RELEASE=1 MODULE_GROUP_OBJ=VP_BASE_VP_BASE_HVMAIN_GROUP"
+    - /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0 "make vp-base RELEASE=1 MODULE_GROUP_OBJ=VP_BASE_HVMAIN_GROUP"
     - if [ $? -ne 0 ]; then exit 1; fi
     - cp ../build/acrn-unit-test/host/bin/vp-base.32.out ../../acrn-sliced-mainline/image/vp-base_hvmain.32.out
     - make clean
