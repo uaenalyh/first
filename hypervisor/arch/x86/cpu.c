@@ -864,6 +864,8 @@ bool start_pcpus(uint64_t mask)
 
 		/** If pcpu_id is equal to i. */
 		if (pcpu_id == i) {
+			/** Set i to the return value of 'ffs64(expected_start_mask)'. */
+			i = ffs64(expected_start_mask);
 			/** Continue to next iteration */
 			continue; /* Avoid start itself */
 		}
