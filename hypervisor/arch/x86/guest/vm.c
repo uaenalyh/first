@@ -275,33 +275,34 @@ static void prepare_prelaunched_vm_memmap(struct acrn_vm *vm, const struct acrn_
 			break;
 		}
 
-		/** If entry->type is E820_TYPE_RAM and remaining_hpa_size not less than entry->length */
-		if ((entry->type == E820_TYPE_RAM) && (remaining_hpa_size >= entry->length)) {
-			/** Call ept_add_mr with the following parameters, in order to setup EPT mapping between GPA
-			 *  and HPA.
-			 *  - vm
-			 *  - vm->arch_vm.nworld_eptp
-			 *  - base_hpa
-			 *  - entry->baseaddr
-			 *  - entry->length
-			 *  - EPT_RWX | EPT_WB
-			 */
-			ept_add_mr(vm, (uint64_t *)vm->arch_vm.nworld_eptp, base_hpa, entry->baseaddr, entry->length,
-				EPT_RWX | EPT_WB);
+		/** If entry->type is E820_TYPE_RAM */
+		if (entry->type == E820_TYPE_RAM) {
+			/** If remaining_hpa_size is not less than entry->length */
+			if (remaining_hpa_size >= entry->length) {
+				/** Call ept_add_mr with the following parameters, in order to setup EPT mapping
+				 *  between GPA and HPA.
+				 *  - vm
+				 *  - vm->arch_vm.nworld_eptp
+				 *  - base_hpa
+				 *  - entry->baseaddr
+				 *  - entry->length
+				 *  - EPT_RWX | EPT_WB
+				 */
+				ept_add_mr(vm, (uint64_t *)vm->arch_vm.nworld_eptp, base_hpa, entry->baseaddr,
+					entry->length, EPT_RWX | EPT_WB);
 
-			/** Increment base_hpa by entry->length as next HPA to map */
-			base_hpa += entry->length;
-			/** Decrement remaining_hpa_size by entry->length as the host phyiscal memory size left */
-			remaining_hpa_size -= entry->length;
-			/** If entry->type is E820_TYPE_RAM and remaining_hpa_size less than entry->length,
-			 *  which indicates there is no enough space of host pyhsical memory to map
-			 */
-		} else if ((entry->type == E820_TYPE_RAM) && (remaining_hpa_size < entry->length)) {
-			/** Logging the following information with a log level of LOG_WARNING.
-			 *  - current function name
-			 *  - warning message
-			 */
-			pr_warn("%s: HPA size incorrectly configured in v820\n", __func__);
+				/** Increment base_hpa by entry->length as next HPA to map */
+				base_hpa += entry->length;
+				/** Decrement remaining_hpa_size by entry->length as the host physical memory size
+				 *  left */
+				remaining_hpa_size -= entry->length;
+			} else {
+				/** Logging the following information with a log level of LOG_WARNING.
+				 *  - current function name
+				 *  - warning message
+				 */
+				pr_warn("%s: HPA size incorrectly configured in v820\n", __func__);
+			}
 		}
 
 		/** If entry->type is not E820_TYPE_RAM and remaining_hpa_size less than entry->length and
