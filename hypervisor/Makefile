@@ -216,6 +216,7 @@ VP_BASE_C_SRCS += arch/x86/guest/vmexit.c
 VP_BASE_C_SRCS += arch/x86/guest/ept.c
 VP_BASE_C_SRCS += arch/x86/guest/ucode.c
 VP_BASE_C_SRCS += arch/x86/guest/vlapic.c
+VP_BASE_C_SRCS += arch/x86/guest/vm_reset.c
 ifeq ($(CONFIG_HYPERV_ENABLED),y)
 endif
 VP_BASE_C_SRCS += boot/guest/vboot_info.c
@@ -236,7 +237,6 @@ VP_DM_C_SRCS += dm/vpci/pci_pt.c
 VP_DM_C_SRCS += dm/vpci/vmsi.c
 VP_DM_C_SRCS += arch/x86/guest/assign.c
 VP_DM_C_SRCS += arch/x86/guest/vmx_io.c
-VP_DM_C_SRCS += arch/x86/guest/vm_reset.c
 
 # virtual platform trusty
 
