@@ -119,8 +119,8 @@ static uint32_t create_zeropage_e820(struct zero_page *zp, const struct acrn_vm 
 	 */
 	const struct e820_entry *vm_e820 = vm->e820_entries;
 
-	/** If either zp_e820 or vm_e820 is NULL, or entry_num is 0, or entry_num is larger than E820_MAX_ENTRIES */
-	if ((zp_e820 == NULL) || (vm_e820 == NULL) || (entry_num == 0U) || (entry_num > E820_MAX_ENTRIES)) {
+	/** If either vm_e820 is NULL, or entry_num is 0, or entry_num is larger than E820_MAX_ENTRIES */
+	if ((vm_e820 == NULL) || (entry_num == 0U) || (entry_num > E820_MAX_ENTRIES)) {
 		/** Logging the following information with a log level of LOG_ERROR.
 		 *  - "e820 create error"
 		 */
