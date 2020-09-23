@@ -577,10 +577,12 @@ void init_pcpu_post(uint16_t pcpu_id)
 	/** Call set_fs_base in order to initialize the per-CPU stack canary structure for the current physical CPU. */
 	set_fs_base();
 #endif
+#ifndef QEMU
 	/** Call msr_write with the following parameters, in order to enable RTM force abort mode.
 	 * - MSR_TSX_FORCE_ABORT
 	 * - 1 */
 	msr_write(MSR_TSX_FORCE_ABORT, 1U);
+#endif
 
 	/** Call load_gdtr_and_tr in order to load GDTR and TR. */
 	load_gdtr_and_tr();

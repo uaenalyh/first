@@ -379,8 +379,10 @@ static void init_vcpuid_entry(uint32_t leaf, uint32_t subleaf, uint32_t flags, s
 		/** Clear Intel Processor Trace Bit (Bit 25) in guest CPUID.(EAX=7H,ECX=0H):EBX */
 		entry->ebx &= ~CPUID_EBX_PROC_TRC;
 
+#ifndef QEMU
 		/** Clear TSX HLE Bit in guest CPUID.(EAX=7H,ECX=0H):EBX */
 		entry->ebx &= ~CPUID_EBX_HLE;
+#endif
 
 		/** Clear STIBP Bit (Bit 27) in guest CPUID.(EAX=7H,ECX=0H):EDX */
 		entry->edx &= ~CPUID_EDX_STIBP;
