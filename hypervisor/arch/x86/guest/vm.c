@@ -397,7 +397,6 @@ static uint64_t get_pcpu_bitmap(struct acrn_vm *vm)
  * @return A status value to indicate whether the VM created successfully.
  *
  * @retval 0 if the VM is created successfully.
- * @retval -EINVAL if it is failed to create the VM.
  *
  * @pre vm_id < CONFIG_MAX_VM_NUM
  * @pre vm_config != NULL
@@ -419,10 +418,6 @@ static int32_t create_vm(uint16_t vm_id, const struct acrn_vm_config *vm_config,
 	 *  - vm representing a pointer to a VM instance from vm_array, initialized as NULL.
 	 */
 	struct acrn_vm *vm = NULL;
-	/** Declare the following local variables of type int32_t.
-	 *  - status representing the return value, initialized as 0.
-	 */
-	int32_t status = 0;
 	/** Declare the following local variables of type uint32_t.
 	 *  - i representing a loop counter used as index of vm_config->vcpu_affinity, not initialized.
 	 */
@@ -526,28 +521,16 @@ static int32_t create_vm(uint16_t vm_id, const struct acrn_vm_config *vm_config,
 		 *  configured in vm_config->vcpu_affinity
 		 */
 		pcpu_id = ffs64(vm_config->vcpu_affinity[i]);
-		/** Set status to the value of 'prepare_vcpu(vm, pcpu_id)' */
-		status = prepare_vcpu(vm, pcpu_id);
-		/** If 'status' is not 0, which indicates that prepare_vcpu has not initialized vCPU successfully */
-		if (status != 0) {
-			/** Terminate the loop */
-			break;
-		}
-	}
-
-	/** If it is failed to initialize one vCPU but the base address of the VM's EPT table is initialized. */
-	if ((status != 0) && (vm->arch_vm.nworld_eptp != NULL)) {
-		/** Call memset with the following parameters, in order to clean all the entries of EPT PML4 table, and
-		 *  discard its return value.
-		 *  - vm->arch_vm.nworld_eptp
-		 *  - 0
-		 *  - PAGE_SIZE
+		/** Call prepare_vcpu with the following parameters, in order to prepare the vCPU associated with the
+		 *  given 'vm',  and discard its return value.
+		 *  - vm
+		 *  - pcpu_id
 		 */
-		(void)memset(vm->arch_vm.nworld_eptp, 0U, PAGE_SIZE);
+		(void)prepare_vcpu(vm, pcpu_id);
 	}
 
-	/** Return status, 0 means success. Others mean failure */
-	return status;
+	/** Return 0 */
+	return 0;
 }
 
 /**
