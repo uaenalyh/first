@@ -108,6 +108,10 @@ struct shell {
 #define SHELL_CMD_STOP_TEST_PARAM	NULL
 #define SHELL_CMD_STOP_TEST_HELP	"stop-test"
 
+#define SHELL_CMD_INJECT_MC		"inject_mc"
+#define SHELL_CMD_INJECT_MC_PARAM	NULL
+#define SHELL_CMD_INJECT_MC_HELP	"inject_mc"
+
 struct vcpu_dump {
 	struct acrn_vcpu *vcpu;
 	char *str;

@@ -21,6 +21,8 @@
 #include "shell_priv.h"
 #include "lib.h"
 #include "config_debug.h"
+#include "pgtable.h"
+#include "idt.h"
 
 #define TEMP_STR_SIZE		60U
 #define MAX_STR_SIZE		256U
@@ -28,6 +30,8 @@
 
 #define SHELL_LOG_BUF_SIZE		(PAGE_SIZE * MAX_PCPU_NUM / 2U)
 static char shell_log_buf[SHELL_LOG_BUF_SIZE];
+
+static uint64_t save_exception_entry;
 
 /* Input Line Other - Switch to the "other" input line (there are only two
  * input lines total).
@@ -49,6 +53,7 @@ static int32_t shell_rdmsr(int32_t argc, char **argv);
 static int32_t shell_wrmsr(int32_t argc, char **argv);
 static int shell_start_test(int argc, char **argv);
 static int shell_stop_test(__unused int argc, __unused char **argv);
+static int shell_inject_mc(__unused int argc, __unused char **argv);
 
 static struct shell_cmd shell_cmds[] = {
 	{
@@ -140,6 +145,12 @@ static struct shell_cmd shell_cmds[] = {
 		.cmd_param	= SHELL_CMD_STOP_TEST_PARAM,
 		.help_str	= SHELL_CMD_STOP_TEST_HELP,
 		.fcn		= shell_stop_test,
+	},
+	{
+		.str		= SHELL_CMD_INJECT_MC,
+		.cmd_param	= SHELL_CMD_INJECT_MC_PARAM,
+		.help_str	= SHELL_CMD_INJECT_MC_HELP,
+		.fcn		= shell_inject_mc,
 	},
 };
 
@@ -1020,5 +1031,91 @@ static int shell_stop_test(__unused int argc, __unused char **argv)
 		shell_puts("Unit test VM does not exist.\r\n");
 	}
 
+	return 0;
+}
+
+void set_idt_entry_offset(int vec, uint64_t addr, uint64_t idt_base, bool is_save)
+{
+	union idt_64_descriptor *idt_desc;
+
+	idt_desc = (union idt_64_descriptor *)idt_base;
+
+	if (is_save) {
+		save_exception_entry = idt_desc[vec].fields.low32.bits.offset_15_0
+			| (idt_desc[vec].fields.high32.bits.offset_31_16 << 16U)
+			| (idt_desc[vec].fields.offset_63_32 << 32U);
+	}
+
+	idt_desc[vec].fields.offset_63_32 = addr >> 32U;
+	idt_desc[vec].fields.high32.bits.offset_31_16 = addr >> 16U;
+	idt_desc[vec].fields.low32.bits.offset_15_0 = addr & 0xffffUL;
+
+	printf("entry=0x%lx save_entry=0x%lx address=0x%lx\n", addr, save_exception_entry, &idt_desc[vec]);
+}
+
+void reset_idt_entry_offset(int vec, uint64_t idt_base)
+{
+	if (save_exception_entry != 0UL) {
+		set_idt_entry_offset(vec, save_exception_entry, idt_base, false);
+	}
+}
+
+void shell_dispatch_exception(struct intr_excp_ctx *ctx)
+{
+	pr_fatal("find exception vector=%ld error_code=%lx rip=%lx cs=%lx\n",
+			ctx->vector, ctx->error_code, ctx->rip, ctx->cs);
+}
+
+asm (".pushsection .text\n\t"
+	"__handle_exception:\n\t"
+	"push %r15; push %r14; push %r13; push %r12\n\t"
+	"push %r11; push %r10; push %r9; push %r8\n\t"
+	"push %rdi; push %rsi; push %rbp; push %rsp;\n\t"
+	"push %rbx; push %rdx; push %rcx; push %rax\n\t"
+	/* Put current stack pointer into 1st param register (rdi) */
+	"movq %rsp, %rdi\n\t"
+	"call	shell_dispatch_exception\n\t"
+	"popq %rax; popq %rcx; popq %rdx; popq %rbx\n\t"
+	"popq %rsp; popq %rbp; popq %rsi; popq %rdi\n\t"
+	"popq %r8;  popq %r9;  popq %r10; popq %r11\n\t"
+	"popq %r12; popq %r13; popq %r14; popq %r15\n\t"
+	/* Skip vector and error code*/
+	"add     $16, %rsp\n\t"
+	"iretq\n\t"
+	".popsection"
+);
+
+/* push pseudo error code */
+#define EX(NAME, N) extern char NAME##_fault;	\
+	asm (".pushsection .text\n\t"		\
+		#NAME"_fault:\n\t"		\
+		"pushq  $0x0\n\t"		\
+		"pushq $"#N"\n\t"		\
+		"jmp __handle_exception\n\t"	\
+		".popsection")
+
+EX(mc, 18);
+
+#define TRIG_MC_MAGIC_ADDR_START  0xde000000UL
+#define TRIG_MC_MAGIC_ADDR_END    0xde066000UL
+static int shell_inject_mc(__unused int argc, __unused char **argv)
+{
+	uint64_t hpa;
+	uint64_t *hva;
+	uint64_t idt_base;
+	struct host_idt_descriptor *idtd;
+
+	idt_base = sidt();
+	set_idt_entry_offset(IDT_MC, (uint64_t)&mc_fault, idt_base, true);
+
+	stac();
+	for (hpa = TRIG_MC_MAGIC_ADDR_START; hpa < TRIG_MC_MAGIC_ADDR_END; hpa += 0x1000UL) {
+		hva = hpa2hva(hpa);
+		pr_info("hva=0x%lx\n", hva);
+		*(uint64_t *)hva = 0x1122334455667788UL;
+	}
+	clac();
+
+	reset_idt_entry_offset(IDT_MC, idt_base);
 	return 0;
 }
