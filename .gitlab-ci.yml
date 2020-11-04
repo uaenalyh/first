@@ -78,7 +78,7 @@ test_srs_job:
     - cd acrn-unit-test/guest/
     - /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0 "./make_all.sh"
     - if [ $? -ne 0 ]; then exit 1; fi
-    - cp x86/obj/* /var/lib/tftpboot/acrn_srs/acrn/
+    - cp -r x86/obj/* /var/lib/tftpboot/acrn_srs/acrn/
     - cd ../../../../acrn-sliced-mainline
     - /opt/fusa_ci.sh launch_acrn_unit_test
   dependencies:
@@ -122,7 +122,7 @@ test_srs_build_job:
     - cd acrn-unit-test/guest/
     - /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0 "./make_all.sh"
     - if [ $? -ne 0 ]; then exit 1; fi
-    - cp x86/obj/* /var/lib/tftpboot/acrn_srs/acrn/
+    - cp -r x86/obj/* /var/lib/tftpboot/acrn_srs/acrn/
     - cd ../../../../acrn-sliced-mainline
     - /opt/fusa_ci.sh launch_acrn_unit_test
   dependencies:
