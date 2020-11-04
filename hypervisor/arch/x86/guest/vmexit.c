@@ -121,7 +121,7 @@ const struct vm_exit_dispatch dispatch_table[NR_VMX_EXIT_REASONS] = {
 	/**
 	 * @brief VM exit handler for Task switch
 	 * is taskswitch_vmexit_handler and the exit qualification information is
-	 * not necessary for the handler.
+	 * necessary for the handler.
 	 */
 	[VMX_EXIT_REASON_TASK_SWITCH] = {
 		.handler = taskswitch_vmexit_handler,
@@ -249,9 +249,10 @@ const struct vm_exit_dispatch dispatch_table[NR_VMX_EXIT_REASONS] = {
 	/**
 	 * @brief VM exit handler for DR accesses
 	 * is movdr_vmexit_handler and the exit qualification information is
-	 * not necessary for the handler. */
+	 * necessary for the handler. */
 	[VMX_EXIT_REASON_DR_ACCESS] = {
-		.handler = movdr_vmexit_handler},
+		.handler = movdr_vmexit_handler,
+		.need_exit_qualification = 1U},
 	/**
 	 * @brief VM exit handler for I/O instruction
 	 * is pio_instr_vmexit_handler and the exit qualification information is
