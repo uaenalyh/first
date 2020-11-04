@@ -1008,16 +1008,69 @@ static int32_t invd_vmexit_handler(struct acrn_vcpu *vcpu)
  * @threadsafety When \a vcpu is different among parallel invocation.
  *
  */
-static int32_t movdr_vmexit_handler(__unused struct acrn_vcpu *vcpu)
+static int32_t movdr_vmexit_handler(struct acrn_vcpu *vcpu)
 {
-	/*
-	 * In the current usecase, triple fault will happen if vcpu inject gp during
-	 * mov_dr handler. Here just do nothing to work around and this issue will be
-	 * resolved in the future.
-	 */
+	/** Declare the following local variable of type uint32_t
+	 *  - idx representing the index of the debug register, not initialized. */
+	uint32_t idx;
+	/** Declare the following local variable of type uint64_t
+	 *  - exit_qual representing the value of vcpu->arch.exit_qualification, not initialized. */
+	uint64_t exit_qual;
+	/** Declare the following local variable of type uint32_t
+	 *  - ret representing the return value of this function, initialized as 0. */
+	int32_t ret = 0;
 
-	/** Return 0 */
-	return 0;
+	/** Set exit_qual to vcpu->arch.exit_qualification. */
+	exit_qual = vcpu->arch.exit_qualification;
+
+	/** Call vm_exit_cr_access_reg_idx() with exit_qual being parameter, in order to get
+	 *  number of general purpose register when VM exit happened and set idx to its return value. */
+	idx = (uint32_t)vm_exit_cr_access_reg_idx(exit_qual);
+
+	/** Assert the idx is less than or equals to 7. */
+	ASSERT((idx <= 7U), "index out of range");
+
+	/** if return value of vm_exit_dr_access_direction() with exit_qual being parameter is 1. */
+	if (vm_exit_dr_access_direction(exit_qual) == 1UL) {
+		/** Switch based on the return value of vm_exit_qualification_bit_mask(exit_qual, 2U, 0U). */
+		switch (vm_exit_qualification_bit_mask(exit_qual, 2U, 0U)) {
+		/** Move from DR4. */
+		case 0x04UL:
+		/** Move from DR6. */
+		case 0x06UL:
+			/** Call vcpu_set_gpreg() with the following parameters, in order to set
+			 *  guest general-purpose register with index idx of \a vcpu to FFFE0FF0h.
+			 *  - vcpu
+			 *  - idx
+			 *  - 0xFFFE0FF0 */
+			vcpu_set_gpreg(vcpu, idx, 0xFFFE0FF0UL);
+			/** go out of the switch */
+			break;
+		/** Move from DR5. */
+		case 0x05UL:
+		/** Move from DR7. */
+		case 0X07UL:
+			/** Call vcpu_set_gpreg() with the following parameters, in order to set
+			 *  guest general-purpose register with index idx of \a vcpu to 400h.
+			 *  - vcpu
+			 *  - idx
+			 *  - 0x400 */
+			vcpu_set_gpreg(vcpu, idx, 0x400UL);
+			/** go out of the switch */
+			break;
+		/** default branch of the switch */
+		default:
+			/** Call vcpu_set_gpreg() with the following parameters, in order to set
+			 *  guest general-purpose register with index idx of \a vcpu to 0.
+			 *  - vcpu
+			 *  - idx
+			 *  - 0 */
+			vcpu_set_gpreg(vcpu, idx, 0UL);
+			/** go out of the switch */
+			break;
+		}
+	}
+	return ret;
 }
 
 /**

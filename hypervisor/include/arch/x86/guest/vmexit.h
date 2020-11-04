@@ -148,6 +148,29 @@ static inline uint64_t vm_exit_cr_access_reg_idx(uint64_t exit_qual)
 }
 
 /**
+ * @brief This function returns direction of debug register access when vmexit happens.
+ *
+ * @param[in] exit_qual The VM exit qualification.
+ *
+ * @return bit4 Direction of access of the exit_qual
+ *
+ * @pre  None
+ *
+ * @post None
+ *
+ * @mode HV_OPERATIONAL
+ *
+ * @reentrancy Unspecified
+ *
+ * @ThreadSafety Yes
+ */
+static inline uint64_t vm_exit_dr_access_direction(uint64_t exit_qual)
+{
+	/** Return bit[4](direction of access) of the exit_qual for DR access */
+	return (vm_exit_qualification_bit_mask(exit_qual, 4U, 4U) >> 4U);
+}
+
+/**
  * @brief This function returns size of attempted access of IO instruction when vm exit happens.
  *
  * @param[in] exit_qual The VM exit qualification.
