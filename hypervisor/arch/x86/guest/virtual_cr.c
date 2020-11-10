@@ -465,31 +465,26 @@ static void vmx_write_cr0(struct acrn_vcpu *vcpu, uint64_t cr0)
 
 		/** No error is found in previous operations */
 		if (err_found == false) {
-			/** If cr0_changed_bits has CR0.CD or CR0.NW set */
-			if ((cr0_changed_bits & (CR0_CD | CR0_NW)) != 0UL) {
-				/** If cr0_changed_bits has CR0.CD set */
-				if ((cr0_changed_bits & CR0_CD) != 0UL) {
-					/** If cr0_mask has CD bit set */
-					if ((cr0_mask & CR0_CD) != 0UL) {
-						/** Configure the vCPU VMCS VMX_GUEST_IA32_PAT_FULL to be PAT_ALL_UC_VALUE.
-						 *  When the guest requests to set CR0.CD, we don't allow guest's CR0.CD
-						 *  to be actually set, instead, we write guest IA32_PAT with all-UC
-						 *  entries to emulate the cache disabled behavior */
-						exec_vmwrite64(VMX_GUEST_IA32_PAT_FULL, PAT_ALL_UC_VALUE);
-					/** cr0_mask has CD bit cleared */
-					} else {
-						/** Configure the VMX_GUEST_IA32_PAT_FULL in VMCS to be
-						 *  vcpu_get_guest_msr(vcpu, MSR_IA32_PAT) */
-						exec_vmwrite64(VMX_GUEST_IA32_PAT_FULL,
-							vcpu_get_guest_msr(vcpu, MSR_IA32_PAT));
-					}
-					/** Call vcpu_make_request to flush TLB entries derived from the EPT of \a vcpu */
-					vcpu_make_request(vcpu, ACRN_REQUEST_EPT_FLUSH);
+			/** If cr0_changed_bits has CR0.CD set */
+			if ((cr0_changed_bits & CR0_CD) != 0UL) {
+				/** If cr0_mask has CD bit set */
+				if ((cr0_mask & CR0_CD) != 0UL) {
+					/** Configure the vCPU VMCS VMX_GUEST_IA32_PAT_FULL to be PAT_ALL_UC_VALUE.
+					 *  When the guest requests to set CR0.CD, we don't allow guest's CR0.CD
+					 *  to be actually set, instead, we write guest IA32_PAT with all-UC
+					 *  entries to emulate the cache disabled behavior */
+					exec_vmwrite64(VMX_GUEST_IA32_PAT_FULL, PAT_ALL_UC_VALUE);
+				/** cr0_mask has CD bit cleared */
+				} else {
+					/** Configure the VMX_GUEST_IA32_PAT_FULL in VMCS to be
+					 *  vcpu_get_guest_msr(vcpu, MSR_IA32_PAT) */
+					exec_vmwrite64(VMX_GUEST_IA32_PAT_FULL,
+						vcpu_get_guest_msr(vcpu, MSR_IA32_PAT));
 				}
 			}
 
-			/** If \a vcpu attempts to change guest CR0.PG or CR0.WP */
-			if ((cr0_changed_bits & (CR0_PG | CR0_WP)) != 0UL) {
+			/** If \a vcpu attempts to change guest CR0.PG or CR0.WP or CR0_CD */
+			if ((cr0_changed_bits & (CR0_PG | CR0_WP | CR0_CD)) != 0UL) {
 				/** Call vcpu_make_request to flush TLB entries derived from the EPT of \a vcpu */
 				vcpu_make_request(vcpu, ACRN_REQUEST_EPT_FLUSH);
 			}
