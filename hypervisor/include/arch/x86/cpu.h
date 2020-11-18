@@ -87,6 +87,7 @@
  * clac                          - Execute clac instruction.
  */
 #include <types.h>
+#include <util.h>
 #include <acrn_common.h>
 
 /**

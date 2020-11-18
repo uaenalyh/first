@@ -12,7 +12,6 @@
 #include <vcpu.h>
 #include <vm.h>
 #include <vmx.h>
-#include <guest_pm.h>
 #include <ucode.h>
 #include <trace.h>
 #include <logmsg.h>

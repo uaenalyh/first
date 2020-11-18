@@ -16,7 +16,6 @@
 #include <vtd.h>
 #include <reloc.h>
 #include <ept.h>
-#include <guest_pm.h>
 #include <console.h>
 #include <ptdev.h>
 #include <vmcs.h>

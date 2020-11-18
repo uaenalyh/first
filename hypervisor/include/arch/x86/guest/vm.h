@@ -30,8 +30,6 @@
 #include <bits.h>
 #include <spinlock.h>
 #include <vcpu.h>
-#include <vioapic.h>
-#include <vpic.h>
 #include <vmx_io.h>
 #include <vcpuid.h>
 #include <vpci.h>

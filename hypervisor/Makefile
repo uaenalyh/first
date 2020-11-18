@@ -226,9 +226,7 @@ VP_BASE_C_SRCS += arch/x86/configs/vacpi.c
 VP_BASE_C_SRCS += arch/x86/configs/$(CONFIG_BOARD)/ve820.c
 
 # virtual platform device model
-VP_DM_C_SRCS += dm/vpic.c
 VP_DM_C_SRCS += dm/vrtc.c
-VP_DM_C_SRCS += dm/vioapic.c
 VP_DM_C_SRCS += dm/io_req.c
 VP_DM_C_SRCS += dm/vpci/vdev.c
 VP_DM_C_SRCS += dm/vpci/vpci.c
