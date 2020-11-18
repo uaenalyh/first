@@ -52,13 +52,6 @@
 #define GUEST_FLAG_HIGHEST_SEVERITY     (1UL << 6U) /* Whether has the highest severity */
 
 /**
- * @brief Hypercall
- *
- * @addtogroup acrn_hypercall ACRN Hypercall
- * @{
- */
-
-/**
  * @brief Representation of a port I/O request
  */
 struct pio_request {
@@ -154,15 +147,6 @@ struct acrn_vcpu_regs {
 
 	uint16_t reserved_16[4];
 };
-
-/**
- * @brief Info The power state data of a VCPU.
- *
- */
-
-/**
- * @}
- */
 
 /**
  * @}

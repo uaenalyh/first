@@ -34,19 +34,8 @@
 
 #define ACRN_INVALID_HPA (~0UL)
 
-/**
- * @brief Hypercall
- *
- * @defgroup acrn_hypercall ACRN Hypercall
- * @{
- */
-
 #define MR_DEL    2U
 #define MR_MODIFY 3U
-
-/**
- * @}
- */
 
 /**
  * @}
