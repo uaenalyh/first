@@ -7,19 +7,6 @@
 #include <vm_config.h>
 #include <vuart.h>
 
-/**
- * @addtogroup hwmgmt_configs
- *
- * @{
- */
-
-/**
- * @file
- * @brief {TBD brief description}
- *
- * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
- */
-
 extern struct acrn_vm_pci_dev_config vm0_pci_devs[VM0_CONFIG_PCI_DEV_NUM];
 extern struct acrn_vm_pci_dev_config vm1_pci_devs[VM1_CONFIG_PCI_DEV_NUM];
 
@@ -69,7 +56,3 @@ struct acrn_vm_config vm_configs[CONFIG_MAX_VM_NUM] = {
 		.pci_devs = vm1_pci_devs,
 	},
 };
-
-/**
- * @}
- */

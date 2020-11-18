@@ -7,19 +7,6 @@
 #ifndef VM_CONFIGURATIONS_H
 #define VM_CONFIGURATIONS_H
 
-/**
- * @addtogroup hwmgmt_configs
- *
- * @{
- */
-
-/**
- * @file
- * @brief {TBD brief description}
- *
- * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
- */
-
 #include <pci_devices.h>
 #include <misc_cfg.h>
 
@@ -76,9 +63,5 @@
 #endif
 
 #define VM1_CONFIG_PCI_DEV_NUM 1U
-
-/**
- * @}
- */
 
 #endif /* VM_CONFIGURATIONS_H */
