@@ -93,7 +93,7 @@
  *
  * @reentrancy Unspecified
  *
- * @ThreadSafety Yes
+ * @threadsafety Yes
  */
 #define load_segment(seg, SEG_NAME)                     \
 	{                                                   \
@@ -135,7 +135,7 @@
  *
  * @reentrancy Unspecified
  *
- * @ThreadSafety Unspecified
+ * @threadsafety Unspecified
  */
  #define foreach_vcpu(idx, vm, vcpu)                                                         \
 	for ((idx) = 0U, (vcpu) = &((vm)->hw.vcpu_array[(idx)]); (idx) < (vm)->hw.created_vcpus; \
@@ -516,7 +516,7 @@ struct acrn_vcpu {
  *
  * @reentrancy Unspecified
  *
- * @ThreadSafety Yes
+ * @threadsafety Yes
  */
 static inline bool is_vcpu_bsp(const struct acrn_vcpu *vcpu)
 {
@@ -537,7 +537,7 @@ static inline bool is_vcpu_bsp(const struct acrn_vcpu *vcpu)
  *
  * @reentrancy Unspecified
  *
- * @ThreadSafety Yes
+ * @threadsafety Yes
  */
 static inline enum vm_cpu_mode get_vcpu_mode(const struct acrn_vcpu *vcpu)
 {
@@ -562,7 +562,7 @@ static inline enum vm_cpu_mode get_vcpu_mode(const struct acrn_vcpu *vcpu)
  *
  * @reentrancy Unspecified
  *
- * @ThreadSafety When \a vcpu is different among multiple invocation
+ * @threadsafety When \a vcpu is different among multiple invocation
  */
 static inline void vcpu_retain_rip(struct acrn_vcpu *vcpu)
 {
@@ -583,7 +583,7 @@ static inline void vcpu_retain_rip(struct acrn_vcpu *vcpu)
  *
  * @reentrancy Unspecified
  *
- * @ThreadSafety When \a vcpu is different among parallel invocation
+ * @threadsafety When \a vcpu is different among parallel invocation
  */
 static inline struct acrn_vlapic *vcpu_vlapic(struct acrn_vcpu *vcpu)
 {
@@ -642,7 +642,7 @@ void set_vcpu_startup_entry(struct acrn_vcpu *vcpu, uint64_t entry);
  *
  * @reentrancy Unspecified
  *
- * @ThreadSafety Yes
+ * @threadsafety Yes
  */
 static inline bool is_long_mode(struct acrn_vcpu *vcpu)
 {
@@ -665,7 +665,7 @@ static inline bool is_long_mode(struct acrn_vcpu *vcpu)
  *
  * @reentrancy Unspecified
  *
- * @ThreadSafety Yes
+ * @threadsafety Yes
  */
 static inline bool is_paging_enabled(struct acrn_vcpu *vcpu)
 {
@@ -688,7 +688,7 @@ static inline bool is_paging_enabled(struct acrn_vcpu *vcpu)
  *
  * @reentrancy Unspecified
  *
- * @ThreadSafety Yes
+ * @threadsafety Yes
  */
 static inline bool is_pae(struct acrn_vcpu *vcpu)
 {

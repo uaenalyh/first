@@ -70,7 +70,7 @@ extern void vm_exit(void);
  *
  * @reentrancy Unspecified
  *
- * @ThreadSafety Yes
+ * @threadsafety Yes
  */
 static inline uint64_t vm_exit_qualification_bit_mask(uint64_t exit_qual, uint32_t msb, uint32_t lsb)
 {
@@ -93,7 +93,7 @@ static inline uint64_t vm_exit_qualification_bit_mask(uint64_t exit_qual, uint32
  *
  * @reentrancy Unspecified
  *
- * @ThreadSafety Yes
+ * @threadsafety Yes
  */
 static inline uint64_t vm_exit_cr_access_cr_num(uint64_t exit_qual)
 {
@@ -116,7 +116,7 @@ static inline uint64_t vm_exit_cr_access_cr_num(uint64_t exit_qual)
  *
  * @reentrancy Unspecified
  *
- * @ThreadSafety Yes
+ * @threadsafety Yes
  */
 static inline uint64_t vm_exit_cr_access_type(uint64_t exit_qual)
 {
@@ -139,7 +139,7 @@ static inline uint64_t vm_exit_cr_access_type(uint64_t exit_qual)
  *
  * @reentrancy Unspecified
  *
- * @ThreadSafety Yes
+ * @threadsafety Yes
  */
 static inline uint64_t vm_exit_cr_access_reg_idx(uint64_t exit_qual)
 {
@@ -162,7 +162,7 @@ static inline uint64_t vm_exit_cr_access_reg_idx(uint64_t exit_qual)
  *
  * @reentrancy Unspecified
  *
- * @ThreadSafety Yes
+ * @threadsafety Yes
  */
 static inline uint64_t vm_exit_io_instruction_size(uint64_t exit_qual)
 {
@@ -185,7 +185,7 @@ static inline uint64_t vm_exit_io_instruction_size(uint64_t exit_qual)
  *
  * @reentrancy Unspecified
  *
- * @ThreadSafety Yes
+ * @threadsafety Yes
  */
 static inline uint64_t vm_exit_io_instruction_access_direction(uint64_t exit_qual)
 {
@@ -208,7 +208,7 @@ static inline uint64_t vm_exit_io_instruction_access_direction(uint64_t exit_qua
  *
  * @reentrancy Unspecified
  *
- * @ThreadSafety Yes
+ * @threadsafety Yes
  */
 static inline uint64_t vm_exit_io_instruction_port_number(uint64_t exit_qual)
 {
