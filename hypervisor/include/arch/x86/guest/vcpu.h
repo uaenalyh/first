@@ -345,8 +345,8 @@ struct guest_cpu_context {
  * @remark None
  */
 struct msr_store_entry {
-	uint32_t msr_index;  /** Index of the MSR to be loaded */
-	uint64_t value;      /** Value to be loaded into the specified MSR during VMentry */
+	uint32_t msr_index;  /**< Index of the MSR to be loaded */
+	uint64_t value;      /**< Value to be loaded into the specified MSR during VM entry */
 } __aligned(16);
 
 /**

@@ -195,16 +195,16 @@
  * @remark N/A
  */
 struct stack_frame {
-	uint64_t rdi;	/** rdi register */
-	uint64_t r15;	/** r15 register */
-	uint64_t r14;	/** r14 register */
-	uint64_t r13;	/** r13 register */
-	uint64_t r12;	/** r12 register */
-	uint64_t rbp;	/** rbp register */
-	uint64_t rbx;	/** rbx register */
-	uint64_t rflag;	/** rflag register */
-	uint64_t rip;	/** rip register */
-	uint64_t magic;	/** the magic number which indicates the bottom of the stack */
+	uint64_t rdi;	/**< rdi register */
+	uint64_t r15;	/**< r15 register */
+	uint64_t r14;	/**< r14 register */
+	uint64_t r13;	/**< r13 register */
+	uint64_t r12;	/**< r12 register */
+	uint64_t rbp;	/**< rbp register */
+	uint64_t rbx;	/**< rbx register */
+	uint64_t rflag;	/**< rflag register */
+	uint64_t rip;	/**< rip register */
+	uint64_t magic;	/**< the magic number which indicates the bottom of the stack */
 };
 
 /**

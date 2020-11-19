@@ -75,7 +75,7 @@ union msi_addr_reg {
 	struct {
 		uint32_t rsvd_1 : 2; /**< The Reserved field */
 		uint32_t dest_mode : 1; /**< The Destination Mode field */
-		uint32_t rh : 1; /** The Redirection Hint field */
+		uint32_t rh : 1; /**< The Redirection Hint field */
 		uint32_t rsvd_2 : 8; /**< The Reserved field */
 		uint32_t dest_field : 8; /**< The Destination field */
 		uint32_t addr_base : 12; /**< The Address Base field */
