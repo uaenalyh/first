@@ -182,8 +182,6 @@ void invept(const void *eptp);
  *
  * It is a wrap of "wbinvd" inline assembly.
  *
- * @param[in] None
- *
  * @return None
  *
  * @pre N/A

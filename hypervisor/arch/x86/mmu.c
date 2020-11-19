@@ -366,8 +366,6 @@ static inline void local_invept(uint64_t type, struct invept_desc desc)
  *        mappings, and combined mappings) in the TLBs and paging-structure caches
  *        that are tagged with all VPIDs (Virtual Processor IDs).
  *
- * @param[in] None
- *
  * @return None
  *
  * @pre N/A
@@ -439,8 +437,6 @@ void invept(const void *eptp)
 
 /**
  * @brief This function gets the HPA of the sanitized page.
- *
- * @param[in] None
  *
  * @return The HPA of the sanitized page.
  *
@@ -544,8 +540,6 @@ void sanitize_pte(uint64_t *pt_page, const struct memory_ops *mem_ops)
 /**
  * @brief This function is used to enable paging.
  *
- * @param[in] None
- *
  * @return None
  *
  * @pre N/A
@@ -610,8 +604,6 @@ void enable_paging(void)
 /**
  * @brief This function enables the Supervisor Mode Execution Prevention in CR4.
  *
- * @param[in] None
- *
  * @return None
  *
  * @pre N/A
@@ -650,8 +642,6 @@ void enable_smep(void)
 
 /**
  * @brief This function enables the Supervisor Mode Access Prevention in CR4.
- *
- * @param[in] None
  *
  * @return None
  *
@@ -755,8 +745,6 @@ void hv_access_memory_region_update(uint64_t base, uint64_t size)
 
 /**
  * @brief This function is used to do MMU page tables initialization
- *
- * @param[in] None
  *
  * @return None
  *

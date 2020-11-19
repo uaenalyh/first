@@ -121,6 +121,10 @@
  * For each idx ranging from 0 to vm->hw.created_vcpus [with a step of 1]. It is used to probe each
  * vCPU in the given VM.
  *
+ * @param[out] idx The loop counter to be used
+ * @param[in] vm A pointer to the VM structure whose vCPUs will be iterated
+ * @param[out] vcpu A pointer to the iterated vCPU structure
+ *
  * @return None
  *
  * @pre  None

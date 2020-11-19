@@ -100,7 +100,7 @@
  * No operation in release version.
  *
  * @param[in]    x        A bool value indicating the condition to be checked. Not used in release version.
- * @param[in]    Variadic Variadic arguments used to format the string which will be logged. Not used in release
+ * @param[in] ... Variadic arguments used to format the string which will be logged. Not used in release
  *                        version.
  *
  * @return None
@@ -132,7 +132,7 @@ void printf(const char *fmt, ...);
 /**
  * @brief Log a message with FATAL severity. No operation in release version.
  *
- * @param[in] Variadic Variadic arguments used to format the string which will be logged. Not used in release
+ * @param[in] ... Variadic arguments used to format the string which will be logged. Not used in release
  *                     version.
  *
  * @mode HV_INIT, HV_OPERATIONAL, HV_TERMINATION
@@ -159,7 +159,7 @@ void printf(const char *fmt, ...);
 /**
  * @brief Log a message with ACRN severity. No operation in release version.
  *
- * @param[in] Variadic Variadic arguments used to format the string which will be logged. Not used in release
+ * @param[in] ... Variadic arguments used to format the string which will be logged. Not used in release
  *                     version.
  *
  * @mode HV_INIT, HV_OPERATIONAL, HV_TERMINATION
@@ -186,7 +186,7 @@ void printf(const char *fmt, ...);
 /**
  * @brief Log a message with ERROR severity. No operation in release version.
  *
- * @param[in] Variadic Variadic arguments used to format the string which will be logged. Not used in release
+ * @param[in] ... Variadic arguments used to format the string which will be logged. Not used in release
  *                     version.
  *
  * @return None
@@ -213,7 +213,7 @@ void printf(const char *fmt, ...);
 /**
  * @brief Log a message with WARN severity. No operation in release version.
  *
- * @param[in] Variadic Variadic arguments used to format the string which will be logged. Not used in release
+ * @param[in] ... Variadic arguments used to format the string which will be logged. Not used in release
  *                     version.
  *
  * @mode HV_INIT, HV_OPERATIONAL, HV_TERMINATION
@@ -240,7 +240,7 @@ void printf(const char *fmt, ...);
 /**
  * @brief Log a message with INFO severity. No operation in release version.
  *
- * @param[in] Variadic Variadic arguments used to format the string which will be logged. Not used in release
+ * @param[in] ... Variadic arguments used to format the string which will be logged. Not used in release
  *                     version.
  *
  * @mode HV_INIT, HV_OPERATIONAL, HV_TERMINATION
@@ -267,7 +267,7 @@ void printf(const char *fmt, ...);
 /**
  * @brief Log a message with DEBUG severity. No operation in release version.
  *
- * @param[in] Variadic Variadic arguments used to format the string which will be logged. Not used in release
+ * @param[in] ... Variadic arguments used to format the string which will be logged. Not used in release
  *                     version.
  *
  * @mode HV_INIT, HV_OPERATIONAL, HV_TERMINATION
@@ -295,7 +295,7 @@ void printf(const char *fmt, ...);
  * @brief Log a message with the given severity. No operation in release version.
  *
  * @param[in] lvl An integer means the severity of the log. Not used in release version.
- * @param[in] Variadic Variadic arguments used to format the string which will be logged. Not used in release
+ * @param[in] ... Variadic arguments used to format the string which will be logged. Not used in release
  *                     version.
  *
  * @mode HV_INIT, HV_OPERATIONAL, HV_TERMINATION
@@ -322,7 +322,7 @@ void printf(const char *fmt, ...);
 /**
  * @brief Enter safety state. Log message in debug version.
  *
- * @param[in] Variadic Variadic arguments used to format the string which will be logged. Not used in release
+ * @param[in] ... Variadic arguments used to format the string which will be logged. Not used in release
  *            version.
  *
  * @mode HV_INIT, HV_OPERATIONAL

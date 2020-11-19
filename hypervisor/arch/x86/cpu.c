@@ -959,7 +959,7 @@ bool need_offline(uint16_t pcpu_id)
 /**
  * @brief Check whether there is any pcpu still active.
  *
- * @param[in] Bits mask of pcpus whose active status need to be checked.
+ * @param[in] mask Bits mask of pcpus whose active status need to be checked.
  *
  * @return Whether there is any pcpu still active.
  *

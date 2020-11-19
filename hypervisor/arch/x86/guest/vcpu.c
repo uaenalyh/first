@@ -1637,6 +1637,7 @@ void reset_vcpu(struct acrn_vcpu *vcpu)
  * Change a vCPU state to VCPU_PAUSED or VCPU_ZOMBIE, and make a reschedule request for it.
  *
  * @param[inout] vcpu A pointer which points to the target vcpu structure which will be paused
+ * @param[in] new_state The new state that \a vcpu shall be put in
  *
  * @return N/A
  *
@@ -1805,7 +1806,7 @@ static void context_switch_out(struct thread_object *prev)
 /**
  * @brief The function is used to restore the extend context for target thread.
  *
- * @param[inout] prev A pointer which points to the target thread_object structure
+ * @param[inout] next A pointer which points to the target thread_object structure
  *
  * @return N/A
  *
@@ -1903,7 +1904,8 @@ void launch_vcpu(struct acrn_vcpu *vcpu)
 /**
  * @brief This function is used to create a vcpu for the vm and mapped to the pcpu.
  *
- * @param[inout] vcpu A pointer which points to a vcpu structure representing the vCPU which will be launched
+ * @param[inout] vm A pointer which points to a vm structure representing the VM whose vCPU shall be created
+ * @param[in] pcpu_id The ID of the physical processor that the vCPU shall be executed on
  *
  * @return An error code indicating if the vCPU creation succeeds or not.
  *
@@ -1985,7 +1987,8 @@ uint16_t pcpuid_from_vcpu(const struct acrn_vcpu *vcpu)
 /**
  * @brief The function converts a bitmap of vCPUs of a VM to a bitmap of corresponding pCPUs they run on.
  *
- * @param[inout] vcpu A pointer which points to a vcpu structure representing the vCPU which will be launched
+ * @param[in] vm A pointer to a VM structure representing the VM acting as the context of the conversion
+ * @param[in] vdmask A bitmap of vCPU IDs to be converted
  *
  * @return N/A
  *

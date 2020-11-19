@@ -92,7 +92,7 @@ static struct acpi_table_info acpi_table_template[CONFIG_MAX_VM_NUM] = {
  * This function is called to calculate checksum value of a buffer data.
  *
  * @param[in] buf A pointer to a data buffer
- * @param[in] len The length of the data buffer
+ * @param[in] length The length of the data buffer
  *
  * @return the checksum value
  *

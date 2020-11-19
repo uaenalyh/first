@@ -444,7 +444,7 @@ void vlapic_set_tsc_deadline_msr(struct acrn_vlapic *vlapic, uint64_t val_arg)
 /**
  * @brief This function sets \a dmask to mask the target vcpu in Physical Destination Mode.
  *
- * @param[in] pointer to the virtual machine structure in which the destination vCPU belongs to.
+ * @param[in] vm pointer to the virtual machine structure in which the destination vCPU belongs to.
  * @param[out] dmask The mask of the target vcpu.
  * @param[in] dest The Local APIC ID for locating the destination vcpu.
  *
@@ -664,7 +664,7 @@ void vlapic_calc_dest(struct acrn_vm *vm, uint64_t *dmask, bool is_broadcast, ui
  * @brief This function is for handling writing to guest Local APIC ICR in \a target_vcpu with a
  *        delivery mode of INIT or STARTUP
  *
- * @param[inout] vcpu pointer to the virtual CPU that attempts to write guest Local APIC ICR.
+ * @param[inout] target_vcpu pointer to the virtual CPU that attempts to write guest Local APIC ICR.
  * @param[in] mode the mode INIT IPI or STARTUP IPI.
  * @param[in] icr_low the lower 32 bits of the ICR.
  *
@@ -1154,7 +1154,7 @@ int32_t vlapic_x2apic_read(struct acrn_vcpu *vcpu, uint32_t msr, uint64_t *val)
 	switch (msr) {
 	/** If msr == MSR_IA32_EXT_APIC_LDR */
 	case MSR_IA32_EXT_APIC_LDR:
-	/** If msr == MSR_IA32_EXT_XAPICID */	
+	/** If msr == MSR_IA32_EXT_XAPICID */
 	case MSR_IA32_EXT_XAPICID:
 	/** If msr == MSR_IA32_EXT_APIC_ICR */
 	case MSR_IA32_EXT_APIC_ICR:

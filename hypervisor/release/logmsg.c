@@ -75,7 +75,7 @@ void init_logmsg(__unused uint32_t flags)
  *
  * @param[in]    severity An integer means the severity of the log. Not used in release version.
  * @param[in]    fmt      A format string. Not used in release version.
- * @param[in]    Variadic Variadic argument used to be introduced after meet '%' in the \a fmt immediately followed
+ * @param[in]    ...      Variadic argument used to be introduced after meet '%' in the \a fmt immediately followed
  *                        conversion specifier, where conversion specifier is a character that specifies the type of
  *                        conversion to be applied. Not used in release version.
  *
@@ -97,7 +97,7 @@ void do_logmsg(__unused uint32_t severity, __unused const char *fmt, ...)
  * @brief Format a string and print it to the serial console. No operation in release version.
  *
  * @param[in]    fmt      A format string. Not used in release version.
- * @param[in]    Variadic Variadic argument used to be introduced after meet '%' in the \a fmt immediately followed
+ * @param[in]    ...      Variadic argument used to be introduced after meet '%' in the \a fmt immediately followed
  *                        conversion specifier, where conversion specifier is a character that specifies the type of
  *                        conversion to be applied. Not used in release version.
  *

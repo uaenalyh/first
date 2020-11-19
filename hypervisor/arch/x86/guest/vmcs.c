@@ -265,8 +265,6 @@ static void init_guest_state(struct acrn_vcpu *vcpu)
 /**
  * @brief This function is used to initialize the VMCS host state.
  *
- * @param N/A
- *
  * @return None
  *
  * @pre N/A
