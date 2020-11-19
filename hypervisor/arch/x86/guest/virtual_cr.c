@@ -878,7 +878,7 @@ void vcpu_set_cr0(struct acrn_vcpu *vcpu, uint64_t val)
  */
 void vcpu_set_cr2(struct acrn_vcpu *vcpu, uint64_t val)
 {
-	/** Set vcpu->arch.context.run_ctx.cr2 to be @val */
+	/** Set vcpu->arch.context.run_ctx.cr2 to be \a val */
 	vcpu->arch.context.run_ctx.cr2 = val;
 }
 

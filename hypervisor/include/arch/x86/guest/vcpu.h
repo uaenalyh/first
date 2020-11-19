@@ -117,7 +117,7 @@
 /**
  * @brief This macro expands to a for-loop statement with one if statement as loop body.
  *
- * The for-loop iterates over the vCPUs of @vm in ascending order of the vcpu_id field in each vcpu.
+ * The for-loop iterates over the vCPUs of \a vm in ascending order of the vcpu_id field in each vcpu.
  * For each idx ranging from 0 to vm->hw.created_vcpus [with a step of 1]. It is used to probe each
  * vCPU in the given VM.
  *

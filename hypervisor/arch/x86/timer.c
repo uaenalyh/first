@@ -221,7 +221,7 @@ uint64_t ticks_to_us(uint64_t ticks)
 }
 
 /**
- * @brief Delay @us microseconds before return.
+ * @brief Delay \a us microseconds before return.
  *
  * @param[in] us: Number of microseconds to delay before returning.
  *

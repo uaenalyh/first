@@ -363,7 +363,7 @@ void vcpu_queue_exception(struct acrn_vcpu *vcpu, uint32_t vector_arg, uint32_t 
  *
  * @reentrancy Unspecified
  *
- * @threadsafety when @vcpu is different among parallel invocation.
+ * @threadsafety when \a vcpu is different among parallel invocation.
  */
 static void vcpu_inject_exception(struct acrn_vcpu *vcpu, uint32_t vector)
 {
@@ -428,7 +428,7 @@ static void vcpu_inject_exception(struct acrn_vcpu *vcpu, uint32_t vector)
  *
  * @reentrancy Unspecified
  *
- * @threadsafety when @vcpu is different among parallel invocation.
+ * @threadsafety when \a vcpu is different among parallel invocation.
  */
 static void vcpu_inject_lo_exception(struct acrn_vcpu *vcpu)
 {
@@ -465,7 +465,7 @@ static void vcpu_inject_lo_exception(struct acrn_vcpu *vcpu)
  *
  * @reentrancy Unspecified
  *
- * @threadsafety when @vcpu is different among parallel invocation.
+ * @threadsafety when \a vcpu is different among parallel invocation.
  */
 void vcpu_inject_gp(struct acrn_vcpu *vcpu, uint32_t err_code)
 {
@@ -497,7 +497,7 @@ void vcpu_inject_gp(struct acrn_vcpu *vcpu, uint32_t err_code)
  *
  * @reentrancy Unspecified
  *
- * @threadsafety when @vcpu is different among parallel invocation.
+ * @threadsafety when \a vcpu is different among parallel invocation.
  */
 void vcpu_inject_pf(struct acrn_vcpu *vcpu, uint64_t addr, uint32_t err_code)
 {
@@ -533,7 +533,7 @@ void vcpu_inject_pf(struct acrn_vcpu *vcpu, uint64_t addr, uint32_t err_code)
  *
  * @reentrancy Unspecified
  *
- * @threadsafety when @vcpu is different among parallel invocation.
+ * @threadsafety when \a vcpu is different among parallel invocation.
  */
 void vcpu_inject_ud(struct acrn_vcpu *vcpu)
 {
@@ -707,7 +707,7 @@ int32_t acrn_handle_pending_request(struct acrn_vcpu *vcpu)
  *
  * @reentrancy Unspecified
  *
- * @threadsafety when @vcpu is different among parallel invocation.
+ * @threadsafety when \a vcpu is different among parallel invocation.
  */
 int32_t exception_vmexit_handler(struct acrn_vcpu *vcpu)
 {

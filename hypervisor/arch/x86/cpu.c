@@ -565,7 +565,7 @@ void init_pcpu_pre(bool is_bsp)
  * @mode HV_SUBMODE_INIT_PRE_SMP, HV_SUBMODE_INIT_POST_SMP
  *
  * @remark This API can be called only after init_pcpu_pre()has been called once on the current logical processor.
- * @remark This API can be called on logical processors with @pcpu_id != 0H only after
+ * @remark This API can be called on logical processors with \a pcpu_id != 0H only after
  * this has been called once on the logical processor with pcpu_id==0H.
  *
  * @reentrancy Unspecified

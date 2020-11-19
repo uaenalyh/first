@@ -211,7 +211,7 @@ int32_t vlapic_x2apic_write(struct acrn_vcpu *vcpu, uint32_t msr, uint64_t val);
 uint32_t vlapic_get_apicid(const struct acrn_vlapic *vlapic);
 
 /**
- * @brief public API for creating virtual Local APIC of a \vcpu.
+ * @brief public API for creating virtual Local APIC of a \a vcpu.
  *
  * @param[in] vcpu pointer to the vcpu whose virual Local APIC is going to be created.
  *

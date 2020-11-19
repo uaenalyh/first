@@ -61,7 +61,7 @@
  * @reentrancy Unspecified
  * @threadsafety Unspecified
  *
- * Expand to the value by select the maximum value from \x and \y.
+ * Expand to the value by select the maximum value from \a x and \a y.
  */
 #define max(x, y) ((x) < (y)) ? (y) : (x)
 

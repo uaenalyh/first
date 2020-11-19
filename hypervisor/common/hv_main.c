@@ -86,7 +86,7 @@
  *
  * @return None
  *
- * @pre @obj shall point to the field sched_obj field of an instance of type acrn_vcpu
+ * @pre \a obj shall point to the field sched_obj field of an instance of type acrn_vcpu
  *
  * @post None
  *
@@ -96,7 +96,7 @@
  *
  * @reentrancy unspecified
  *
- * @threadsafety when @obj is different among parallel invocation
+ * @threadsafety when \a obj is different among parallel invocation
  */
 void vcpu_thread(struct thread_object *obj)
 {

@@ -295,7 +295,7 @@ static struct acrn_scheduler *get_scheduler(uint16_t pcpu_id)
  * @mode HV_SUBMODE_INIT_ROOT, HV_OPERATIONAL
  *
  * @remark This API can be called only after init_sched
- * have been called once on the processor specified by @obj->pcpu_id.
+ * have been called once on the processor specified by \a obj->pcpu_id.
  *
  * @reentrancy Unspecified
  * @threadsafety Yes
@@ -308,7 +308,7 @@ uint16_t sched_get_pcpuid(const struct thread_object *obj)
 }
 
 /**
- * @brief Initialize the scheduler control block of the physical CPU specified by @pcpu_id.
+ * @brief Initialize the scheduler control block of the physical CPU specified by \a pcpu_id.
  *
  * @param[in] pcpu_id The ID of the physical CPU whose scheduler control block to be initialized.
  *
@@ -375,7 +375,7 @@ void init_sched(uint16_t pcpu_id)
  * @mode HV_SUBMODE_INIT_ROOT, HV_OPERATIONAL
  *
  * @remark This API can be called only after init_sched have been called once
- * on the processor specified by @pcpu_id.
+ * on the processor specified by \a pcpu_id.
  *
  * @reentrancy Unspecified
  * @threadsafety When \a pcpu_id is different among parallel invocation.
@@ -532,7 +532,7 @@ void make_reschedule_request(uint16_t pcpu_id, uint16_t delmode)
  * @mode HV_SUBMODE_INIT_ROOT, HV_OPERATIONAL
  *
  * @remark This API can be called only after init_sched
- * have been called once on the processor specified by @pcpu_id.
+ * have been called once on the processor specified by \a pcpu_id.
  *
  * @reentrancy Unspecified
  * @threadsafety When \a pcpu_id is different among parallel invocation.
@@ -675,8 +675,8 @@ void schedule(void)
  * @brief The interface sleeps the specified thread.
  *
  * Set the thread object status to THREAD_STS_BLOCKED,
- * if the status of the thread specified by @obj is THREAD_STS_RUNNING,
- * this interface will notify the target processor specified by @obj->pcpu_id.
+ * if the status of the thread specified by \a obj is THREAD_STS_RUNNING,
+ * this interface will notify the target processor specified by \a obj->pcpu_id.
  *
  * @param[inout] obj The pointer of the thread object which will sleep.
  *
@@ -692,7 +692,7 @@ void schedule(void)
  *
  * @remark This API can be called only after init_sched
  * have been called once on the processor specified by obj->pcpu_id.
- * @remark The API can only be called after @obj have been initialized by init_thread_data().
+ * @remark The API can only be called after \a obj have been initialized by init_thread_data().
  *
  * @reentrancy Unspecified
  * @threadsafety Yes.
@@ -747,9 +747,9 @@ void sleep_thread(struct thread_object *obj)
 /**
  * @brief The interface wakes the specified thread.
  *
- * If the status of the thread specified by @obj is THREAD_STS_BLOCKED,
+ * If the status of the thread specified by \a obj is THREAD_STS_BLOCKED,
  * this interface will set the thread object status to THREAD_STS_RUNNABLE
- * and notify the target processor specified by @obj->pcpu_id.
+ * and notify the target processor specified by \a obj->pcpu_id.
  *
  * @param[inout] obj The thread object of the thread which will be woken up.
  *
@@ -764,8 +764,8 @@ void sleep_thread(struct thread_object *obj)
  * @mode HV_SUBMODE_INIT_ROOT, HV_OPERATIONAL
  *
  * @remark This API can be called only after init_sched
- * have been called once on the processor specified by @obj->pcpu_id.
- * @remark The API can only be called after @obj have been initialized by init_thread_data().
+ * have been called once on the processor specified by \a obj->pcpu_id.
+ * @remark The API can only be called after \a obj have been initialized by init_thread_data().
  *
  * @reentrancy Unspecified
  * @threadsafety Yes.
@@ -833,8 +833,8 @@ void wake_thread(struct thread_object *obj)
  * @mode HV_SUBMODE_INIT_ROOT, HV_OPERATIONAL
  *
  * @remark This API can be called only after init_sched
- * have been called once on the processor specified by @obj->pcpu_id.
- * @remark The API can only be called after @obj have been initialized by init_thread_data().
+ * have been called once on the processor specified by \a obj->pcpu_id.
+ * @remark The API can only be called after \a obj have been initialized by init_thread_data().
  *
  * @reentrancy Unspecified
  * @threadsafety Yes.
@@ -888,7 +888,7 @@ void kick_thread(const struct thread_object *obj)
  *
  * This interface is to update the curr_obj field of scheduler control block
  * to record the running thread object, and set thread object status as THREAD_STS_RUNNING,
- * then jump to the entry point of the thread specified by @obj.
+ * then jump to the entry point of the thread specified by \a obj.
  *
  * @param[inout] obj The schedule object which will be scheduled..
  *
@@ -902,8 +902,8 @@ void kick_thread(const struct thread_object *obj)
  * @mode HV_SUBMODE_INIT_ROOT, HV_OPERATIONAL
  *
  * @remark This API can be called only after init_sched have been
- * called once on the processor specified by @obj->pcpu_id.
- * @remark The API can only be called after @obj have been initialized by init_thread_data().
+ * called once on the processor specified by \a obj->pcpu_id.
+ * @remark The API can only be called after \a obj have been initialized by init_thread_data().
  *
  * @reentrancy Unspecified
  * @threadsafety When \a obj is different among parallel invocation.
@@ -924,7 +924,7 @@ void run_thread(struct thread_object *obj)
 	 *  - &rflag */
 	obtain_schedule_lock(obj->pcpu_id, &rflag);
 	/** Set the 'curr_obj' field of get_cpu_var(sched_ctl) to \a obj,
-	 *  Meaning schedule thread \obj to run on the physical CPU
+	 *  Meaning schedule thread \a obj to run on the physical CPU
 	 *  corresponding to scheduler control block 'sched_ctl' */
 	get_cpu_var(sched_ctl).curr_obj = obj;
 	/** Call set_thread_status with the following parameters, in order to
