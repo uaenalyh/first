@@ -37,7 +37,7 @@
  * @brief This type is to indicate the states of vCPU thread
  * and these states are used by scheduler .
  *
- * @asinteger disallowed}
+ * @asinteger disallowed
  */
 enum thread_object_state {
 	/**
@@ -57,7 +57,7 @@ enum thread_object_state {
 /**
  * @brief This type is to indicate how the target vCPU will be notified by scheduler.
  *
- * @asinteger disallowed}
+ * @asinteger disallowed
  */
 enum sched_notify_mode {
 	/**

@@ -56,7 +56,7 @@
  *			  Depends on:
  *			    - msr_write()
  *
- * - ioapic_setup_irqs()  This function masks all IOAPIC pins.
+ *  - ioapic_setup_irqs()  This function masks all IOAPIC pins.
  *			  Depends on:
  *			    - spinlock_init()
  *			    - map_ioapic()
