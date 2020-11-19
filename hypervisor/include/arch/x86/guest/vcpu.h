@@ -205,16 +205,10 @@ struct segment_sel {
  * @remark None
  */
 struct run_context {
-	/**
-	 * @brief This union to store the guest general purpose registers.
-	 *
-	 * This must be the first element in the structure, so that the offsets
-	 * in vmx_asm.S match
-	 */
 	union cpu_regs_t {
 		struct acrn_gp_regs regs; /**< the structure to store vcpu general purpose registers. */
 		uint64_t longs[NUM_GPRS]; /**< the array to store vcpu general purpose registers. */
-	} cpu_regs;
+	} cpu_regs; /**< guest general purpose registers. Must be the first to keep the offsets same as vmx_asm.S */
 
 	uint64_t cr0;      /**< guest CR register 0 */
 
