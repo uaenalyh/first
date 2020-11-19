@@ -38,7 +38,7 @@
  *  ------
  *   RSDP  ->   0xf2400    (36 bytes fixed)
  *     XSDT  ->   0xf2480    (36 bytes + 8*7 table addrs, 4 used)
- *       MADT  ->   0xf2500  (depends on #CPUs)
+ *       MADT  ->   0xf2500  (depends on the number of CPUs)
  */
 
 #include <types.h>

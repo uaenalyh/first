@@ -992,7 +992,7 @@ static inline bool is_mc_status_msr(uint32_t msr)
  * Handle the VM exit caused by a RDMSR instruction executing from guest software and return a status code indicating
  * whether further handling operations are required from the caller.
  * If the status code is 0, it indicates that no further operation is required.
- * If the status code is negative, it indicates that the caller needs to inject #GP(0) to guest software.
+ * If the status code is negative, it indicates that the caller needs to inject \# GP(0) to guest software.
  *
  * It is supposed to be used as a callback in 'vmexit_handler' from 'vp-base.hv_main' module.
  *
@@ -1671,7 +1671,7 @@ static int32_t write_efer_msr(struct acrn_vcpu *vcpu, uint64_t value)
 		/*
 		 * Handle invalid write to Reserved bits.
 		 *
-		 * Modifying Reserved bits causes a general-protection exception (#GP(0)).
+		 * Modifying Reserved bits causes a general-protection exception (\# GP(0)).
 		 */
 		/** Set 'err' to -EACCES, which indicates that \a value is not valid to be written into
 		 *  guest MSR IA32_EFER */
@@ -1682,7 +1682,7 @@ static int32_t write_efer_msr(struct acrn_vcpu *vcpu, uint64_t value)
 		/*
 		 * Handle invalid write to LME bit.
 		 *
-		 * Modifying LME bit while paging is enabled causes a general-protection exception (#GP(0)).
+		 * Modifying LME bit while paging is enabled causes a general-protection exception (\# GP(0)).
 		 */
 		/** Set 'err' to -EACCES, which indicates that \a value is not valid to be written into
 		 *  guest MSR IA32_EFER */
@@ -1711,7 +1711,7 @@ static int32_t write_efer_msr(struct acrn_vcpu *vcpu, uint64_t value)
 			 * Handle invalid write to NXE bit.
 			 *
 			 * Writing NXE bit to 1 when the XD Bit extended feature flag is set to 0
-			 * causes a general-protection exception (#GP(0)).
+			 * causes a general-protection exception (\# GP(0)).
 			 */
 			/** Set 'err' to -EACCES, which indicates that \a value is not valid to be written into
 			 *  guest MSR IA32_EFER */
@@ -1764,7 +1764,7 @@ static int32_t write_efer_msr(struct acrn_vcpu *vcpu, uint64_t value)
  * Handle the VM exit caused by a WRMSR instruction executing from guest software and return a status code indicating
  * whether further handling operations are required from the caller.
  * If the status code is 0, it indicates that no further operation is required.
- * If the status code is negative, it indicates that the caller needs to inject #GP(0) to guest software.
+ * If the status code is negative, it indicates that the caller needs to inject \# GP(0) to guest software.
  *
  * It is supposed to be used as a callback in 'vmexit_handler' from 'vp-base.hv_main' module.
  *
@@ -1849,7 +1849,7 @@ int32_t wrmsr_vmexit_handler(struct acrn_vcpu *vcpu)
 	}
 	/** 'msr' is MSR_IA32_BIOS_SIGN_ID */
 	case MSR_IA32_BIOS_SIGN_ID: {
-		/* Writing non-zero value causes a general-protection exception (#GP(0)). */
+		/* Writing non-zero value causes a general-protection exception (\# GP(0)). */
 		/** If 'v' is not equal to 0H */
 		if (v != 0UL) {
 			/** Set 'err' to -EACCES, which indicates that an exception needs to be injected

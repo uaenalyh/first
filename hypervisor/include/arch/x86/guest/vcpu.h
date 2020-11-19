@@ -80,8 +80,8 @@
  * @brief This macro is used to pre-define load segment function which set selector, base, limit and
  *  attribute of specified selector.
  *
- * The macro set seg.selector to encoding SSG_NAME##SEL, seg.base to encoding SEG_NAME##_BASE, seg.limit
- * to encoding SEG_NAME##_LIMIT and set seg.attr to encoding SEG_NAME##_ATTR of the VMCS fields.
+ * The macro set seg.selector to encoding SSG_NAME\#\# SEL, seg.base to encoding SEG_NAME\#\# _BASE, seg.limit
+ * to encoding SEG_NAME\#\# _LIMIT and set seg.attr to encoding SEG_NAME\#\# _ATTR of the VMCS fields.
  *
  * @return None
  *

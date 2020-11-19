@@ -882,7 +882,7 @@
 #define VMX_PROCBASED_CTLS2_UNRESTRICT (1U << 7U)
 /**
  * @brief Bit field in the secondary processor-based VM execution controls that determines
- * whether execution of XSAVES or XRSTORS causes a #UD.
+ * whether execution of XSAVES or XRSTORS causes a \# UD.
  */
 #define VMX_PROCBASED_CTLS2_XSVE_XRSTR (1U << 20U)
 

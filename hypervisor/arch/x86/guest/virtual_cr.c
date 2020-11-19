@@ -334,7 +334,7 @@ static void vmx_write_cr0(struct acrn_vcpu *vcpu, uint64_t cr0)
 	if (!is_cr0_write_valid(vcpu, cr0)) {
 		/** Print a debug message */
 		pr_dbg("Invalid cr0 write operation from guest");
-		/** Call vcpu_inject_gp to inject #GP(0) to \a vcpu */
+		/** Call vcpu_inject_gp to inject \# GP(0) to \a vcpu */
 		vcpu_inject_gp(vcpu, 0U);
 	/** If write to CR0 is valid */
 	} else {
@@ -388,7 +388,7 @@ static void vmx_write_cr0(struct acrn_vcpu *vcpu, uint64_t cr0)
 					/** Record the error found by setting the err_found to be true */
 					err_found = true;
 					/** Call vcpu_inject_gp with following parameters, in order to
-					 *  inject #GP(0) to \a vcpu.
+					 *  inject \# GP(0) to \a vcpu.
 					 *  - vcpu
 					 *  - 0H
 					 */
@@ -411,7 +411,7 @@ static void vmx_write_cr0(struct acrn_vcpu *vcpu, uint64_t cr0)
 				if (load_pdptrs(vcpu) != 0) {
 					/** Record the error found */
 					err_found = true;
-					/** Call vcpu_inject_gp to inject #GP(0) to \a vcpu */
+					/** Call vcpu_inject_gp to inject \# GP(0) to \a vcpu */
 					vcpu_inject_gp(vcpu, 0U);
 				}
 			/** Not long mode and not pae mode */
@@ -428,7 +428,7 @@ static void vmx_write_cr0(struct acrn_vcpu *vcpu, uint64_t cr0)
 					pr_dbg("This is an invalid case");
 					/** Set the err_found to be true */
 					err_found = true;
-					/** Call vcpu_inject_gp to inject #GP(0) to \a vcpu */
+					/** Call vcpu_inject_gp to inject \# GP(0) to \a vcpu */
 					vcpu_inject_gp(vcpu, 0U);
 				/** If the vcpu is running in the compatibility mode */
 				} else {
@@ -585,9 +585,9 @@ static bool is_cr4_write_valid(struct acrn_vcpu *vcpu, uint64_t cr4)
  *
  * For CR4, if some feature is not supported by hardware, the corresponding bit
  * will be set in cr4_always_off_mask. If guest try to set these bits after
- * vmexit, will inject a #GP.
+ * vmexit, it will be injected a \# GP.
  * If a bit for a feature not supported by hardware, which is flexible to guest,
- * and write to it do not lead to a VM exit, a #GP should be generated inside
+ * and write to it do not lead to a VM exit, a \# GP should be generated inside
  * guest.
  *
  *   - VME (0) Flexible to guest
@@ -642,7 +642,7 @@ static void vmx_write_cr4(struct acrn_vcpu *vcpu, uint64_t cr4)
 	if (!is_cr4_write_valid(vcpu, cr4)) {
 		/** Print a debug message */
 		pr_dbg("Invalid cr4 write operation from guest");
-		/** Call vcpu_inject_gp to inject #GP(0) to \a vcpu */
+		/** Call vcpu_inject_gp to inject \# GP(0) to \a vcpu */
 		vcpu_inject_gp(vcpu, 0U);
 	/** If write to CR4 is valid */
 	} else {
@@ -662,7 +662,7 @@ static void vmx_write_cr4(struct acrn_vcpu *vcpu, uint64_t cr4)
 				if (load_pdptrs(vcpu) != 0) {
 					/** Record the error found */
 					err_found = true;
-					/** Call vcpu_inject_gp to inject #GP(0) to \a vcpu */
+					/** Call vcpu_inject_gp to inject \# GP(0) to \a vcpu */
 					vcpu_inject_gp(vcpu, 0U);
 				}
 			}
