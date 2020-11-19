@@ -584,31 +584,6 @@ void vcpu_set_guest_msr(struct acrn_vcpu *vcpu, uint32_t msr, uint64_t val)
 }
 
 /**
- * @brief This function is dead code in fusa scenario.
- *
- * @return N/A
- *
- * @pre None
- *
- * @post None
- *
- * @mode None
- *
- * @reentrancy Unspecified
- *
- * @threadsafety Unspecified
- *
- */
-void vcpu_set_vmcs_eoi_exit(const struct acrn_vcpu *vcpu)
-{
-	/*DO nothong here*/
-	/** Logging the following information with a log level of LOG_DEBUG.
-	 *  -__func__: name of the current function
-	 */
-	pr_dbg("%s", __func__);
-}
-
-/**
  * @brief This function is to determine the vCPU mode of operation according to the guest cs
  * attributes, IA32_EFER and cr0, and save the result to the given vCPU data structure.
  *
