@@ -179,6 +179,21 @@
  */
 
 /**
+ * @file arch/x86/guest/vmx_asm.S
+ *
+ * @brief This file provides the VM entry sequence and entry point for VM exits
+ *
+ * This file implements a function, namely vmx_vmrun, that conducts an VM entry and returns after an VM exit. Taking a
+ * pointer to a structure of type run_context and a signed integer being either VM_LAUNCH or VM_RESUME, this function
+ * restores registers listed in the run_context with the given values, executes a vm_luanch or vm_resume instruction as
+ * specified, saves guest states in the given run_context, and returns VM_FAIL if an VM entry failure occurs; otherwise
+ * the function returns VM_SUCCESS.
+ *
+ * Refer to the control flow diagrams in section 11.4.8.4.17 (with vmx_run_start being the source node) and section
+ * 11.4.8.5.1 in the Software Architecture Design Specification for detailed behavior of this function.
+ */
+
+/**
  * @file
  * @brief This file implements APIs that shall be provided by the vCPU module.
  */
@@ -513,6 +528,9 @@ void vcpu_set_rflags(struct acrn_vcpu *vcpu, uint64_t val)
 
 /**
  * @brief This function is used to get the guest msr from the vcpu structure.
+ *
+ * @param[in] vcpu A pointer to the vCPU whose MSR is to be read
+ * @param[in] msr Address of the MSR to be read
  *
  * @return Value in the specified guest MSR of the given vCPU.
  *

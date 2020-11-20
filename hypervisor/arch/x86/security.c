@@ -56,6 +56,20 @@
  */
 
 /**
+ * @file arch/x86/lib/retpoline-thunk.S
+ *
+ * @brief This file provides indirect thunks for retpoline
+ *
+ * Retpoline is a compiler-based mitigation to the branch target injection vulnerability. When compiled with a
+ * retpoline-enabled compiler, a program must provide so-called "thunks" which are used to replace indirect jumps. As
+ * indirect jumps may use any general purpose register except RSP, a separate thunk shall be defined for each of them.
+ *
+ * Refer to section 11.3.5.3 of the Software Architecture Design Specification for the list of thunks defined, and the
+ * white paper Retpoline: A Branch Target Inject Mitigation [11] for a listing of assembly that shall be used to define
+ * a thunk.
+ */
+
+/**
  * @file
  * @brief this file implements APIs that shall be provided by the hwmgmt.security module.
  */

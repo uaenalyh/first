@@ -27,7 +27,6 @@
  *
  * The hwmgmt.irq module mainly contains two files: irq.c which implements initialization of host IDT,
  * idt.S which implements handler of all these interrupts and exceptions.
- * TBD: Currently idt.S is not covered in this module design.
  *
  * Dependency:
  * - This module depends on 'hwmgmt.apic' module to initialize the LAPIC.
@@ -36,6 +35,21 @@
  * - 'hwmgmt.cpu' module depends on this module to initialize the host IDT and relevant handlers.
  *
  * @{
+ */
+
+/**
+ * @file arch/x86/idt.S
+ *
+ * @brief This file defines the IDT used by the hypervisor
+ *
+ * This file statically defines HOST_IDTR which contains the address and size of the interrupt descriptor table (IDT)
+ * that shall be used by the hypervisor. The descriptors in the defined IDT puts all the fields except handler addresses
+ * in the right places. The 64-bit addresses of the handlers are, however, placed in the upper 64-bit, which is not the
+ * format that can be consumed by hardware. Thus, this static IDT is designed to be manipulated by fixup_idt(), which
+ * moves the handler addresses to the right places, before it is loaded to hardware.
+ *
+ * For details on the contents of the IDT, refer to the truth table in section 11.3.10.3.1 in the Software Architecture
+ * Design Specification.
  */
 
 /**

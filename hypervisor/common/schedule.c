@@ -33,6 +33,20 @@
  */
 
 /**
+ * @file arch/x86/sched.S
+ *
+ * @brief This file defines the context switch sub-routine
+ *
+ * This file provides one single function, namely arch_switch_to, that does a switch of thread contexts. Taking a stack
+ * pointer of the current thread and another of the target thread as inputs, this function saves the current registers
+ * on the stack of the current thread and restores the values on the target thread's stack.
+ *
+ * For the detailed steps during a context switch, refer to section 5.6 in the Software Architecture Design
+ * Specification. For details on the behavior of this function, refer to the control flow diagram in section 11.3.13.5.8
+ * in the Software Architecture Design Specification.
+ */
+
+/**
  * @file
  * @brief This file contains the data structures and functions for the hwmgmt.schedule module.
  *
@@ -59,7 +73,6 @@
  * - release_schedule_lock
  * - get_scheduler
  * - make_reschedule_request
- * - arch_switch_to
  */
 
 /**

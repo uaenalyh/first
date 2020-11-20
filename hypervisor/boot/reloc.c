@@ -9,7 +9,7 @@
 #include <ld_sym.h>
 
 /**
- * @defgroup boot
+ * @defgroup boot boot
  * @brief The boot component provides entries of the hypervisor on both physical BP and APs, sets up C
  * execution environment and calls the main initialization routine of the hypervisor in the init component.
  *
@@ -31,6 +31,33 @@
  * cpu_primary.S -set up the initial execution environment
  *
  * @{
+ */
+
+/**
+ * @file arch/x86/boot/cpu_primary.S
+ *
+ * @brief This file provides entry point and Multiboot header of the hypervisor
+ *
+ * This file implements the entry point of ACRN hypervisor, namely cpu_primary_start_32, which sets up a proper C
+ * execution environment in 64-bit mode. The GDT and page table are properly set up to establish an identical mapping
+ * from the first 4G in the logical address space (in any segment) to the first 4G in the physical address space. Refer
+ * to section 11.1.3.3 of the Software Architecture Design Specification for a detailed control flow that specifies its
+ * expected behavior.
+ *
+ * Additionally a Multiboot header is defined with the values defined in section 6.2 of the Software Architecture Design
+ * Specification, so that a Multiboot-compliant bootloader can properly load and transfer control to the hypervisor.
+ */
+
+/**
+ * @file arch/x86/boot/trampoline.S
+ *
+ * @brief This file provides starting point of application processors
+ *
+ * This file implements a starting point, namely trampoline_start_16, which sets up a proper C execution environment in
+ * 64-bit mode for application processors which start execution from real-address mode. The GDT and page table are
+ * properly set up to establish an identical mapping from the first 4G in the logical address space (in any segment) to
+ * the first 4G in the physical address space. Refer to section 11.1.3.2 and its related global variables of the
+ * Software Architecture Design Specification for a detailed control flow that specifies its expected behavior.
  */
 
 /**
