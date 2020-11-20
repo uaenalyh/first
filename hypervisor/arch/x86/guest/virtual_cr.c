@@ -909,8 +909,8 @@ uint64_t vcpu_get_cr4(struct acrn_vcpu *vcpu)
          *  - mask representing the value read from VMCS VMX_CR4_GUEST_HOST_MASK, not initialized */
 	uint64_t mask;
 	/** Declare the following local variable of type 'struct run_context *'
-         *  - ctx representing the current run_context structure, initialized as
-         *    &vcpu->arch.contexts[vcpu->arch.cur_context].run_ctx */
+	 *  - ctx representing the current run_context structure, initialized as
+	 *	&vcpu->arch.context.run_ctx */
 	struct run_context *ctx = &vcpu->arch.context.run_ctx;
 
 	/** Set bit CPU_REG_CR4 in vcpu->reg_cached to 1 while check if its old value is 0
