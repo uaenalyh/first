@@ -757,79 +757,68 @@ static int32_t xsetbv_vmexit_handler(struct acrn_vcpu *vcpu)
 	 *  - ret representing return value, initialized as 0. */
 	int32_t ret = 0;
 
-	/** Set val64 to GUEST_CR4 read from VMCS */
-	val64 = exec_vmread(VMX_GUEST_CR4);
-	/** If OSXSAVE bit of val64 is clear */
-	if ((val64 & CR4_OSXSAVE) == 0UL) {
-		/** Call vcpu_inject_gp() with the following parameters, in order to inject GP to the vcpu
-		 *  with error code 0.
+	/** If ECX of the target vcpu is not 0 */
+	if ((vcpu_get_gpreg(vcpu, CPU_REG_RCX) & 0xffffffffUL) != 0UL) {
+		/** Call vcpu_inject_gp() with the following parameters, in order to inject GP to the
+		 *  vcpu with error code 0.
 		 *  - vcpu
 		 *  - 0 */
 		vcpu_inject_gp(vcpu, 0U);
 	} else {
-			/** If ECX of the target vcpu is not 0 */
-			if ((vcpu_get_gpreg(vcpu, CPU_REG_RCX) & 0xffffffffUL) != 0UL) {
-				/** Call vcpu_inject_gp() with the following parameters, in order to inject GP to the
-				 *  vcpu with error code 0.
+		/** Set val64 to (vcpu_get_gpreg(vcpu, CPU_REG_RAX) & 0xffffffffUL)|
+		 *  (vcpu_get_gpreg(vcpu, CPU_REG_RDX) << 32U) */
+		val64 = (vcpu_get_gpreg(vcpu, CPU_REG_RAX) & 0xffffffffUL) |
+			(vcpu_get_gpreg(vcpu, CPU_REG_RDX) << 32U);
+
+		/** If bit 0 of val64 is clear */
+		if ((val64 & 0x01UL) == 0UL) {
+			/** Call vcpu_inject_gp() with the following parameters, in order
+			 *  to inject GP to the vcpu with error code 0.
+			 *  - vcpu
+			 *  - 0 */
+			vcpu_inject_gp(vcpu, 0U);
+		/** If any of the reserved bits(specified by XCR0_RESERVED_BITS) of val64 is not 0 */
+		} else if ((val64 & XCR0_RESERVED_BITS) != 0UL) {
+			/** Call vcpu_inject_gp() with the following parameters, in order
+			 *  to inject GP to the vcpu with error code 0.
+			 *  - vcpu
+			 *  - 0 */
+			vcpu_inject_gp(vcpu, 0U);
+		} else {
+			/*
+				* XCR0[2:1] (SSE state & AVX state) can't not be
+				* set to 10b as it is necessary to set both bits
+				* to use AVX instructions.
+				*/
+			/** If bits 2:1 of val64 is equal to XCR0_AVX */
+			if ((val64 & (XCR0_SSE | XCR0_AVX)) == XCR0_AVX) {
+				/** Call vcpu_inject_gp() with the following parameters, in order
+				 * to inject GP to the vcpu with error code 0.
 				 *  - vcpu
 				 *  - 0 */
 				vcpu_inject_gp(vcpu, 0U);
 			} else {
-				/** Set val64 to (vcpu_get_gpreg(vcpu, CPU_REG_RAX) & 0xffffffffUL)|
-				 *  (vcpu_get_gpreg(vcpu, CPU_REG_RDX) << 32U) */
-				val64 = (vcpu_get_gpreg(vcpu, CPU_REG_RAX) & 0xffffffffUL) |
-					(vcpu_get_gpreg(vcpu, CPU_REG_RDX) << 32U);
-
-				/** If bit 0 of val64 is clear */
-				if ((val64 & 0x01UL) == 0UL) {
-					/** Call vcpu_inject_gp() with the following parameters, in order
-					 *  to inject GP to the vcpu with error code 0.
-					 *  - vcpu
-					 *  - 0 */
-					vcpu_inject_gp(vcpu, 0U);
-				/** If any of the reserved bits(specified by XCR0_RESERVED_BITS) of val64 is not 0 */
-				} else if ((val64 & XCR0_RESERVED_BITS) != 0UL) {
-					/** Call vcpu_inject_gp() with the following parameters, in order
-					 *  to inject GP to the vcpu with error code 0.
+				/*
+					* SDM Vol.1 13-4, XCR0[4:3] are associated with MPX state,
+					* Guest should not set these two bits without MPX support.
+					*/
+				/** If bits 4:3 of val64 is not 0 */
+				if ((val64 & (XCR0_BNDREGS | XCR0_BNDCSR)) != 0UL) {
+					/** Call vcpu_inject_gp() with the following parameters,
+					 *  in order to inject GP to the vcpu with error code 0.
 					 *  - vcpu
 					 *  - 0 */
 					vcpu_inject_gp(vcpu, 0U);
 				} else {
-					/*
-					 * XCR0[2:1] (SSE state & AVX state) can't not be
-					 * set to 10b as it is necessary to set both bits
-					 * to use AVX instructions.
-					 */
-					/** If bits 2:1 of val64 is equal to XCR0_AVX */
-					if ((val64 & (XCR0_SSE | XCR0_AVX)) == XCR0_AVX) {
-						/** Call vcpu_inject_gp() with the following parameters, in order
-						 * to inject GP to the vcpu with error code 0.
-						 *  - vcpu
-						 *  - 0 */
-						vcpu_inject_gp(vcpu, 0U);
-					} else {
-						/*
-						 * SDM Vol.1 13-4, XCR0[4:3] are associated with MPX state,
-						 * Guest should not set these two bits without MPX support.
-						 */
-						/** If bits 4:3 of val64 is not 0 */
-						if ((val64 & (XCR0_BNDREGS | XCR0_BNDCSR)) != 0UL) {
-							/** Call vcpu_inject_gp() with the following parameters,
-							 *  in order to inject GP to the vcpu with error code 0.
-							 *  - vcpu
-							 *  - 0 */
-							vcpu_inject_gp(vcpu, 0U);
-						} else {
-							/** Call write_xcr() with the following parameters, in order to
-							 *  write val64 into the XCR0.
-							 *  - 0
-							 *  - val64 */
-							write_xcr(0, val64);
-						}
-					}
+					/** Call write_xcr() with the following parameters, in order to
+					 *  write val64 into the XCR0.
+					 *  - 0
+					 *  - val64 */
+					write_xcr(0, val64);
 				}
 			}
 		}
+	}
 
 	/** Return ret */
 	return ret;
