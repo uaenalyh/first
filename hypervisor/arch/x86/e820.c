@@ -13,7 +13,29 @@
 #include <logmsg.h>
 
 /**
- * @addtogroup hwmgmt_configs
+ * @defgroup hwmgmt_configs hwmgmt.configs
+ * @ingroup hwmgmt
+ * @brief Implementation of APIs to manage physical E820 table.
+ *
+ * Usage Remark: hwmgmt.cpu module uses this module to manage physical E820 table and to
+ *		 request memory buffer for trampoline code.
+ *		 hwmgmt.mmu module uses this module to fetch E820 table information and hypervisor
+ *		 memory range.
+ *
+ * Dependency Justification: This module uses round_page_up() and round_page_down() provided
+ *				by hwmgmt.mmu module, and uses debug module to dump information.
+ *
+ * Dependencies among Files:
+ *	- Definitions of miscellaneous macros for hypervisor:
+ *		config.h
+ *
+ *	- Definitions of miscellaneous macros for current physical platform:
+ *		misc_cfg.h
+ *
+ *	- Definitions of Multiboot and E820 related functions and data structures for hypervisor:
+ *		multiboot.h
+ *		e820.h
+ *		e820.c
  *
  * @{
  */

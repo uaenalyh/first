@@ -10,47 +10,31 @@
 #include <pgtable.h>
 
 /**
- * @defgroup hwmgmt_configs hwmgmt.configs
- * @ingroup hwmgmt
- * @brief Implementation of APIs to manage physical E820 table, and to get platform memory
- *	  information or static configurations for specific VM.
+ * @defgroup vp-base_vm-config vp-base.vm-config
+ * @ingroup vp-base
+ * @brief Static VM configuration data
  *
- * Usage Remark: hwmgmt.cpu module uses this module to manage physical E820 table and to
- *		 request memory buffer for trampoline code.
- *		 hwmgmt.mmu module uses this module to fetch E820 table information and hypervisor
- *		 memory range.
- *		 vp-base.vm, vp-base.vboot and vp-dm.vperipheral modules use this module to get
- *		 static configurations of specific VM.
+ * The vm-config module provides static configuration data that specify the number of VMs to be launched, the allocation
+ * of physical resources (including CPUs, memory and peripherals) to each VM, the settings of virtualized resources and
+ * the boot protocol to launch each VM.
  *
- * Dependency Justification: This module uses round_page_up() and round_page_down() provided
- *				by hwmgmt.mmu module, and uses debug module to dump information.
+ * Usage:
+ * - The vp-base.vboot module depends on this one to prepare for the data for setting up VM initial states according to
+ *   the specified boot protocol.
+ * - The vp-base.vm module depends on this one to prepare for the resources allocated to each VM.
+ * - The vp-dm.vperipheral module depends on this one to initialize the passed-through and virtual PCI functions of each
+ *   VM.
  *
- * Dependencies among Files:
- *	- Definitions of miscellaneous macros for hypervisor:
- *		config.h
- *
- *	- Definitions of miscellaneous macros for current physical platform:
- *		misc_cfg.h
- *
- *	- Definitions of Multiboot and E820 related functions and data structures for hypervisor:
- *		multiboot.h
- *		e820.h
- *		e820.c
- *
- *	- Definitions of functions and data structures for guest configurations:
- *		vm_config.h
- *		vm_config.c
- *		pci_dev.c
- *		vm_configurations.c
- *		vm_configurations.h
- *		pci_devices.h
+ * Dependency:
+ * This module does not depend on any other module as it only provides an interface to get the static configuration
+ * data.
  *
  * @{
  */
 
 /**
  * @file
- * @brief This file implements get_vm_config() function that shall be provided by the hwmgmt.configs module.
+ * @brief This file implements get_vm_config() function that shall be provided by the vp-base.vm-config module.
  *
  * External APIs:
  *  - get_vm_config()     This function gets the static configurations for specific VM.

@@ -9,7 +9,7 @@
 #include <vuart.h>
 
 /**
- * @addtogroup hwmgmt_configs
+ * @addtogroup vp-base_vm-config
  *
  * @{
  */

@@ -8,7 +8,7 @@
 #define VM_CONFIG_H_
 
 /**
- * @addtogroup hwmgmt_configs
+ * @addtogroup vp-base_vm-config
  *
  * @{
  */
@@ -16,7 +16,7 @@
 /**
  * @file
  * @brief this file declares the specific for VM configurations external data structures
- *		  and APIs provided by hwmgmt.configs module.
+ *		  and APIs provided by vp-base.vm-config module.
  */
 
 #include <types.h>

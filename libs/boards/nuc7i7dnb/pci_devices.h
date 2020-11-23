@@ -8,7 +8,7 @@
 #define PCI_DEVICES_H_
 
 /**
- * @addtogroup hwmgmt_configs
+ * @addtogroup vp-base_vm-config
  *
  * @{
  */

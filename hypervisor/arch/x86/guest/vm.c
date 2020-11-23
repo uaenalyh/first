@@ -47,7 +47,6 @@
  *
  * Dependency:
  * - This module depends on 'hwmgmt.apic' module to send IPI to other physical CPU.
- * - This module depends on 'hwmgmt.configs' module to get the VM configuration information.
  * - This module depends on 'hwmgmt.cpu' module to get physical CPU ID/numbers, start/offline the CPU.
  * - This module depends on 'hwmgmt.iommu' module to release IOMMU.
  * - This module depends on 'hwmgmt.mmu' module to sanitize each PTE of EPT PML4 items.
@@ -56,6 +55,7 @@
  * - This module depends on 'hwmgmt.vboot' module to initialize guest VM boot info, including kernel and boot arguments.
  * - This module depends on 'lib.bits' module to set/get/clear bit in specific value.
  * - This module depends on 'lib.util' module to do memory set.
+ * - This module depends on 'vp-base.vm-config' module to get the VM configuration information.
  * - This module depends on 'vp-base.vcpu' module to prepare/launch/reset/offline the vCPU, and to access the
  *        states of the specific vCPU.
  * - This module depends on 'vp-base.vcpuid' module to setup vCPUID entries for the VM.
