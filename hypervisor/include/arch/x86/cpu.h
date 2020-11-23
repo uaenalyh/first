@@ -424,10 +424,6 @@ enum cpu_reg_name {
 	CPU_REG_GDTR /**< The global descriptor table register (GDTR) */
 };
 
-/* In trampoline range, hold the jump target which trampline will jump to */
-extern uint64_t main_entry[1];
-extern uint64_t secondary_cpu_stack[1];
-
 /*
  * To support per_cpu access, we use a special struct "per_cpu_region" to hold
  * the pattern of per CPU data. And we allocate memory for per CPU data

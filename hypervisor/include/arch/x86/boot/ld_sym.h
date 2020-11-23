@@ -44,7 +44,20 @@ extern uint8_t ld_bss_end;
  */
 extern const uint8_t ld_trampoline_load;
 
+/**
+ * @brief Fake address of the first type of the trampoline
+ *
+ * The address of this variable (which is fixed to 0H) is a fake address of the first byte of the trampoline
+ * segment. The address shall only be used along with ld_trampoline_end to calculate the size of the trampoline segment.
+ */
 extern uint8_t ld_trampoline_start;
+
+/**
+ * @brief Fake address of the first byte right after the trampoline
+ *
+ * The address of this variable is a fake address of the first byte right after the trampoline segment.  The address
+ * shall only be used along with ld_trampoline_start to calculate the size of the trampoline segment.
+ */
 extern uint8_t ld_trampoline_end;
 
 /**
