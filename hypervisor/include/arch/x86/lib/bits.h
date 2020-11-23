@@ -465,7 +465,6 @@ build_bitmap_testandset(bitmap_test_and_set_lock, "q", uint64_t, BUS_LOCK)
 			     : "cc", "memory");                          \
 		return (ret != 0);                                       \
 	}
-build_bitmap_testandclear(bitmap_test_and_clear_nolock, "q", uint64_t, "")
 
 /**
  * @brief Test and clear the \a nr_arg-th bit in the integer pointed by \a addr.

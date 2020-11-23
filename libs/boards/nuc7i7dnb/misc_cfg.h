@@ -22,13 +22,6 @@
 
 #define ROOTFS_0            "root=/dev/sda3 " /**< Path of root file-system. */
 
-#ifndef CONFIG_RELEASE
-#define SOS_BOOTARGS_DIFF      \
-	"hvlog=2M@0x1FE00000 " \
-	"memmap=0x200000$0x1fe00000 "
-#else
-#endif
-
 /**
  * @}
  */

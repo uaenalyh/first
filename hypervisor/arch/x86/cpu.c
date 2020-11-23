@@ -331,7 +331,6 @@ static void init_pcpu_xsave(void);
 static void set_current_pcpu_id(uint16_t pcpu_id);
 static void print_hv_banner(void);
 static uint16_t get_pcpu_id_from_lapic_id(uint32_t lapic_id);
-static uint64_t start_tsc __attribute__((__section__(".bss_noinit")));
 
 /**
  * @brief Initialize lapic_id field of per_cpu_data.
@@ -465,9 +464,6 @@ void init_pcpu_pre(bool is_bsp)
 	if (is_bsp) {
 		/** Set pcpu_id to BOOT_CPU_ID. */
 		pcpu_id = BOOT_CPU_ID;
-		/** Set start_tsc to  the return value of rdtsc(),
-		 *  which indicates the current time-stamp counter of the physical processor. */
-		start_tsc = rdtsc();
 
 		/** Call memset with the following parameters, in order to initialize BSS section as all 0s.
 		 *  - &ld_bss_start
@@ -607,11 +603,9 @@ void init_pcpu_post(uint16_t pcpu_id)
 		 *  - HV_BUILD_TYPE
 		 *  - HV_DAILY_TAG
 		 *  - HV_BUILD_USER
-		 *  - HV_CONFIG_TOOL
-		 *  - ticks_to_us(start_tsc) */
-		pr_acrnlog("HV version %s-%s-%s %s (daily tag:%s) build by %s%s, start time %luus", HV_FULL_VERSION,
-			HV_BUILD_TIME, HV_BUILD_VERSION, HV_BUILD_TYPE, HV_DAILY_TAG, HV_BUILD_USER, HV_CONFIG_TOOL,
-			ticks_to_us(start_tsc));
+		 *  - HV_CONFIG_TOOL */
+		pr_acrnlog("HV version %s-%s-%s %s (daily tag:%s) build by %s%s", HV_FULL_VERSION,
+			HV_BUILD_TIME, HV_BUILD_VERSION, HV_BUILD_TYPE, HV_DAILY_TAG, HV_BUILD_USER, HV_CONFIG_TOOL);
 
 		/** Logging the following information with a log level of LOG_ACRN.
 		 *  - HV_API_MAJOR_VERSION
