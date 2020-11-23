@@ -8,14 +8,14 @@
 #define VM_RESET_H_
 
 /**
- * @addtogroup vp-base_vm-reset
+ * @addtogroup vp-base_vm
  *
  * @{
  */
 
 /**
  * @file
- * @brief This file declares the external APIs of the vp-base.vm-reset
+ * @brief This file declares the APIs of requesting and handling VM shutdown.
  */
 
 #include <acrn_common.h>

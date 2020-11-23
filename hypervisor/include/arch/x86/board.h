@@ -7,16 +7,17 @@
 #define BOARD_H
 
 /**
- * @addtogroup hwmgmt_configs
+ * @addtogroup vp-base_vm
  *
  * @{
  */
 
 /**
  * @file
- * @brief {TBD brief description}
+ * @brief Declaration of the API building e820 table for a VM.
  *
- * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ * This file declares the create_prelaunched_vm_e820() API which builds a virtual e820 table and fills it into the given
+ * VM data structure.
  */
 
 #include <types.h>

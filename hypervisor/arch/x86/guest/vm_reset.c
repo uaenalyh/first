@@ -11,52 +11,15 @@
 #include <vm_reset.h>
 
 /**
- * @defgroup  vp-base_vm-reset vp-base.vm_reset
- * @ingroup vp-base
- *
- * @brief Implementation of vm_reset related utilities functions and APIs to do VM reset operation.
- *
- * This module interacts with with the following modules:
- *
- *    - vp-base.vm
- *
- *      Use vp-base.vm module to get the virtual machine structure, do vm state transition, send
- *      shutdown message to vm.
- *
- *      All the APIs used in vp-base.vm module listing below:
- *
- *          + get_vm_from_vmid
- *          + shutdown_vm
- *          + pause_vm
- *          + make_shutdown_vm_request
- *
- *    - hwmgmt.cpu
- *
- *      Use hwmgmt.cpu module to get per-CPU region of the given physical cpu.
- *
- *      All the APIs used in hwmgmt.cpu module listing below:
- *
- *          + per_cpu
- *
- *    - vp-base.vcpu
- *
- *      Use vp-base.vcpu module to get physical cpu id, where the physical cpu is where the given vcpu runs on.
- *
- *      All the APIs used in vp-base.vcpu module listing below:
- *
- *          + pcpuid_from_vcpu
- *
- * This module is decomposed into the following files:
- *
- *     vm_reset.c    -defines all external APIs that shall be provided by the vp-base.vm-reset module
- *     vm_reset.h    -declares all external APIs that shall be provided by the vp-base.vm-reset module
+ * @addtogroup vp-base_vm
  *
  * @{
  */
 
 /**
  * @file
- * @brief This file declares all external APIs that shall be provided by the vp-base.vm-reset module.
+ * @brief This file defines the APIs of requesting and handling VM shutdown.
+ *
  * This file is decomposed into the following functions:
  *     fatal_error_shutdown_vm  -Do partial shutdown operation on the vm which vcpu belongs.
  *     shutdown_vm_from_idle    -Shutdown the vm that masked to be shutdown.

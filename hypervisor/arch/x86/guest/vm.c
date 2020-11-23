@@ -47,7 +47,8 @@
  *
  * Dependency:
  * - This module depends on 'hwmgmt.apic' module to send IPI to other physical CPU.
- * - This module depends on 'hwmgmt.cpu' module to get physical CPU ID/numbers, start/offline the CPU.
+ * - This module depends on 'hwmgmt.cpu' module to start/offline the CPU and get per-cpu data and physical CPU
+ *   ID/numbers.
  * - This module depends on 'hwmgmt.iommu' module to release IOMMU.
  * - This module depends on 'hwmgmt.mmu' module to sanitize each PTE of EPT PML4 items.
  * - This module depends on 'hwmgmt.page' module to set EPT memory operations callback functions, which are called from
