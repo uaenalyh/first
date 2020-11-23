@@ -618,12 +618,10 @@ void schedule(void)
 	 *  - pcpu_id
 	 *  - &rflag */
 	obtain_schedule_lock(pcpu_id, &rflag);
-	/** If ctl->scheduler->pick_next is not NULL,
-	 *  meaning scheduler 'pick_next' callback function isn't a NULL pointer */
-	if (ctl->scheduler->pick_next != NULL) {
-		/** Set next to the thread picked by scheduler */
-		next = ctl->scheduler->pick_next(ctl);
-	}
+
+	/** Set next to the thread picked by scheduler */
+	next = ctl->scheduler->pick_next(ctl);
+
 	/** Call bitmap_clear_lock with the following parameters, in order to
 	 *  clear 'NEED_RESCHEDULE' bit in the 'flags' field of scheduler control block 'ctl'.
 	 *  - NEED_RESCHEDULE
@@ -658,24 +656,21 @@ void schedule(void)
 	/** If prev is not next,
 	 *  meaning thread 'prev' and thread 'next' isn't identical */
 	if (prev != next) {
-		/** If prev is not NULL and prev->switch_out is not NULL,
-		 *  meaning thread 'prev' isn't a NULL pointer and
-		 *  its 'switch_out' callback function isn't a NULL pointer */
-		if ((prev != NULL) && (prev->switch_out != NULL)) {
+		/** If prev->switch_out is not NULL,
+		 *  meaning 'switch_out' of thread 'prev' isn't a NULL pointer. */
+		if (prev->switch_out != NULL) {
 			/** Call prev->switch_out with the following parameters, in order to switch out thread 'prev'.
 			 *  - prev */
 			prev->switch_out(prev);
 		}
 
-		/** If next is not NULL and next->switch_in is not NULL,
-		 *  meaning thread 'next' isn't a NULL pointer and
-		 *  its 'switch_in' callback function isn't a NULL pointer */
-		if ((next != NULL) && (next->switch_in != NULL)) {
-			/** Call pnext->switch_in with the following parameters, in order to switch in thread 'next'.
+		/** If next->switch_in is not NULL,
+		 *  meaning 'switch_in' of thread 'next' isn't a NULL pointer. */
+		if (next->switch_in != NULL) {
+			/** Call next->switch_in with the following parameters, in order to switch in thread 'next'.
 			 *  - next */
 			next->switch_in(next);
 		}
-
 		/** Call arch_switch_to with the following parameters, in order to
 		 *  save thread 'prev' context and restore thread 'next' context.
 		 *  - &prev->host_sp
