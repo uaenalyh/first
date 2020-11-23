@@ -8,14 +8,14 @@
 #define TYPES_H
 
 /**
- * @addtogroup lib_utils
+ * @addtogroup lib_util
  *
  * @{
  */
 
 /**
  * @file
- * @brief This file declares external macros and types that shall be provided by the lib.utils module.
+ * @brief This file declares external macros and types that shall be provided by the lib.util module.
  *
  * This file is decomposed into the following macros:
  *

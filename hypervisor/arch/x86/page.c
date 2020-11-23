@@ -56,7 +56,7 @@
  *
  * Dependency:
  * - This module depends on 'debug' module to log some information in debug phase.
- * - This module depends on 'lib.utils' module to set the contents in the specified memory region to all 0s.
+ * - This module depends on 'lib.util' module to set the contents in the specified memory region to all 0s.
  * - This module depends on 'hwmgmt.vtd' module to flush cache lines that contain the specified memory region.
  * - This module depends on 'hwmgmt.mmu' module to sanitize the paging-structure entries.
  * - This module depends on 'hwmgmt.security' module to determine whether the physical platform is vulnerable to the

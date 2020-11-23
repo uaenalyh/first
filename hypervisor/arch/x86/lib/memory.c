@@ -5,7 +5,7 @@
 #include <types.h>
 
 /**
- * @defgroup lib_utils lib.utils
+ * @defgroup lib_util lib.util
  * @ingroup lib
  * @brief Providing utility APIS, error codes, standard types and attribute attached macros.
  *
@@ -16,20 +16,20 @@
  *
  * This module is decomposed into the following files:
  *
- *     memory.c        - Implement memory operation APIs that shall be provided by the lib.utils module.
- *     string.c        - Implement string operation APIs that shall be provided by the lib.utils module.
+ *     memory.c        - Implement memory operation APIs that shall be provided by the lib.util module.
+ *     string.c        - Implement string operation APIs that shall be provided by the lib.util module.
  *     util.h          - Implement utils APIs including arithmetic operation and alignment checking operation.
- *     types.h         - Declare external macros and types that shall be provided by the lib.utils module.
- *     rtl.h           - Declare string operation APIs that shall be provided by the lib.utils module.
- *     list.h          - Declare external list APIs that shall be provided by the lib.utils module.
- *     errno.h         - Declare external error codes that shall be provided by the lib.utils module.
+ *     types.h         - Declare external macros and types that shall be provided by the lib.util module.
+ *     rtl.h           - Declare string operation APIs that shall be provided by the lib.util module.
+ *     list.h          - Declare external list APIs that shall be provided by the lib.util module.
+ *     errno.h         - Declare external error codes that shall be provided by the lib.util module.
  *
  * @{
  */
 
 /**
  * @file
- * @brief This file defines and implements memory operation APIs that shall be provided by the lib.utils module.
+ * @brief This file defines and implements memory operation APIs that shall be provided by the lib.util module.
  *
  * This file is decomposed into the following functions:
  *

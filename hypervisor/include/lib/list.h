@@ -30,14 +30,14 @@
 #define LIST_H_
 
 /**
- * @addtogroup lib_utils
+ * @addtogroup lib_util
  *
  * @{
  */
 
 /**
  * @file
- * @brief This file declares external list APIs that shall be provided by the lib.utils module.
+ * @brief This file declares external list APIs that shall be provided by the lib.util module.
  */
 
 /**

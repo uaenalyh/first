@@ -55,7 +55,7 @@
  *        this module to setup EPT memory mapping for the VMs and to do other EPT operations.
  * - This module depends on 'hwmgmt.vboot' module to initialize guest VM boot info, including kernel and boot arguments.
  * - This module depends on 'lib.bits' module to set/get/clear bit in specific value.
- * - This module depends on 'lib.utils' module to do memory set.
+ * - This module depends on 'lib.util' module to do memory set.
  * - This module depends on 'vp-base.vcpu' module to prepare/launch/reset/offline the vCPU, and to access the
  *        states of the specific vCPU.
  * - This module depends on 'vp-base.vcpuid' module to setup vCPUID entries for the VM.

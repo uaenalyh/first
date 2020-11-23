@@ -50,7 +50,7 @@
  * - This module depends on 'hwmgmt.iommu' module to add the passthrough PCI device into IOMMU domain.
  * - This module depends on 'hwmgmt.pci' module to access the passthrough PCI device's physical configuration space.
  * - This module depends on 'hwmgmt.configs' module to get VM configuration data of one VM's PCI devices.
- * - This module depends on 'lib.utils' module to do memory initialization.
+ * - This module depends on 'lib.util' module to do memory initialization.
  *
  * @{
  */

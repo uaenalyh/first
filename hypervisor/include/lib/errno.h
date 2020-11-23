@@ -8,14 +8,14 @@
 #define ERRNO_H
 
 /**
- * @addtogroup lib_utils
+ * @addtogroup lib_util
  *
  * @{
  */
 
 /**
  * @file
- * @brief This file declares external error codes that shall be provided by the lib.utils module.
+ * @brief This file declares external error codes that shall be provided by the lib.util module.
  */
 
 /** Indicate permission denied */

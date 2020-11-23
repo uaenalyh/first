@@ -49,11 +49,11 @@
  *
  *          + get_vm_config
  *
- *    - lib.utils
+ *    - lib.util
  *
- *      Use the lib.utils module to calculate string lengths and compare strings.
+ *      Use the lib.util module to calculate string lengths and compare strings.
  *
- *      All the APIs used in lib.utils module listing below:
+ *      All the APIs used in lib.util module listing below:
  *          + strnlen_s
  *          + strncmp
  *

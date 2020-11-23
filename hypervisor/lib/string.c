@@ -18,14 +18,14 @@
  */
 
 /**
- * @addtogroup lib_utils
+ * @addtogroup lib_util
  *
  * @{
  */
 
 /**
  * @file
- * @brief This file implements string operation APIs that shall be provided by the lib.utils.
+ * @brief This file implements string operation APIs that shall be provided by the lib.util.
  *
  * This file is decomposed into the following functions:
  *

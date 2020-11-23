@@ -34,7 +34,7 @@
  * - 'vp-base.hv_main' depends on this module to flush page cache when wbinvd VMExit happens.
  *
  * Dependency:
- * - This module depends on 'lib.utils' to operate on the host memory.
+ * - This module depends on 'lib.util' to operate on the host memory.
  * - This module depends on 'vp-base.vm' to get virtual CPU structure pointer.
  * - This module depends on 'hwmgmt.cpu' to do following things:
  *   - Access guest's memory protected by SMAP.

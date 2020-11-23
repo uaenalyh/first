@@ -31,7 +31,7 @@
  * Dependency:
  * - This module depends on 'hwmgmt.cpu' module to read the MSR register and use CPUID related APIs.
  * - This module depends on 'hwmgmt.page' module to get page related information.
- * - This module depends on 'lib.utils' module to use type related macros.
+ * - This module depends on 'lib.util' module to use type related macros.
  *
  * @{
  */

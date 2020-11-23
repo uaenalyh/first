@@ -44,7 +44,7 @@
  * - 'hwmgmt.apic' depends on this module for spinlock operation.
  *
  * Dependency:
- * - This module depends on 'lib.utils' module to use memset.
+ * - This module depends on 'lib.util' module to use memset.
  * - This module depends on 'hwmgmt.cpu' module to disable/restore CPU interrupts.
  *
  * @{

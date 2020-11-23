@@ -58,7 +58,7 @@
  *   - Get per-cpu data for current CPU.
  *   - Read and write MSR.
  *   - Read and write CR registers.
- * - This module depends on lib.utils to do memory copy.
+ * - This module depends on lib.util to do memory copy.
  * - This module depends on hwmgmt.page to do memory address translation.
  *
  * @{

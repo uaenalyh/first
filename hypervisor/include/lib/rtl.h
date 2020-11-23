@@ -8,14 +8,14 @@
 #define RTL_H
 
 /**
- * @addtogroup lib_utils
+ * @addtogroup lib_util
  *
  * @{
  */
 
 /**
  * @file
- * @brief This file declares external string APIs that shall be provided by the lib.utils module.
+ * @brief This file declares external string APIs that shall be provided by the lib.util module.
  */
 
 #include <types.h>

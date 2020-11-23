@@ -8,7 +8,7 @@
 #define UTIL_H
 
 /**
- * @addtogroup lib_utils
+ * @addtogroup lib_util
  *
  * @{
  */

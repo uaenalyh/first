@@ -36,7 +36,7 @@
  * - This module depends on 'hwmgmt.cpu_caps' module to get the native processor information regarding to CPUID
  * instruction.
  * - This module depends on 'lib.bits' module to find the most significant bit set in specified value.
- * - This module depends on 'lib.utils' module to do memory copy.
+ * - This module depends on 'lib.util' module to do memory copy.
  *
  * @{
  */

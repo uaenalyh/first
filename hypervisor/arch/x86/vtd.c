@@ -50,7 +50,7 @@
  *
  * Dependency:
  * - This module depends on 'debug' module to log some information in debug phase.
- * - This module depends on 'lib.utils' module to set the contents in the specified memory region to all 0s.
+ * - This module depends on 'lib.util' module to set the contents in the specified memory region to all 0s.
  * - This module depends on 'hwmgmt.time' module to get the current TSC value for debug purpose.
  * - This module depends on 'hwmgmt.mmu' module to clear user/supervisor (U/S) flags for the specified memory region.
  *
