@@ -43,7 +43,7 @@
  * @file
  * @brief This file implements MSI operation APIs which are used within vPCI component
  *
- * This file implements MSI operation APIs which are used within vPCI component. The main parts are focused on
+ * This file implements MSI operation APIs which are used within vPCI component. The main parts focus on
  * the MSI interrupt remapping implementation. It also defines one helper function to implement the features that
  * are commonly used in this file. In addition, it defines one decomposed function to improve the readability of the
  * code.

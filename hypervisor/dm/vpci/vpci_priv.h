@@ -299,7 +299,7 @@ static inline bool vbar_access(const struct pci_vdev *vdev, uint32_t offset)
  * @brief Check whether the given vPCI device has a MSI capability
  *
  * This function is called to check whether the given vPCI device has a MSI capability. If it has a MSI capability, the
- * offset of the MSI capabilit structure should not be 0.
+ * offset of the MSI capability structure should not be 0.
  *
  * @param[in] vdev A vPCI device whose MSI info is to check
  *

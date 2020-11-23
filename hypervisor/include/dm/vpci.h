@@ -183,7 +183,7 @@ union pci_cfg_addr_reg {
 /**
  * @brief Data structure to present the vPCI information of a VM
  *
- * Data structure to present present the vPCI information of a VM.
+ * Data structure to present the vPCI information of a VM.
  *
  * @consistency N/A
  * @alignment N/A
