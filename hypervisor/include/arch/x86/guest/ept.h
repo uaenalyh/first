@@ -8,7 +8,7 @@
 #define EPT_H
 
 /**
- * @addtogroup vp-base_guest_mem
+ * @addtogroup vp-base_guest-mem
  *
  * @{
  */

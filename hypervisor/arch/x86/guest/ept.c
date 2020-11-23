@@ -12,7 +12,7 @@
 #include <trace.h>
 
 /**
- * @addtogroup vp-base_guest_mem
+ * @addtogroup vp-base_guest-mem
  *
  * @{
  */

@@ -8,7 +8,7 @@
 #define IO_EMUL_H
 
 /**
- * @addtogroup vp-dm_io_req
+ * @addtogroup vp-dm_io-req
  *
  * @{
  */

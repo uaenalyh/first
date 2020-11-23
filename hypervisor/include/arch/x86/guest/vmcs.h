@@ -8,7 +8,7 @@
 #define VMCS_H_
 
 /**
- * @addtogroup vp-base_hv_main
+ * @addtogroup vp-base_hv-main
  *
  * @{
  */

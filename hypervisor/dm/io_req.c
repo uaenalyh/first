@@ -9,7 +9,7 @@
 #include <logmsg.h>
 
 /**
- * @defgroup vp-dm_io_req vp-dm.io_req
+ * @defgroup vp-dm_io-req vp-dm.io-req
  * @ingroup vp-dm
  * @brief Implementation of API to register port IO emulation handlers and API to handle I/O instruction VM exit.
  *

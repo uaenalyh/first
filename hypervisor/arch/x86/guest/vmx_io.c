@@ -18,7 +18,7 @@
 #include <logmsg.h>
 
 /**
- * @addtogroup vp-dm_io_req
+ * @addtogroup vp-dm_io-req
  *
  * @{
  */

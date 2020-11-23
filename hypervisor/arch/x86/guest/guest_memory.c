@@ -13,7 +13,7 @@
 #include <logmsg.h>
 
 /**
- * @defgroup vp-base_guest_mem vp-base.guest_mem
+ * @defgroup vp-base_guest-mem vp-base.guest-mem
  * @ingroup vp-base
  * @brief This module implements all the operations related to guest memory access and address translation.
 

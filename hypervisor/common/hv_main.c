@@ -16,7 +16,7 @@
 #include <console.h>
 
 /**
- * @defgroup vp-base_hv_main vp-base.hv_main
+ * @defgroup vp-base_hv-main vp-base.hv-main
  * @ingroup vp-base
  * @brief  The hv_main module provides thread functions when a physical processor has or has not an
  * assigned vCPU to run.
