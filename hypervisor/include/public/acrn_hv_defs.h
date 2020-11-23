@@ -6,12 +6,6 @@
  * SPDX-License-Identifier: BSD-3-Clause
  */
 
-/**
- * @file acrn_hv_defs.h
- *
- * @brief acrn data structure for hypercall
- */
-
 #ifndef ACRN_HV_DEFS_H
 #define ACRN_HV_DEFS_H
 
@@ -23,19 +17,16 @@
 
 /**
  * @file
- * @brief {TBD brief description}
+ * @brief Definition of page table operation types and invalid addresses
  *
- * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ * This file defines the values (in the form of object-like macros) indicating page table operation types and invalid
+ * addresses.
  */
 
-/*
- * Common structures for HV/VHM
- */
+#define ACRN_INVALID_HPA (~0UL)  /**< The value indicating an invalid host physical address */
 
-#define ACRN_INVALID_HPA (~0UL)
-
-#define MR_DEL    2U
-#define MR_MODIFY 3U
+#define MR_DEL    2U  /**< The value indicating the deletion of the mapping of a memory region */
+#define MR_MODIFY 3U  /**< The value indicating the modification of mapping attributes of a memory region */
 
 /**
  * @}
