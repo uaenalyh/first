@@ -339,10 +339,10 @@ void printf(const char *fmt, ...);
  * Expand to the following steps:
  *
  * - Logging the following information with a log level of FATAL.
- *   - __func__
- *   - __LINE__
+ *   - Name of the current function
+ *   - Line of source where this macro is used
  * - Logging the following information with a log level of FATAL.
- *   - __VA_ARGS__
+ *   - The variadic parameters given to this macro
  * - Call bsp_fatal_error() defined in Board Support Package and never return in order to transfer the control to Board
  *   Support Package.
  */
