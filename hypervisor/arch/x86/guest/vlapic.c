@@ -48,9 +48,19 @@
 
 /**
  * @defgroup vp-base vp-base
- * @brief {TBD brief description}
+ * @brief The component that creates / destroys VMs and handles VM-exits
  *
- * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ * The vp-base component is responsible for initializing resources of VMs, launching the VMs and handle VM exit events
+ * triggered by the vCPUs.
+ *
+ * This component is above the boot, lib and hwmgmt component and at the same level as the vp-dm component. The
+ * functionality of this component relies on the boot component for a proper C execution environment, the lib component
+ * for mutual exclusion, bitmap and string operations and the hwmgmt component for updating virtual machine control
+ * structures, operating DMA remapping units and scheduling vCPUs. It relies on the vp-dm component to handle VM exit
+ * events specific to virtual peripherals or pass-through devices.
+ *
+ * Refer to section 10.3 of Software Architecture Design Specification for the detailed decomposition of this component
+ * and section 11.4 for the external APIs of each module inside this component.
  */
 
 /**

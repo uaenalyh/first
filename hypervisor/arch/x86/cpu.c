@@ -27,6 +27,19 @@
 #include <uart16550.h>
 
 /**
+ * @defgroup hwmgmt hwmgmt
+ * @brief Hardware management component
+ *
+ * The hwmgmt component is responsible for initializing the physical platform to a known state and providing interfaces
+ * for accessing the resources. This component is above the boot and lib component. The functionality of this component
+ * relies on the boot component for a proper C execution environment and the lib component for mutual exclusion, bitmap
+ * and string operations.
+ *
+ * Refer to section 10.2 of Software Architecture Design Specification for the detailed decomposition of this component
+ * and section 11.3 for the external APIs of each module inside this component.
+ */
+
+/**
  * @defgroup hwmgmt_cpu hwmgmt.cpu
  * @ingroup hwmgmt
  * @brief Provide macros, structures, and APIs related to CPU.

@@ -15,6 +15,9 @@
  * lib.bits     - Implementation of bit APIs to do bitmap operating.
  * lib.lock     - Implementation of lock APIs to do lock operating.
  * lib.util     - Implementation of utility APIs to do string operating and memory operation.
+ *
+ * Refer to section 10.1 of Software Architecture Design Specification for the detailed decomposition of this component
+ * and section 11.2 for the external APIs of each module inside this component.
  */
 
 /**

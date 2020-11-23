@@ -10,9 +10,18 @@
 
 /**
  * @defgroup vp-dm vp-dm
- * @brief {TBD brief description}
+ * @brief The component implementing virtual peripherals
  *
- * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ * The vp-dm component is responsible for handling accesses to virtual peripherals and pass-through devices.
+ *
+ * This component is above the boot, lib and hwmgmt component and at the same level as the vp-base component. The
+ * functionality of this component relies on the boot component for a proper C execution environment, the lib component
+ * for mutual exclusion, bitmap and string operations and the hwmgmt component for updating virtual machine control
+ * structures, operating DMA remapping units and scheduling vCPUs. It relies on the vp-base component to get the values
+ * in vCPU registers.
+ *
+ * Refer to section 10.4 of Software Architecture Design Specification for the detailed decomposition of this component
+ * and section 11.5 for the external APIs of each module inside this component.
  */
 
 /**
