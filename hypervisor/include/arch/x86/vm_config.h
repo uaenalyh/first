@@ -25,7 +25,24 @@
 #include <acrn_common.h>
 #include <vm_configurations.h>
 
-#define AFFINITY_CPU(n)      (1U << (n)) /**< Bitmap for specific CPU of affinity */
+/**
+ * @brief Bitmap for specific CPU of affinity
+ *
+ * Given an ID of a physical CPU, this macro expands to a bitmap with only the corresponding bit set. This macro is
+ * designed to be used in the initializers of static VM configuration data which define the set of physical CPUs a VM
+ * can run on.
+ *
+ * @param[in] n the ID of the physical CPU
+ *
+ * @return A 32-bit unsigned integer with bit \a n set and the others cleared
+ *
+ * @mode NOT_APPLICABLE
+ *
+ * @reentrancy Unspecified
+ * @threadsafety Unspecified
+ */
+#define AFFINITY_CPU(n)      (1U << (n))
+
 #define MAX_VCPUS_PER_VM     MAX_PCPU_NUM /**< Maximum number of virtual CPU for one VM */
 #define MAX_VUART_NUM_PER_VM 2U	/**< Maximum number of virtual UART devices for one VM */
 #define MAX_VM_OS_NAME_LEN   32U /**< Maximum character number for OS name, including terminated NULL */

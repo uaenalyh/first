@@ -5,7 +5,7 @@
  */
 
 #ifndef VBOOT_INFO_H
-
+#define VBOOT_INFO_H
 
 /**
  * @addtogroup vp-base_vboot
@@ -15,14 +15,12 @@
 
 /**
  * @file
- * @brief {TBD brief description}
+ * @brief Declaration of the external API provided by the vp-base.vboot module.
  *
- * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ * This file declares the init_vm_boot_info() which is the only external API provided by this module.
  */
 
 #include <vm.h>
-
-#define VBOOT_INFO_H
 
 void init_vm_boot_info(struct acrn_vm *vm);
 

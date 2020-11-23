@@ -488,7 +488,7 @@ build_bitmap_testandset(bitmap_test_and_set_lock, "q", uint64_t, BUS_LOCK)
  * This function does the following actions in sequence:
  *
  * 1. Declare a local variable of type uint16_t,  'nr' representing the effective index of the bit which is to be
- * tested and set in the integer pointed by \a addr.
+ * tested and cleared in the integer pointed by \a addr.
  *
  * 2. Declare a local variable of type int32_t ret representing whether the \a nr-th bit is set in the integer pointed
  *    by \a addr, the value -1 express that the corresponding bit is 1, otherwise is 0, initialized as 0.

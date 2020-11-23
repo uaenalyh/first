@@ -63,7 +63,7 @@ union irte_index {
  * @remark N/A
  */
 union msi_addr_reg {
-	uint64_t full;
+	uint64_t full; /**< The full content as a single 64-bit integer */
 	/**
 	 * @brief Bits decode of the 64 bits MSI Address Register as Compatibility Format
 	 *

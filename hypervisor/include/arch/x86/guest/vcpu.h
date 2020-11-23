@@ -83,6 +83,9 @@
  * The macro set seg.selector to encoding SSG_NAME\#\# SEL, seg.base to encoding SEG_NAME\#\# _BASE, seg.limit
  * to encoding SEG_NAME\#\# _LIMIT and set seg.attr to encoding SEG_NAME\#\# _ATTR of the VMCS fields.
  *
+ * @param[in] seg The segment_sel structure that contains the details of the segment to be loaded
+ * @param[in] SEG_NAME The name of the segment (e.g. CS) to be loaded
+ *
  * @return None
  *
  * @pre  None
@@ -499,6 +502,8 @@ struct acrn_vcpu {
 /**
  * @brief This function is used to judge if vcpu is bsp.
  *
+ * @param[in] vcpu A pointer to the vCPU to be checked
+ *
  * @return A Boolean value indicating if the vCPU is bsp.
  * @retval true when vcpu->vcpu_id == BOOT_CPU_ID, Otherwise return false
  *
@@ -520,6 +525,8 @@ static inline bool is_vcpu_bsp(const struct acrn_vcpu *vcpu)
 
 /**
  * @brief This function is used to get the vCPU mode.
+ *
+ * @param[in] vcpu The vCPU whose mode is to be returned
  *
  * @return vcpu->arch.cpu_mode
  *
@@ -546,6 +553,8 @@ static inline enum vm_cpu_mode get_vcpu_mode(const struct acrn_vcpu *vcpu)
  * last VM exit event. This function can be called to force the vCPU re-execute the same
  * instruction for the next VM entry. This function is idempotent.
  *
+ * @param[in] vcpu A pointer to the vCPU whose RIP will be manipulated
+ *
  * @return vcpu->arch.cpu_mode
  *
  * @pre vcpu != NULL
@@ -566,6 +575,8 @@ static inline void vcpu_retain_rip(struct acrn_vcpu *vcpu)
 
 /**
  * @brief This function is used to return the vLAPIC structure of a vCPU.
+ *
+ * @param[in] vcpu A pointer to the vCPU whose vLAPIC structure will be returned
  *
  * @return &(vcpu->arch.vlapic)
  *
@@ -626,6 +637,8 @@ void set_vcpu_startup_entry(struct acrn_vcpu *vcpu, uint64_t entry);
 /**
  * @brief This function is used to judge if the vcpu is in long mode .
  *
+ * @param[in] vcpu A pointer to the vCPU whose mode is to be checked
+ *
  * @return A Boolean value indicating if the vCPU is currently in long mode or not.
  *
  * @pre vcpu != NULL
@@ -649,6 +662,8 @@ static inline bool is_long_mode(struct acrn_vcpu *vcpu)
 /**
  * @brief This function is used to judge if paging is enabled .
  *
+ * @param[in] vcpu A pointer to the vCPU whose paging mode is to be checked
+ *
  * @return A Boolean value indicating if paging is enabled or not.
  *
  * @pre vcpu != NULL
@@ -671,6 +686,8 @@ static inline bool is_paging_enabled(struct acrn_vcpu *vcpu)
 
 /**
  * @brief This function is used to judge if PAE is enabled .
+ *
+ * @param[in] vcpu A pointer to the vCPU whose PAE mode is to be checked
  *
  * @return A Boolean value indicating if PAE is enabled or not.
  *
