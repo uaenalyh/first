@@ -7,6 +7,9 @@
 #include <vm_config.h>
 #include <vuart.h>
 
+#define COM1_BASE 0x3F8U
+#define COM1_IRQ 4U
+
 extern struct acrn_vm_pci_dev_config vm0_pci_devs[VM0_CONFIG_PCI_DEV_NUM];
 extern struct acrn_vm_pci_dev_config vm1_pci_devs[VM1_CONFIG_PCI_DEV_NUM];
 

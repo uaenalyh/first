@@ -31,27 +31,23 @@
 #define VUART_H
 
 /**
- * @addtogroup vp-dm_vperipheral
+ * @addtogroup debug
  *
  * @{
  */
 
 /**
  * @file
- * @brief {TBD brief description}
+ * @brief Declaration of vUART initialization and deinitialization routines
  *
- * {TBD detailed description, including purposes, designed usages, usage remarks and dependency justification}
+ * This file declares init_vuart() and deinit_vuart() APIs of the debug module which can be used by debug code to
+ * initialize virtual UARTs that can fetch logs from a serial console of a VM.
  */
+
 #include <types.h>
 #include <spinlock.h>
 #include <vm_config.h>
 #include <vm.h>
-
-#define COM1_BASE 0x3F8U
-#define COM2_BASE 0x2F8U
-
-#define COM1_IRQ 4U
-#define COM2_IRQ 3U
 
 void init_vuart(struct acrn_vm *vm, const struct vuart_config *vu_config);
 void deinit_vuart(struct acrn_vm *vm);

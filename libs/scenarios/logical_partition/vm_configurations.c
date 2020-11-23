@@ -6,13 +6,15 @@
 
 #include <vm.h>
 #include <vm_config.h>
-#include <vuart.h>
 
 /**
  * @addtogroup vp-base_vm-config
  *
  * @{
  */
+
+#define COM1_BASE 0x3F8U   /**< Base address of a virtual UART in port I/O space. For debugging purpose only. */
+#define COM1_IRQ 4U        /**< IRQ line of a virtual UART. For debugging purpose only. */
 
   /**
   * @file
