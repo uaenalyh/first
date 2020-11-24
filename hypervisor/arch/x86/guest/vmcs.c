@@ -170,8 +170,10 @@ static void init_guest_vmx(struct acrn_vcpu *vcpu, uint64_t cr0, uint64_t cr3, u
 	 *  - MSR_IA32_MISC_ENABLE
 	 * */
 	misc_enable = msr_read(MSR_IA32_MISC_ENABLE);
-	/** Bitwise AND misc_enable by ~~(MSR_IA32_MISC_ENABLE_MONITOR_ENA | MSR_IA32_MISC_ENABLE_PMA). */
-	misc_enable &= ~(MSR_IA32_MISC_ENABLE_MONITOR_ENA | MSR_IA32_MISC_ENABLE_PMA);
+	/** Bitwise AND misc_enable by ~~(MSR_IA32_MISC_ENABLE_MONITOR_ENA | MSR_IA32_MISC_ENABLE_PMA |
+	 *  MSR_IA32_MISC_ENABLE_EITS | MSR_IA32_MISC_ENABLE_TCC). */
+	misc_enable &= ~(MSR_IA32_MISC_ENABLE_MONITOR_ENA | MSR_IA32_MISC_ENABLE_PMA | MSR_IA32_MISC_ENABLE_EITS
+			| MSR_IA32_MISC_ENABLE_TCC);
 	/** Bitwise OR misc_enable by MSR_IA32_MISC_BTS_UNAVILABLE | MSR_IA32_MISC_PEBS_UNAVILABLE. */
 	misc_enable |= MSR_IA32_MISC_BTS_UNAVILABLE | MSR_IA32_MISC_PEBS_UNAVILABLE;
 	/** Call vcpu_set_guest_msr with the following parameters, in order to write

@@ -535,6 +535,14 @@
  * @brief The bit of the IA32_MISC_ENABLE MSR used for processor event based sampling Unavailable.
  */
 #define MSR_IA32_MISC_PEBS_UNAVILABLE (1UL << 12U)
+/*
+ * @brief The bit of the IA32_MISC_ENABLE MSR used to enable Automatic Thermal Control Circuit.
+ */
+#define MSR_IA32_MISC_ENABLE_TCC       (1UL << 3U)
+/**
+ * @brief The bit of the IA32_MISC_ENABLE MSR used to enable Intel SpeedStep Technology.
+ */
+#define MSR_IA32_MISC_ENABLE_EITS      (1UL << 16U)
 
 /**
  * @brief The bit of the IA32_MISC_ENABLE MSR used to enable MONITOR FSM.
