@@ -835,11 +835,11 @@ void set_vcpu_regs(struct acrn_vcpu *vcpu, struct acrn_vcpu_regs *vcpu_regs)
 		vcpu_set_rflags(vcpu, vcpu_regs->rflags & ~(0x8d5UL));
 	}
 
-	/* Set ctx->cr0 to vcpu_regs->cr0. */
+	/** Set ctx->cr0 to vcpu_regs->cr0. */
 	ctx->cr0 = vcpu_regs->cr0;
-	/* Set ectx->cr3 to vcpu_regs->cr3. */
+	/** Set ectx->cr3 to vcpu_regs->cr3. */
 	ectx->cr3 = vcpu_regs->cr3;
-	/* Set ctx->cr4 to vcpu_regs->cr4. */
+	/** Set ctx->cr4 to vcpu_regs->cr4. */
 	ctx->cr4 = vcpu_regs->cr4;
 
 	/** Call set_vcpu_mode() with the following parameters, in order to set the relevant vcpu mode.

@@ -157,7 +157,6 @@ static inline void spinlock_release(spinlock_t *lock)
 	 *  - Output operands: None
 	 *  - Clobbers: "cc", "memory"
 	 */
-
 	asm volatile("   lock incl %[tail]\n" : : [ tail ] "m"(lock->tail) : "cc", "memory");
 }
 

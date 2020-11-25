@@ -626,10 +626,10 @@ void enable_smep(void)
 	 */
 	uint64_t val64 = 0UL;
 
-	/* Call CPU_CR_READ with following parameters, in order to
-	 * Read CR4 value and store it into val64.
-	 * - cr4
-	 * - &val64
+	/** Call CPU_CR_READ with following parameters, in order to
+	 *  Read CR4 value and store it into val64.
+	 *  - cr4
+	 *  - &val64
 	 */
 	CPU_CR_READ(cr4, &val64);
 	/** Call CPU_CR_WRITE with following parameters, in order to write val64 | CR4_SMEP
@@ -665,10 +665,10 @@ void enable_smap(void)
 	 */
 	uint64_t val64 = 0UL;
 
-	/* Call CPU_CR_READ with following parameters, in order to read CR4 value
-	 * and store it into val64.
-	 * - cr4
-	 * - &val64
+	/** Call CPU_CR_READ with following parameters, in order to read CR4 value
+	 *  and store it into val64.
+	 *  - cr4
+	 *  - &val64
 	 */
 	CPU_CR_READ(cr4, &val64);
 	/** Call CPU_CR_WRITE with following parameters, in order to enable CR4.SMAP
@@ -944,10 +944,10 @@ void init_paging(void)
 	/** Call enable_paging in order to enable paging */
 	enable_paging();
 
-	/* Call sanitize_pte with following parameters, in order to
-	 * set entries in sanitized page point to itself.
-	 * - (uint64_t *)sanitized_page
-	 * - &ppt_mem_ops
+	/** Call sanitize_pte with following parameters, in order to
+	 *  set entries in sanitized page point to itself.
+	 *  - (uint64_t *)sanitized_page
+	 *  - &ppt_mem_ops
 	 */
 	sanitize_pte((uint64_t *)sanitized_page, &ppt_mem_ops);
 }

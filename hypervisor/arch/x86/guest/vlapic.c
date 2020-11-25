@@ -364,8 +364,8 @@ uint64_t vlapic_get_tsc_deadline_msr(const struct acrn_vlapic *vlapic)
 	/** Declare the following local variable of type uint64_t
          *  - ret representing the value of IA32_TSC_DEADLINE MSR of \a vlapic, not initialized */
 	uint64_t ret;
-	/* If physical TSC_DEADLINE is zero which means it's not armed (automatically disarmed
-	 * after timer triggered) */
+	/** If physical TSC_DEADLINE is zero which means it's not armed (automatically disarmed
+	 *  after timer triggered) */
 	if (msr_read(MSR_IA32_TSC_DEADLINE) == 0UL) {
 		/** Call vcpu_set_guest_msr with the following parameters, in order to
 	         *  set the virtual IA32_TSC_DEADLINE of a given vcpu to be 0UL
