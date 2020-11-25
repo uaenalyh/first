@@ -72,7 +72,7 @@
  *   All the APIs used in boot module listing below:
  *
  *       + get_hv_image_delta
-
+ *
  * - hwmgmt.acpi
  *
  *   Use the hwmgmt.acpi module to set physical local APIC IDs and return the number of physical local APICs on
@@ -1158,7 +1158,7 @@ static void set_current_pcpu_id(uint16_t pcpu_id)
 static void print_hv_banner(void)
 {
 	/** Declare the following local variables of type const char *.
-	 *  - boot_msg representing the message will be printed, initialized as "ACRN Hypervisor\n\r". */
+	 *  - boot_msg representing the message will be printed, initialized as "ACRN Hypervisor\\n\\r". */
 	const char *boot_msg = "ACRN Hypervisor\n\r";
 
 	/** Call printf with the following parameters, in order to print the boot message.
