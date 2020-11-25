@@ -46,12 +46,12 @@
  *
  * Following functionalities are provided in this module:
  *
- * 1.Provide the macros related to registers, CPU features, CPUIDs, segment descriptors, MSRs.
- * 2.Provide the enumeration type to identify the architecturally defined registers.
- * 3.Provide the structure to store the information of descriptor table.
- * 4.Provide the structure to hold TSS descriptor and GDT descriptor.
- * 5.Provide the structure to hold all per CPU information.
- * 6.Provide the APIs to do the operation list below:
+ * 1. Provide the macros related to registers, CPU features, CPUIDs, segment descriptors, MSRs.
+ * 2. Provide the enumeration type to identify the architecturally defined registers.
+ * 3. Provide the structure to store the information of descriptor table.
+ * 4. Provide the structure to hold TSS descriptor and GDT descriptor.
+ * 5. Provide the structure to hold all per CPU information.
+ * 6. Provide the APIs to do the operation list below:
  *
  *   - Read/Write MSR
  *   - Load/Store IDT
@@ -270,15 +270,15 @@
  * @file
  * @brief This file provides the information to be used for CPU operations.
  *
- * 1.Define timeout related macros to limit the time to wait during start physical CPU or offline physical CPU.
- * 2.Define variables to provide the following data:
+ * 1. Define timeout related macros to limit the time to wait during start physical CPU or offline physical CPU.
+ * 2. Define variables to provide the following data:
  *
  *     - Basic data of per CPU.
  *     - Shared data between CPU used as inter-process message.
  *     - Count of physical CPU.
  *     - Start address of APs.
  *
- * 3.Implementation of CPU APIS to do CPU operations list below:
+ * 3. Implementation of CPU APIS to do CPU operations list below:
  *     - Initialize per-CPU region data.
  *     - Startup all APs.
  *     - Manage CPU lifecycle.

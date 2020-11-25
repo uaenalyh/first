@@ -433,11 +433,11 @@ static inline bool bitmap_test(uint16_t nr, const volatile uint64_t *addr)
  *
  * 3. Set nr to the value calculated by \a nr_arg bitwise AND with 63.
  *
- * 4.Use bts instruction to selects the bit in \a addr at the bit-position designated by the bit offset operand nr,
+ * 4. Use bts instruction to selects the bit in \a addr at the bit-position designated by the bit offset operand nr,
  * stores the value of the bit in the CF flag, and sets the selected bit in the integer pointed by \a addr, the btr
  * instruction is executed atomically.
  *
- * 5.Stores the value in ret, where the value is 0 minus CF flag.
+ * 5. Stores the value in ret, where the value is 0 minus CF flag.
  *
  * 6. Return true if ret is non-zero, otherwise, return false.
  *
@@ -496,11 +496,11 @@ build_bitmap_testandset(bitmap_test_and_set_lock, "q", uint64_t, BUS_LOCK)
  * 3. Set nr to the value calculated by \a nr_arg bitwise AND with Y, where Y is multiply 8 by sizeof(uint64_t)
  * minus 1.
  *
- * 4.Use btr instruction to selects the bit in \a addr at the bit-position designated by the bit offset operand nr,
+ * 4. Use btr instruction to selects the bit in \a addr at the bit-position designated by the bit offset operand nr,
  * stores the value of the bit in the CF flag, and clears the selected bit in the intger pointed by \a addr, the btr
  * instruction is executed atomically.
  *
- * 5.Stores the value in ret, where the value is 0 minus CF flag.
+ * 5. Stores the value in ret, where the value is 0 minus CF flag.
  *
  * 6. Return true if ret is non-zero, otherwise, return false.
  *
