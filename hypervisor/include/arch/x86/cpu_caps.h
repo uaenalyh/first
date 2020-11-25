@@ -15,7 +15,7 @@
 
 /**
  * @file
- * @brief This file declares all external APIs that shall be provided by the hwmgmt.cpu_caps module
+ * @brief Declaration of external APIs of the hwmgmt.cpu_caps module
  *
  * This file declares all external functions, data structures, and macros
  * that shall be provided by the hwmgmt.cpu_caps module.

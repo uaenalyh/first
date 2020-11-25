@@ -557,8 +557,6 @@ static void intercept_x2apic_msrs(uint8_t *msr_bitmap, uint32_t mode)
 /**
  * @brief Initialize the VMX-transition MSR areas for the specified vCPU.
  *
- * Initialize the VMX-transition MSR areas for the specified vCPU.
- *
  * It is supposed to be called only by 'init_msr_emulation'.
  *
  * @param[inout] vcpu A pointer which points to a structure representing the vCPU whose MSR areas are to be initialized.
@@ -804,8 +802,6 @@ static inline bool is_pat_mem_type_invalid(uint64_t x)
 
 /**
  * @brief Emulate the write operation into the MSR IA32_PAT for guest.
- *
- * Emulate the write operation into the MSR IA32_PAT for guest.
  *
  * If the specified value is valid, the MSR IA32_PAT associated with the specified vCPU would be updated,
  * and the 64-Bit guest state field IA32_PAT in current VMCS would be updated as well if the
@@ -1783,7 +1779,7 @@ static int32_t write_efer_msr(struct acrn_vcpu *vcpu, uint64_t value)
 /**
  * @brief Handle the VM exit caused by a WRMSR instruction executing from guest software.
  *
- * Handle the VM exit caused by a WRMSR instruction executing from guest software and return a status code indicating
+ * This function handles the VM exit caused by a WRMSR instruction and return a status code indicating
  * whether further handling operations are required from the caller.
  * If the status code is 0, it indicates that no further operation is required.
  * If the status code is negative, it indicates that the caller needs to inject \# GP(0) to guest software.

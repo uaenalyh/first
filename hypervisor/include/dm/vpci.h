@@ -51,7 +51,7 @@
 /**
  * @brief Data structure to present PCI BAR information
  *
- * Data structure to present PCI BAR information, including its type (MMIO BAR and 32bits or 64bits), BAR size,
+ * For a PCI BAR, this structure includes its type (MMIO BAR and 32bits or 64bits), BAR size,
  * GPA/HPA of BAR base, BAR memory type (low 4bits of a BAR register) and BAR size mask.
  *
  * @consistency N/A
@@ -71,8 +71,8 @@ struct pci_bar {
 /**
  * @brief Data structure to present PCI MSI capability basic information
  *
- * Data structure to present PCI MSI capability basic information, including its type (32bits or 64bits capability),
- * offset and length of the MSI capability.
+ * For a PCI MSI capability, this structure includes its type (32bits or 64bits capability),
+ * offset and length.
  *
  * @consistency N/A
  * @alignment N/A
@@ -88,8 +88,7 @@ struct pci_msi {
 /**
  * @brief A union data structure to store all the data of a PCI configuration space
  *
- * A union data structure to store all the data of a PCI configuration space. It includes 256 bytes. Also it
- * can be accessed as 2bytes or 4bytes aligned.
+ * It includes 256 bytes. Also it can be accessed as 2bytes or 4bytes aligned.
  *
  * @consistency N/A
  * @alignment N/A
@@ -107,8 +106,7 @@ struct pci_vdev; /**< A declaration of 'struct pci_vdev' just for usage here */
 /**
  * @brief Data structure to present a set of operation functions to a vPCI device
  *
- * Data structure to present a set of operation functions to a vPCI device. It includes 4 functions:
- * init / de-init / read / write.
+ * It includes 4 functions: init / de-init / read / write.
  *
  * @consistency N/A
  * @alignment N/A
@@ -132,10 +130,9 @@ struct pci_vdev_ops {
 /**
  * @brief Data structure to present a vPCI device information
  *
- * Data structure to present a vPCI device information, which includes the associated information: the pointer to
- *  the vPCI field of a VM and the pointer to its device configuration data; and the basic information of its self:
- * like its BAR, MSI, virtual configuration space registers and virtual BDF, and physical BDF if it is associated with
- * a phyiscal PCI device.
+ * This structure includes the following information: the pointer to the vPCI field of a VM and the pointer to its
+ * device configuration data; and the basic information of its self: like its BAR, MSI, virtual configuration space
+ * registers and virtual BDF, and physical BDF if it is associated with a phyiscal PCI device.
  *
  * @consistency N/A
  * @alignment N/A
@@ -162,7 +159,7 @@ struct pci_vdev {
 /**
  * @brief A union data structure to present a MMIO address used when a guest OS accesses a PCI configuration register
  *
- * A union data structure to present an address used when a guest OS accesses a PCI configuration register. It includes
+ * This union presents an address used when a guest OS accesses a PCI configuration register. It includes
  * the BDF of a PCI device, the register offset in the configuration space, and a enabling bit.
  *
  * @consistency N/A
@@ -182,8 +179,6 @@ union pci_cfg_addr_reg {
 
 /**
  * @brief Data structure to present the vPCI information of a VM
- *
- * Data structure to present the vPCI information of a VM.
  *
  * @consistency N/A
  * @alignment N/A

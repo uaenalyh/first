@@ -16,8 +16,6 @@
 /**
  * @file
  * @brief This file declares the function related to the microcode MSR IA32_BIOS_SIGN_ID.
- *
- * This file declares the function related to the microcode MSR IA32_BIOS_SIGN_ID.
  */
 
 #include <types.h>

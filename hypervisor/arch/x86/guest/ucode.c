@@ -25,7 +25,6 @@
  * @file
  * @brief This file implements the function related to the microcode MSR IA32_BIOS_SIGN_ID.
  *
- * This file implements the function related to the microcode MSR IA32_BIOS_SIGN_ID.
  * The function defined in this file is supposed to be called by 'rdmsr_vmexit_handler' defined in vmsr.c.
  * It is supposed to be used when hypervisor attempts to handle the VM exit caused by RDMSR instruction executed from
  * guest software and the associated MSR is IA32_BIOS_SIGN_ID.

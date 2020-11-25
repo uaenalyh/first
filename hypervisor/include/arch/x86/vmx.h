@@ -16,8 +16,6 @@
 /**
  * @file
  * @brief This file declares all external functions and MACROS that shall be provided by the hwmgmt.vmx module.
- *
- * This file declares all external functions and MACROS that shall be provided by the hwmgmt.vmx module.
  */
 
 #include <types.h>
