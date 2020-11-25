@@ -137,8 +137,8 @@ void calibrate_tsc(void)
 	tsc_khz = eax_base_mhz * 1000U;
 
 	/** Logging the following information.
-	 *	- name of this function
-	 *	- tsc_khz
+	 *  - name of this function
+	 *  - tsc_khz
 	 */
 	printf("%s, tsc_khz=%lu\n", __func__, tsc_khz);
 }

@@ -153,7 +153,7 @@ static inline void spinlock_release(spinlock_t *lock)
 	 *  with following parameters, in order to increment tail of queue.
 	 *  - Instruction template: "   lock incl %[tail]\n"
 	 *  - Input operands:
-	 *	- Memory pointed to by lock->tail field holds a spinlock tail field.
+	 *  - Memory pointed to by lock->tail field holds a spinlock tail field.
 	 *  - Output operands: None
 	 *  - Clobbers: "cc", "memory"
 	 */
