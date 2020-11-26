@@ -396,57 +396,115 @@ void set_fs_base(void)
 }
 #endif
 
-#ifdef CONFIG_MCE_ON_PSC_WORKAROUND_DISABLED
+/**
+ * @brief Detect if the current physical processor is affected by unintended machine check on page size changes
+ *
+ * It is a known issue of the processor that unintended machine check exceptions will be raised under certain conditions
+ * when the size of a memory page containing code is changed without flushing TLB. In order to avoid such unintended
+ * exceptions, the hypervisor will enforce the usage of 4-Kbyte pages for entries with executable permission in EPT if
+ * the physical processor is vulnerable to this issue.
+ *
+ * This function detects the applicability of the issue on the current physical processor by the family and model IDs
+ * as well as the value in MSR_ARCH_CAPABILITIES. Only non-Atom cores without bit 6 in MSR_ARCH_CAPABILITIES set is
+ * considered vulnerable.
+ *
+ * @return A boolean indicating whether 4-Kbyte executable pages shall be enforced in EPT
+ *
+ * @pre None
+ *
+ * @post None
+ *
+ * @mode HV_SUBMODE_INIT_ROOT
+ *
+ * @reentrancy unspecified
+ * @threadsafety Yes
+ */
 bool is_ept_force_4k_ipage(void)
 {
-	return false;
-}
-#else
-bool is_ept_force_4k_ipage(void)
-{
+	/** Declare the following local variable of type bool.
+	 *  - force_4k_ipage representing whether page table entries with executable permissions shall be forced to
+	 *    4-Kbyte small pages, initialized as true.
+	 */
 	bool force_4k_ipage = true;
+
+	/** Declare the following local variable of type const struct cpuinfo_x86 *.
+	 *  - info representing a pointer to the processor information structure, initialized as the return value of a
+	 *    call to get_cpu_info().
+	 */
 	const struct cpuinfo_x86 *info = get_pcpu_info();
+
+	/** Declare the following local variable of type uint64_t.
+	 *  - x86_arch_capabilities representing the value in the MSR_IA32_ARCH_CAPABILITIES register, not initialized.
+	 */
 	uint64_t x86_arch_capabilities;
 
+	/** If info->displayfamily, which is the family ID of the physical processors, is 6H */
 	if (info->displayfamily == 0x6U) {
+		/** Depending on info->displaymodel which is the model ID of the physical processors */
 		switch (info->displaymodel) {
+		/** The model ID is 26H */
 		case 0x26U:
+		/** The model ID is 27H */
 		case 0x27U:
+		/** The model ID is 35H */
 		case 0x35U:
+		/** The model ID is 36H */
 		case 0x36U:
+		/** The model ID is 37H */
 		case 0x37U:
+		/** The model ID is 86H */
 		case 0x86U:
+		/** The model ID is 1CH */
 		case 0x1CU:
+		/** The model ID is 4AH */
 		case 0x4AU:
+		/** The model ID is 4CH */
 		case 0x4CU:
+		/** The model ID is 4DH */
 		case 0x4DU:
+		/** The model ID is 5AH */
 		case 0x5AU:
+		/** The model ID is 5CH */
 		case 0x5CU:
+		/** The model ID is 5DH */
 		case 0x5DU:
+		/** The model ID is 5FH */
 		case 0x5FU:
+		/** The model ID is 6EH */
 		case 0x6EU:
+		/** The model ID is 7AH */
 		case 0x7AU:
-			/* Atom processor is not affected by the issue
-			 * "Machine Check Error on Page Size Change"
-			 */
+			/** Set force_4k_ipage to false, as Atom processors are not affected by the issue "Machine Check
+			 *  Error on Page Size Change" */
 			force_4k_ipage = false;
+			/** End of case */
 			break;
+		/** Otherwise */
 		default:
+			/** Set force_4k_ipage to true, as non-Atom processors are affected by the issue */
 			force_4k_ipage = true;
+			/** End of case */
 			break;
 		}
 	}
 
+	/** If a call to pcpu_has_cap with X86_FEATURE_ARCH_CAP being the parameter returns true, indicating that
+	 *  MSR_IA32_ARCH_CAPABILITIES register is present */
 	if (pcpu_has_cap(X86_FEATURE_ARCH_CAP)) {
+		/** Set x86_arch_capabilities to the return value of a call to msr_read with MSR_IA32_ARCH_CAPABILITIES
+		 *  being the parameter, in order to get the value in the MSR_IA32_ARCH_CAPABILITIES register. */
 		x86_arch_capabilities = msr_read(MSR_IA32_ARCH_CAPABILITIES);
+		/** If bit 6 of x86_arch_capabilities is 1, indicating that the physical processor is not affected by
+		 *  the issue */
 		if ((x86_arch_capabilities & IA32_ARCH_CAP_IF_PSCHANGE_MC_NO) != 0UL) {
+			/** Set force_4k_ipage to false */
 			force_4k_ipage = false;
 		}
 	}
 
+	/** Return force_4k_ipage */
 	return force_4k_ipage;
 }
-#endif
 
 /**
  * @}

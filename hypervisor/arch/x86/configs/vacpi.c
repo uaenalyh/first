@@ -110,13 +110,23 @@ static struct acpi_table_info acpi_table_template[CONFIG_MAX_VM_NUM] = {
  */
 static inline uint8_t calculate_checksum8(const void *buf, uint32_t length)
 {
+	/** Declare the following local variable of type uint32_t.
+	 *  - i representing the loop counter. not initialized.
+	 */
 	uint32_t i;
+
+	/** Declare the following local variable of type uint8_t.
+	 *  - sum representing the sum of bytes in the given buffer, initialized as 0.
+	 */
 	uint8_t sum = 0U;
 
+	/** For each i ranging from 0 to (length - 1) [with a step of 1] */
 	for (i = 0U; i < length; i++) {
+		/** Increment 'sum' by the (i+1)-th byte in buf. */
 		sum += *((const uint8_t *)buf + i);
 	}
 
+	/** Return the value that can be added to 'sum' (as a byte) to get a result of 0. */
 	return (uint8_t)(0x100U - sum);
 }
 

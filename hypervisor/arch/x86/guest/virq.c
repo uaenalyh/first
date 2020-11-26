@@ -750,6 +750,7 @@ int32_t exception_vmexit_handler(struct acrn_vcpu *vcpu)
 		 *  - 0U
 		 */
 		vcpu_inject_gp(vcpu, 0U);
+		/** End of case */
 		break;
 	/** Otherwise */
 	default:
