@@ -98,7 +98,7 @@
  */
 static inline bool is_blocked(const struct thread_object *obj)
 {
-	/** Check the 'status' filed of thread \a obj,
+	/** Check the 'status' field of thread \a obj,
 	 *  If the value is 'THREAD_STS_BLOCKED', return true.
 	 *  Otherwise, return false.
 	 */
@@ -128,7 +128,7 @@ static inline bool is_blocked(const struct thread_object *obj)
  */
 static inline bool is_runnable(const struct thread_object *obj)
 {
-	/** Check the 'status' filed of thread \a obj,
+	/** Check the 'status' field of thread \a obj,
 	 *  If the value is 'THREAD_STS_RUNNABLE', return true.
 	 *  Otherwise, return false.
 	 */
@@ -158,7 +158,7 @@ static inline bool is_runnable(const struct thread_object *obj)
  */
 static inline bool is_running(const struct thread_object *obj)
 {
-	/** Check the 'status' filed of thread \a obj,
+	/** Check the 'status' field of thread \a obj,
 	 *  If the value is 'THREAD_STS_RUNNING', return true.
 	 *  Otherwise, return false.
 	 */
@@ -186,7 +186,7 @@ static inline bool is_running(const struct thread_object *obj)
  */
 static inline void set_thread_status(struct thread_object *obj, enum thread_object_state status)
 {
-	/** Set the 'status' filed of thread \a obj to \a status */
+	/** Set the 'status' field of thread \a obj to \a status */
 	obj->status = status;
 }
 
@@ -315,7 +315,7 @@ static struct acrn_scheduler *get_scheduler(uint16_t pcpu_id)
  */
 uint16_t sched_get_pcpuid(const struct thread_object *obj)
 {
-	/** Return the 'pcpu_id' filed of thread \a obj,
+	/** Return the 'pcpu_id' field of thread \a obj,
 	 *  meaning return the physical CPU ID corresponding to thread \a obj. */
 	return obj->pcpu_id;
 }

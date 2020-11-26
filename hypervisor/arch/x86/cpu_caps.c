@@ -13,7 +13,7 @@
 #include <cpu_caps.h>
 
 /**
- * @defgroup hwmgmt_cpu_caps hwmgmt.cpu_caps
+ * @defgroup hwmgmt_cpu_caps hwmgmt.cpu-caps
  * @ingroup hwmgmt
  * @brief The definition and implementation of CPU capabilities related stuff.
  *

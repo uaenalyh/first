@@ -25,7 +25,7 @@
  * kernel images and boot-time arguments of each guest VM is currently placed, sizes of these images and the guest
  * physical addresses where the OS kernel images shall be loaded.
  *
- * This module interacts with with the following modules:
+ * This module interacts with the following modules:
  *
  *    - hwmgmt.page
  *

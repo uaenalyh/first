@@ -136,7 +136,7 @@ union lapic_base_msr {
 /**
  * @brief This function clears local APIC ISR registers on current processor.
  *
- * This is a Intel recommended procedure and assures that the processor
+ * This is an Intel recommended procedure and assures that the processor
  * does not get hung up due to already set "in-service" interrupts left
  * over from the boot loader environment. This actually occurs in real
  * life, therefore we will ensure all the in-service bits are clear.
