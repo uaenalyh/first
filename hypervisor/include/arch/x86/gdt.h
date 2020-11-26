@@ -19,8 +19,8 @@
  *
  * Following functionalities are provided in this file:
  *
- * 1.Define the structures to hold TSS descriptor and GDT descriptor.
- * 2.Define macros related to segment descriptors.
+ * 1. Define the structures to hold TSS descriptor and GDT descriptor.
+ * 2. Define macros related to segment descriptors.
  */
 
 /* GDT is defined in assembly so it can be used to switch modes before long mode

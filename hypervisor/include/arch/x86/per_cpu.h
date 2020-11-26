@@ -17,13 +17,13 @@
  * @file
  * @brief Define structures and implement per-CPU APIs to hold per CPU information.
  *
- * 1.Define the per_cpu_region to hold all per CPU information.
- * 2.Implement functions to get data from per CPU region.
+ * 1. Define the per_cpu_region to hold all per CPU information.
+ * 2. Implement functions to get data from per CPU region.
  *
  * This file is decomposed into the following functions:
  *
- * per_cpu(name, pcpu_id) - Get the per_cpu_data's specified field \a name of the CPU whose CPU id is \a pcpu_id.
- * get_cpu_var(name)      - Get the per_cpu_data's specified field \a name of the current CPU.
+ * - per_cpu(name, pcpu_id): Get the per_cpu_data's specified field \a name of the CPU whose CPU id is \a pcpu_id.
+ * - get_cpu_var(name): Get the per_cpu_data's specified field \a name of the current CPU.
  */
 
 #include <types.h>

@@ -50,41 +50,40 @@
  *
  * Following functionalities are provided in this file:
  *
- * 1.Define register related macros.
- * 2.Define the enumeration type to identify the architecturally defined registers.
- * 3.Define the enumeration type to identify the physical CPU's state.
- * 4.Define the structures to store the information of descriptor table.
- * 5.Implement register related APIS to read/write MSR, load/store idt, load/store GDT.
- * 6.Implement CPU status related APIS to pause/halt CPU, disable/enable interrupt.
+ * 1. Define register related macros.
+ * 2. Define the enumeration type to identify the architecturally defined registers.
+ * 3. Define the enumeration type to identify the physical CPU's state.
+ * 4. Define the structures to store the information of descriptor table.
+ * 5. Implement register related APIS to read/write MSR, load/store idt, load/store GDT.
+ * 6. Implement CPU status related APIS to pause/halt CPU, disable/enable interrupt.
  *
  * This file is decomposed into the following functions:
  *
- * CPU_SEG_READ(seg, result_ptr) - Read from the specified segment \a seg and save the content to 16-bit address
- *                                 \a result_ptr.
- * CPU_CR_READ(cr, result_ptr)   - Read the content of the control register specified by \a cr and save the content to
- *                                 \a result_ptr.
- * CPU_CR_WRITE(cr, value)       - Write the content specified by \a value into the control register specified by
- *                                 \a cr.
- * sgdt                          - Get the base address of the GDT table.
- * sidt                          - Get the base address of the IDT.
- * asm_pause                     - Pause the current CPU.
- * asm_hlt                       - Stop instruction execution and place the processor in a HALT state.
- * CPU_IRQ_DISABLE               - Disable interrupts on the current CPU.
- * CPU_IRQ_ENABLE                - Enable interrupts on the current CPU.
- * cpu_write_memory_barrier      - Synchronize all write and read accesses to memory.
- * CPU_LTR_EXECUTE               - Load Task Register.
- * CPU_RFLAGS_SAVE               - Save rflags register.
- * CPU_RFLAGS_RESTORE            - Restore rflags register.
- * CPU_INT_ALL_DISABLE           - Save the current architecture status register to the specified address.
- * CPU_INT_ALL_RESTORE(rflags)   - Restore the architecture status register used to lockout interrupts to the specified
- *                                 value \a rflags.
- * get_pcpu_id                   - Get the current physical CPU ID.
- * msr_read                      - Read MSR.
- * msr_write                     - Write MSR.
- * write_xcr(reg, val)           - Write value into the XCR specified by \a reg.
- * read_xcr(reg)                 - Read value from the XCR specified by \a reg.
- * stac                          - Execute stac instruction.
- * clac                          - Execute clac instruction.
+ * - CPU_SEG_READ(seg, result_ptr): Read from the specified segment \a seg and save the content to 16-bit address \a
+ *   result_ptr.
+ * - CPU_CR_READ(cr, result_ptr): Read the content of the control register specified by \a cr and save the content to \a
+ *   result_ptr.
+ * - CPU_CR_WRITE(cr, value): Write the content specified by \a value into the control register specified by \a cr.
+ * - sgdt: Get the base address of the GDT table.
+ * - sidt: Get the base address of the IDT.
+ * - asm_pause: Pause the current CPU.
+ * - asm_hlt: Stop instruction execution and place the processor in a HALT state.
+ * - CPU_IRQ_DISABLE: Disable interrupts on the current CPU.
+ * - CPU_IRQ_ENABLE: Enable interrupts on the current CPU.
+ * - cpu_write_memory_barrier: Synchronize all write and read accesses to memory.
+ * - CPU_LTR_EXECUTE: Load Task Register.
+ * - CPU_RFLAGS_SAVE: Save rflags register.
+ * - CPU_RFLAGS_RESTORE: Restore rflags register.
+ * - CPU_INT_ALL_DISABLE: Save the current architecture status register to the specified address.
+ * - CPU_INT_ALL_RESTORE(rflags): Restore the architecture status register used to lockout interrupts to the specified
+ *   value \a rflags.
+ * - get_pcpu_id: Get the current physical CPU ID.
+ * - msr_read: Read MSR.
+ * - msr_write: Write MSR.
+ * - write_xcr(reg, val): Write value into the XCR specified by \a reg.
+ * - read_xcr(reg): Read value from the XCR specified by \a reg.
+ * - stac: Execute stac instruction.
+ * - clac: Execute clac instruction.
  */
 #include <types.h>
 #include <util.h>

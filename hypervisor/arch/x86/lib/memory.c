@@ -16,13 +16,13 @@
  *
  * This module is decomposed into the following files:
  *
- *     memory.c        - Implement memory operation APIs that shall be provided by the lib.util module.
- *     string.c        - Implement string operation APIs that shall be provided by the lib.util module.
- *     util.h          - Implement utils APIs including arithmetic operation and alignment checking operation.
- *     types.h         - Declare external macros and types that shall be provided by the lib.util module.
- *     rtl.h           - Declare string operation APIs that shall be provided by the lib.util module.
- *     list.h          - Declare external list APIs that shall be provided by the lib.util module.
- *     errno.h         - Declare external error codes that shall be provided by the lib.util module.
+ * - memory.c: Implement memory operation APIs that shall be provided by the lib.util module.
+ * - string.c: Implement string operation APIs that shall be provided by the lib.util module.
+ * - util.h: Implement utils APIs including arithmetic operation and alignment checking operation.
+ * - types.h: Declare external macros and types that shall be provided by the lib.util module.
+ * - rtl.h: Declare string operation APIs that shall be provided by the lib.util module.
+ * - list.h: Declare external list APIs that shall be provided by the lib.util module.
+ * - errno.h: Declare external error codes that shall be provided by the lib.util module.
  *
  * @{
  */
@@ -33,10 +33,10 @@
  *
  * This file is decomposed into the following functions:
  *
- *     memset        - Set n bytes starting from base to v.
- *     memcpy_s      - Copy slen bytes from a source address to a destination address.
- *     memset_erms   - Set n bytes starting from base to v by using Enhanced REP MOVSB/STOSB.
- *     memcpy_erms   - Copy slen bytes from source address to destination address by using Enhanced REP MOVSB/STOSB.
+ * - memset: Set n bytes starting from base to v.
+ * - memcpy_s: Copy slen bytes from a source address to a destination address.
+ * - memset_erms: Set n bytes starting from base to v by using Enhanced REP MOVSB/STOSB.
+ * - memcpy_erms: Copy slen bytes from source address to destination address by using Enhanced REP MOVSB/STOSB.
  */
 
 /**

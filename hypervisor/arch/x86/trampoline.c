@@ -28,12 +28,12 @@
  *
  * This file is decomposed into the following functions:
  *
- * get_ap_trampoline_buf         - Get the start address of the relocated trampoline section.
- * trampoline_relo_addr          - Calculate the offset of a trampoline symbol based on the start address of the
- *                                 trampoline code.
- * write_trampoline_stack_sym    - Prepare the stack to be used for the given AP.
- * update_trampoline_code_refs   - Update trampoline data lived in trampoline code.
- * prepare_trampoline            - Prepare trampoline code.
+ * - get_ap_trampoline_buf: Get the start address of the relocated trampoline section.
+ * - trampoline_relo_addr: Calculate the offset of a trampoline symbol based on the start address of the trampoline
+     code.
+ * - write_trampoline_stack_sym: Prepare the stack to be used for the given AP.
+ * - update_trampoline_code_refs: Update trampoline data lived in trampoline code.
+ * - prepare_trampoline: Prepare trampoline code.
  */
 
 /**

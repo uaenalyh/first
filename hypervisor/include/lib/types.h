@@ -19,12 +19,12 @@
  *
  * This file is decomposed into the following macros:
  *
- *     ARRAY_SIZE(arr)    - Get the number of elements in \a arr as is statically defined in the declaration or
- *                          definition of the array.
- *     __aligned(x)       - Restrict the compiler to place instances of a struct/union type or a global variable at
- *                          \a x-byte aligned host virtual addresses.
- *     __packed           - Specify each member of the structure or union is placed to minimize the memory required.
- *     __unused           - Attached to a type, used to specify the variables of that type are possibly unused.
+ * - ARRAY_SIZE(arr): Get the number of elements in \a arr as is statically defined in the declaration or definition of
+ *                    the array.
+ * - __aligned(x): Restrict the compiler to place instances of a struct/union type or a global variable at \a x-byte
+ *                 aligned host virtual addresses.
+ * - __packed: Specify each member of the structure or union is placed to minimize the memory required.
+ * - __unused: Attached to a type, used to specify the variables of that type are possibly unused.
  */
 
 /**

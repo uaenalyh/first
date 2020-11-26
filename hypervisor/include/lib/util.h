@@ -19,10 +19,10 @@
  *
  * This file is decomposed into the following functions and macros:
  *
- *     INT_DIV_ROUNDUP(x, y)     - Calculate \a x divided by \a y, round up.
- *     max                       - Get the maximum value from the 2 parameters.
- *     STRINGIFY(x)              - Expand to a constant string with \a x being its content.
- *     mem_aligned_check         - Check if a value is aligned to the required boundary.
+ * - INT_DIV_ROUNDUP(x, y): Calculate \a x divided by \a y, round up.
+ * - max: Get the maximum value from the 2 parameters.
+ * - STRINGIFY(x): Expand to a constant string with \a x being its content.
+ * - mem_aligned_check: Check if a value is aligned to the required boundary.
  */
 #include <types.h>
 

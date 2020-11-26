@@ -17,16 +17,16 @@
  * @file
  * @brief This file provides the information to be used for cpuid operations.
  *
-  * Following functionalities are provided in this file:
+ * Following functionalities are provided in this file:
  *
- * 1.Define the macros related to CPUID.
- * 2.Define CPUID APIs to execute cpuid instructions.
+ * 1. Define the macros related to CPUID.
+ * 2. Define CPUID APIs to execute cpuid instructions.
  *
  * This file is decomposed into the following functions:
  *
- * cpuid(leaf, eax, ebx, ecx, edx)			- Execute a CPUID instruction with specified \a leaf.
- * cpuid_subleaf(leaf, subleaf, eax, ebx, ecx, edx)	- Execute a CPUID instruction with specified \a leaf and
- *                                                        \a subleaf.
+ * - cpuid(leaf, eax, ebx, ecx, edx): Execute a CPUID instruction with specified \a leaf.
+ * - cpuid_subleaf(leaf, subleaf, eax, ebx, ecx, edx): Execute a CPUID instruction with specified \a leaf and \a
+ *   subleaf.
  */
 
 #include <types.h>

@@ -20,9 +20,9 @@
  *
  * This file is decomposed into the following functions:
  *
- * set_tss_desc         - Set TSS descriptor.
- * load_gdt(gdtr)       - Load \a gdtr into the GDTR.
- * load_gdtr_and_tr     - Load GDTR and TR.
+ * - set_tss_desc: Set TSS descriptor.
+ * - load_gdt(gdtr): Load \a gdtr into the GDTR.
+ * - load_gdtr_and_tr: Load GDTR and TR.
  */
 
 /**

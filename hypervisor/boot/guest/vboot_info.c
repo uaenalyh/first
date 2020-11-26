@@ -66,8 +66,8 @@
  *
  * This module is decomposed into the following files:
  *
- *     vboot_info.c        -Implements all APIs that shall be provided by the vp-base.vboot
- *     vboot_info.h        -Declares all APIs that shall be provided by the vp-base.vboot
+ * - vboot_info.c: Implements all APIs that shall be provided by the vp-base.vboot
+ * - vboot_info.h: Declares all APIs that shall be provided by the vp-base.vboot
  *
  * @{
  */
@@ -78,11 +78,11 @@
  *
  * This file is decomposed into the following functions:
  *
- *     init_vm_boot_info         -Initialize virtual platform boot info
- *     get_mod_idx_by_tag        -Using tag to find the matching module embedded in module structure array
- *     init_vm_bootargs_info     -Initialize virtual machine bootargs_info field.
- *     init_vm_kernel_info       -Initialize the virtual machine kernel_info field of the given argument \a vm
- *     get_kernel_load_addr      -Get guest physical address where the kernel image will be placed to
+ * - init_vm_boot_info: Initialize virtual platform boot info
+ * - get_mod_idx_by_tag: Using tag to find the matching module embedded in module structure array
+ * - init_vm_bootargs_info: Initialize virtual machine bootargs_info field.
+ * - init_vm_kernel_info: Initialize the virtual machine kernel_info field of the given argument \a vm
+ * - get_kernel_load_addr: Get guest physical address where the kernel image will be placed to
  */
 
 /**

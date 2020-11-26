@@ -253,16 +253,16 @@
  *
  * This module is decomposed into the following files:
  *
- * cpu.c          - Provide the information to be used for CPU operations.
- * cpu.h          - Define macros, data structures and APIs related to the register and the CPU status.
- * cpuid.h        - Provide the information to be used for CPUID instruction.
- * gdt.c          - Implement APIs to set TSS descriptor and load GTDR and TR.
- * trampoline.c   - Define variables and implement trampoline APIs to initialize the environment before start APs.
- * per_cpu.h      - Define structures and implement per-CPU APIs to hold per CPU information.
- * cpufeatures.h  - Define the macros related to CPU features.
- * gdt.h          - Define structures and macros, declare APIs to hold and maintain descriptors.
- * msr.h          - Define macros related to MSRs.
- * trampoline.h   - Declare trampoline APIs used to initialize the environment before start APs.
+ * - cpu.c: Provide the information to be used for CPU operations.
+ * - cpu.h: Define macros, data structures and APIs related to the register and the CPU status.
+ * - cpuid.h: Provide the information to be used for CPUID instruction.
+ * - gdt.c: Implement APIs to set TSS descriptor and load GTDR and TR.
+ * - trampoline.c: Define variables and implement trampoline APIs to initialize the environment before start APs.
+ * - per_cpu.h: Define structures and implement per-CPU APIs to hold per CPU information.
+ * - cpufeatures.h: Define the macros related to CPU features.
+ * - gdt.h: Define structures and macros, declare APIs to hold and maintain descriptors.
+ * - msr.h: Define macros related to MSRs.
+ * - trampoline.h: Declare trampoline APIs used to initialize the environment before start APs.
  * @{
  */
 
@@ -286,27 +286,26 @@
  *
  * This file is decomposed into the following functions:
  *
- * init_percpu_lapic_id                    - Initialize lapic_id field of per_cpu_data.
- * pcpu_set_current_state(pcpu_id, state)  - Set the state of CPU to \a state.
- * get_pcpu_nums                           - The function returns the number of CPU cores detected by the hypervisor.
- * init_pcpu_pre                           - Perform the physical CPU's early stage initialization.
- * init_pcpu_post                          - Perform the physical CPU's late stage initialization.
- * get_pcpu_id_from_lapic_id(lapic_id)     - Get physical CPU id whose local APIC id is equal to \a lapic_id
- * start_pcpu(pcpu_id)                     - Start the physical CPU whose CPU id is \a pcpu_id.
- * start_pcpus                             - Start all cpus if the bit is set in mask except itself
- * make_pcpu_offline                       - Submit a request to offline the target CPU.
- * need_offline                            - Test and clear the NEED_OFFLINE bit of the given CPU.
- * is_any_pcpu_active                      - If there is any physical CPU still active.
- * wait_pcpus_offline                      - Wait for physical CPU offline with a timeout of 100ms.
- * cpu_do_idle                             - Do idle operation
- * cpu_dead                                - Put the current physical CPU in halt state.
- * set_current_pcpu_id                     - Write current physical CPU ID to MSR_IA32_TSC_AUX.
- * print_hv_banner                         - Print the boot message.
- * asm_monitor                             - Set up a linear address range to be monitored by hardware and activate
- *                                           the monitor.
- * asm_mwait                               - Enter an implementation-dependent optimized state.
- * wait_sync_change(sync, wake_sync)       - Wait until \a *sync is equal to \a wake_sync.
- * init_pcpu_xsave                         - Initialize physical CPU XSAVE features.
+ * - init_percpu_lapic_id: Initialize lapic_id field of per_cpu_data.
+ * - pcpu_set_current_state(pcpu_id, state): Set the state of CPU to \a state.
+ * - get_pcpu_nums: The function returns the number of CPU cores detected by the hypervisor.
+ * - init_pcpu_pre: Perform the physical CPU's early stage initialization.
+ * - init_pcpu_post: Perform the physical CPU's late stage initialization.
+ * - get_pcpu_id_from_lapic_id(lapic_id): Get physical CPU id whose local APIC id is equal to \a lapic_id
+ * - start_pcpu(pcpu_id): Start the physical CPU whose CPU id is \a pcpu_id.
+ * - start_pcpus: Start all cpus if the bit is set in mask except itself
+ * - make_pcpu_offline: Submit a request to offline the target CPU.
+ * - need_offline: Test and clear the NEED_OFFLINE bit of the given CPU.
+ * - is_any_pcpu_active: If there is any physical CPU still active.
+ * - wait_pcpus_offline: Wait for physical CPU offline with a timeout of 100ms.
+ * - cpu_do_idle: Do idle operation
+ * - cpu_dead: Put the current physical CPU in halt state.
+ * - set_current_pcpu_id: Write current physical CPU ID to MSR_IA32_TSC_AUX.
+ * - print_hv_banner: Print the boot message.
+ * - asm_monitor: Set up a linear address range to be monitored by hardware and activate the monitor.
+ * - asm_mwait: Enter an implementation-dependent optimized state.
+ * - wait_sync_change(sync, wake_sync): Wait until \a *sync is equal to \a wake_sync.
+ * - init_pcpu_xsave: Initialize physical CPU XSAVE features.
  */
 
 /**

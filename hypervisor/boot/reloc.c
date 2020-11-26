@@ -27,8 +27,8 @@
  * Internal functions are wrappers in assembly code in cpu_primary.S.
  *
  * This module is decomposed into the following files:
- * reloc.c -implements all APIs that shall be provided by the boot
- * cpu_primary.S -set up the initial execution environment
+ * - reloc.c: implements all APIs that shall be provided by the boot
+ * - cpu_primary.S: set up the initial execution environment
  *
  * @{
  */
@@ -65,8 +65,8 @@
  * @brief thie file implements all APIs that shall be provided by the boot module.
  *
  * function definition:
- * get_hv_image_delta()  - get the delta between actual load host virtual address(HVA) and CONFIG_HV_RAM_START
- * get_hv_image_base()   - get the actual Hypervisor load host virtual address(HVA).
+ * - get_hv_image_delta(): get the delta between actual load host virtual address(HVA) and CONFIG_HV_RAM_START
+ * - get_hv_image_base(): get the actual Hypervisor load host virtual address(HVA).
  */
 
 /**
