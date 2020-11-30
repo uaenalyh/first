@@ -49,10 +49,21 @@ void fatal_error_shutdown_vm(struct acrn_vcpu *vcpu)
 	 *  - vm representing the virtual machine of the vcpu, initialized as vcpu->vm. */
 	struct acrn_vm *vm = vcpu->vm;
 
-	/* Either SOS or pre-launched VMs */
+	/** Call spinlock_obtain with the following parameter, in order to acquire the spinlock for protecting
+	 *  simultaneous VM state transition requests
+	 *  - &vm->vm_lock
+	 */
+	spinlock_obtain(&vm->vm_lock);
+
 	/** Call pause_vm with the following parameters, in order to pause the virtual machine.
 	 *  - vm */
 	pause_vm(vm);
+
+	/** Call spinlock_release with the following parameter, in order to release the spinlock for protecting
+	 *  simultaneous VM state transition requests
+	 *  - &vm->vm_lock
+	 */
+	spinlock_release(&vm->vm_lock);
 
 	/** set the shutdown_vm_id field of per-CPU region of the cpu to the id of the virtual machine
 	 *  which will be shutdown by hypervisor, where the cpu is where the given vcpu runs on. */
@@ -91,10 +102,25 @@ void shutdown_vm_from_idle(uint16_t pcpu_id)
 	 *    get_vm_from_vmid(per_cpu(shutdown_vm_id, pcpu_id). */
 	struct acrn_vm *vm = get_vm_from_vmid(per_cpu(shutdown_vm_id, pcpu_id));
 
-	/** Call shutdown_vm with the following parameters, in order to shutdown the virtual machine, and discard
-	 *  its return value because the return value of shutdown_vm is always 0.
-	 *  - vm */
-	(void)shutdown_vm(vm);
+	/** Call spinlock_obtain with the following parameter, in order to acquire the spinlock for protecting
+	 *  simultaneous VM state transition requests
+	 *  - &vm->vm_lock
+	 */
+	spinlock_obtain(&vm->vm_lock);
+
+	/** If vm->state is VM_PAUSED, indicating that the VM has been paused. */
+	if (vm->state == VM_PAUSED) {
+		/** Call shutdown_vm with the following parameters, in order to shutdown the virtual machine, and
+		 *  discard its return value because the return value of shutdown_vm is always 0.
+		 *  - vm */
+		(void)shutdown_vm(vm);
+	}
+
+	/** Call spinlock_release with the following parameter, in order to release the spinlock for protecting
+	 *  simultaneous VM state transition requests
+	 *  - &vm->vm_lock
+	 */
+	spinlock_release(&vm->vm_lock);
 }
 
 /**

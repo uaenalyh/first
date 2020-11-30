@@ -7,6 +7,7 @@
 #include <vm.h>
 #include <io.h>
 #include <logmsg.h>
+#include <vm_reset.h>
 
 /**
  * @defgroup vp-dm vp-dm
@@ -287,11 +288,11 @@ static void vrtc_read(struct acrn_vcpu *vcpu, uint16_t addr, __unused size_t wid
 				 */
 				panic("read rtc timeout, system exception!");
 			} else {
-				/** Call shutdown_vm with the following parameters, in order to shutdown the VM if
-				 *  the VM is not safety VM.
+				/** Call fatal_error_shutdown_vm with the following parameters, in order to shutdown the
+				 *  VM if the VM is not safety VM.
 				 *  - vm
 				 */
-				shutdown_vm(vm);
+				fatal_error_shutdown_vm(vm);
 			}
 		}
 	}

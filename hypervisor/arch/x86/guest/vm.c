@@ -369,7 +369,7 @@ static uint64_t get_pcpu_bitmap(struct acrn_vm *vm)
 	uint64_t bitmap = 0UL;
 
 	/** For each vcpu in the online vCPUs of the given VM, using i as the loop counter */
-	foreach_vcpu (i, vm, vcpu) {
+	foreach_vcpu(i, vm, vcpu) {
 		/** Call bitmap_set_nolock with the following parameters, in order to set the bit of the
 		 *  variable 'bitmap' corresponding to the vCPU's physical CPU ID.
 		 *  - pcpuid_from_vcpu(vcpu)
@@ -488,6 +488,12 @@ static int32_t create_vm(uint16_t vm_id, const struct acrn_vm_config *vm_config,
 	 */
 	spinlock_init(&vm->ept_lock);
 
+	/** Call spinlock_init with the following parameter, in order to initialize the spinlock for protecting VM state
+	 *  transitions.
+	 *  - &vm->vm_lock
+	 */
+	spinlock_init(&vm->vm_lock);
+
 	/** Call setup_io_bitmap with the following parameters, in order to setup IO bit-mask so the VM-exit occurs
 	 *  on selected IO ranges.
 	 *  - vm
@@ -553,6 +559,7 @@ static int32_t create_vm(uint16_t vm_id, const struct acrn_vm_config *vm_config,
  * @retval -EINVAL if the given VM is not in PAUSED state.
  *
  * @pre vm != NULL
+ * @pre vm->state == VM_PAUSED
  *
  * @post N/A
  *
@@ -582,97 +589,81 @@ int32_t shutdown_vm(struct acrn_vm *vm)
 	 *  - vcpu representing a pointer to one vCPU data structure of this VM, initialized as NULL.
 	 */
 	struct acrn_vcpu *vcpu = NULL;
-	/** Declare the following local variables of type int32_t.
-	 *  - ret representing the running result of this function, initialized as 0.
+
+	/** Set vm->state to VM_POWERED_OFF */
+	vm->state = VM_POWERED_OFF;
+	/** Set this_pcpu_id to the return value of 'get_pcpu_id()' */
+	this_pcpu_id = get_pcpu_id();
+	/** Set mask to the return value of 'get_pcpu_bitmap(vm)', which is the ID bitmap of all the
+	 *  physical CPUs which run the given VM
 	 */
-	int32_t ret = 0;
+	mask = get_pcpu_bitmap(vm);
 
-	/** Call pause_vm with the following parameters, in order to pause all the vCPUs of this VM and set its
-	 *  state to VM_PAUSED.
-	 *  - vm
+	/** If this_pcpu_id is set in the 'mask' (a bitmap of physical CPU IDs), which means the current
+	 *  physical CPU is running the given VM. In this case only an offline flag shall be set as this
+	 *  physical CPU can only be offlined later.
 	 */
-	pause_vm(vm);
-
-	/** If vm->state is VM_PAUSED, which is the only state that a VM can be shutdown */
-	if (vm->state == VM_PAUSED) {
-		/** Set vm->state to VM_POWERED_OFF */
-		vm->state = VM_POWERED_OFF;
-		/** Set this_pcpu_id to the return value of 'get_pcpu_id()' */
-		this_pcpu_id = get_pcpu_id();
-		/** Set mask to the return value of 'get_pcpu_bitmap(vm)', which is the ID bitmap of all the
-		 *  physical CPUs which run the given VM
+	if (bitmap_test(this_pcpu_id, &mask)) {
+		/** Call bitmap_clear_nolock with the following parameters, in order to clear the bit in 'mask'.
+		 *  - this_pcpu_id
+		 *  - &mask
 		 */
-		mask = get_pcpu_bitmap(vm);
-
-		/** If this_pcpu_id is set in the 'mask' (a bitmap of physical CPU IDs), which means the current
-		 *  physical CPU is running the given VM. In this case only an offline flag shall be set as this
-		 *  physical CPU can only be offlined later.
+		bitmap_clear_nolock(this_pcpu_id, &mask);
+		/** Call make_pcpu_offline with the following parameters, in order to set its offline flag.
+		 *  - this_pcpu_id
 		 */
-		if (bitmap_test(this_pcpu_id, &mask)) {
-			/** Call bitmap_clear_nolock with the following parameters, in order to clear the bit in 'mask'.
-			 *  - this_pcpu_id
-			 *  - &mask
-			 */
-			bitmap_clear_nolock(this_pcpu_id, &mask);
-			/** Call make_pcpu_offline with the following parameters, in order to set its offline flag.
-			 *  - this_pcpu_id
-			 */
-			make_pcpu_offline(this_pcpu_id);
-		}
-
-		/** For each vcpu in the online vCPUs of the given VM, using i as the loop counter */
-		foreach_vcpu (i, vm, vcpu) {
-			/** Call reset_vcpu with the following parameters, in order to cleanup this vCPU data.
-			 *  - vcpu
-			 */
-			reset_vcpu(vcpu);
-			/** Call offline_vcpu with the following parameters, in order to set offline flag in this vCPU.
-			 *  - vcpu
-			 */
-			offline_vcpu(vcpu);
-
-			/** If the physical CPU ID associated with this vCPU is set in the 'mask' */
-			if (bitmap_test(pcpuid_from_vcpu(vcpu), &mask)) {
-				/** Call make_pcpu_offline with the following parameters, in order to send an offline
-				 *  request to the corresponding physical CPU.
-				 *  - pcpuid_from_vcpu(vcpu)
-				 */
-				make_pcpu_offline(pcpuid_from_vcpu(vcpu));
-			}
-		}
-
-		/** Call wait_pcpus_offline with the following parameters, in order to wait for all the physical CPUs
-		 *  to be in the offline state, except current physical CPU.
-		 *  - mask
-		 */
-		wait_pcpus_offline(mask);
-
-		/** Call vpci_cleanup with the following parameters, in order to release vPCI resources.
-		 *  - vm
-		 */
-		vpci_cleanup(vm);
-
-		/** Call deinit_vuart with the following parameters, in order to deinit vUART.
-		 *  - vm
-		 */
-		deinit_vuart(vm);
-
-		/** Call destroy_iommu_domain with the following parameters, in order to release IOMMU resources.
-		 *  - vm->iommu
-		 */
-		destroy_iommu_domain(vm->iommu);
-
-		/** Call destroy_ept with the following parameters, in order to clear the EPT of the given VM.
-		 *  - vm
-		 */
-		destroy_ept(vm);
-	} else {
-		/** Set ret to -EINVAL, which indicates a wrong vm->sate */
-		ret = -EINVAL;
+		make_pcpu_offline(this_pcpu_id);
 	}
 
-	/** Return ret to indicate the shutdown_vm run successfully or not */
-	return ret;
+	/** For each vcpu in the online vCPUs of the given VM, using i as the loop counter */
+	foreach_vcpu(i, vm, vcpu) {
+		/** Call reset_vcpu with the following parameters, in order to cleanup this vCPU data.
+		 *  - vcpu
+		 */
+		reset_vcpu(vcpu);
+		/** Call offline_vcpu with the following parameters, in order to set offline flag in this vCPU.
+		 *  - vcpu
+		 */
+		offline_vcpu(vcpu);
+
+		/** If the physical CPU ID associated with this vCPU is set in the 'mask' */
+		if (bitmap_test(pcpuid_from_vcpu(vcpu), &mask)) {
+			/** Call make_pcpu_offline with the following parameters, in order to send an offline
+			 *  request to the corresponding physical CPU.
+			 *  - pcpuid_from_vcpu(vcpu)
+			 */
+			make_pcpu_offline(pcpuid_from_vcpu(vcpu));
+		}
+	}
+
+	/** Call wait_pcpus_offline with the following parameters, in order to wait for all the physical CPUs
+	 *  to be in the offline state, except current physical CPU.
+	 *  - mask
+	 */
+	wait_pcpus_offline(mask);
+
+	/** Call vpci_cleanup with the following parameters, in order to release vPCI resources.
+	 *  - vm
+	 */
+	vpci_cleanup(vm);
+
+	/** Call deinit_vuart with the following parameters, in order to deinit vUART.
+	 *  - vm
+	 */
+	deinit_vuart(vm);
+
+	/** Call destroy_iommu_domain with the following parameters, in order to release IOMMU resources.
+	 *  - vm->iommu
+	 */
+	destroy_iommu_domain(vm->iommu);
+
+	/** Call destroy_ept with the following parameters, in order to clear the EPT of the given VM.
+	 *  - vm
+	 */
+	destroy_ept(vm);
+
+	/** Return 0 to indicate the shutdown_vm run successfully */
+	return 0;
 }
 
 /**
@@ -731,6 +722,7 @@ static void start_vm(struct acrn_vm *vm)
  * @return None
  *
  * @pre vm != NULL
+ * @pre (vm->state == VM_STARTED) || (vm->state == VM_PAUSED)
  *
  * @post N/A
  *
@@ -753,23 +745,20 @@ void pause_vm(struct acrn_vm *vm)
 	 */
 	struct acrn_vcpu *vcpu = NULL;
 
-	/** If vm->state is not VM_PAUSED */
-	if (vm->state != VM_PAUSED) {
-		/** If vm->state is VM_STARTED, just a started VM can be paused */
-		if (vm->state == VM_STARTED) {
-			/** For each vcpu in the online vCPUs of the given VM, using i as the loop counter */
-			foreach_vcpu (i, vm, vcpu) {
-				/** Call pause_vcpu with the following parameters, in order to switch the vCPU to
-				 *  VCPU_ZOMBIE state.
-				 *  - vcpu
-				 *  - VCPU_ZOMBIE
-				 */
-				pause_vcpu(vcpu, VCPU_ZOMBIE);
-			}
-
-			/** Set vm->state to VM_PAUSED */
-			vm->state = VM_PAUSED;
+	/** If vm->state is VM_STARTED, just a started VM can be paused */
+	if (vm->state == VM_STARTED) {
+		/** For each vcpu in the online vCPUs of the given VM, using i as the loop counter */
+		foreach_vcpu(i, vm, vcpu) {
+			/** Call pause_vcpu with the following parameters, in order to switch the vCPU to
+			 *  VCPU_ZOMBIE state.
+			 *  - vcpu
+			 *  - VCPU_ZOMBIE
+			 */
+			pause_vcpu(vcpu, VCPU_ZOMBIE);
 		}
+
+		/** Set vm->state to VM_PAUSED */
+		vm->state = VM_PAUSED;
 	}
 }
 
