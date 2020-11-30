@@ -27,7 +27,7 @@ testdev_io_write(struct acrn_vcpu *vcpu, __unused uint16_t port, __unused size_t
 	struct acrn_vcpu *vcpu_tmp = NULL;
 
 	foreach_vcpu(i, vm, vcpu_tmp) {
-		pause_vcpu(vcpu_tmp, VCPU_PAUSED);
+		pause_vcpu(vcpu_tmp);
 	}
 }
 

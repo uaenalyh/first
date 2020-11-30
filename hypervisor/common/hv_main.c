@@ -128,16 +128,25 @@ void vcpu_thread(struct thread_object *obj)
 		/** If 'ret' is smaller than 0, indicating that error happened during
 		 *  handling pending request */
 		if (ret < 0) {
-			/** Logging the following information with a log level of LOG_FATAL.
-			 *  - vcpu handling pending request fail
-			 */
-			pr_fatal("vcpu handling pending request fail");
-			 /** Call pause_vcpu() with the following parameters, in order to pause the target vcpu
-			  *  and set the state of the vCPU to VCPU_ZOMBIE.
-			  *  - vcpu
-			  *  - VCPU_ZOMBIE
-			  */
-			pause_vcpu(vcpu, VCPU_ZOMBIE);
+			/** If the VM associated with the given \a vcpu is safety vm */
+			if (is_safety_vm(vcpu->vm)) {
+				/** Call panic with the following parameters, in order to print error information
+				 *  and panic the corresponding pcpu.
+				 *  - "vcpu handling pending request fail" */
+				panic("vcpu handling pending request fail");
+			} else {
+				/** Logging the following information with a log level of LOG_FATAL.
+				 *  - "vcpu handling pending request fail"
+				 */
+				pr_fatal("vcpu handling pending request fail");
+
+				/** Call fatal_error_shutdown_vm() with the following parameters, in order to
+				 *  shutdown the corresponding vm.
+				 *  - vcpu
+				 */
+				fatal_error_shutdown_vm(vcpu);
+			}
+
 			/** Continue to next iteration */
 			continue;
 		}
@@ -157,16 +166,25 @@ void vcpu_thread(struct thread_object *obj)
 		ret = run_vcpu(vcpu);
 		/** If 'ret' is not 0, indicating that error happened when handling run_vcpu()  */
 		if (ret != 0) {
-			/** Logging the following information with a log level of LOG_FATAL.
-			 *  - vcpu resume failed
-			 */
-			pr_fatal("vcpu resume failed");
-			/** Call pause_vcpu() with the following parameters, in order to pause the target vcpu
-			 *  and set the state of the vCPU to VCPU_ZOMBIE.
-			 *  - vcpu
-			 *  - VCPU_ZOMBIE
-			 */
-			pause_vcpu(vcpu, VCPU_ZOMBIE);
+			/** If the VM associated with the given \a vcpu is safety vm */
+			if (is_safety_vm(vcpu->vm)) {
+				/** Call panic with the following parameters, in order to print error information
+				 *  and panic the corresponding pcpu.
+				 *  - "vcpu resume failed" */
+				panic("vcpu resume failed");
+			} else {
+				/** Logging the following information with a log level of LOG_FATAL.
+				 *  - "vcpu resume failed"
+				 */
+				pr_fatal("vcpu resume failed");
+
+				/** Call fatal_error_shutdown_vm() with the following parameters, in order to
+				 *  shutdown the corresponding vm.
+				 *  - vcpu
+				 */
+				fatal_error_shutdown_vm(vcpu);
+			}
+
 			/** Continue to next iteration */
 			continue;
 		}

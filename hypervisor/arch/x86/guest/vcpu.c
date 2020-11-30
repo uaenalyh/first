@@ -1550,6 +1550,7 @@ static uint64_t build_stack_frame(struct acrn_vcpu *vcpu)
  * @return N/A
  *
  * @pre vcpu != NULL
+ * @pre vcpu->state == VCPU_ZOMBIE
  *
  * @post None
  *
@@ -1572,62 +1573,56 @@ void reset_vcpu(struct acrn_vcpu *vcpu)
 	/** Logging the following information with a log level of LOG_DEBUG.
 	 *  - vcpu->vcpu_id: vcpu id to reset */
 	pr_dbg("vcpu%hu reset", vcpu->vcpu_id);
-	/** Assert state of vcpu is VCPU_RUNNING.
-	 */
-	ASSERT(vcpu->state != VCPU_RUNNING, "reset vcpu when it's running");
 
-	/** If state of vcpu is not VCPU_INIT */
-	if (vcpu->state != VCPU_INIT) {
-		/** Set state of the vcpu to VCPU_INIT */
-		vcpu->state = VCPU_INIT;
+	/** Set state of the vcpu to VCPU_INIT */
+	vcpu->state = VCPU_INIT;
 
-		/** Set launched state of vcpu to false */
-		vcpu->launched = false;
-		/** Set running state of vcpu to false */
-		vcpu->running = false;
-		/** Set nr_sipi state of vcpu->arch to false */
-		vcpu->arch.nr_sipi = 0U;
+	/** Set launched state of vcpu to false */
+	vcpu->launched = false;
+	/** Set running state of vcpu to false */
+	vcpu->running = false;
+	/** Set nr_sipi state of vcpu->arch to false */
+	vcpu->arch.nr_sipi = 0U;
 
-		/** Set exception information of vcpu->arch to VECTOR_INVALID */
-		vcpu->arch.exception_info.exception = VECTOR_INVALID;
+	/** Set exception information of vcpu->arch to VECTOR_INVALID */
+	vcpu->arch.exception_info.exception = VECTOR_INVALID;
 
-		/** Set irq_window_enabled of vcpu->arch to false */
-		vcpu->arch.irq_window_enabled = false;
-		/** Call memset() with the following parameters, in order to set PAGE_SIZE bytes
-		 *  starting from &vcpu->arch.vmcs to 0.
-		 *  - (void *)vcpu->arch.vmcs: The address of the memory block to fill
-		 *  - 0: The value to be set to each byte of the specified memory block.
-		 *  - PAGE_SIZE: The number of bytes to be set */
-		(void)memset((void *)vcpu->arch.vmcs, 0U, PAGE_SIZE);
+	/** Set irq_window_enabled of vcpu->arch to false */
+	vcpu->arch.irq_window_enabled = false;
+	/** Call memset() with the following parameters, in order to set PAGE_SIZE bytes
+	 *  starting from &vcpu->arch.vmcs to 0.
+	 *  - (void *)vcpu->arch.vmcs: The address of the memory block to fill
+	 *  - 0: The value to be set to each byte of the specified memory block.
+	 *  - PAGE_SIZE: The number of bytes to be set */
+	(void)memset((void *)vcpu->arch.vmcs, 0U, PAGE_SIZE);
 
-		/** Call memset() with the following parameters, in order to set
-		 *  sizeof(struct run_context) bytes starting from &vcpu->arch.context to 0.
-		 *  - (void *)&vcpu->arch.contexts[i]: The address of the memory block to fill
-		 *  - 0: The value to be set to each byte of the specified memory block.
-		 *  - sizeof(struct run_context): The number of bytes to be set */
-		(void)memset((void *)(&vcpu->arch.context), 0U, sizeof(struct run_context));
+	/** Call memset() with the following parameters, in order to set
+	 *  sizeof(struct run_context) bytes starting from &vcpu->arch.context to 0.
+	 *  - (void *)&vcpu->arch.contexts[i]: The address of the memory block to fill
+	 *  - 0: The value to be set to each byte of the specified memory block.
+	 *  - sizeof(struct run_context): The number of bytes to be set */
+	(void)memset((void *)(&vcpu->arch.context), 0U, sizeof(struct run_context));
 
-		/** Set notify mode of vcpu->thread_obj to SCHED_NOTIFY_IPI. */
-		vcpu->thread_obj.notify_mode = SCHED_NOTIFY_IPI;
+	/** Set notify mode of vcpu->thread_obj to SCHED_NOTIFY_IPI. */
+	vcpu->thread_obj.notify_mode = SCHED_NOTIFY_IPI;
 
-		/** Call vcpu_vlapic() with vcpu as parameter in order to get address of the
-		 *  vlapic structure associated with the vcpu and set vlapic to its return value. */
-		vlapic = vcpu_vlapic(vcpu);
-		/** Call vlapic_reset() with the following parameters, in order to reset the target vlapic.
-		 *  - vlapic: the target vlapic to reset */
-		vlapic_reset(vlapic);
+	/** Call vcpu_vlapic() with vcpu as parameter in order to get address of the
+	 *  vlapic structure associated with the vcpu and set vlapic to its return value. */
+	vlapic = vcpu_vlapic(vcpu);
+	/** Call vlapic_reset() with the following parameters, in order to reset the target vlapic.
+	 *  - vlapic: the target vlapic to reset */
+	vlapic_reset(vlapic);
 
-		/** Call reset_vcpu_regs() with the following parameters, in order to reset the vcpu registers.
-		 *  -vcpu: the target vcpu to reset */
-		reset_vcpu_regs(vcpu);
-	}
+	/** Call reset_vcpu_regs() with the following parameters, in order to reset the vcpu registers.
+	 *  -vcpu: the target vcpu to reset */
+	reset_vcpu_regs(vcpu);
 }
 
 
 /**
  * @brief This function is used to pause the target vcpu.
  *
- * Change a vCPU state to VCPU_PAUSED or VCPU_ZOMBIE, and make a reschedule request for it.
+ * Change a vCPU state to VCPU_ZOMBIE, and make a reschedule request for it.
  *
  * @param[inout] vcpu A pointer which points to the target vcpu structure which will be paused
  * @param[in] new_state The new state that \a vcpu shall be put in
@@ -1645,7 +1640,7 @@ void reset_vcpu(struct acrn_vcpu *vcpu)
  * @threadsafety When \a vcpu is different among parallel invocation
  *
  */
-void pause_vcpu(struct acrn_vcpu *vcpu, enum vcpu_state new_state)
+void pause_vcpu(struct acrn_vcpu *vcpu)
 {
 	/** Declare the following local variables of type uint16_t.
 	 *  - pcpu_id representing id of the pcpu, initialized as pcpuid_from_vcpu(vcpu). */
@@ -1653,26 +1648,30 @@ void pause_vcpu(struct acrn_vcpu *vcpu, enum vcpu_state new_state)
 
 	/** Logging the following information with a log level of LOG_DEBUG.
 	 *  - vcpu->vcpu_id: id of the vcpu
-	 *  - new_state new state of the vcpu*/
-	pr_dbg("vcpu%hu paused, new state: %d", vcpu->vcpu_id, new_state);
+	 */
+	pr_dbg("vcpu%hu paused", vcpu->vcpu_id);
 
-	/** Set prev_state of the vcpu to vcpu->state */
-	vcpu->prev_state = vcpu->state;
-	/** Set vcpu->state to the input new_state */
-	vcpu->state = new_state;
+	/** If vcpu->state is VCPU_RUNNING or VCPU_INIT */
+	if ((vcpu->state == VCPU_RUNNING) || (vcpu->state == VCPU_INIT)) {
+		/** Set prev_state of the vcpu to vcpu->state */
+		vcpu->prev_state = vcpu->state;
+		/** Set vcpu->state to VCPU_ZOMBIE */
+		vcpu->state = VCPU_ZOMBIE;
 
-	/** If vcpu->prev_state is VCPU_RUNNING */
-	if (vcpu->prev_state == VCPU_RUNNING) {
-		/** Call sleep_thread() with the following parameters, in order to sleep the target thread.
-		 *  - &vcpu->thread_obj: address of the target thread. */
-		sleep_thread(&vcpu->thread_obj);
-	}
-	/** If pcpu_id is different with return value of get_cpu_id(). */
-	if (pcpu_id != get_pcpu_id()) {
-		/** Until vcpu->running is false */
-		while (vcpu->running) {
-			/** Call asm_pause(), in order to pause current physical CPU. */
-			asm_pause();
+		/** If vcpu->prev_state is VCPU_RUNNING */
+		if (vcpu->prev_state == VCPU_RUNNING) {
+			/** Call sleep_thread() with the following parameters, in order to sleep the target thread.
+			 *  - &vcpu->thread_obj: address of the target thread. */
+			sleep_thread(&vcpu->thread_obj);
+
+			/** If pcpu_id is different with return value of get_cpu_id(). */
+			if (pcpu_id != get_pcpu_id()) {
+				/** Until vcpu->running is false */
+				while (vcpu->running) {
+					/** Call asm_pause(), in order to pause current physical CPU. */
+					asm_pause();
+				}
+			}
 		}
 	}
 }

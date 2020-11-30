@@ -649,9 +649,6 @@ static int32_t shell_list_vcpu(__unused int32_t argc, __unused char **argv)
 			case VCPU_INIT:
 				(void)strncpy_s(state, 32U, "Init", 32U);
 				break;
-			case VCPU_PAUSED:
-				(void)strncpy_s(state, 32U, "Paused", 32U);
-				break;
 			case VCPU_RUNNING:
 				(void)strncpy_s(state, 32U, "Running", 32U);
 				break;

@@ -752,9 +752,8 @@ void pause_vm(struct acrn_vm *vm)
 			/** Call pause_vcpu with the following parameters, in order to switch the vCPU to
 			 *  VCPU_ZOMBIE state.
 			 *  - vcpu
-			 *  - VCPU_ZOMBIE
 			 */
-			pause_vcpu(vcpu, VCPU_ZOMBIE);
+			pause_vcpu(vcpu);
 		}
 
 		/** Set vm->state to VM_PAUSED */

@@ -150,12 +150,10 @@
  *
  */
 enum vcpu_state {
+	VCPU_OFFLINE = 0U,  /**< vCPU deinitialized */
 	VCPU_INIT,          /**< vCPU under initialization */
-	VCPU_RUNNING,       /**< vCPU launched vCPU under initialization */
-	VCPU_PAUSED,        /**< vCPU temporarily paused but can be resumed later */
+	VCPU_RUNNING,       /**< vCPU launched */
 	VCPU_ZOMBIE,        /**< vCPU stopped and wait for being deinitialized */
-	VCPU_OFFLINE,       /**< vCPU deinitialized vCPU under initialization */
-	VCPU_UNKNOWN_STATE, /**< non-defined vCPU state */
 };
 
 /**
@@ -720,7 +718,7 @@ void offline_vcpu(struct acrn_vcpu *vcpu);
 
 void reset_vcpu(struct acrn_vcpu *vcpu);
 
-void pause_vcpu(struct acrn_vcpu *vcpu, enum vcpu_state new_state);
+void pause_vcpu(struct acrn_vcpu *vcpu);
 
 void launch_vcpu(struct acrn_vcpu *vcpu);
 
