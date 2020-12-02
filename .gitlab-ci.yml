@@ -139,8 +139,39 @@ test_sas_job:
     - cd ../acrn-hypervisor/
     - git reset --hard && git checkout master && git pull
     - cd ../acrn-sas-test-code/
-    - git reset --hard && git checkout master && git pull && cp /home/cxy/fusa_use/test_desc.* host/lib/
+    - git reset --hard && git checkout master && git pull
     - cd host/
+    - sed -i 's/acrn-hypervisor/acrn-sliced-mainline/g' Makefile
+    - make clean
+    - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
+    - make RELEASE=1 hw MODULE_GROUP_OBJ=SAMPLE_GROUP
+    - if [ $? -ne 0 ]; then exit 1; fi
+    - cp ../build/acrn-unit-test/host/bin/hw.32.out ../../acrn-sliced-mainline/image/hw_sample.32.out
+    - make clean
+    - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
+    - make RELEASE=1 boot MODULE_GROUP_OBJ=SAMPLE_GROUP
+    - if [ $? -ne 0 ]; then exit 1; fi
+    - cp ../build/acrn-unit-test/host/bin/boot.32.out ../../acrn-sliced-mainline/image/boot_sample.32.out
+    - make clean
+    - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
+    - make RELEASE=1 init MODULE_GROUP_OBJ=SAMPLE_GROUP
+    - if [ $? -ne 0 ]; then exit 1; fi
+    - cp ../build/acrn-unit-test/host/bin/init.32.out ../../acrn-sliced-mainline/image/init_sample.32.out
+    - make clean
+    - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
+    - make RELEASE=1 lib MODULE_GROUP_OBJ=SAMPLE_GROUP
+    - if [ $? -ne 0 ]; then exit 1; fi
+    - cp ../build/acrn-unit-test/host/bin/lib.32.out ../../acrn-sliced-mainline/image/lib_sample.32.out
+    - make clean
+    - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
+    - make RELEASE=1 vp-base MODULE_GROUP_OBJ=SAMPLE_GROUP
+    - if [ $? -ne 0 ]; then exit 1; fi
+    - cp ../build/acrn-unit-test/host/bin/vp-base.32.out ../../acrn-sliced-mainline/image/vp-base_sample.32.out
+    - make clean
+    - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
+    - make RELEASE=0 vp-dm MODULE_GROUP_OBJ=SAMPLE_GROUP
+    - if [ $? -ne 0 ]; then exit 1; fi
+    - cp ../build/acrn-unit-test/host/bin/vp-dm.32.out ../../acrn-sliced-mainline/image/vp-dm_sample.32.out
     - make clean
     - cd ../../acrn-hypervisor && git reset --hard && cd ../acrn-sas-test-code/host
     - /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0 "make boot RELEASE=1"
