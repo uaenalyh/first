@@ -878,9 +878,9 @@ static struct acrn_vcpu_regs realmode_init_vregs = {
 	 */
 	.rip = 0xFFF0UL,
 	/**
-	 * @brief The initial value for guest CR0 in real mode is CR0 to CR0_ET | CR0_NE.
+	 * @brief The initial value for guest CR0 in real mode is CR0 to CR0_ET | CR0_NE | CR0_CD | CR0_NW.
 	 */
-	.cr0 = CR0_ET | CR0_NE,
+	.cr0 = CR0_ET | CR0_NE | CR0_CD | CR0_NW,
 	/**
 	 * @brief The initial value for guest CR3 in real mode is 0.
 	 */
@@ -889,6 +889,12 @@ static struct acrn_vcpu_regs realmode_init_vregs = {
 	 * @brief The initial value for attributes of guest CR4 in real mode is 0.
 	 */
 	.cr4 = 0UL,
+	.gprs = {
+		/**
+		 * @brief The initial value for RDX in real mode is 00080600h.
+		 */
+		.rdx = 0x00080600UL,
+	}
 };
 
 /**
@@ -921,9 +927,9 @@ static struct acrn_vcpu_regs protect_mode_init_vregs = {  /* initial values of v
 	 */
 	.cs_sel = 0x10U,
 	/**
-	 * @brief The initial value for guest CR0 in protected mode is CR0_ET | CR0_NE | CR0_PE.
+	 * @brief The initial value for guest CR0 in protected mode is CR0_ET | CR0_NE | CR0_PE | CR0_CD | CR0_NW.
 	 */
-	.cr0 = CR0_ET | CR0_NE | CR0_PE,
+	.cr0 = CR0_ET | CR0_NE | CR0_PE | CR0_NW | CR0_CD,
 	/**
 	 * @brief The initial value for selector of guest DS in protected mode is 18h.
 	 */
@@ -935,7 +941,7 @@ static struct acrn_vcpu_regs protect_mode_init_vregs = {  /* initial values of v
 	/**
 	 * @brief The initial value for selector of guest ES in protected mode is 18h.
 	 */
-	.es_sel = 0x18U,
+	.es_sel = 0x18U
 };
 
 /**
@@ -1003,6 +1009,8 @@ void init_vcpu_protect_mode_regs(struct acrn_vcpu *vcpu, uint64_t vgdt_base_gpa)
 	vcpu_regs.gdt.base = vgdt_base_gpa;
 	/** Set GDTR limit of the vcpu to (sizeof(init_vgdt) - 1) */
 	vcpu_regs.gdt.limit = sizeof(init_vgdt) - 1U;
+	/** Set IDTR limit of the vcpu to 0XffffU */
+	vcpu_regs.idt.limit = 0xffffU;
 	/** Call copy_to_gpa() with the following parameters, in order to copy data in the host virtual memory region
 	 *  [&init_vgdt, &init_vgdt + sizeof(init_vgdt)) into the guest physical memory region [&init_vgdt, &init_vgdt
 	 *  + sizeof(init_vgdt)).
@@ -1130,6 +1138,9 @@ int32_t create_vcpu(uint16_t pcpu_id, struct acrn_vm *vm, struct acrn_vcpu **rtn
 
 		/** Set exception information of the vcpu to VECTOR_INVALID */
 		vcpu->arch.exception_info.exception = VECTOR_INVALID;
+
+		/** Set vcpu->arch.vcpu_powerup to false; */
+		vcpu->arch.vcpu_powerup = false;
 
 		/* Create per vcpu vlapic */
 		/** Call vlapic_create() with the following parameters, in order to initialize vlapic related states.
@@ -1275,6 +1286,9 @@ int32_t run_vcpu(struct acrn_vcpu *vcpu)
 		 *  - ctx->cr4:  cr4 to set */
 		vcpu_set_cr4(vcpu, ctx->cr4);
 	}
+
+	/** Set vcpu->arch.vcpu_powerup to true; */
+	vcpu->arch.vcpu_powerup = true;
 
 	/** If this VCPU is not already launched */
 	if (!vcpu->launched) {

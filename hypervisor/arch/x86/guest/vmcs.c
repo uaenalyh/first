@@ -75,6 +75,9 @@ static void init_guest_vmx(struct acrn_vcpu *vcpu, uint64_t cr0, uint64_t cr3, u
 	/** Declare the following local variables of type struct ext_context *.
 	 *  - ectx representing the current ext_context structure, initialized as &ctx->ext_ctx. */
 	struct ext_context *ectx = &ctx->ext_ctx;
+	/** Declare the following local variables of type uint64_t.
+	 *  - v representing the value of guest MSR IA32_MISC_ENABLE. */
+	uint64_t v;
 	/** Call vcpu_set_cr4() with the following parameters, in order to set \a cr4 to virtual CR4 of the \a vcpu.
 	 *  - vcpu
 	 *  - cr4 */
@@ -162,12 +165,21 @@ static void init_guest_vmx(struct acrn_vcpu *vcpu, uint64_t cr0, uint64_t cr3, u
 	 *  - ectx->ldtr
 	 *  - VMX_GUEST_LDTR */
 	load_segment(ectx->ldtr, VMX_GUEST_LDTR);
+	/** Call msr_read() with the followin parameters, in order to get the native processor
+	 *  information of MSR IA32_MISC_ENABLE.
+	 *  - MSR_IA32_MISC_ENABLE
+	 * */
+	v = msr_read(MSR_IA32_MISC_ENABLE);
+	/** Bitwise AND v by ~~(MSR_IA32_MISC_ENABLE_MONITOR_ENA | MSR_IA32_MISC_ENABLE_PMA). */
+	v &= ~(MSR_IA32_MISC_ENABLE_MONITOR_ENA | MSR_IA32_MISC_ENABLE_PMA);
+	/** Bitwise OR v by MSR_IA32_MISC_BTS_UNAVILABLE | MSR_IA32_MISC_PEBS_UNAVILABLE. */
+	v |= MSR_IA32_MISC_BTS_UNAVILABLE | MSR_IA32_MISC_PEBS_UNAVILABLE;
 	/** Call vcpu_set_guest_msr with the following parameters, in order to write
-	 *  msr_read(MSR_IA32_MISC_ENABLE) into the MSR IA32_MISC_ENABLE associated with \a vcpu.
+	 *  v into the MSR IA32_MISC_ENABLE associated with \a vcpu.
 	 *  - vcpu
 	 *  - MSR_IA32_MISC_ENABLE
-	 *  - msr_read(MSR_IA32_MISC_ENABLE) */
-	vcpu_set_guest_msr(vcpu, MSR_IA32_MISC_ENABLE, msr_read(MSR_IA32_MISC_ENABLE));
+	 *  - v */
+	vcpu_set_guest_msr(vcpu, MSR_IA32_MISC_ENABLE, v);
 	/** Call exec_vmwrite() with the following parameters, in order to write 0 to the
 	 *  field 'Guest IA32_SYSENTER_CS' in current VMCS.
 	 *  - VMX_GUEST_IA32_SYSENTER_CS
@@ -208,17 +220,20 @@ static void init_guest_vmx(struct acrn_vcpu *vcpu, uint64_t cr0, uint64_t cr3, u
 	 *  - VMX_GUEST_SMBASE
 	 *  - 0 */
 	exec_vmwrite32(VMX_GUEST_SMBASE, 0U);
-	/** Call vcpu_set_guest_msr with the following parameters, in order to write PAT_POWER_ON_VALUE into
-	 *  the MSR IA32_PAT associated with \a vcpu.
-	 *  - vcpu
-	 *  - MSR_IA32_PAT
-	 *  - PAT_POWER_ON_VALUE */
-	vcpu_set_guest_msr(vcpu, MSR_IA32_PAT, PAT_POWER_ON_VALUE);
-	/** Call exec_vmwrite() with the following parameters, in order to write PAT_POWER_ON_VALUE
-	 *  to the field 'Guest IA32_PAT' in current VMCS.
-	 *  - VMX_GUEST_IA32_PAT_FULL
-	 *  - PAT_POWER_ON_VALUE */
-	exec_vmwrite(VMX_GUEST_IA32_PAT_FULL, PAT_POWER_ON_VALUE);
+	/** If vcpu->arch.vcpu_powerup is false. */
+	if (vcpu->arch.vcpu_powerup == false) {
+		/** Call vcpu_set_guest_msr with the following parameters, in order to write PAT_POWER_ON_VALUE into
+		 *  the MSR IA32_PAT associated with \a vcpu.
+		 *  - vcpu
+		 *  - MSR_IA32_PAT
+		 *  - PAT_POWER_ON_VALUE */
+		vcpu_set_guest_msr(vcpu, MSR_IA32_PAT, PAT_POWER_ON_VALUE);
+		/** Call exec_vmwrite() with the following parameters, in order to write PAT_POWER_ON_VALUE
+		 *  to the field 'Guest IA32_PAT' in current VMCS.
+		 *  - VMX_GUEST_IA32_PAT_FULL
+		 *  - PAT_POWER_ON_VALUE */
+		exec_vmwrite(VMX_GUEST_IA32_PAT_FULL, PAT_POWER_ON_VALUE);
+	}
 	/** Call exec_vmwrite() with the following parameters, in order to write DR7_INIT_VALUE to
 	 *  the field 'Guest DR7' in current VMCS.
 	 *  - VMX_GUEST_DR7

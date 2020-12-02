@@ -694,92 +694,97 @@ void vlapic_calc_dest(struct acrn_vm *vm, uint64_t *dmask, bool is_broadcast, ui
  */
 static void vlapic_process_init_sipi(struct acrn_vcpu *target_vcpu, uint32_t mode, uint32_t icr_low)
 {
+	/** If the target_vcpu->vcpu_id is not equals to BOOT_CPU_ID. */
+	if (target_vcpu->vcpu_id != BOOT_CPU_ID) {
 	/** If the Delivery Mode is INIT */
-	if (mode == APIC_DELMODE_INIT) {
-		/** Print a debug message to show which vCPU the INIT IPI is sent to */
-		dev_dbg(ACRN_DBG_LAPIC, "Sending INIT to %hu", target_vcpu->vcpu_id);
+		if (mode == APIC_DELMODE_INIT) {
+			/** Print a debug message to show which vCPU the INIT IPI is sent to */
+			dev_dbg(ACRN_DBG_LAPIC, "Sending INIT to %hu", target_vcpu->vcpu_id);
 
-		/** Call spinlock_obtain with the following parameter, in order to acquire the spinlock for protecting
-		 *  simultaneous VM state transition requests
-		 *  - &target_vcpu->vm->vm_lock
-		 */
-		spinlock_obtain(&target_vcpu->vm->vm_lock);
-
-		/** Call pause_vcpu with the following parameters, in order to
-		 *  put target vcpu to VCPU_ZOMBIE state so that it can be safely reset
-		 *  - target_vcpu
-		 */
-		pause_vcpu(target_vcpu);
-
-		/** Call reset_vcpu with the following parameters, in order to
-		 *  reset the vCPU
-		 *  - target_vcpu
-		 */
-		reset_vcpu(target_vcpu);
-
-		/** Set target_vcpu->arch.nr_sipi to be 1U.
-		 *  new cpu model only need one SIPI to kick AP run,
-		 *  the second SIPI will be ignored as it move out of
-		 *  wait-for-SIPI state.
-		 */
-		target_vcpu->arch.nr_sipi = 1U;
-
-		/** Call spinlock_release with the following parameter, in order to release the spinlock for protecting
-		 *  simultaneous VM state transition requests
-		 *  - &target_vcpu->vm->vm_lock
-		 */
-		spinlock_release(&target_vcpu->vm->vm_lock);
-	/** If the Delivery Mode is STARTUP */
-	} else if (mode == APIC_DELMODE_STARTUP) {
-		/** Call spinlock_obtain with the following parameter, in order to acquire the spinlock for protecting
-		 *  simultaneous VM state transition requests
-		 *  - &target_vcpu->vm->vm_lock
-		 */
-		spinlock_obtain(&target_vcpu->vm->vm_lock);
-
-		/** If target_vcpu->state equals to VCPU_INIT and target_vcpu->arch.nr_sipi
-		 *  does not equal to 0U, i.e.. ignore SIPIs in any state other than wait-for-SIPI */
-		if ((target_vcpu->state == VCPU_INIT) && (target_vcpu->arch.nr_sipi != 0U)) {
-			/** Print a debug message to show the vCPU the SIPI is sent to and the vector it is sent with */
-			dev_dbg(ACRN_DBG_LAPIC, "Sending SIPI to %hu with vector %u", target_vcpu->vcpu_id,
-				(icr_low & APIC_VECTOR_MASK));
-
-			/** Set target_vcpu->arch.nr_sipi to be (target_vcpu->arch.nr_sipi - 1) */
-			target_vcpu->arch.nr_sipi--;
-
-			/** Logging the following information with a log level of LOG_ERROR.
-			 *  - target_vcpu->vcpu_id
-			 *  - target_vcpu->vm->vm_id
+			/** Call spinlock_obtain with the following parameter, in order to acquire the
+			 *  spinlock for protecting simultaneous VM state transition requests
+			 *  - &target_vcpu->vm->vm_lock
 			 */
-			pr_err("Start Secondary VCPU%hu for VM[%d]...", target_vcpu->vcpu_id,
-				target_vcpu->vm->vm_id);
-			/** Call set_vcpu_startup_entry with the following parameters, in order to
-			 *  set start up entry for \a target_vcpu.
-			 *  - target_vcpu
-			 *  - (icr_low & APIC_VECTOR_MASK) << 12U
-			 */
-			set_vcpu_startup_entry(target_vcpu, (icr_low & APIC_VECTOR_MASK) << 12U);
-			/** Call vcpu_make_request with the following parameters, in order to
-			 *  request ACRN_REQUEST_INIT_VMCS for \a target_vcpu.
-			 *  - target_vcpu
-			 *  - ACRN_REQUEST_INIT_VMCS
-			 */
-			vcpu_make_request(target_vcpu, ACRN_REQUEST_INIT_VMCS);
-			/** Call launch_vcpu with the following parameters, in order to
-			 *  launch \a target_vcpu.
+			spinlock_obtain(&target_vcpu->vm->vm_lock);
+
+			/** Call pause_vcpu with the following parameters, in order to
+			 *  put target vcpu to VCPU_ZOMBIE state so that it can be safely reset
 			 *  - target_vcpu
 			 */
-			launch_vcpu(target_vcpu);
+			pause_vcpu(target_vcpu);
+
+			/** Call reset_vcpu with the following parameters, in order to
+			 *  reset the vCPU
+			 *  - target_vcpu
+			 */
+			reset_vcpu(target_vcpu);
+
+			/** Set target_vcpu->arch.nr_sipi to be 1U.
+			 *  new cpu model only need one SIPI to kick AP run,
+			 *  the second SIPI will be ignored as it move out of
+			 *  wait-for-SIPI state.
+			 */
+			target_vcpu->arch.nr_sipi = 1U;
+
+			/** Call spinlock_release with the following parameter, in order to release the
+			 *  spinlock for protecting simultaneous VM state transition requests
+			 *  - &target_vcpu->vm->vm_lock
+			 */
+			spinlock_release(&target_vcpu->vm->vm_lock);
+		/** If the Delivery Mode is STARTUP */
+		} else if (mode == APIC_DELMODE_STARTUP) {
+			/** Call spinlock_obtain with the following parameter, in order to acquire the
+			 *  spinlock for protecting simultaneous VM state transition requests
+			 *  - &target_vcpu->vm->vm_lock
+			 */
+			spinlock_obtain(&target_vcpu->vm->vm_lock);
+
+			/** If target_vcpu->state equals to VCPU_INIT and target_vcpu->arch.nr_sipi
+			 *  does not equal to 0U, i.e.. ignore SIPIs in any state other than wait-for-SIPI */
+			if ((target_vcpu->state == VCPU_INIT) && (target_vcpu->arch.nr_sipi != 0U)) {
+				/** Print a debug message to show the vCPU the SIPI is sent to and
+				 *  the vector it is sent with */
+				dev_dbg(ACRN_DBG_LAPIC, "Sending SIPI to %hu with vector %u", target_vcpu->vcpu_id,
+					(icr_low & APIC_VECTOR_MASK));
+
+				/** Set target_vcpu->arch.nr_sipi to be (target_vcpu->arch.nr_sipi - 1) */
+				target_vcpu->arch.nr_sipi--;
+
+				/** Logging the following information with a log level of LOG_ERROR.
+				 *  - target_vcpu->vcpu_id
+				 *  - target_vcpu->vm->vm_id
+				 */
+				pr_err("Start Secondary VCPU%hu for VM[%d]...", target_vcpu->vcpu_id,
+					target_vcpu->vm->vm_id);
+				/** Call set_vcpu_startup_entry with the following parameters, in order to
+				 *  set start up entry for \a target_vcpu.
+				 *  - target_vcpu
+				 *  - (icr_low & APIC_VECTOR_MASK) << 12U
+				 */
+				set_vcpu_startup_entry(target_vcpu, (icr_low & APIC_VECTOR_MASK) << 12U);
+				/** Call vcpu_make_request with the following parameters, in order to
+				 *  request ACRN_REQUEST_INIT_VMCS for \a target_vcpu.
+				 *  - target_vcpu
+				 *  - ACRN_REQUEST_INIT_VMCS
+				 */
+
+				vcpu_make_request(target_vcpu, ACRN_REQUEST_INIT_VMCS);
+				/** Call launch_vcpu with the following parameters, in order to
+				 *  launch \a target_vcpu.
+				 *  - target_vcpu
+				 */
+				launch_vcpu(target_vcpu);
+			}
+
+			/** Call spinlock_release with the following parameter, in order to release the
+			 *  spinlock for protecting simultaneous VM state transition requests
+			 *  - &target_vcpu->vm->vm_lock
+			 */
+			spinlock_release(&target_vcpu->vm->vm_lock);
+		/** If the Delivery Mode is not INIT or STARTUP */
+		} else {
+			/** No other state currently, do nothing */
 		}
-
-		/** Call spinlock_release with the following parameter, in order to release the spinlock for protecting
-		 *  simultaneous VM state transition requests
-		 *  - &target_vcpu->vm->vm_lock
-		 */
-		spinlock_release(&target_vcpu->vm->vm_lock);
-	/** If the Delivery Mode is not INIT or STARTUP */
-	} else {
-		/** No other state currently, do nothing */
 	}
 }
 

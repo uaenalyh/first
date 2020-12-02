@@ -429,6 +429,7 @@ struct acrn_vcpu_arch {
 	uint32_t idt_vectoring_info; /**< idt vector information */
 	uint64_t exit_qualification; /**< vmexit qualification information */
 	uint32_t inst_len;           /**< length of the instruction which causes vmexit */
+	bool vcpu_powerup;           /**< Indicates if the vcpu is initialized first time */
 
 	enum vm_cpu_mode cpu_mode;   /**< mode of vcpu */
 	uint8_t nr_sipi;             /**< number of SIPI */

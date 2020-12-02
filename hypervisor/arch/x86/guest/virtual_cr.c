@@ -541,8 +541,9 @@ static bool is_cr4_write_valid(struct acrn_vcpu *vcpu, uint64_t cr4)
 		ret = false;
 	/** If no always off bit is set */
 	} else {
-		/** If CR4 has CR4.VMXE or CR4.SMXE or CR4.PKE set */
-		if (((cr4 & CR4_VMXE) != 0UL) || ((cr4 & CR4_SMXE) != 0UL) || ((cr4 & CR4_PKE) != 0UL)) {
+		/** If CR4 has CR4.VMXE or CR4.SMXE or CR4.PKE or CR4_PCE set */
+		if (((cr4 & CR4_VMXE) != 0UL) || ((cr4 & CR4_SMXE) != 0UL) || ((cr4 & CR4_PKE) != 0UL)
+		 || ((cr4 & CR4_PCE) != 0UL)) {
 			/** Set the ret to false */
 			ret = false;
 		/** If the corresponding if condition does not meet */

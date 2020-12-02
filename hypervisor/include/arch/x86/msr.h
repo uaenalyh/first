@@ -522,6 +522,21 @@
 #define PAT_MEM_TYPE_UCM 0x07UL /* uncached minus */
 
 /**
+ * @brief The bit of the IA32_MISC_ENABLE MSR used for performance monitoring available.
+ */
+#define MSR_IA32_MISC_ENABLE_PMA (1UL << 7U)
+
+/**
+ * @brief The bit of the IA32_MISC_ENABLE MSR used for Branch Trace Storage Unavailable.
+ */
+#define MSR_IA32_MISC_BTS_UNAVILABLE (1UL << 11U)
+
+/**
+ * @brief The bit of the IA32_MISC_ENABLE MSR used for processor event based sampling Unavailable.
+ */
+#define MSR_IA32_MISC_PEBS_UNAVILABLE (1UL << 12U)
+
+/**
  * @brief The bit of the IA32_MISC_ENABLE MSR used to enable MONITOR FSM.
  *
  * When this bit is set to 0, the MONITOR feature flag is not set (CPUID.01H:ECX[bit3] = 0).
