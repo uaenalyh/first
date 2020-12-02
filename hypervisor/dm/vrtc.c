@@ -184,41 +184,140 @@ static bool cmos_get_reg_val(uint8_t addr, uint32_t *value)
 	/** Declare the following local variables of type int32_t.
 	 *  - tries representing the total times to check the RTC updating status, initialized as 3000. */
 	int32_t tries = 3000;
+	/** Declare the following local variables of type bool.
+	 *  - is_default representing whether a default value of the RTC register at index \a addr is specified,
+	 *  initialized as false. */
+	bool is_default = false;
 
-	/** Call spinlock_obtain with the following parameters, in order to avoid the physical RTC register is
-	 *  accessed by different guest VMs in parallel.
-	 *  - &cmos_lock
-	 */
-	spinlock_obtain(&cmos_lock);
+	/** Depending on the address of the RTC register. */
+	switch (addr) {
+	/** \a addr is 0h, representing the RTC register whose functionality is to get the current second. */
+	case 0x0U:
+		/** End of case */
+		break;
+	/** \a addr is 1h, representing the RTC register whose functionality is to alarm second. */
+	case 0x1U:
+		/** Set is_default to true, which means this RTC register has a default value prepared for guest. */
+		is_default = true;
+		/** Set *value to 0h, which means this RTC register has a default value 0h. */
+		*value = 0U;
+		/** End of case */
+		break;
+	/** \a addr is 2h, representing the RTC register whose functionality is to get the current minute. */
+	case 0x2U:
+		/** End of case */
+		break;
+	/** \a addr is 3h, representing the RTC register whose functionality is to alarm minute. */
+	case 0x3U:
+		/** Set is_default to true, which means this RTC register has a default value prepared for guest. */
+		is_default = true;
+		/** Set *value to 0h, which means this RTC register has a default value 0h. */
+		*value = 0U;
+		/** End of case */
+		break;
+	/** \a addr is 4h, representing the RTC register whose functionality is to get the current hour. */
+	case 0x4U:
+		/** End of case */
+		break;
+	/** \a addr is 5h, representing the RTC register whose functionality is to alarm hour. */
+	case 0x5U:
+		/** Set *value to 0h, which means this RTC register has a default value 0h. */
+		*value = 0U;
+		/** Set is_default to true, which means this RTC register has a default value prepared for guest. */
+		is_default = true;
+		/** End of case */
+		break;
+	/** \a addr is 6h, representing the RTC register whose functionality is to get the current day of
+	 * week(1=Sunday). */
+	case 0x6U:
+	/** \a addr is 7h, representing the RTC register whose functionality is to get the current date of month. */
+	case 0x7U:
+	/** \a addr is 8h, representing the RTC register whose functionality is to get the current month. */
+	case 0x8U:
+	/** \a addr is 9h, representing the RTC register whose functionality is to get the current year. */
+	case 0x9U:
+		/** End of case */
+		break;
+	/** \a addr is Ah, representing the RTC register used for general configuration of the RTC functions. */
+	case 0xAU:
+		/** Set *value to 0h, which means this RTC register has a default value 0h. */
+		*value = 0x0U;
+		/** Set is_default to true, which means this RTC register has a default value prepared for guest. */
+		is_default = true;
+		/** End of case */
+		break;
+	/** \a addr is Bh, representing the RTC register used for general configuration of the RTC functions. */
+	case 0xBU:
+		/** Set *value to 2h, which means this RTC register has a default value 2h. */
+		*value = 0x2U;
+		/** Set is_default to true, which means this RTC register has a default value prepared for guest. */
+		is_default = true;
+		/** End of case */
+		break;
+	/** \a addr is Ch, representing the RTC Flag Register. */
+	case 0xCU:
+		/** Set *value to 0h, which means this RTC register has a default value 0h. */
+		*value = 0x0U;
+		/** Set is_default to true, which means this RTC register has a default value prepared for guest. */
+		is_default = true;
+		/** End of case */
+		break;
+	/** \a addr is Dh, representing the RTC Flag Register. */
+	case 0xDU:
+		/** Set *value to 80h, which means this RTC register has a default value 80h. */
+		*value = 0x80U;
+		/** Set is_default to true, which means this RTC register has a default value prepared for guest. */
+		is_default = true;
+		/** End of case */
+		break;
+	/** \a addr is not matched, representing invalid RTC register. */
+	default:
+		/** Set *value to 0h, which means this RTC register has a default value 0h. */
+		*value = 0U;
+		/** Set is_default to true, which means this RTC register has a default value prepared for guest. */
+		is_default = true;
+		/** End of case */
+		break;
+	}
 
-	/** Until it's false of the value returned by cmos_update_in_progress or the 'tries' count is reduced to 0;
-	 *  the first condition means the RTC register updating is done, the second condition indicates that the
-	 *  RTC is in updating status for too long time.
-	 */
-	while (cmos_update_in_progress() && (tries != 0)) {
-		/** Decrement tries by 1 */
-		tries -= 1;
-		/** Call udelay with the following parameters, in order to delay 10 microseconds.
-		 *  - 10
+	/** If the RTC register specified by \a addr doesn't have default value. */
+	if (!is_default) {
+		/** Call spinlock_obtain with the following parameters, in order to avoid the physical RTC register is
+		 *  accessed by different guest VMs in parallel.
+		 *  - &cmos_lock
 		 */
-		udelay(10U);
-	}
+		spinlock_obtain(&cmos_lock);
 
-	/** If 'tries' is less than 0 or equals to 0, which means it has tried for a long time. */
-	if (tries <= 0) {
-		/** Set result to false, which means it is failed to read the physical RTC register this time. */
-		result = false;
-	} else {
-		/** Set '*value' to the value returned by cmos_read with addr being the parameter, which is
-		 *  to read the physical RTC register. */
-		*value = cmos_read(addr);
-	}
+		/** Until it's false of the value returned by cmos_update_in_progress or the 'tries' count is reduced
+		 * to 0; the first condition means the RTC register updating is done, the second condition indicates
+		 * that the RTC is in updating status for too long time.
+		 */
+		while (cmos_update_in_progress() && (tries != 0)) {
+			/** Decrement tries by 1 */
+			tries -= 1;
+			/** Call udelay with the following parameters, in order to delay 10 microseconds.
+			 *  - 10
+			 */
+			udelay(10U);
+		}
 
-	/** Call spinlock_release with the following parameters, in order to release the lock, then other guest VM
-	 *  can access the physical RTC register.
-	 *  - &cmos_lock
-	 */
-	spinlock_release(&cmos_lock);
+		/** If 'tries' is less than 0 or equals to 0, which means it has tried for a long time. */
+		if (tries <= 0) {
+			/** Set result to false, which means it is failed to read the physical RTC register this
+			 * time. */
+			result = false;
+		} else {
+			/** Set '*value' to the value returned by cmos_read with addr being the parameter, which is
+			 *  to read the physical RTC register. */
+			*value = cmos_read(addr);
+		}
+
+		/** Call spinlock_release with the following parameters, in order to release the lock, then other guest
+		 * VM can access the physical RTC register.
+		 *  - &cmos_lock
+		 */
+		spinlock_release(&cmos_lock);
+	}
 	/** Return 'result' to indicate whether this reading is successful. */
 	return result;
 }
@@ -266,10 +365,9 @@ static void vrtc_read(struct acrn_vcpu *vcpu, uint16_t addr, __unused size_t wid
 
 	/** If the given 'addr' is CMOS_ADDR_PORT, to indicate that the guest VM is reading the address port. */
 	if (addr == CMOS_ADDR_PORT) {
-		/** Set pio_req->value to vm->vrtc_offset, it means the address register value is just the value
-		 *  set last time by the guest VM.
+		/** Set pio_req->value to 0, the default value of the RTC register whose address is 70h is 0h.
 		 */
-		pio_req->value = vm->vrtc_offset;
+		pio_req->value = 0U;
 	} else {
 		/** Declare the following local variables of type bool.
 		 *  - ret representing the status returned by cmos_get_reg_val with offset and &(pio_reg->value) being
