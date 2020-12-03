@@ -124,7 +124,8 @@ const struct vm_exit_dispatch dispatch_table[NR_VMX_EXIT_REASONS] = {
 	 * not necessary for the handler.
 	 */
 	[VMX_EXIT_REASON_TASK_SWITCH] = {
-		.handler = taskswitch_vmexit_handler},
+		.handler = taskswitch_vmexit_handler,
+		.need_exit_qualification = 1U},
 	/**
 	 * @brief VM exit handler for CPUID instruction
 	 * is cpuid_vmexit_handler and the exit qualification information is
