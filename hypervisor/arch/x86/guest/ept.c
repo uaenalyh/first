@@ -7,6 +7,7 @@
 #include <acrn_hv_defs.h>
 #include <vm.h>
 #include <mmu.h>
+#include <pgtable.h>
 #include <ept.h>
 #include <logmsg.h>
 #include <trace.h>
@@ -387,137 +388,22 @@ void ept_flush_leaf_page(uint64_t *pge, uint64_t size)
  */
 void walk_ept_table(struct acrn_vm *vm, pge_handler cb)
 {
+	/** Declare the following local variable of type uint64_t *.
+	 *  - pml4_page representing the PML4 page of the EPT of the given VM, initialized as the return value of
+	 *    get_ept_entry(vm) casted to uint64_t *. */
+	uint64_t *pml4_page = (uint64_t *)get_ept_entry(vm);
+
 	/** Declare the following local variables of type const struct memory_ops *.
 	 *  - mem_ops representing the operations for the EPT, initialized as &vm->arch_vm.ept_mem_ops. */
 	const struct memory_ops *mem_ops = &vm->arch_vm.ept_mem_ops;
-	/** Declare the following local variables of type uint64_t *.
-	 *  - pml4e representing the PML4 Table entry, not initialized.
-	 *  - pdpte representing the Page-Directory-Pointer Table entry, not initialized.
-	 *  - pde representing the Page Directory Table entry, not initialized.
-	 *  - pte representing the Page Table entry, not initialized.
-	 */
-	uint64_t *pml4e, *pdpte, *pde, *pte;
-	/** Declare the following local variables of type uint64_t.
-	 *  - i representing the PML4 Table entry index, not initialized.
-	 *  - j representing the Page-Directory-Pointer Table entry index, not initialized.
-	 *  - k representing the Page Directory Table entry index, not initialized.
-	 *  - m representing the Page Table entry index, not initialized.
-	 */
-	uint64_t i, j, k, m;
 
-	/** For each i ranging from 0 to PTRS_PER_PML4E, in order to loop through all the PML4 Table entries. */
-	for (i = 0UL; i < PTRS_PER_PML4E; i++) {
-		/** Call get_ept_entry with following parameters to get EPT structure.
-		 *  - vm
-		 *  Then call pml4e_offset with following parameters to get PML4 table entry and
-		 *  set its value to 'pml4e'.
-		 *  - The EPT structure returned by get_ept_entry
-		 *  - i << PML4E_SHIFT
-		 */
-		pml4e = pml4e_offset((uint64_t *)get_ept_entry(vm), i << PML4E_SHIFT);
-		/** Call mem_ops->pgentry_present with following parameters to check whether the
-		 *  corresponding Page-Directory-Pointer Table is present.
-		 *  - *pml4e
-		 *  If the Page-Directory-Pointer table isn't present.
-		 */
-		if (mem_ops->pgentry_present(*pml4e) == 0UL) {
-			/** Continue this loop */
-			continue;
-		}
-		/** For each j ranging from 0 to PTRS_PER_PDPTE, in order to loop through all
-		 *  the Page-directory-pointer table entries.
-		 */
-		for (j = 0UL; j < PTRS_PER_PDPTE; j++) {
-			/**  Call pdpte_offset with following parameters to get Page-Directory-Pointer Table entry
-			 *   and set return its value to 'pdpte'.
-			 *  - pml4e
-			 *  - j << PDPTE_SHIFT
-			 */
-			pdpte = pdpte_offset(pml4e, j << PDPTE_SHIFT);
-			/** Call mem_ops->pgentry_present with following parameters to check whether the
-			 *  corresponding table entry is present.
-			 *  - *pdpte
-			 *  If the table entry isn't present.
-			 */
-			if (mem_ops->pgentry_present(*pdpte) == 0UL) {
-				/** Continue this loop */
-				continue;
-			}
-			/** Call pdpte_large with following parameters to check whether the
-			 *  corresponding table entry is a 1GB page entry.
-			 *  - *pdpte
-			 *  If it is a 1GB page entry.
-			 */
-			if (pdpte_large(*pdpte) != 0UL) {
-				/** Call \a cb with following parameters to perform an action for this page entry.
-				 *  - pdpte
-				 *  - PDPTE_SIZE
-				 */
-				cb(pdpte, PDPTE_SIZE);
-				/** Continue this loop */
-				continue;
-			}
-			/** For each k ranging from 0 to PTRS_PER_PDE, in order to loop
-			 *  through all the Page Directory entries.
-			 */
-			for (k = 0UL; k < PTRS_PER_PDE; k++) {
-				/** Call pde_offset with following parameters to get Page
-				 *  directory entry and set its return value to 'pde'.
-				 *  - pdpte
-				 *  - k << PDE_SHIFT
-				 */
-				pde = pde_offset(pdpte, k << PDE_SHIFT);
-				/** Call mem_ops->pgentry_present with following parameters to check whether the
-				 *  corresponding Page directory entry is present.
-				 *  - *pde
-				 *  If the table entry isn't present.
-				 */
-				if (mem_ops->pgentry_present(*pde) == 0UL) {
-					/** Continue this loop */
-					continue;
-				}
-				/** Call pde_large with following parameters to check whether the
-				 *  corresponding entry is a 2MB page entry.
-				 *  - *pde
-				 *  If it is a 2MB page entry.
-				 */
-				if (pde_large(*pde) != 0UL) {
-					/** Call \a cb with following parameters to perform an
-					 *  action for this page entry.
-					 *  - pde
-					 *  - PDE_SIZE
-					 */
-					cb(pde, PDE_SIZE);
-					/** Continue this loop */
-					continue;
-				}
-				/** For each m ranging from 0 to PTRS_PER_PTE, in order to
-				 *  loop through all the Page Table entries.
-				 */
-				for (m = 0UL; m < PTRS_PER_PTE; m++) {
-					/** Call pte_offset with following parameters to get
-					 *  Page Table entry and set its return value to 'pte'.
-					 *  - pde
-					 *  - m << PTE_SHIFT
-					 */
-					pte = pte_offset(pde, m << PTE_SHIFT);
-					/** Call mem_ops->pgentry_present with following parameters to check whether the
-					 *  corresponding Page Table entry is present.
-					 *  - *pte
-					 *  If the table entry isn't present.
-					 */
-					if (mem_ops->pgentry_present(*pte) != 0UL) {
-						/** Call \a cb with following parameters to perform an action
-						 *  for this page entry.
-						 *  - pte
-						 *  - PTE_SIZE
-						 */
-						cb(pte, PTE_SIZE);
-					}
-				}
-			}
-		}
-	}
+	/** Call walk_page_table with following parameters to apply \a cb to each entry in pml4_page that identifies a
+	 *  page frame.
+	 *  - pml4_page
+	 *  - mem_ops
+	 *  - cb
+	 */
+	walk_page_table(pml4_page, mem_ops, cb);
 }
 
 /**

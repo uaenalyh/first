@@ -802,6 +802,14 @@ void mmu_add(uint64_t *pml4_page, uint64_t paddr_base, uint64_t vaddr_base, uint
 void mmu_modify_or_del(uint64_t *pml4_page, uint64_t vaddr_base, uint64_t size, uint64_t prot_set, uint64_t prot_clr,
 	const struct memory_ops *mem_ops, uint32_t type);
 
+
+/**
+ * @brief The callback function type for walking through EPT, it will be called on every table entry.
+ */
+typedef void (*pge_handler)(uint64_t *pgentry, uint64_t size);
+
+void walk_page_table(uint64_t *pml4_page, const struct memory_ops *mem_ops, pge_handler cb);
+
 /**
  * @}
  */

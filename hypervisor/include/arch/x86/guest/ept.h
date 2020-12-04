@@ -21,12 +21,8 @@
  * a macro for invalid host physical address.
  */
 #include <types.h>
+#include <pgtable.h>
 #include <vm.h>
-
-/**
- * @brief The callback function type for walking through EPT, it will be called on every table entry.
- */
-typedef void (*pge_handler)(uint64_t *pgentry, uint64_t size);
 
 /**
  * @brief The invalid host physical memory address.
