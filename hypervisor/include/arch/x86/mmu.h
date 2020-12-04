@@ -239,7 +239,7 @@ static inline void clflush(const volatile void *p)
 	 *  linear address specified with \a p.
 	 *  - Instruction template: "clflush (%0)"
 	 *  - Input operands:
-	 *	- A general register holds the linear address to be flushed.
+	 *      1. A general register holds the linear address to be flushed.
 	 *  - Output operands: None
 	 *  - Clobbers: None
 	 */
@@ -280,7 +280,7 @@ static inline void clflushopt(const volatile void *p)
 	 *  linear address specified with \a p.
 	 *  - Instruction template: "clflushopt (%0)"
 	 *  - Input operands:
-	 *	- A general register holds the linear address to be flushed.
+	 *      1. A general register holds the linear address to be flushed.
 	 *  - Output operands: None
 	 *  - Clobbers: None
 	 */

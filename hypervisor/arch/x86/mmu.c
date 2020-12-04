@@ -311,10 +311,10 @@ static inline int32_t asm_invept(uint64_t type, struct invept_desc desc)
 	 *  that were derived from extended page tables (EPT).
 	 *  - Instruction template: "invept %1, %2\n" VMFAIL_INVALID_EPT_VPID
 	 *  - Input operands:
-	 *	- Memory pointed to by desc holds a "invept" descriptor.
-	 *	- A general register holds the operation type parameter for "invept".
+	 *      1. Memory pointed to by desc holds a "invept" descriptor.
+	 *      2. A general register holds the operation type parameter for "invept".
 	 *  - Output operands:
-	 *	- error is stored to a general register.
+	 *      1. error is stored to a general register.
 	 *  - Clobbers: "memory"
 	 */
 	asm volatile("invept %1, %2\n" VMFAIL_INVALID_EPT_VPID : "=r"(error) : "m"(desc), "r"(type) : "memory");

@@ -102,17 +102,17 @@ static inline void spinlock_obtain(spinlock_t *lock)
 	 *  counter of the queue. If the old head of the queue is equal to the
 	 *  tail, we have locked the spinlock. Otherwise we have to wait.
 	 *  - Instruction template:
-	 *	"   movl $0x1,%%eax\n"
-	 *	"   lock xaddl %%eax,%[head]\n"
-	 *	"   cmpl %%eax,%[tail]\n"
-	 *	"   jz 1f\n"
-	 *	"2: pause\n"
-	 *	"   cmpl %%eax,%[tail]\n"
-	 *	"   jnz 2b\n"
-	 *	"1:\n"
+	 *      "   movl $0x1,%%eax\n"
+	 *      "   lock xaddl %%eax,%[head]\n"
+	 *      "   cmpl %%eax,%[tail]\n"
+	 *      "   jz 1f\n"
+	 *      "2: pause\n"
+	 *      "   cmpl %%eax,%[tail]\n"
+	 *      "   jnz 2b\n"
+	 *      "1:\n"
 	 *  - Input operands:
-	 *	- Memory pointed to by lock->head holds a spinlock head field.
-	 *	- Memory pointed to by lock->tail holds a spinlock tail field.
+	 *      1. Memory pointed to by lock->head holds a spinlock head field.
+	 *      2. Memory pointed to by lock->tail holds a spinlock tail field.
 	 *  - Output operands: None
 	 *  - Clobbers: "cc", "memory", "eax"
 	 */
