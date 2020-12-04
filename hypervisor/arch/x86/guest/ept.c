@@ -147,6 +147,13 @@ void ept_add_mr(struct acrn_vm *vm, uint64_t *pml4_page, uint64_t hpa, uint64_t 
 		/** Set SNP bit to force snooping of PCIe devices */
 		prot |= EPT_SNOOP_CTRL;
 	}
+
+	/** Call spinlock_obtain with the following parameter, in order to acquire the spinlock for protecting EPT
+	 *  manipulations.
+	 *  - &vm->ept_lock
+	 */
+	spinlock_obtain(&vm->ept_lock);
+
 	/** Call mmu_add with following parameters in order to add table entry in the EPT.
 	 *  - pml4_page
 	 *  - hpa
@@ -156,6 +163,12 @@ void ept_add_mr(struct acrn_vm *vm, uint64_t *pml4_page, uint64_t hpa, uint64_t 
 	 *  - &vm->arch_vm.ept_mem_ops
 	 */
 	mmu_add(pml4_page, hpa, gpa, size, prot, &vm->arch_vm.ept_mem_ops);
+
+	/** Call spinlock_release with the following parameter, in order to release the spinlock for protecting EPT
+	 *  manipulations.
+	 *  - &vm->ept_lock
+	 */
+	spinlock_release(&vm->ept_lock);
 
 	/** For each vcpu in the online vCPUs of vm, using i as the loop counter. */
 	foreach_vcpu (i, vm, vcpu) {
@@ -222,6 +235,12 @@ void ept_modify_mr(
 		local_prot |= EPT_SNOOP_CTRL;
 	}
 
+	/** Call spinlock_obtain with the following parameter, in order to acquire the spinlock for protecting EPT
+	 *  manipulations.
+	 *  - &vm->ept_lock
+	 */
+	spinlock_obtain(&vm->ept_lock);
+
 	/** Call mmu_modify_or_del with following parameters in order to change guest memory
 	 *  region's access rights and type.
 	 *  - pml4_page
@@ -233,6 +252,12 @@ void ept_modify_mr(
 	 *  - MR_MODIFY
 	 */
 	mmu_modify_or_del(pml4_page, gpa, size, local_prot, prot_clr, &(vm->arch_vm.ept_mem_ops), MR_MODIFY);
+
+	/** Call spinlock_release with the following parameter, in order to release the spinlock for protecting EPT
+	 *  manipulations.
+	 *  - &vm->ept_lock
+	 */
+	spinlock_release(&vm->ept_lock);
 
 	/** For each vcpu in the online vCPUs of vm, using i as the loop counter. */
 	foreach_vcpu (i, vm, vcpu) {
@@ -288,6 +313,12 @@ void ept_del_mr(struct acrn_vm *vm, uint64_t *pml4_page, uint64_t gpa, uint64_t 
 	 */
 	dev_dbg(ACRN_DBG_EPT, "%s,vm[%d] gpa 0x%lx size 0x%lx\n", __func__, vm->vm_id, gpa, size);
 
+	/** Call spinlock_obtain with the following parameter, in order to acquire the spinlock for protecting EPT
+	 *  manipulations.
+	 *  - &vm->ept_lock
+	 */
+	spinlock_obtain(&vm->ept_lock);
+
 	/** Call mmu_modify_or_del with following parameters in order to delete guest memory region's mapping.
 	 *  - pml4_page
 	 *  - gpa
@@ -298,6 +329,12 @@ void ept_del_mr(struct acrn_vm *vm, uint64_t *pml4_page, uint64_t gpa, uint64_t 
 	 *  - MR_DEL
 	 */
 	mmu_modify_or_del(pml4_page, gpa, size, 0UL, 0UL, &vm->arch_vm.ept_mem_ops, MR_DEL);
+
+	/** Call spinlock_release with the following parameter, in order to release the spinlock for protecting EPT
+	 *  manipulations.
+	 *  - &vm->ept_lock
+	 */
+	spinlock_release(&vm->ept_lock);
 
 	/** For each vcpu in the online vCPUs of vm, using i as the loop counter. */
 	foreach_vcpu (i, vm, vcpu) {

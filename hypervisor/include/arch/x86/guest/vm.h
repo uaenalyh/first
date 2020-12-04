@@ -159,6 +159,8 @@ struct acrn_vm {
 	enum vm_state state; /**< the VM state */
 	struct iommu_domain *iommu; /**< iommu domain of this VM */
 
+	spinlock_t ept_lock;	/**< Spin-lock used to protect ept add/modify/remove for a VM */
+
 	struct vm_io_handler_desc emul_pio[EMUL_PIO_IDX_MAX]; /**< emulated port I/O handler descriptor */
 
 	uint8_t uuid[16]; /**< the UUID of this VM */

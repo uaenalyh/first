@@ -482,6 +482,12 @@ static int32_t create_vm(uint16_t vm_id, const struct acrn_vm_config *vm_config,
 	 */
 	init_vm_boot_info(vm);
 
+	/** Call spinlock_init with the following parameter, in order to initialize the spinlock for protecting EPT
+	 *  manipulations.
+	 *  - &vm->ept_lock
+	 */
+	spinlock_init(&vm->ept_lock);
+
 	/** Call setup_io_bitmap with the following parameters, in order to setup IO bit-mask so the VM-exit occurs
 	 *  on selected IO ranges.
 	 *  - vm
