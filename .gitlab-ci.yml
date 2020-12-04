@@ -336,7 +336,7 @@ test_build_job:
     - cd ../acrn-hypervisor/
     - git reset --hard && git checkout master && git pull
     - cd ../acrn-sas-test-code/
-    - git reset --hard && git checkout master && git pull && cp /home/cxy/fusa_use/test_desc.* host/lib/
+    - git reset --hard && git checkout master && git pull
     - cd host/
     - make clean
     - cd ../../acrn-hypervisor && git reset --hard && cd ../acrn-sas-test-code/host
