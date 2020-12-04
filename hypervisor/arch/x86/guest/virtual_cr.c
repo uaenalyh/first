@@ -78,10 +78,10 @@
 /**
  * @brief CR4 bits hypervisor wants to trap to track status change.
  *
- * The hypervisor will trap CR4.PSE, CR4.PAE, CR4.VMXE, CR4.PCIDE, CR4.SMEP, CR4.SMAP, CR4.PKE to
+ * The hypervisor will trap CR4.PSE, CR4.PAE, CR4.VMXE, CR4.PCIDE, CR4.SMEP, CR4.SMAP, CR4.PKE, CR4.SMXE to
  * track the status change. This macro marks these bits.
  */
-#define CR4_TRAP_MASK (CR4_PSE | CR4_PAE | CR4_VMXE | CR4_PCIDE | CR4_SMEP | CR4_SMAP | CR4_PKE)
+#define CR4_TRAP_MASK (CR4_PSE | CR4_PAE | CR4_VMXE | CR4_PCIDE | CR4_SMEP | CR4_SMAP | CR4_PKE | CR4_SMXE)
 /**
  * @brief These CR4 bits are reserved according to the SDM and shall not be changed by the guests.
  *
