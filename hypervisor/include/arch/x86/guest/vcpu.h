@@ -174,7 +174,7 @@ enum vm_cpu_mode {
 /**
  * @brief The number of common MSRs.
  */
-#define NUM_COMMON_MSRS 15U
+#define NUM_COMMON_MSRS 16U
 /**
  * @brief The number of guest MSRs.
  */

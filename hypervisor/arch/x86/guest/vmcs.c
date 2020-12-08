@@ -76,8 +76,8 @@ static void init_guest_vmx(struct acrn_vcpu *vcpu, uint64_t cr0, uint64_t cr3, u
 	 *  - ectx representing the current ext_context structure, initialized as &ctx->ext_ctx. */
 	struct ext_context *ectx = &ctx->ext_ctx;
 	/** Declare the following local variables of type uint64_t.
-	 *  - v representing the value of guest MSR IA32_MISC_ENABLE. */
-	uint64_t v;
+	 *  - misc_enable representing the value of guest MSR IA32_MISC_ENABLE. */
+	uint64_t misc_enable;
 	/** Call vcpu_set_cr4() with the following parameters, in order to set \a cr4 to virtual CR4 of the \a vcpu.
 	 *  - vcpu
 	 *  - cr4 */
@@ -169,17 +169,17 @@ static void init_guest_vmx(struct acrn_vcpu *vcpu, uint64_t cr0, uint64_t cr3, u
 	 *  information of MSR IA32_MISC_ENABLE.
 	 *  - MSR_IA32_MISC_ENABLE
 	 * */
-	v = msr_read(MSR_IA32_MISC_ENABLE);
-	/** Bitwise AND v by ~~(MSR_IA32_MISC_ENABLE_MONITOR_ENA | MSR_IA32_MISC_ENABLE_PMA). */
-	v &= ~(MSR_IA32_MISC_ENABLE_MONITOR_ENA | MSR_IA32_MISC_ENABLE_PMA);
-	/** Bitwise OR v by MSR_IA32_MISC_BTS_UNAVILABLE | MSR_IA32_MISC_PEBS_UNAVILABLE. */
-	v |= MSR_IA32_MISC_BTS_UNAVILABLE | MSR_IA32_MISC_PEBS_UNAVILABLE;
+	misc_enable = msr_read(MSR_IA32_MISC_ENABLE);
+	/** Bitwise AND misc_enable by ~~(MSR_IA32_MISC_ENABLE_MONITOR_ENA | MSR_IA32_MISC_ENABLE_PMA). */
+	misc_enable &= ~(MSR_IA32_MISC_ENABLE_MONITOR_ENA | MSR_IA32_MISC_ENABLE_PMA);
+	/** Bitwise OR misc_enable by MSR_IA32_MISC_BTS_UNAVILABLE | MSR_IA32_MISC_PEBS_UNAVILABLE. */
+	misc_enable |= MSR_IA32_MISC_BTS_UNAVILABLE | MSR_IA32_MISC_PEBS_UNAVILABLE;
 	/** Call vcpu_set_guest_msr with the following parameters, in order to write
-	 *  v into the MSR IA32_MISC_ENABLE associated with \a vcpu.
+	 *  misc_enable into the MSR IA32_MISC_ENABLE associated with \a vcpu.
 	 *  - vcpu
 	 *  - MSR_IA32_MISC_ENABLE
-	 *  - v */
-	vcpu_set_guest_msr(vcpu, MSR_IA32_MISC_ENABLE, v);
+	 *  - misc_enable */
+	vcpu_set_guest_msr(vcpu, MSR_IA32_MISC_ENABLE, misc_enable);
 	/** Call exec_vmwrite() with the following parameters, in order to write 0 to the
 	 *  field 'Guest IA32_SYSENTER_CS' in current VMCS.
 	 *  - VMX_GUEST_IA32_SYSENTER_CS

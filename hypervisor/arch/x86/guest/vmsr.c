@@ -181,7 +181,6 @@ static const uint32_t emulated_guest_msrs[NUM_GUEST_MSRS] = {
 	 */
 	MSR_IA32_PAT,
 	MSR_IA32_TSC_ADJUST,
-
 	/*
 	 * MSRs don't need isolation between worlds
 	 * Number of entries: NUM_COMMON_MSRS
@@ -195,8 +194,9 @@ static const uint32_t emulated_guest_msrs[NUM_GUEST_MSRS] = {
 	MSR_IA32_FEATURE_CONTROL,
 
 	MSR_IA32_MCG_CAP,
-	MSR_RSVD,			/* MSR_IA32_MCG_STATUS, */
+	MSR_SMI_COUNT,      /* MSR_SMI_COUNT, */
 	MSR_IA32_MISC_ENABLE,
+	MSR_IA32_MCG_STATUS, /* MSR_IA32_MCG_STATUS, */
 
 	/* Don't support SGX Launch Control yet, read only */
 	MSR_RSVD,			/* MSR_IA32_SGXLEPUBKEYHASH0, */
@@ -213,7 +213,7 @@ static const uint32_t emulated_guest_msrs[NUM_GUEST_MSRS] = {
  * If a MSR is not intercepted, it means that RDMSR and WRMSR instructions executed from guest associated with this MSR
  * would not cause VM exit.
  */
-#define NUM_UNINTERCEPTED_MSRS 20U
+#define NUM_UNINTERCEPTED_MSRS 18U
 /**
  * @brief An array which contains the MSRs that are not intercepted.
  *
@@ -224,7 +224,6 @@ static const uint32_t unintercepted_msrs[NUM_UNINTERCEPTED_MSRS] = {
 	MSR_IA32_P5_MC_ADDR,
 	MSR_IA32_P5_MC_TYPE,
 	MSR_IA32_PLATFORM_ID,
-	MSR_SMI_COUNT,
 	MSR_IA32_PRED_CMD,
 	MSR_PLATFORM_INFO,
 	MSR_IA32_FLUSH_CMD,
@@ -232,7 +231,6 @@ static const uint32_t unintercepted_msrs[NUM_UNINTERCEPTED_MSRS] = {
 	MSR_IA32_SYSENTER_CS,
 	MSR_IA32_SYSENTER_ESP,
 	MSR_IA32_SYSENTER_EIP,
-	MSR_IA32_MCG_STATUS,
 	MSR_IA32_STAR,
 	MSR_IA32_LSTAR,
 	MSR_IA32_CSTAR,
@@ -684,7 +682,13 @@ void init_msr_emulation(struct acrn_vcpu *vcpu)
 	 *  - INTERCEPT_WRITE
 	 */
 	enable_msr_interception(msr_bitmap, MSR_IA32_EFER, INTERCEPT_WRITE);
-
+	/** Call enable_msr_interception with the following parameters, in order to update 'msr_bitmap'
+	 *  according to the specified MSR IA32_MCG_STATUS and the specified mode INTERCEPT_WRITE.
+	 *  - msr_bitmap
+	 *  - MSR_IA32_MCG_STATUS
+	 *  - INTERCEPT_WRITE
+	 */
+	enable_msr_interception(msr_bitmap, MSR_IA32_MCG_STATUS, INTERCEPT_WRITE);
 	/* handle cases different between safety VM and non-safety VM */
 	/* Machine Check */
 	/** If 'vcpu->vm' is a safety VM */
@@ -1865,6 +1869,8 @@ int32_t wrmsr_vmexit_handler(struct acrn_vcpu *vcpu)
 		/** End of case */
 		break;
 	}
+	/** 'msr' is MSR_IA32_MCG_STATUS */
+	case MSR_IA32_MCG_STATUS:
 	/** 'msr' is MSR_IA32_BIOS_SIGN_ID */
 	case MSR_IA32_BIOS_SIGN_ID: {
 		/* Writing non-zero value causes a general-protection exception (\# GP(0)). */
