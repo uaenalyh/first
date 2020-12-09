@@ -78,10 +78,11 @@
 /**
  * @brief CR4 bits hypervisor wants to trap to track status change.
  *
- * The hypervisor will trap CR4.PSE, CR4.PAE, CR4.VMXE, CR4.PCIDE, CR4.SMEP, CR4.SMAP, CR4.PKE, CR4.SMXE, CR4.DE to
- * track the status change. This macro marks these bits.
+ * The hypervisor will trap CR4.PSE, CR4.PAE, CR4.VMXE, CR4.PCIDE, CR4.SMEP, CR4.SMAP, CR4.PKE, CR4.SMXE, CR4.DE,
+ * CR4.MCE to track the status change. This macro marks these bits.
  */
-#define CR4_TRAP_MASK (CR4_PSE | CR4_PAE | CR4_VMXE | CR4_PCIDE | CR4_SMEP | CR4_SMAP | CR4_PKE | CR4_SMXE | CR4_DE)
+#define CR4_TRAP_MASK \
+	(CR4_PSE | CR4_PAE | CR4_VMXE | CR4_PCIDE | CR4_SMEP | CR4_SMAP | CR4_PKE | CR4_SMXE | CR4_DE | CR4_MCE)
 /**
  * @brief These CR4 bits are reserved according to the SDM and shall not be changed by the guests.
  *
@@ -543,9 +544,11 @@ static bool is_cr4_write_valid(struct acrn_vcpu *vcpu, uint64_t cr4)
 		ret = false;
 	/** If no always off bit is set */
 	} else {
-		/** If CR4 has CR4.VMXE or CR4.SMXE or CR4.PKE or CR4_PCE or CR4_DE set */
+		/** If CR4 has CR4.VMXE or CR4.SMXE or CR4.PKE or CR4_PCE or CR4_DE set or
+		 *  the vcpu is belong to non-safety-vm and the CR4 has CR4.MCE.*/
 		if (((cr4 & CR4_VMXE) != 0UL) || ((cr4 & CR4_SMXE) != 0UL) || ((cr4 & CR4_PKE) != 0UL)
-		 || ((cr4 & CR4_PCE) != 0UL) || ((cr4 & CR4_DE) != 0UL)) {
+		 || ((cr4 & CR4_PCE) != 0UL) || ((cr4 & CR4_DE) != 0UL)
+		 || (!is_safety_vm(vcpu->vm) && ((cr4 & CR4_MCE) != 0UL))) {
 			/** Set the ret to false */
 			ret = false;
 		/** If the corresponding if condition does not meet */
@@ -673,8 +676,8 @@ static void vmx_write_cr4(struct acrn_vcpu *vcpu, uint64_t cr4)
 
 		/** If no error is found in previous operations */
 		if (err_found == false) {
-			/** Set cr4_shadow to be (cr4 & ~CR4_MCE) */
-			cr4_shadow = cr4 & ~CR4_MCE;
+			/* Set cr4_shadow to cr4. */
+			cr4_shadow = cr4;
 			/** Set cr4_vmx to cr4_always_on_mask | cr4_shadow */
 			cr4_vmx = cr4_always_on_mask | cr4_shadow;
 			/** Configure VMX_GUEST_CR4 in VMCS to be cr4_vmx & 0xFFFFFFFFUL */

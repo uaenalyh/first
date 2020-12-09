@@ -196,8 +196,9 @@ static const uint32_t emulated_guest_msrs[NUM_GUEST_MSRS] = {
 	MSR_IA32_MCG_CAP,
 	MSR_SMI_COUNT,      /* MSR_SMI_COUNT, */
 	MSR_IA32_MISC_ENABLE,
-	MSR_IA32_MCG_STATUS, /* MSR_IA32_MCG_STATUS, */
-
+	MSR_IA32_MCG_STATUS,		/* MSR_IA32_MCG_STATUS, */
+	MSR_IA32_P5_MC_ADDR,
+	MSR_IA32_P5_MC_TYPE,
 	/* Don't support SGX Launch Control yet, read only */
 	MSR_RSVD,			/* MSR_IA32_SGXLEPUBKEYHASH0, */
 	MSR_RSVD,			/* MSR_IA32_SGXLEPUBKEYHASH1, */
@@ -213,7 +214,7 @@ static const uint32_t emulated_guest_msrs[NUM_GUEST_MSRS] = {
  * If a MSR is not intercepted, it means that RDMSR and WRMSR instructions executed from guest associated with this MSR
  * would not cause VM exit.
  */
-#define NUM_UNINTERCEPTED_MSRS 18U
+#define NUM_UNINTERCEPTED_MSRS 16U
 /**
  * @brief An array which contains the MSRs that are not intercepted.
  *
@@ -221,8 +222,6 @@ static const uint32_t emulated_guest_msrs[NUM_GUEST_MSRS] = {
  * would not cause VM exit.
  */
 static const uint32_t unintercepted_msrs[NUM_UNINTERCEPTED_MSRS] = {
-	MSR_IA32_P5_MC_ADDR,
-	MSR_IA32_P5_MC_TYPE,
 	MSR_IA32_PLATFORM_ID,
 	MSR_IA32_PRED_CMD,
 	MSR_PLATFORM_INFO,
@@ -682,6 +681,7 @@ void init_msr_emulation(struct acrn_vcpu *vcpu)
 	 *  - INTERCEPT_WRITE
 	 */
 	enable_msr_interception(msr_bitmap, MSR_IA32_EFER, INTERCEPT_WRITE);
+
 	/** Call enable_msr_interception with the following parameters, in order to update 'msr_bitmap'
 	 *  according to the specified MSR IA32_MCG_STATUS and the specified mode INTERCEPT_WRITE.
 	 *  - msr_bitmap
@@ -689,6 +689,22 @@ void init_msr_emulation(struct acrn_vcpu *vcpu)
 	 *  - INTERCEPT_WRITE
 	 */
 	enable_msr_interception(msr_bitmap, MSR_IA32_MCG_STATUS, INTERCEPT_WRITE);
+
+	/** Call enable_msr_interception with the following parameters, in order to update 'msr_bitmap'
+	 *  according to the specified MSR IA32_P5_MC_ADDR and the specified mode INTERCEPT_WRITE.
+	 *  - msr_bitmap
+	 *  - MSR_IA32_P5_MC_ADDR
+	 *  - INTERCEPT_WRITE
+	 */
+	enable_msr_interception(msr_bitmap, MSR_IA32_P5_MC_ADDR, INTERCEPT_WRITE);
+
+	/** Call enable_msr_interception with the following parameters, in order to update 'msr_bitmap'
+	 *  according to the specified MSR IA32_P5_MC_TYPE and the specified mode INTERCEPT_WRITE.
+	 *  - msr_bitmap
+	 *  - MSR_IA32_P5_MC_TYPE
+	 *  - INTERCEPT_WRITE
+	 */
+	enable_msr_interception(msr_bitmap, MSR_IA32_P5_MC_TYPE, INTERCEPT_WRITE);
 	/* handle cases different between safety VM and non-safety VM */
 	/* Machine Check */
 	/** If 'vcpu->vm' is a safety VM */

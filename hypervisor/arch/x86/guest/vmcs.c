@@ -180,6 +180,30 @@ static void init_guest_vmx(struct acrn_vcpu *vcpu, uint64_t cr0, uint64_t cr3, u
 	 *  - MSR_IA32_MISC_ENABLE
 	 *  - misc_enable */
 	vcpu_set_guest_msr(vcpu, MSR_IA32_MISC_ENABLE, misc_enable);
+	/** Call vcpu_set_guest_msr with the following parameters, in order to write
+	 *  0 into the MSR_IA32_MCG_CAP associated with \a vcpu.
+	 *  - vcpu
+	 *  - MSR_IA32_MCG_CAP,
+	 *  - 0 */
+	vcpu_set_guest_msr(vcpu, MSR_IA32_MCG_CAP, 0UL);
+	/** Call vcpu_set_guest_msr with the following parameters, in order to write
+	 *  0 into the MSR_IA32_MCG_STATUS, associated with \a vcpu.
+	 *  - vcpu
+	 *  - MSR_IA32_MCG_STATUS,
+	 *  - 0 */
+	vcpu_set_guest_msr(vcpu, MSR_IA32_MCG_STATUS, 0UL);
+	/** Call vcpu_set_guest_msr with the following parameters, in order to write
+	 *  0 into the MSR_IA32_P5_MC_ADDR, associated with \a vcpu.
+	 *  - vcpu
+	 *  - MSR_IA32_P5_MC_ADDR,
+	 *  - 0 */
+	vcpu_set_guest_msr(vcpu, MSR_IA32_P5_MC_ADDR, 0UL);
+	/** Call vcpu_set_guest_msr with the following parameters, in order to write
+	 *  0 into the IA32_P5_MC_TYPE, associated with \a vcpu.
+	 *  - vcpu
+	 *  - MSR_IA32_P5_MC_TYPE,
+	 *  - 0 */
+	vcpu_set_guest_msr(vcpu, MSR_IA32_P5_MC_TYPE, 0UL);
 	/** Call exec_vmwrite() with the following parameters, in order to write 0 to the
 	 *  field 'Guest IA32_SYSENTER_CS' in current VMCS.
 	 *  - VMX_GUEST_IA32_SYSENTER_CS
