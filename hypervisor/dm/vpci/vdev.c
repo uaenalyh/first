@@ -296,7 +296,10 @@ uint32_t pci_vdev_read_bar(const struct pci_vdev *vdev, uint32_t idx)
  * @param[in] bar_base The base address of the BAR to check
  * @param[in] size The size of a BAR to check
  *
- * @return True if the BAR range is valid, of return false.
+ * @return Whether the BAR range is valid or not
+ *
+ * @retval true the BAR range is valid
+ * @retval false the BAR range is invalid
  *
  * @pre None
  *

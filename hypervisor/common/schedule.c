@@ -531,7 +531,7 @@ void make_reschedule_request(uint16_t pcpu_id, uint16_t delmode)
  * @brief The interface checks whether the specified physical CPU need reschedule or not.
  *
  * @param[in] pcpu_id The ID of the physical cpu, which schedule context's
- * flags NEED_OFFLINE will be tested and cleared.
+ * flags NEED_RESCHEDULE will be tested and cleared.
  *
  * @return A Boolean value indicating whether the specified physical CPU need reschedule or not.
  *
@@ -682,9 +682,8 @@ void schedule(void)
 /**
  * @brief The interface sleeps the specified thread.
  *
- * Set the thread object status to THREAD_STS_BLOCKED,
- * if the status of the thread specified by \a obj is THREAD_STS_RUNNING,
- * this interface will notify the target processor specified by \a obj->pcpu_id.
+ * Set the thread object status to THREAD_STS_BLOCKED. If the previous status of the thread specified by \a obj is
+ * THREAD_STS_RUNNING, this interface will notify the target processor specified by \a obj->pcpu_id.
  *
  * @param[inout] obj The pointer of the thread object which will sleep.
  *

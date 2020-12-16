@@ -493,7 +493,7 @@ uint64_t vcpu_get_rflags(struct acrn_vcpu *vcpu)
 
 	/** If calls to bitmap_test and bitmap_test_and_set_lock with CPU_REG_RFLAGS and
 	 *  &vcpu->reg_updated (for bitmap_test) or &vcpu->reg_cached (for the other)
-	 *  being parameters both returns 0.
+	 *  being parameters both returns 0, and vcpu->launched is true.
 	 */
 	if (!bitmap_test(CPU_REG_RFLAGS, &vcpu->reg_updated) &&
 		!bitmap_test_and_set_lock(CPU_REG_RFLAGS, &vcpu->reg_cached) && vcpu->launched) {

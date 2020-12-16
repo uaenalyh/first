@@ -21,7 +21,7 @@
 #include <types.h>
 
 /**
- * @brief Global uint8_t variable whose address is the host virtual address of the first byte after the .bss
+ * @brief Global uint8_t variable whose address is the host virtual address of the first byte after the .text
  * segment in the loaded hypervisor image.
  */
 extern uint8_t ld_text_end;

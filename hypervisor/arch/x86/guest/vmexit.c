@@ -43,7 +43,7 @@ static int32_t undefined_vmexit_handler(struct acrn_vcpu *vcpu);
 static int32_t xsetbv_vmexit_handler(struct acrn_vcpu *vcpu);
 static int32_t wbinvd_vmexit_handler(struct acrn_vcpu *vcpu);
 static int32_t unexpected_vmexit_handler(struct acrn_vcpu *vcpu);
-static int32_t init_signal_vmexit_handler(__unused struct acrn_vcpu *vcpu);
+static int32_t init_signal_vmexit_handler(struct acrn_vcpu *vcpu);
 static int32_t taskswitch_vmexit_handler(struct acrn_vcpu *vcpu);
 static int32_t invd_vmexit_handler(struct acrn_vcpu *vcpu);
 static int32_t movdr_vmexit_handler(struct acrn_vcpu *vcpu);
@@ -618,7 +618,7 @@ static int32_t unexpected_vmexit_handler(struct acrn_vcpu *vcpu)
 	/** Logging the following information with a log level of LOG_FATAL.
 	 *  - vcpu->arch.exit_reason */
 	pr_fatal("Exit Reason: 0x%016lx ", vcpu->arch.exit_reason);
-	/** Logging the following information with a log level of LOG_FATAL.
+	/** Logging the following information with a log level of LOG_ERROR.
 	 *  - exec_vmread(VMX_EXIT_QUALIFICATION) */
 	pr_err("Exit qualification: 0x%016lx ", exec_vmread(VMX_EXIT_QUALIFICATION));
 	/** Call TRACE_2L() with the following parameters, in order to trace unexpected
@@ -705,17 +705,17 @@ int32_t cpuid_vmexit_handler(struct acrn_vcpu *vcpu)
 	/** Call vcpu_set_gpreg() with the following parameters, in order to set the guest RBX to 'rbx'.
 	 *  - vcpu
 	 *  - CPU_REG_RBX
-	 *  - rax */
+	 *  - rbx */
 	vcpu_set_gpreg(vcpu, CPU_REG_RBX, rbx);
 	/** Call vcpu_set_gpreg() with the following parameters, in order to set the guest RCX to 'rcx'.
 	 *  - vcpu
 	 *  - CPU_REG_RCX
-	 *  - rax */
+	 *  - rcx */
 	vcpu_set_gpreg(vcpu, CPU_REG_RCX, rcx);
 	/** Call vcpu_set_gpreg() with the following parameters, in order to set the guest RDX to 'rdx'.
 	 *  - vcpu
 	 *  - CPU_REG_RDX
-	 *  - rax */
+	 *  - rdx */
 	vcpu_set_gpreg(vcpu, CPU_REG_RDX, rdx);
 
 	/** Return 0 */

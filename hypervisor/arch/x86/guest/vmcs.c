@@ -1040,13 +1040,13 @@ static void init_entry_ctrl(const struct acrn_vcpu *vcpu)
 
 	/** Call exec_vmwrite32() with the following parameters, in order to write 0
 	 *  to VM-entry exception error code field in current VMCS.
-	 *  - VMX_ENTRY_INT_INFO_FIELD
+	 *  - VMX_ENTRY_EXCEPTION_ERROR_CODE
 	 *  - 0U */
 	exec_vmwrite32(VMX_ENTRY_EXCEPTION_ERROR_CODE, 0U);
 
 	/** Call exec_vmwrite32() with the following parameters, in order to write 0
 	 *  to VM-entry instruction length field in current VMCS.
-	 *  - VMX_ENTRY_INT_INFO_FIELD
+	 *  - VMX_ENTRY_INSTR_LENGTH
 	 *  - 0U */
 	exec_vmwrite32(VMX_ENTRY_INSTR_LENGTH, 0U);
 }

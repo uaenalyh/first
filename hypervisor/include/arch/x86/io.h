@@ -207,7 +207,7 @@ static inline uint32_t pio_read32(uint16_t port)
 	 */
 	uint32_t value;
 
-	/** Execute 'inw' instruction in order to get a 32-bits value from a I/O port.
+	/** Execute 'inl' instruction in order to get a 32-bits value from a I/O port.
 	 *  - Input operands: \a port which is a source operand
 	 *  - Output operands: 'value' which is a destination operand
 	 *  - Clobbers none

@@ -406,7 +406,7 @@ void deinit_vmsi(const struct pci_vdev *vdev)
 		 *  the virtual MSI data/address to the physical MSI data/address.
 		 *  - vdev->vpci->vm
 		 *  - vdev->bdf.value
-		 *  - 0
+		 *  - 1
 		 */
 		ptirq_remove_msix_remapping(vdev->vpci->vm, vdev->bdf.value, 1U);
 	}
@@ -418,7 +418,7 @@ void deinit_vmsi(const struct pci_vdev *vdev)
  * This function is called to initialize the virtual MSI of the given vPCI device. It includes the MSI capability
  * registers in the virtual configuration space and its MSI information structure.
  *
- * @param[in] vdev A vPCI device which is associated with a physical PCI device
+ * @param[inout] vdev A vPCI device which is associated with a physical PCI device
  *
  * @return N/A
  *

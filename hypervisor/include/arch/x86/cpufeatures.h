@@ -38,6 +38,10 @@
 /* Intel-defined CPU features, CPUID level 0x00000007 (EDX) */
 /**
  * @brief CPUID: Enumerates support for clearing CPU internal buffer.
+ *
+ * This flag is associated with the array "cpuid_leaves" defined in the data structure "struct cpuinfo_x86".
+ * The higher 27 bits represent the index of the element (associated the specified feature) in the array.
+ * The lower 5 bits represent the bit position (associated with the specified feature) to be checked.
  */
 #define X86_FEATURE_MDS_CLEAR ((FEAT_7_0_EDX << 5U) + 10U)
 /**

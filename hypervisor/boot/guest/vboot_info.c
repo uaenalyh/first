@@ -120,7 +120,7 @@
  */
 static uint64_t get_kernel_load_addr(struct acrn_vm *vm)
 {
-	/** Declare the following local variables of type void *.
+	/** Declare the following local variables of type uint64_t.
 	 *  - load_addr representing the guest physical address where the kernel image will be placed to, initialized
 	 *    as 0UL. */
 	uint64_t load_addr = 0UL;
@@ -163,8 +163,8 @@ static uint64_t get_kernel_load_addr(struct acrn_vm *vm)
 		break;
 	/** Otherwise */
 	default:
-		/* kernel type is either KERNEL_BZIMAGE or KERNEL_ZEPHYR, do nothing here */
-		/** Unexpected case. Break gracefully without changing load_addr as a defensive action. */
+		/** Unexpected case as kernel type is neither KERNEL_BZIMAGE nor KERNEL_ZEPHYR. Break gracefully without
+		 *  changing load_addr as a defensive action. */
 		break;
 	}
 
@@ -299,7 +299,7 @@ static uint32_t get_mod_idx_by_tag(const struct multiboot_module *mods, uint32_t
 	 *    strlen_s(tag, MAX_MOD_TAG_LEN). */
 	uint32_t tag_len = strnlen_s(tag, MAX_MOD_TAG_LEN);
 
-	/** For each i ranging from 0 to mods_count [with a step of 1] */
+	/** For each i ranging from 0 to (mods_count - 1) [with a step of 1] */
 	for (i = 0U; i < mods_count; i++) {
 		/** Declare the following local variables of type const char *.
 		 *  - mm_string representing the mm_string field of the ith entry in mods, initialized as
@@ -311,7 +311,7 @@ static uint32_t get_mod_idx_by_tag(const struct multiboot_module *mods, uint32_t
 		uint32_t mm_str_len = strnlen_s(mm_string, MAX_MOD_TAG_LEN);
 
 		/* when do file stitch by tool, the tag in mm_string might be followed with 0x0d or 0x0a */
-		/** If mm_str_len is greater than tag_len
+		/** If mm_str_len is greater than or equal to tag_len
 		 *  and the first tag_len characters in mm_string are the same as tag
 		 *  and the content of mm_string[tag_len] is equal to 0x0d/0x0a/0 */
 		if ((mm_str_len >= tag_len) && (strncmp(mm_string, tag, tag_len) == 0) &&
