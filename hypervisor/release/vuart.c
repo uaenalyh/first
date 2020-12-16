@@ -57,7 +57,7 @@
  * @param[inout]    vm        A pointer to the VM whose virtual UART data structure will be initialized. It will be
  *                            unused in release version.
  * @param[in]       vu_config A pointer to virtual UART configuration data structure which is used to configure the
- *                            vuart.
+ *                            vuart. This parameter is not used in release version.
  *
  * @return None
  *
