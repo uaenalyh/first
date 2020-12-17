@@ -206,7 +206,7 @@ static inline void cache_flush_invalidate_all(void)
 	 *  - Output operands: None
 	 *  - Clobbers: "memory"
 	 */
-	asm volatile("   wbinvd\n" : : : "memory");
+	asm volatile("wbinvd\n" : : : "memory");
 }
 
 /**
@@ -243,7 +243,7 @@ static inline void clflush(const volatile void *p)
 	 *  - Output operands: None
 	 *  - Clobbers: None
 	 */
-	asm volatile("clflush (%0)" ::"r"(p));
+	asm volatile("clflush (%0)" : : "r"(p));
 }
 
 /**
@@ -284,7 +284,7 @@ static inline void clflushopt(const volatile void *p)
 	 *  - Output operands: None
 	 *  - Clobbers: None
 	 */
-	asm volatile("clflushopt (%0)" ::"r"(p));
+	asm volatile("clflushopt (%0)" : : "r"(p));
 }
 
 /**

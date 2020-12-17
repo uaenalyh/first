@@ -56,7 +56,7 @@ static inline void pio_write8(uint8_t value, uint16_t port)
 	 *  - Output operands: none
 	 *  - Clobbers none
 	 */
-	asm volatile("outb %0,%1" ::"a"(value), "dN"(port));
+	asm volatile("outb %0,%1" : : "a"(value), "dN"(port));
 }
 
 /**
@@ -115,7 +115,7 @@ static inline void pio_write16(uint16_t value, uint16_t port)
 	 *  - Output operands: none
 	 *  - Clobbers none
 	 */
-	asm volatile("outw %0,%1" ::"a"(value), "dN"(port));
+	asm volatile("outw %0,%1" : : "a"(value), "dN"(port));
 }
 
 /**
@@ -181,7 +181,7 @@ static inline void pio_write32(uint32_t value, uint16_t port)
 	 *  - Output operands: none
 	 *  - Clobbers none
 	 */
-	asm volatile("outl %0,%1" ::"a"(value), "dN"(port));
+	asm volatile("outl %0,%1" : : "a"(value), "dN"(port));
 }
 
 /**

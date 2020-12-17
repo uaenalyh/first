@@ -70,7 +70,7 @@ static inline void memcpy_erms(void *d, const void *s, size_t slen)
 	 *  - Input operands: ECX holds slen, RDI holds d, RSI holds s
 	 *  - Output operands: None
 	 *  - Clobbers: memory */
-	asm volatile("rep; movsb" :: "D"(d), "S"(s), "c"(slen) : "memory");
+	asm volatile("rep; movsb" : : "D"(d), "S"(s), "c"(slen) : "memory");
 }
 
 /**
@@ -144,7 +144,7 @@ static inline void memset_erms(void *base, uint8_t v, size_t n)
 	 *  - Input operands: EAX holds zero-extended v, RDI holds base, ECX holds n
 	 *  - Output operands: None
 	 *  - Clobbers: memory */
-	asm volatile("rep ; stosb" :: "D"(base), "a"(v), "c"(n) : "memory");
+	asm volatile("rep ; stosb" : : "D"(base), "a"(v), "c"(n) : "memory");
 }
 
 /**

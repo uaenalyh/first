@@ -591,7 +591,7 @@ static inline uint64_t sgdt(void)
 	 *  - Input operands: None
 	 *  - Output operands: the content of the GDTR is stored to variable gdtb.
 	 *  - Clobbers: memory */
-	asm volatile("sgdt %0" : "=m"(gdtb)::"memory");
+	asm volatile("sgdt %0" : "=m"(gdtb) : : "memory");
 	/** Return the base field of gdtb */
 	return gdtb.base;
 }
@@ -618,7 +618,7 @@ static inline uint64_t sidt(void)
 	 *  - Input operands: None
 	 *  - Output operands: the content of the IDTR is stored to variable idtb.
 	 *  - Clobbers: memory */
-	asm volatile("sidt %0" : "=m"(idtb)::"memory");
+	asm volatile("sidt %0" : "=m"(idtb) : : "memory");
 	/** Return the base field of the idtb. */
 	return idtb.base;
 }
@@ -642,7 +642,7 @@ static inline void asm_pause(void)
 	 *  - Input operands: None
 	 *  - Output operands: None
 	 *  - Clobbers: memory */
-	asm volatile("pause" ::: "memory");
+	asm volatile("pause" : : : "memory");
 }
 
 /**
@@ -871,7 +871,7 @@ static inline uint16_t get_pcpu_id(void)
 	 *  - Input operands: None
 	 *  - Output operands: EAX is stored to tsl, EDX is stored to tsh, ECX is stored to cpu_id.
 	 *  - Clobbers: None */
-	asm volatile("rdtscp" : "=a"(tsl), "=d"(tsh), "=c"(cpu_id)::);
+	asm volatile("rdtscp" : "=a"(tsl), "=d"(tsh), "=c"(cpu_id));
 	/** Return cpu_id. */
 	return (uint16_t)cpu_id;
 }

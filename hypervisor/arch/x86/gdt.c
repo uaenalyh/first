@@ -102,7 +102,7 @@ static inline void load_gdt(struct host_gdt_descriptor *gdtr)
 	 *  - Input operands: a memory operand holds the value pointed by \a gdtr
 	 *  - Output operands: None
 	 *  - Clobbers: None */
-	asm volatile("lgdt %0" ::"m"(*gdtr));
+	asm volatile("lgdt %0" : : "m"(*gdtr));
 }
 
 /**
