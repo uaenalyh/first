@@ -34,7 +34,7 @@ void destroy_ept(struct acrn_vm *vm);
 void ept_add_mr(struct acrn_vm *vm, uint64_t *pml4_page, uint64_t hpa, uint64_t gpa, uint64_t size, uint64_t prot_orig);
 
 void ept_modify_mr(struct acrn_vm *vm, uint64_t *pml4_page, uint64_t gpa,
-					uint64_t size, uint64_t prot_set, uint64_t prot_clr);
+		   uint64_t size, uint64_t prot_set, uint64_t prot_clr);
 
 void ept_del_mr(struct acrn_vm *vm, uint64_t *pml4_page, uint64_t gpa, uint64_t size);
 
