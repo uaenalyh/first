@@ -56,19 +56,19 @@ static uint64_t get_ap_trampoline_buf(void)
 	/** Declare the following local variables of type struct multiboot_info *.
 	 *  - mbi representing the multiboot information structure given from the boot_regs which saves multiboot
 	 *    information pointer, not initialized. */
-        struct multiboot_info *mbi;
+	struct multiboot_info *mbi;
 	/** Declare the following local variables of type uint32_t.
 	 *  - size representing the size of the memory to be allocated for trampoline code, initialized as
 	 *    CONFIG_LOW_RAM_SIZE. */
-        uint32_t size = CONFIG_LOW_RAM_SIZE;
+	uint32_t size = CONFIG_LOW_RAM_SIZE;
 	/** Declare the following local variables of type uint64_t.
 	 *  - ret representing start address of the relocated trampoline section (allocated from low 1MB physical
 	 *    memory),
 	 *  initialized as e820_alloc_low_memory(size). */
-        uint64_t ret = e820_alloc_low_memory(size);
+	uint64_t ret = e820_alloc_low_memory(size);
 	/** Declare the following local variables of type uint64_t.
 	 *  - end representing the end address of the relocated trampoline section, initialized as ret plus size. */
-        uint64_t end = ret + size;
+	uint64_t end = ret + size;
 
 	/** If ret is equal to ACRN_INVALID_HPA. */
 	if (ret == ACRN_INVALID_HPA) {
@@ -77,35 +77,35 @@ static uint64_t get_ap_trampoline_buf(void)
 	}
 
 	/** Set mbi to to the host virtual address translated from the boot_regs[1]. */
-        mbi = (struct multiboot_info *)hpa2hva((uint64_t)boot_regs[1]);
+	mbi = (struct multiboot_info *)hpa2hva((uint64_t)boot_regs[1]);
 	/** If end is greater than mi_mmap_addr field of mbi and
 	 *     ret is less than the value, where the value is calculated by adding mi_mmap_addr
 	 *     field of mbi and mi_mmap_length field of mbi. */
-        if ((end > mbi->mi_mmap_addr) && (ret < (mbi->mi_mmap_addr + mbi->mi_mmap_length))) {
+	if ((end > mbi->mi_mmap_addr) && (ret < (mbi->mi_mmap_addr + mbi->mi_mmap_length))) {
 		/** Call panic in order to enter safety state. */
-                panic("overlaped with memroy map");
-        }
+		panic("overlaped with memroy map");
+	}
 
 	/** If end is greater than the address of mbi and
 	 *  ret is less than the value, where the value is calculated by adding the address of mbi
 	 *  and the size of structure multiboot_info. */
-        if ((end > (uint64_t)mbi) && (ret < ((uint64_t)mbi + sizeof(struct multiboot_info)))) {
+	if ((end > (uint64_t)mbi) && (ret < ((uint64_t)mbi + sizeof(struct multiboot_info)))) {
 		/** Call panic in order to enter safety state. */
-                panic("overlaped with multiboot information");
-        }
+		panic("overlaped with multiboot information");
+	}
 
 	/** If end is greater than the mi_mods_addr field of mbi and
 	 *  ret is smaller than the value, where the value is calculated by plusing mi_mods_addr field
 	 *  of mbi and the x, where the x is calculated by mi_mods_count field of mbi multiplying the
 	 *  size of structure multiboot_module. */
-        if ((end > mbi->mi_mods_addr) &&
-                (ret < (mbi->mi_mods_addr + mbi->mi_mods_count * sizeof(struct multiboot_module)))) {
+	if ((end > mbi->mi_mods_addr) &&
+		(ret < (mbi->mi_mods_addr + mbi->mi_mods_count * sizeof(struct multiboot_module)))) {
 		/** Call panic in order to enter safety state. */
-                panic("overlaped with module address");
-        }
+		panic("overlaped with module address");
+	}
 
 	/** Return 'ret'. */
-        return ret;
+	return ret;
 }
 
 /*

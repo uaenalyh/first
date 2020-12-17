@@ -104,7 +104,7 @@ static uint32_t calculate_logical_dest_mask(uint64_t pdmask)
 		 *  corresponding to the pCPU specified by pcpu_id, in order to
 		 *  calculate the mask used to specify the destination processors in
 		 *  the logical destination mode.
-	         */
+		 */
 		dest_mask |= per_cpu(lapic_ldr, pcpu_id);
 		/** Call ffs64 with the following parameters, in order to
 		 *  get the CPU ID of the first marked pCPU in pcpu_mask and assign it to

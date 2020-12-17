@@ -42,9 +42,9 @@
  *
  */
 
-#define APIC_OFFSET_ID  	0x20U   /**< offset of Local APIC ID register */
-#define APIC_OFFSET_LDR 	0xD0U   /**< offset of Logical Destination register */
-#define APIC_OFFSET_ICR_LOW 	0x300U  /**< offset of Interrupt Command Register */
+#define APIC_OFFSET_ID		0x20U   /**< offset of Local APIC ID register */
+#define APIC_OFFSET_LDR		0xD0U   /**< offset of Logical Destination register */
+#define APIC_OFFSET_ICR_LOW	0x300U  /**< offset of Interrupt Command Register */
 
 /**
  * @}

@@ -154,7 +154,7 @@
 static struct acrn_vlapic *vm_lapic_from_vcpu_id(struct acrn_vm *vm, uint16_t vcpu_id)
 {
 	/** Declare the following local variable of type 'struct acrn_vcpu *'
-         *  - vcpu representing the vCPU structure associated with the vcpu_id, not initialized */
+	 *  - vcpu representing the vCPU structure associated with the vcpu_id, not initialized */
 	struct acrn_vcpu *vcpu;
 
 	/** Call vcpu_from_vid with the following parameters, in order to get the vCPU
@@ -195,19 +195,19 @@ static struct acrn_vlapic *vm_lapic_from_vcpu_id(struct acrn_vm *vm, uint16_t vc
 static uint16_t vm_apicid2vcpu_id(struct acrn_vm *vm, uint32_t lapicid)
 {
 	/** Declare the following local variable of type uint16_t
-         *  - i representing the ith vCPU, not initialized */
+	 *  - i representing the ith vCPU, not initialized */
 	uint16_t i;
 	/** Declare the following local variable of type 'struct acrn_vcpu *'
-         *  - vcpu representing the vCPU whose LAPIC ID is lapicid, not initialized */
+	 *  - vcpu representing the vCPU whose LAPIC ID is lapicid, not initialized */
 	struct acrn_vcpu *vcpu;
 	/** Declare the following local variable of type uint16_t
-         *  - cpu_id representing converted vCPU ID, initialized as INVALID_CPU_ID */
+	 *  - cpu_id representing converted vCPU ID, initialized as INVALID_CPU_ID */
 	uint16_t cpu_id = INVALID_CPU_ID;
 
 	/** loop for each non-offline vCPU, from 0 to (vm->hw.created_vcpus - 1) */
 	foreach_vcpu (i, vm, vcpu) {
 		/** Declare the following local variable of type 'struct acrn_vlapic *'
-	         *  - vlapic representing the Local APIC structure of vcpu, initialized as vcpu_vlapic(vcpu) */
+		 *  - vlapic representing the Local APIC structure of vcpu, initialized as vcpu_vlapic(vcpu) */
 		const struct acrn_vlapic *vlapic = vcpu_vlapic(vcpu);
 		/** Get virtual Local APIC ID from the Local APIC structure and if it equals to the lapicid */
 		if (vlapic_get_apicid(vlapic) == lapicid) {
@@ -249,7 +249,7 @@ static uint16_t vm_apicid2vcpu_id(struct acrn_vm *vm, uint32_t lapicid)
 uint32_t vlapic_get_apicid(const struct acrn_vlapic *vlapic)
 {
 	/** Declare the following local variable of type uint32_t
-         *  - apicid representing virtual Local APIC ID, not initialized */
+	 *  - apicid representing virtual Local APIC ID, not initialized */
 	uint32_t apicid;
 	/** Assign vlapic->apic_page.id.v to apicid */
 	apicid = vlapic->apic_page.id.v;
@@ -283,10 +283,10 @@ uint32_t vlapic_get_apicid(const struct acrn_vlapic *vlapic)
 static inline uint32_t vlapic_build_id(const struct acrn_vlapic *vlapic)
 {
 	/** Declare the following local variable of type 'const struct acrn_vcpu *'
-         *  - vcpu representing the vCPU the vlapic belongs to, initialized as vlapic->vcpu */
+	 *  - vcpu representing the vCPU the vlapic belongs to, initialized as vlapic->vcpu */
 	const struct acrn_vcpu *vcpu = vlapic->vcpu;
 	/** Declare the following local variable of type uint32_t
-         *  - lapic_regs_id representing the generated the virtual Local APIC ID, not initialized */
+	 *  - lapic_regs_id representing the generated the virtual Local APIC ID, not initialized */
 	uint32_t lapic_regs_id;
 
 	/** Set the lapic_regs_id to be (uint32_t)vcpu->vcpu_id */
@@ -321,11 +321,11 @@ static inline uint32_t vlapic_build_id(const struct acrn_vlapic *vlapic)
 static inline void vlapic_build_x2apic_id(struct acrn_vlapic *vlapic)
 {
 	/** Declare the following local variable of type 'struct lapic_regs *'
-         *  - lapic representing the registers structure of \a vlapic, not initialized */
+	 *  - lapic representing the registers structure of \a vlapic, not initialized */
 	struct lapic_regs *lapic;
 	/** Declare the following local variable of type uint32_t
-         *  - logical_id representing the Logical ID of \a vlapic, not initialized.
-         *  - cluster_id representing the Cluster ID of \a vlapic, not initialized */
+	 *  - logical_id representing the Logical ID of \a vlapic, not initialized.
+	 *  - cluster_id representing the Cluster ID of \a vlapic, not initialized */
 	uint32_t logical_id, cluster_id;
 
 	/** Set lapic to be &(vlapic->apic_page) */
@@ -362,16 +362,16 @@ static inline void vlapic_build_x2apic_id(struct acrn_vlapic *vlapic)
 uint64_t vlapic_get_tsc_deadline_msr(const struct acrn_vlapic *vlapic)
 {
 	/** Declare the following local variable of type uint64_t
-         *  - ret representing the value of IA32_TSC_DEADLINE MSR of \a vlapic, not initialized */
+	 *  - ret representing the value of IA32_TSC_DEADLINE MSR of \a vlapic, not initialized */
 	uint64_t ret;
 	/** If physical TSC_DEADLINE is zero which means it's not armed (automatically disarmed
 	 *  after timer triggered) */
 	if (msr_read(MSR_IA32_TSC_DEADLINE) == 0UL) {
 		/** Call vcpu_set_guest_msr with the following parameters, in order to
-	         *  set the virtual IA32_TSC_DEADLINE of a given vcpu to be 0UL
-	         *  - vlapic->vcpu
-	         *  - 0UL
-	         */
+		 *  set the virtual IA32_TSC_DEADLINE of a given vcpu to be 0UL
+		 *  - vlapic->vcpu
+		 *  - 0UL
+		 */
 		vcpu_set_guest_msr(vlapic->vcpu, MSR_IA32_TSC_DEADLINE, 0UL);
 		/** Set the ret to be 0UL */
 		ret = 0UL;
@@ -412,8 +412,8 @@ uint64_t vlapic_get_tsc_deadline_msr(const struct acrn_vlapic *vlapic)
 void vlapic_set_tsc_deadline_msr(struct acrn_vlapic *vlapic, uint64_t val_arg)
 {
 	/** Declare the following local variable of type uint64_t
-         *  - val representing the value to be set to the vlapic MSR IA32_TSC_DEADLINE,
-         *        initialized as val_arg */
+	 *  - val representing the value to be set to the vlapic MSR IA32_TSC_DEADLINE,
+	 *        initialized as val_arg */
 	uint64_t val = val_arg;
 
 	/** Call vcpu_set_guest_msr with the following parameters, in order to
@@ -426,7 +426,7 @@ void vlapic_set_tsc_deadline_msr(struct acrn_vlapic *vlapic, uint64_t val_arg)
 	/** If val is not zero, which mean guest intends to arm the tsc_deadline timer */
 	if (val != 0UL) {
 		/** Set val to be (val - exec_vmread64(VMX_TSC_OFFSET_FULL)) which is for
-	         *  its corresponding physical IA32_TSC_DEADLINE MSR configuration */
+		 *  its corresponding physical IA32_TSC_DEADLINE MSR configuration */
 		val -= exec_vmread64(VMX_TSC_OFFSET_FULL);
 		/** if the calculated value to write to the physical TSC_DEADLINE msr is zero */
 		if (val == 0UL) {
@@ -475,7 +475,7 @@ void vlapic_set_tsc_deadline_msr(struct acrn_vlapic *vlapic, uint64_t val_arg)
 static inline void set_dest_mask_phys(struct acrn_vm *vm, uint64_t *dmask, uint32_t dest)
 {
 	/** Declare the following local variable of type uint16_t
-         *  - vcpu_id representing the target vcpu to be masked in \a dmask, not initialized */
+	 *  - vcpu_id representing the target vcpu to be masked in \a dmask, not initialized */
 	uint16_t vcpu_id;
 
 	/** Call vm_apicid2vcpu_id with the following parameters, in order to
@@ -519,10 +519,10 @@ static inline void set_dest_mask_phys(struct acrn_vm *vm, uint64_t *dmask, uint3
 static inline bool is_dest_field_matched(const struct acrn_vlapic *vlapic, uint32_t dest)
 {
 	/** Declare the following local variable of type uint32_t
-         *  - logical_id representing the Logical ID of \a vlapic, not initialized
-         *  - cluster_id representing the Cluster ID of \a vlapic, not initialized
-         *  - dest_logical_id representing the Logical ID of \a dest, not initialized
-         *  - dest_cluster_id representing the Cluster ID of \a dest, not initialized*/
+	 *  - logical_id representing the Logical ID of \a vlapic, not initialized
+	 *  - cluster_id representing the Cluster ID of \a vlapic, not initialized
+	 *  - dest_logical_id representing the Logical ID of \a dest, not initialized
+	 *  - dest_cluster_id representing the Cluster ID of \a dest, not initialized*/
 	uint32_t logical_id, cluster_id, dest_logical_id, dest_cluster_id;
 	/** Declare the following local variable of type uint32_t
 	 *  - ldr representing the temp value of virtual Local destination register,
@@ -649,10 +649,10 @@ void vlapic_calc_dest(struct acrn_vm *vm, uint64_t *dmask, bool is_broadcast, ui
 			/** If this is not Lowest Priority Delivery Mode */
 			} else {
 				/** Call bitmap_set_nolock with the following parameters, in order to
-		                 *  mask the target vCPU in dmask
-		                 *  - vcpu_id
-		                 *  - dmask
-		                 */
+				 *  mask the target vCPU in dmask
+				 *  - vcpu_id
+				 *  - dmask
+				 */
 				bitmap_set_nolock(vcpu_id, dmask);
 			}
 		}
@@ -661,10 +661,10 @@ void vlapic_calc_dest(struct acrn_vm *vm, uint64_t *dmask, bool is_broadcast, ui
 		 *  equals to NULL */
 		if (lowprio && (lowprio_dest != NULL)) {
 			/** Call bitmap_set_nolock with the following parameters, in order to
-		         *  mask the target vCPU in dmask
-		         *  - lowprio_dest->vcpu->vcpu_id
-		         *  - dmask
-		         */
+			 *  mask the target vCPU in dmask
+			 *  - lowprio_dest->vcpu->vcpu_id
+			 *  - dmask
+			 */
 			bitmap_set_nolock(lowprio_dest->vcpu->vcpu_id, dmask);
 		}
 	}
@@ -942,9 +942,9 @@ void vlapic_reset(struct acrn_vlapic *vlapic)
 static void vlapic_init(struct acrn_vlapic *vlapic)
 {
 	/** Call vlapic_reset with the following parameters, in order to finish the initialization
-         *  on \a vlapic.
-         *  - vlapic
-         */
+	 *  on \a vlapic.
+	 *  - vlapic
+	 */
 	vlapic_reset(vlapic);
 }
 
@@ -1113,8 +1113,8 @@ static int32_t vlapic_x2apic_pt_icr_access(struct acrn_vm *vm, uint64_t val)
 					break;
 				/** Otherwise */
 				default:
-					/** convert the dest from virtual apic_id to physical apic_id
-				         *  by setting papic_id to be per_cpu(lapic_id, pcpuid_from_vcpu(target_vcpu)) */
+					/** convert the dest from virtual apic_id to physical apic_id by setting
+					 *  papic_id to be per_cpu(lapic_id, pcpuid_from_vcpu(target_vcpu)) */
 					papic_id = per_cpu(lapic_id, pcpuid_from_vcpu(target_vcpu));
 					/** Print out the value of vapic_id, papic_id and icr_low for debug purpose */
 					dev_dbg(ACRN_DBG_LAPICPT,
@@ -1197,11 +1197,11 @@ int32_t vlapic_x2apic_read(struct acrn_vcpu *vcpu, uint32_t msr, uint64_t *val)
 		offset = x2apic_msr_to_regoff(msr);
 		/** Call vlapic_read with the following parameters, in order to
 		 *  read the register at the offset into \a val and
-	         *  assign the return value of vlapic_read to error
-	         *  - vlapic
-	         *  - offset
-	         *  - val
-	         */
+		 *  assign the return value of vlapic_read to error
+		 *  - vlapic
+		 *  - offset
+		 *  - val
+		 */
 		error = vlapic_read(vlapic, offset, val);
 		/** End of case */
 		break;
