@@ -724,7 +724,7 @@ int32_t exception_vmexit_handler(struct acrn_vcpu *vcpu)
 	vcpu_retain_rip(vcpu);
 
 	/** Depending on 'exception_vector' */
-	switch(exception_vector) {
+	switch (exception_vector) {
 	/** exception_vector is IDT_DB. */
 	case IDT_DB:
 		/** Call vcpu_inject_gp() with the following parameters, in order to
