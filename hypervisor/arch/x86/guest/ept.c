@@ -171,7 +171,7 @@ void ept_add_mr(struct acrn_vm *vm, uint64_t *pml4_page, uint64_t hpa, uint64_t 
 	spinlock_release(&vm->ept_lock);
 
 	/** For each vcpu in the online vCPUs of vm, using i as the loop counter. */
-	foreach_vcpu (i, vm, vcpu) {
+	foreach_vcpu(i, vm, vcpu) {
 		/** Call vcpu_make_request with following parameters in order to notify the vCPU to flush its TLB.
 		 *  - vcpu
 		 *  - ACRN_REQUEST_EPT_FLUSH
@@ -260,7 +260,7 @@ void ept_modify_mr(
 	spinlock_release(&vm->ept_lock);
 
 	/** For each vcpu in the online vCPUs of vm, using i as the loop counter. */
-	foreach_vcpu (i, vm, vcpu) {
+	foreach_vcpu(i, vm, vcpu) {
 		/** Call vcpu_make_request with following parameters in order to notify the vCPU to flush its TLB.
 		 *  - vcpu
 		 *  - ACRN_REQUEST_EPT_FLUSH
@@ -337,7 +337,7 @@ void ept_del_mr(struct acrn_vm *vm, uint64_t *pml4_page, uint64_t gpa, uint64_t 
 	spinlock_release(&vm->ept_lock);
 
 	/** For each vcpu in the online vCPUs of vm, using i as the loop counter. */
-	foreach_vcpu (i, vm, vcpu) {
+	foreach_vcpu(i, vm, vcpu) {
 		/** Call vcpu_make_request with following parameters in order to notify the vCPU to flush its TLB.
 		 *  - vcpu
 		 *  - ACRN_REQUEST_EPT_FLUSH

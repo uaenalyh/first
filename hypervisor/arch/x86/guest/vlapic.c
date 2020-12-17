@@ -205,7 +205,7 @@ static uint16_t vm_apicid2vcpu_id(struct acrn_vm *vm, uint32_t lapicid)
 	uint16_t cpu_id = INVALID_CPU_ID;
 
 	/** loop for each non-offline vCPU, from 0 to (vm->hw.created_vcpus - 1) */
-	foreach_vcpu (i, vm, vcpu) {
+	foreach_vcpu(i, vm, vcpu) {
 		/** Declare the following local variable of type 'struct acrn_vlapic *'
 		 *  - vlapic representing the Local APIC structure of vcpu, initialized as vcpu_vlapic(vcpu) */
 		const struct acrn_vlapic *vlapic = vcpu_vlapic(vcpu);
@@ -616,7 +616,7 @@ void vlapic_calc_dest(struct acrn_vm *vm, uint64_t *dmask, bool is_broadcast, ui
 		/** Go through all vCPU in the VM to find the destination vCPU.
 		 *  In Logical mode: "dest" is message destination addr
 		 *  to be compared with the logical APIC ID in LDR. */
-		foreach_vcpu (vcpu_id, vm, vcpu) {
+		foreach_vcpu(vcpu_id, vm, vcpu) {
 			/** Call vm_lapic_from_vcpu_id with the following parameters, in order to
 			 *  get the vlapic structure and assign it to vlapic
 			 *  - vm

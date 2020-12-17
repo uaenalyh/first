@@ -210,7 +210,7 @@ static inline uint64_t vm_active_cpus(const struct acrn_vm *vm)
 	const struct acrn_vcpu *vcpu;
 
 	/** For each vcpu in the online vCPUs of vm, using i as the loop counter */
-	foreach_vcpu (i, vm, vcpu) {
+	foreach_vcpu(i, vm, vcpu) {
 		/** Call bitmap_set_nolock with the following parameters, in order to set the corresponding bit
 		 *  of the vcpu->vcpu_id in 'dmask'.
 		 *  - vcpu->vcpu_id
@@ -294,7 +294,7 @@ static inline struct acrn_vcpu *vcpu_from_pid(struct acrn_vm *vm, uint16_t pcpu_
 	struct acrn_vcpu *vcpu, *target_vcpu = NULL;
 
 	/** For each vcpu in the online vCPUs of vm, using i as the loop counter */
-	foreach_vcpu (i, vm, vcpu) {
+	foreach_vcpu(i, vm, vcpu) {
 		/** If pcpu_id equals the return value of pcpuid_from_vcpu(vcpu) */
 		if (pcpuid_from_vcpu(vcpu) == pcpu_id) {
 			/** Set target_vcpu to vcpu, which is running on the physical CPU (ID is pcpu_id) */
