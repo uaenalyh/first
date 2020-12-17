@@ -290,7 +290,7 @@ static inline void verw_buffer_overwriting(void)
 	 *  - Output operands: none
 	 *  - Clobbers: cc
 	 */
-	asm volatile("verw %[ds]" : : [ ds ] "m"(ds) : "cc");
+	asm volatile("verw %[ds]" : : [ds] "m"(ds) : "cc");
 }
 
 /**

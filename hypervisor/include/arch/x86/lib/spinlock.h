@@ -125,7 +125,7 @@ static inline void spinlock_obtain(spinlock_t *lock)
 		     "   jnz 2b\n"
 		     "1:\n"
 		     :
-		     : [ head ] "m"(lock->head), [ tail ] "m"(lock->tail)
+		     : [head] "m"(lock->head), [tail] "m"(lock->tail)
 		     : "cc", "memory", "eax");
 }
 
@@ -157,7 +157,7 @@ static inline void spinlock_release(spinlock_t *lock)
 	 *  - Output operands: None
 	 *  - Clobbers: "cc", "memory"
 	 */
-	asm volatile("   lock incl %[tail]\n" : : [ tail ] "m"(lock->tail) : "cc", "memory");
+	asm volatile("   lock incl %[tail]\n" : : [tail] "m"(lock->tail) : "cc", "memory");
 }
 
 #else
