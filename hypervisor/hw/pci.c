@@ -77,7 +77,10 @@
  * @brief A spin lock variable used in PCI read/write operation, to avoid different guest VMs to operate the PCI
  * configuration space in parallel.
  */
-static spinlock_t pci_device_lock = {.head = 0U, .tail = 0U};
+static spinlock_t pci_device_lock = {
+	.head = 0U,
+	.tail = 0U
+};
 
 /**
  * @brief Calculate an address as PCI spec requirement and used to operate a PCI device configuration register
