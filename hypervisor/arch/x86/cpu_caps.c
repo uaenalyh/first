@@ -205,27 +205,27 @@ void init_pcpu_capabilities(void)
 	 *  - &boot_cpu_data.cpuid_leaves[FEAT_1_EDX] */
 	cpuid(CPUID_FEATURES, &eax, &unused, &boot_cpu_data.cpuid_leaves[FEAT_1_ECX],
 		&boot_cpu_data.cpuid_leaves[FEAT_1_EDX]);
-	/** Set 'family_id' to ((eax >> 8) & fH) */
+	/** Set 'family_id' to ((eax >> 8) & fH), which is bit 11:8 (i.e. the family ID field) in eax */
 	family_id = (eax >> 8U) & 0xfU;
 	/** Set 'displayfamily' to 'family_id' */
 	displayfamily = family_id;
 	/** If native processor family ID (specified by 'family_id') is FH */
 	if (family_id == 0xFU) {
-		/** Update the value of 'displayfamily', increased by
-		 *  the native processor extended family ID (calculated by ((eax >> 20) & ffH)) */
+		/** Update the value of 'displayfamily', increased by the native processor extended family ID
+		 *  (calculated by ((eax >> 20) & ffH), i.e. bit 27:20 in eax) */
 		displayfamily += ((eax >> 20U) & 0xffU);
 	}
 	/** Set the displayfamily field of boot_cpu_data to lower 8 bits of 'displayfamily' */
 	boot_cpu_data.displayfamily = (uint8_t)displayfamily;
-	/** Set 'model_id' to ((eax >> 4) & fH)  */
+	/** Set 'model_id' to ((eax >> 4) & fH), which is bit 7:4 (i.e. the model ID field) in eax */
 	model_id = (eax >> 4U) & 0xfU;
 	/** Set 'displaymodel' to 'model_id' */
 	displaymodel = model_id;
 	/** If native processor family id (specified by 'family_id') is 6H or FH */
 	if ((family_id == 0x06U) || (family_id == 0xFU)) {
-		/** Update the value of 'displaymodel', bits 7:4 of the new value is
-		 *  the native processor extended model ID (calculated by ((eax >> 16) & fH)),
-		 *  bits 3:0 of the new value is the native processor model ID (calculated by ((eax >> 4) & fH)) */
+		/** Update the value of 'displaymodel', bits 7:4 of the new value is the native processor extended model
+		 *  ID (calculated by ((eax >> 16) & fH), i.e. bit 19:16 in eax), bits 3:0 of the new value is the
+		 *  native processor model ID (calculated by ((eax >> 4) & fH)) */
 		displaymodel += ((eax >> 16U) & 0xfU) << 4U;
 	}
 	/** Set the displaymodel field of boot_cpu_data to lower 8 bits of 'displaymodel' */
@@ -292,10 +292,10 @@ void init_pcpu_capabilities(void)
 	 *     bits 15-08: #Linear Address Bits
 	 */
 	/** Set the virt_bits field of boot_cpu_data to ((eax >> 8) & ffH),
-	 *  Meaning store native processor supported linear address bits into boot_cpu_data */
+	 *  i.e. store native processor supported linear address bits (bit 15:8 in eax) into boot_cpu_data */
 	boot_cpu_data.virt_bits = (uint8_t)((eax >> 8U) & 0xffU);
 	/** Set the phys_bits field of boot_cpu_data to (eax & 0xffU),
-	 *  Meaning store native processor supported physical address bits into boot_cpu_data */
+	 *  i.e. store native processor supported physical address bits (bit 7:0 in eax) into boot_cpu_data */
 	boot_cpu_data.phys_bits = (uint8_t)(eax & 0xffU);
 }
 

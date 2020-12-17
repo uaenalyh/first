@@ -588,7 +588,7 @@ void init_pcpu_post(uint16_t pcpu_id)
 #ifndef QEMU
 	/** Call msr_write with the following parameters, in order to enable RTM force abort mode.
 	 * - MSR_TSX_FORCE_ABORT
-	 * - 1 */
+	 * - 1, which sets the bit that controls the RTM force abort mode */
 	msr_write(MSR_TSX_FORCE_ABORT, 1U);
 #endif
 

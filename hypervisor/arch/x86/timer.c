@@ -126,7 +126,7 @@ void calibrate_tsc(void)
 	uint32_t eax_base_mhz, ebx_max_mhz, ecx_bus_mhz, edx;
 
 	/** Call cpuid with the following parameters, in order to get TSC frequency.
-	 *  -  0x16U
+	 *  -  0x16U, which is the index of processor frequency information leaf
 	 *  -  &eax_base_mhz
 	 *  -  &ebx_max_mhz
 	 *  -  &ecx_bus_mhz

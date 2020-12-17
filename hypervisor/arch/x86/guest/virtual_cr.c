@@ -186,8 +186,9 @@ static int32_t load_pdptrs(const struct acrn_vcpu *vcpu)
 	} else {
 		/** Set maxphyaddr to be cpu_info->phys_bits */
 		maxphyaddr = cpu_info->phys_bits;
-		/** Set rsvd_bits_mask to be
-		 *  ((1UL << (63U - maxphyaddr + 1U)) - 1UL) << maxphyaddr */
+		/** Set rsvd_bits_mask to be ((1UL << (63U - maxphyaddr + 1U)) - 1UL) << maxphyaddr, in order to set bit
+		 *  63:maxphyaddr in rsvd_bits_mask to 1 where 63 is the index of the most significant bit in 64-bit
+		 *  physical addresses. */
 		rsvd_bits_mask = ((1UL << (63U - maxphyaddr + 1U)) - 1UL) << maxphyaddr;
 		/** Set rsvd_bits_mask to be (rsvd_bits_mask | PAE_PDPTE_FIXED_RESVD_BITS) */
 		rsvd_bits_mask |= PAE_PDPTE_FIXED_RESVD_BITS;
@@ -1043,7 +1044,7 @@ int32_t cr_access_vmexit_handler(struct acrn_vcpu *vcpu)
 	 *  and assign the result to idx */
 	idx = (uint32_t)vm_exit_cr_access_reg_idx(exit_qual);
 
-	/** The idx should never be bigger than 15 */
+	/** The idx should never be bigger than 15 as there are only 16 general purpose registers */
 	ASSERT((idx <= 15U), "index out of range");
 	/** For MOV CR, set reg to the value from the general-purpose register indicated by idx */
 	reg = vcpu_get_gpreg(vcpu, idx);

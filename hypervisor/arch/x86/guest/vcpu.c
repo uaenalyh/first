@@ -833,7 +833,7 @@ void set_vcpu_regs(struct acrn_vcpu *vcpu, struct acrn_vcpu_regs *vcpu_regs)
 	/** Call vcpu_set_rflags() with the following parameters, in order to
 	 *  set the rflags to 02h, which is the initial value of EFLAGS register.
 	 *  - vcpu: the target vcpu
-	 *  - 0x02UL: the value of the rflags
+	 *  - 0x02UL: the default value of RFLAGS register following startup or INIT
 	 */
 	vcpu_set_rflags(vcpu, 0x02UL);
 

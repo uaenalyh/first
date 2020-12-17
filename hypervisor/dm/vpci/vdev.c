@@ -386,8 +386,9 @@ static void pci_vdev_update_bar_base(struct pci_vdev *vdev, uint32_t idx)
 		if (vbar->type == PCIBAR_MEM64) {
 			/** Set vbar to next BAR (high 32bits) */
 			vbar = &vdev->bar[idx + 1U];
-			/** Set hi to the value returned by pci_vdev_read_cfg_u32 with vdev and offset + 4 being the
-			 *  parameters, which is to get the high 32bits register value.
+			/** Set hi to the value returned by pci_vdev_read_cfg_u32 with vdev and offset + 4 (i.e. the
+			 *  offset of the next BAR) being the parameters, which is to get the high 32bits register
+			 *  value.
 			 */
 			hi = pci_vdev_read_cfg_u32(vdev, offset + 4U);
 			/** If hi is not 0FFFFFFFFH, which means it is a valid high 32bits MMIO address */

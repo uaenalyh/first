@@ -133,7 +133,8 @@ static uint32_t pci_pdev_calc_address(union pci_bdf bdf, uint32_t offset)
  * @return The register value of the phyiscal PCI device in its configuration space.
  *
  * @pre offset < PCI_REGMAX
- * @pre bytes shall be the value among 1, 2 and 4.
+ * @pre (offset & (bytes - 1)) == 0
+ * @pre bytes == 1 || bytes == 2 || bytes == 4
  *
  * @post N/A
  *
@@ -152,6 +153,9 @@ uint32_t pci_pdev_read_cfg(union pci_bdf bdf, uint32_t offset, uint32_t bytes)
 	/** Declare the following local variables of type uint32_t.
 	 *  - val representing the value of the register to read, not initialized. */
 	uint32_t val;
+	/** Declare the following local variables of type uint16_t.
+	 *  - data_port_addr representing the address of the PCI data port to read, not initialized. */
+	uint16_t data_port_addr;
 
 	/** Call pci_pdev_calc_address with the following parameters, in order to calculate the value
 	 *  for PCI configuration-address port to access the given register, and set addr to its return value.
@@ -159,6 +163,12 @@ uint32_t pci_pdev_read_cfg(union pci_bdf bdf, uint32_t offset, uint32_t bytes)
 	 *  - offset
 	 */
 	addr = pci_pdev_calc_address(bdf, offset);
+
+	/** Set data_port_addr to PCI_CONFIG_DATA, which is the base address of the PCI data port. */
+	data_port_addr = (uint16_t)PCI_CONFIG_DATA;
+	/** Increment data_port_addr by the last two bits in \a offset, which is the offset within the data port where
+	 *  the to-be-accessed register resides. */
+	data_port_addr += (uint16_t)(offset & 3U);
 
 	/** Call spinlock_obtain with the following parameters, in order to block other access to the PCI configuration
 	 *  space, and to avoid different guest VMs to operate the PCI configuration space in parallel.
@@ -178,27 +188,27 @@ uint32_t pci_pdev_read_cfg(union pci_bdf bdf, uint32_t offset, uint32_t bytes)
 	case 1U:
 		/** Set val to the value returned by pio_read8 with following parameter, to read one byte from the
 		 *  physical PCI configure data port.
-		 *  - (uint16_t)PCI_CONFIG_DATA + ((uint16_t)offset & 3U)
+		 *  - data_port_addr
 		 */
-		val = (uint32_t)pio_read8((uint16_t)PCI_CONFIG_DATA + ((uint16_t)offset & 3U));
+		val = (uint32_t)pio_read8(data_port_addr);
 		/** End of case */
 		break;
-		/** To read \a bytes is 2 */
+	/** To read \a bytes is 2 */
 	case 2U:
 		/** Set val to the value returned by pio_read16 with following parameter, to read two bytes from the
 		 *  physical PCI configure data port.
-		 *  - (uint16_t)PCI_CONFIG_DATA + ((uint16_t)offset & 2U)
+		 *  - data_port_addr
 		 */
-		val = (uint32_t)pio_read16((uint16_t)PCI_CONFIG_DATA + ((uint16_t)offset & 2U));
+		val = (uint32_t)pio_read16(data_port_addr);
 		/** End of case */
 		break;
 	/** Otherwise */
 	default:
 		/** Set val to the value returned by pio_read32 with following parameter, to read four bytes from the
 		 *  physical PCI configure data port.
-		 *  - (uint16_t)PCI_CONFIG_DATA
+		 *  - data_port_addr
 		 */
-		val = pio_read32((uint16_t)PCI_CONFIG_DATA);
+		val = pio_read32(data_port_addr);
 		/** End of case */
 		break;
 	}
@@ -227,7 +237,8 @@ uint32_t pci_pdev_read_cfg(union pci_bdf bdf, uint32_t offset, uint32_t bytes)
  * @return None
  *
  * @pre offset < PCI_REGMAX
- * @pre bytes shall be the value among 1, 2 and 4.
+ * @pre (offset & (bytes - 1)) == 0
+ * @pre bytes == 1 || bytes == 2 || bytes == 4
  *
  * @post N/A
  *
@@ -243,6 +254,9 @@ void pci_pdev_write_cfg(union pci_bdf bdf, uint32_t offset, uint32_t bytes, uint
 	/** Declare the following local variables of type uint32_t.
 	 *  - addr representing the value to address the register of the physical PCI device, not initialized. */
 	uint32_t addr;
+	/** Declare the following local variables of type uint16_t.
+	 *  - data_port_addr representing the address of the PCI data port to read, not initialized. */
+	uint16_t data_port_addr;
 
 	/** Call spinlock_obtain with the following parameters, in order to block other access to the PCI configuration
 	 *  space, and to avoid different guest VMs to operate the PCI configuration space in parallel.
@@ -257,6 +271,12 @@ void pci_pdev_write_cfg(union pci_bdf bdf, uint32_t offset, uint32_t bytes, uint
 	 */
 	addr = pci_pdev_calc_address(bdf, offset);
 
+	/** Set data_port_addr to PCI_CONFIG_DATA, which is the base address of the PCI data port. */
+	data_port_addr = (uint16_t)PCI_CONFIG_DATA;
+	/** Increment data_port_addr by the last two bits in \a offset, which is the offset within the data port where
+	 *  the to-be-accessed register resides. */
+	data_port_addr += (uint16_t)(offset & 3U);
+
 	/** Call pio_write32 with the following parameters, in order to write 'addr' to PCI configuration-address port.
 	 *  - addr
 	 *  - PCI_CONFIG_ADDR
@@ -270,20 +290,20 @@ void pci_pdev_write_cfg(union pci_bdf bdf, uint32_t offset, uint32_t bytes, uint
 		/** Call pio_write8 with the following parameters, in order to write 'val' to the configuration register
 		 *  of the physical PCI device.
 		 *  - (uint8_t)val
-		 *  - (uint16_t)PCI_CONFIG_DATA + ((uint16_t)offset & 3U)
+		 *  - data_port_addr
 		 */
-		pio_write8((uint8_t)val, (uint16_t)PCI_CONFIG_DATA + ((uint16_t)offset & 3U));
+		pio_write8((uint8_t)val, data_port_addr);
 		/** End of case */
 		break;
-		/** To write \a bytes is 2 */
+	/** To write \a bytes is 2 */
 	case 2U:
 		/** Call pio_write16 with the following parameters, in order to write 'val' to the register in the
 		 *  configuration space.
 		 *  of the physical PCI device.
 		 *  - (uint16_t)val
-		 *  - (uint16_t)PCI_CONFIG_DATA + ((uint16_t)offset & 2U)
+		 *  - data_port_addr
 		 */
-		pio_write16((uint16_t)val, (uint16_t)PCI_CONFIG_DATA + ((uint16_t)offset & 2U));
+		pio_write16((uint16_t)val, data_port_addr);
 		/** End of case */
 		break;
 	/** Otherwise */
@@ -291,9 +311,9 @@ void pci_pdev_write_cfg(union pci_bdf bdf, uint32_t offset, uint32_t bytes, uint
 		/** Call pio_write32 with the following parameters, in order to write 'val' to the configuration
 		 *  register of the physical PCI device.
 		 *  - val
-		 *  - (uint16_t)PCI_CONFIG_DATA
+		 *  - data_port_addr
 		 */
-		pio_write32(val, (uint16_t)PCI_CONFIG_DATA);
+		pio_write32(val, data_port_addr);
 		/** End of case */
 		break;
 	}

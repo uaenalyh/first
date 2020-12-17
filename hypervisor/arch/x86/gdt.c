@@ -74,8 +74,10 @@ static void set_tss_desc(struct tss_64_descriptor *desc, uint64_t tss, size_t ts
 	desc->low32_value = u1 | (tss_limit & 0xFFFFU);
 	/** Set base_addr_63_32 field of desc to tss_hi_32. */
 	desc->base_addr_63_32 = tss_hi_32;
-	/** Set high32_value of desc to the value , where the value is calculated by bitwise OR u2, 0x8000U, u3, and
-	 *  the v togerther, where the v is calculated by shifting type to left by 8. */
+
+	/** Set high32_value of desc to the value , where the value is calculated by bitwise OR u2, 0x8000U (which is
+	 *  the present bit in TSS descriptor), u3, and the v togerther, where the v is calculated by shifting type to
+	 *  left by 8. */
 	desc->high32_value = u2 | (type << 8U) | 0x8000U | u3;
 }
 

@@ -1043,7 +1043,7 @@ static int32_t movdr_vmexit_handler(struct acrn_vcpu *vcpu)
 			 *  guest general-purpose register with index idx of \a vcpu to FFFE0FF0h.
 			 *  - vcpu
 			 *  - idx
-			 *  - 0xFFFE0FF0 */
+			 *  - 0xFFFE0FF0, which is the constant value in DR4/DR6 as defined by requirements */
 			vcpu_set_gpreg(vcpu, idx, 0xFFFE0FF0UL);
 			/** go out of the switch */
 			break;
@@ -1055,7 +1055,7 @@ static int32_t movdr_vmexit_handler(struct acrn_vcpu *vcpu)
 			 *  guest general-purpose register with index idx of \a vcpu to 400h.
 			 *  - vcpu
 			 *  - idx
-			 *  - 0x400 */
+			 *  - 0x400, which is the constant value in DR5/DR7 as defined by requirements */
 			vcpu_set_gpreg(vcpu, idx, 0x400UL);
 			/** go out of the switch */
 			break;

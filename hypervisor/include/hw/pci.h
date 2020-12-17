@@ -65,7 +65,7 @@
 #define PCIR_VENDOR          0x00U /**< Pre-defined the offset of vendor ID register in PCI configuration space. */
 #define PCIR_DEVICE          0x02U /**< Pre-defined the offset of device ID register in PCI configuration space. */
 #define PCIR_COMMAND         0x04U /**< Pre-defined the offset of command register in PCI configuration space. */
-#define PCIM_CMD_INTxDIS     0x400U /**< Pre-defined the mask used to set disable bit to PCI legacy interrupt. */
+#define PCIM_CMD_INTXDIS     0x400U /**< Pre-defined the mask used to set disable bit to PCI legacy interrupt. */
 #define PCIR_REVID           0x08U /**< Pre-defined the offset of revision ID register in PCI configuration space. */
 #define PCIR_SUBCLASS        0x0AU /**< Pre-defined the offset of subclass ID register in PCI configuration space. */
 #define PCIR_CLASS           0x0BU /**< Pre-defined the offset of class ID register in PCI configuration space. */

@@ -233,8 +233,9 @@ static inline void ioapic_write_reg32(void *ioapic_base, const uint32_t offset, 
 static inline void ioapic_set_rte_entry(void *ioapic_addr, uint32_t pin, union ioapic_rte rte)
 {
 	/** Declare the following local variables of type uint32_t
-	 *  - ret_addr representing offset of target RTE register,
-	 *    initialized as ((pin * 2H) + 10H). */
+	 *  - ret_addr representing offset of target RTE register, initialized as ((pin * 2H) + 10H) where 10H is the
+	 *    base address of RTE registers and each RTE register is 2-byte wide.
+	 */
 	uint32_t rte_addr = (pin * 2U) + 0x10U;
 	/** Call ioapic_write_reg32() with the following parameters,
 	 *  in order to write 'rte.u.lo_32' to the low 32-bits of RTE register
@@ -333,7 +334,8 @@ static uint32_t ioapic_nr_pins(void *ioapic_base)
 	 */
 	dev_dbg(ACRN_DBG_IRQ, "IOAPIC version: %x", version);
 
-	/** Set nr_pins to (((version & IOAPIC_MAX_RTE_MASK) >> MAX_RTE_SHIFT) + 1H) */
+	/** Set nr_pins to (((version & IOAPIC_MAX_RTE_MASK) >> MAX_RTE_SHIFT) + 1H), i.e. one more than the maximum
+	 *  index of RTEs. */
 	nr_pins = (((version & IOAPIC_MAX_RTE_MASK) >> MAX_RTE_SHIFT) + 1U);
 
 	/** Return nr_pins */

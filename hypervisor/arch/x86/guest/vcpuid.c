@@ -929,9 +929,11 @@ static void guest_cpuid_0bh(struct acrn_vcpu *vcpu, uint32_t *eax, uint32_t *ebx
 	case 0U:
 		/** Set guest CPUID.(EAX=BH,ECX=0H):EAX to 0H */
 		*eax = 0U;
-		/** Set guest CPUID.(EAX=BH,ECX=0H):EBX to 1H */
+		/** Set guest CPUID.(EAX=BH,ECX=0H):EBX to 1H, indicating there is only 1 logical processor at this
+		 *  level. */
 		*ebx = 1U;
-		/** Set high 24-bits of guest CPUID.(EAX=BH,ECX=0H):ECX to 1H */
+		/** Set high 24-bits of guest CPUID.(EAX=BH,ECX=0H):ECX to 1H, indicating the level type of this
+		 *  sub-leaf is 'SMT' */
 		*ecx |= (1U << 8U);
 		/** End of case */
 		break;
@@ -950,7 +952,8 @@ static void guest_cpuid_0bh(struct acrn_vcpu *vcpu, uint32_t *eax, uint32_t *ebx
 		}
 		/** Set guest CPUID.(EAX=BH,ECX=1H):EBX to 'vcpu->vm->hw.created_vcpus' */
 		*ebx = vcpu->vm->hw.created_vcpus;
-		/** Set high 24-bits of guest CPUID.(EAX=BH,ECX=1H):ECX to 2H */
+		/** Set high 24-bits of guest CPUID.(EAX=BH,ECX=1H):ECX to 2H, indicating the level type of this
+		 *  sub-leaf is 'Core'. */
 		*ecx |= (2U << 8U);
 		/** End of case */
 		break;

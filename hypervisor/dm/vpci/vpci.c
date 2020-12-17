@@ -65,6 +65,8 @@
 #define PCI_USB_CONTROLLER 0x0CU /**< Pre-defined class number of USB PCI device. */
 #define PCI_ETH_CONTROLLER 0x02U /**< Pre-defined class number of Ethernet PCI device. */
 
+#define PCI_DISABLED_CONFIG_ADDR 0x00FFFF00U /**< A value indicating the PCI config address port is disabled. */
+
 /**
  * @brief Data structure to represent a PCI capability's ID and its length.
  *
@@ -345,9 +347,9 @@ static void pci_cfgdata_io_read(struct acrn_vcpu *vcpu, uint16_t addr, size_t by
 	struct pio_request *pio_req = &vcpu->req.reqs.pio;
 
 	/** Set cfg_addr.value to the value returned by function atomic_swap32, which returns vpci->addr.value and
-	 *  set vpci->addr.value to 00FFFF00H.
+	 *  set vpci->addr.value to PCI_DISABLED_CONFIG_ADDR.
 	 */
-	cfg_addr.value = atomic_swap32(&vpci->addr.value, 0x00FFFF00U);
+	cfg_addr.value = atomic_swap32(&vpci->addr.value, PCI_DISABLED_CONFIG_ADDR);
 	/** If cfg_addr.bits.enable is not 0, which means the configuration address is enabled. */
 	if (cfg_addr.bits.enable != 0U) {
 		/** Declare the following local variables of type uint32_t.
@@ -426,9 +428,9 @@ static void pci_cfgdata_io_write(struct acrn_vcpu *vcpu, uint16_t addr, size_t b
 	uint32_t offset = addr - PCI_CONFIG_DATA;
 
 	/** Set cfg_addr.value to the value returned by function atomic_swap32, which returns vpci->addr.value and
-	 *  set vpci->addr.value to 00FFFF00H.
+	 *  set vpci->addr.value to PCI_DISABLED_CONFIG_ADDR.
 	 */
-	cfg_addr.value = atomic_swap32(&vpci->addr.value, 0x00FFFF00U);
+	cfg_addr.value = atomic_swap32(&vpci->addr.value, PCI_DISABLED_CONFIG_ADDR);
 	/** If cfg_addr.bits.enable is not 0, which means the configuration address is enabled. */
 	if (cfg_addr.bits.enable != 0U) {
 		/** Declare the following local variables of type uint32_t.
@@ -494,13 +496,13 @@ void vpci_init(struct acrn_vm *vm)
 	 */
 	struct vm_io_range pci_cfgdata_range = { .base = PCI_CONFIG_DATA, .len = 4U };
 
-	/** Set vm->vpci.addr.value to 00FFFF00H as a default value */
-	vm->vpci.addr.value = 0x00FFFF00U;
+	/** Set vm->vpci.addr.value to PCI_DISABLED_CONFIG_ADDR as a default value */
+	vm->vpci.addr.value = PCI_DISABLED_CONFIG_ADDR;
 	/** Set vm->vpci.vm to vm */
 	vm->vpci.vm = vm;
 	/** Set vm->iommu to the value returned by create_iommu_domain with vm->vm_id, the return value of a call to
-	 *  hva2hpa (with vm->arch_vm.nworld_eptp) and 48 being the parameters, which creates an IOMMU domain for
-	 *  the given VM
+	 *  hva2hpa (with vm->arch_vm.nworld_eptp) and 48 being the parameters, which creates an IOMMU domain (with an
+	 *  address width of 48) for the given VM
 	 */
 	vm->iommu = create_iommu_domain(vm->vm_id, hva2hpa(vm->arch_vm.nworld_eptp), 48U);
 	/** Call vpci_init_vdevs with the following parameters, in order to initialize the vPCI devices list for the
@@ -745,8 +747,8 @@ static void init_default_cfg(struct pci_vdev *vdev)
 	 */
 	pci_command = (uint16_t)pci_pdev_read_cfg(vdev->pbdf, PCIR_COMMAND, 2U);
 
-	/** Bitwise OR pci_command by 400H, which is used to disable legacy interrupt. */
-	pci_command |= 0x400U;
+	/** Bitwise OR pci_command by PCIM_CMD_INTXDIS, which is used to disable legacy interrupt. */
+	pci_command |= PCIM_CMD_INTXDIS;
 	/** Call pci_pdev_write_cfg with the following parameters, in order to update the command register
 	 *  to the physical PCI device to disable the legacy interrupt.
 	 *  - pbdf
@@ -1068,9 +1070,9 @@ static void vpci_write_pt_dev_cfg(struct pci_vdev *vdev, uint32_t offset, uint32
 			 *  - vdev->pbdf
 			 *  - offset
 			 *  - bytes
-			 *  - val | 0x4U
+			 *  - val | (PCIM_CMD_INTXDIS >> 16U)
 			 */
-			pci_pdev_write_cfg(vdev->pbdf, offset, bytes, val | 0x4U);
+			pci_pdev_write_cfg(vdev->pbdf, offset, bytes, val | (PCIM_CMD_INTXDIS >> 16U));
 		/** If offset is 04H and bytes is 2 or 4, which means
 		 *  all the bytes of command register or command and status registers. */
 		} else if ((offset == PCIR_COMMAND) && ((bytes == 2U) || (bytes == 4U))) {
@@ -1081,9 +1083,9 @@ static void vpci_write_pt_dev_cfg(struct pci_vdev *vdev, uint32_t offset, uint32
 			 *  - vdev->pbdf
 			 *  - offset
 			 *  - bytes
-			 *  - val | 0x400U
+			 *  - val | PCIM_CMD_INTXDIS
 			 */
-			pci_pdev_write_cfg(vdev->pbdf, offset, bytes, val | 0x400U);
+			pci_pdev_write_cfg(vdev->pbdf, offset, bytes, val | PCIM_CMD_INTXDIS);
 		} else {
 			/** Call pci_pdev_write_cfg with the following parameters, in order to write command or status
 			 *  register to the configuration space of the physical PCI device
