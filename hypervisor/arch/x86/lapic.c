@@ -183,9 +183,9 @@ static void clear_lapic_isr(void)
 /**
  * @brief This function enables x2APIC mode.
  *
- *	This function enables x2APIC mode of LAPIC on the current processor
- *	this interface is called upon. The firmware should not put LAPIC into
- *	the invalid state.
+ * This function enables x2APIC mode of LAPIC on the current processor
+ * this interface is called upon. The firmware should not put LAPIC into
+ * the invalid state.
  *
  * @return None
  *
@@ -230,22 +230,22 @@ void early_init_lapic(void)
 /**
  * @brief This function initializes the local APIC on the current processor.
  *
- *  This function initializes below the physical local APIC registers for current processor:
- *	 - MSR_IA32_EXT_APIC_LVT_CMCI
- *	 - MSR_IA32_EXT_APIC_LVT_TIMER
- *	 - MSR_IA32_EXT_APIC_LVT_THERMAL
- *	 - MSR_IA32_EXT_APIC_LVT_PMI
- *	 - MSR_IA32_EXT_APIC_LVT_LINT0
- *	 - MSR_IA32_EXT_APIC_LVT_LINT1
- *	 - MSR_IA32_EXT_APIC_LVT_ERROR
- *	 - MSR_IA32_EXT_APIC_DIV_CONF
- *	 - MSR_IA32_TSC_DEADLINE
- *	 - MSR_IA32_EXT_APIC_ICR
- *	 - MSR_IA32_EXT_APIC_SIVR
- *  And this function also clears local APIC ISR registers by calling clear_lapic_isr() function.
+ * This function initializes below the physical local APIC registers for current processor:
+ * - MSR_IA32_EXT_APIC_LVT_CMCI
+ * - MSR_IA32_EXT_APIC_LVT_TIMER
+ * - MSR_IA32_EXT_APIC_LVT_THERMAL
+ * - MSR_IA32_EXT_APIC_LVT_PMI
+ * - MSR_IA32_EXT_APIC_LVT_LINT0
+ * - MSR_IA32_EXT_APIC_LVT_LINT1
+ * - MSR_IA32_EXT_APIC_LVT_ERROR
+ * - MSR_IA32_EXT_APIC_DIV_CONF
+ * - MSR_IA32_TSC_DEADLINE
+ * - MSR_IA32_EXT_APIC_ICR
+ * - MSR_IA32_EXT_APIC_SIVR
+ * And this function also clears local APIC ISR registers by calling clear_lapic_isr() function.
  *
- * Temporal Constraints:
- *	This interface can be called only after early_init_lapic is called once on the current processor.
+ * Temporal Constraints: This interface can be called only after early_init_lapic is called once on the current
+ * processor.
  *
  * @param[in]  pcpu_id		ID of current logical processor.
  *
@@ -344,12 +344,11 @@ void init_lapic(uint16_t pcpu_id)
 /**
  * @brief This function gets local APIC ID for current processor.
  *
- *  This function reads LAPIC ID register on the current processor,
- *  via the RDMSR instruction reading the MSR at address 0802H.
+ * This function reads LAPIC ID register on the current processor,
+ * via the RDMSR instruction reading the MSR at address 0802H.
  *
- * Temporal Constraints:
- *	This API can be called only after early_init_lapic has been called once on
- *	the current processor.
+ * Temporal Constraints: This API can be called only after early_init_lapic has been called once on the current
+ * processor.
  *
  * @return local APIC ID for current processor
  *
@@ -377,12 +376,11 @@ uint32_t get_cur_lapic_id(void)
 }
 
 /**
- * @brief This function sends a INIT-SIPI sequence to target logical processor,
- * to notify target logical processor to start booting.
+ * @brief This function sends a INIT-SIPI sequence to target logical processor, to notify target logical processor to
+ *        start booting.
  *
- * Temporal Constraints:
- *	This API can be called only after early_init_lapic has been called once on
- *	the current processor.
+ * Temporal Constraints: This API can be called only after early_init_lapic has been called once on the current
+ * processor.
  *
  * @param[in]  cpu_startup_shorthand	Not used. No shorthand is used for current scope,
  *					keep it for future scope extension.
@@ -456,8 +454,8 @@ void send_startup_ipi(__unused enum intr_cpu_startup_shorthand cpu_startup_short
  * processor is in VMX root operation. But INIT signal is not blocked in VMX non-root
  * operation and causes VM exit.
  *
- * Temporal Constraints:
- *	This interface can be called only after early_init_lapic is called once on the current processor.
+ * Temporal Constraints: This interface can be called only after early_init_lapic is called once on the current
+ * processor.
  *
  * @param[in]  pcpu_id		ID of target logical processor.
  *

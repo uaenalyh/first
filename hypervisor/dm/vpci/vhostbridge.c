@@ -66,7 +66,7 @@
  *
  * @param[in] vdev A vPCI device which will be initialized as a virtual hostbridge.
  *
- * @return N/A
+ * @return None
  *
  * @pre vdev != NULL
  *
@@ -142,7 +142,7 @@ static void init_vhostbridge(struct pci_vdev *vdev)
  *
  * @param[in] vdev A vPCI device which is a virtual hostbridge
  *
- * @return N/A
+ * @return None
  *
  * @pre vdev != NULL
  *
@@ -169,7 +169,7 @@ static void deinit_vhostbridge(__unused struct pci_vdev *vdev)
  * @param[in] bytes The length of the register to read.
  * @param[out] val The pointer to save the value to read.
  *
- * @return N/A
+ * @return None
  *
  * @pre vdev != NULL
  *
@@ -201,7 +201,7 @@ static void vhostbridge_read_cfg(const struct pci_vdev *vdev, uint32_t offset, u
  * @param[in] bytes The length of the register to write.
  * @param[in] val The value to write.
  *
- * @return N/A
+ * @return None
  *
  * @pre vdev != NULL
  *

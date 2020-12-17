@@ -864,10 +864,6 @@ void mmu_modify_or_del(uint64_t *pml4_page, uint64_t vaddr_base, uint64_t size, 
 	}
 }
 
-/*
- * In PT level,
- * add [vaddr_start, vaddr_end) to [paddr_base, ...) MT PT mapping
- */
 /**
  * @brief Establish mappings on the PTEs associated with the specified input address space.
  *
@@ -972,10 +968,6 @@ static void add_pte(const uint64_t *pde, uint64_t paddr_start, uint64_t vaddr_st
 	}
 }
 
-/*
- * In PD level,
- * add [vaddr_start, vaddr_end) to [paddr_base, ...) MT PT mapping
- */
 /**
  * @brief Establish mappings on the PDEs associated with the specified input address space.
  *
@@ -1158,10 +1150,6 @@ static void add_pde(const uint64_t *pdpte, uint64_t paddr_start, uint64_t vaddr_
 	}
 }
 
-/*
- * In PDPT level,
- * add [vaddr_start, vaddr_end) to [paddr_base, ...) MT PT mapping
- */
 /**
  * @brief Establish mappings on the PDPTEs associated with the specified input address space.
  *
@@ -1344,11 +1332,6 @@ static void add_pdpte(const uint64_t *pml4e, uint64_t paddr_start, uint64_t vadd
 	}
 }
 
-/*
- * action: MR_ADD
- * add [vaddr_base, vaddr_base + size ) memory region page table mapping.
- * @pre: the prot should set before call this function.
- */
 /**
  * @brief Establish mappings on the paging-structure entries associated with the specified input address space.
  *

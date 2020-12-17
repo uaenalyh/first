@@ -113,7 +113,7 @@ static void write_cfg(struct acrn_vpci *vpci, union pci_bdf bdf, uint32_t offset
  * @param[in] addr The port IO address that the vCPU attempts to access.
  * @param[in] bytes Number of bytes the vCPU attempts to read.
  *
- * @return N/A.
+ * @return None.
  *
  * @pre vcpu != NULL
  * @pre vcpu->vm != NULL
@@ -167,7 +167,7 @@ static void pci_cfgaddr_io_read(struct acrn_vcpu *vcpu, uint16_t addr, size_t by
  * @param[in] bytes Number of bytes the vCPU attempts to write.
  * @param[in] val The value that the vCPU attempts to write.
  *
- * @return N/A.
+ * @return None.
  *
  * @pre vcpu != NULL
  * @pre vcpu->vm != NULL
@@ -302,7 +302,7 @@ static inline bool vpci_is_valid_access(uint32_t offset, uint32_t bytes)
  * @param[in] addr The port IO address that the vCPU attempts to access.
  * @param[in] bytes Number of bytes the vCPU attempts to read.
  *
- * @return N/A.
+ * @return None.
  *
  * @pre vcpu != NULL
  * @pre vcpu->vm != NULL
@@ -390,7 +390,7 @@ static void pci_cfgdata_io_read(struct acrn_vcpu *vcpu, uint16_t addr, size_t by
  * @param[in] bytes Number of bytes the vCPU attempts to write.
  * @param[in] val The value the vCPU attempts to write.
  *
- * @return N/A.
+ * @return None.
  *
  * @pre vcpu != NULL
  * @pre vcpu->vm != NULL
@@ -467,7 +467,7 @@ static void pci_cfgdata_io_write(struct acrn_vcpu *vcpu, uint16_t addr, size_t b
  *
  * @param[inout] vm A pointer to a VM instance whose vPCI component is to be initialized.
  *
- * @return N/A.
+ * @return None.
  *
  * @pre vm != NULL
  * @pre vm->vm_id < CONFIG_MAX_VM_NUM
@@ -549,7 +549,7 @@ void vpci_init(struct acrn_vm *vm)
  *
  * @param[in] vm A pointer to a VM instance whose vPCI resource is to be released.
  *
- * @return N/A.
+ * @return None.
  *
  * @pre vm != NULL
  * @pre vm->vm_id < CONFIG_MAX_VM_NUM
@@ -593,7 +593,7 @@ void vpci_cleanup(struct acrn_vm *vm)
  *
  * @param[in] vdev A vPCI device which is associated with a physical PCI device
  *
- * @return N/A.
+ * @return None.
  *
  * @pre vdev != NULL
  * @pre vdev->vpci != NULL
@@ -642,7 +642,7 @@ static void assign_vdev_pt_iommu_domain(const struct pci_vdev *vdev)
  *
  * @param[in] vdev A vPCI device which is associated with a physical PCI device
  *
- * @return N/A.
+ * @return None.
  *
  * @pre vdev != NULL
  * @pre vdev->vpci != NULL
@@ -692,7 +692,7 @@ static void remove_vdev_pt_iommu_domain(const struct pci_vdev *vdev)
  *
  * @param[in] vdev A vPCI device which is associated with a physical PCI device
  *
- * @return N/A.
+ * @return None.
  *
  * @pre vdev != NULL
  * @pre vdev->vpci != NULL
@@ -899,7 +899,7 @@ static void init_default_cfg(struct pci_vdev *vdev)
  *
  * @param[in] vdev A vPCI device which is associated with a physical PCI device
  *
- * @return N/A.
+ * @return None.
  *
  * @pre vdev != NULL
  * @pre vdev->vpci != NULL
@@ -949,7 +949,7 @@ static void vpci_init_pt_dev(struct pci_vdev *vdev)
  *
  * @param[in] vdev A vPCI device which is associated with a physical PCI device
  *
- * @return N/A.
+ * @return None.
  *
  * @pre vdev != NULL
  * @pre vdev->vpci != NULL
@@ -1367,7 +1367,7 @@ static void vpci_init_vdev(struct acrn_vpci *vpci, struct acrn_vm_pci_dev_config
  *
  * @param[inout] vm A pointer to a VM instance whose vPCI devices are to be initialized.
  *
- * @return N/A.
+ * @return None.
  *
  * @pre vm != NULL
  *

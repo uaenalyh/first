@@ -101,7 +101,7 @@ static void *map_ioapic(uint64_t ioapic_paddr)
 /**
  * @brief This function reads a given IOAPIC register.
  *
- *  This function is used to read a given IOAPIC register.
+ * This function is used to read a given IOAPIC register.
  *
  * @param[in]  ioapic_base	Physical IOAPIC base virtual address.
  * @param[in]  offset		Address offset of the given IOAPIC register.
@@ -157,7 +157,7 @@ static inline uint32_t ioapic_read_reg32(void *ioapic_base, const uint32_t offse
 /**
  * @brief This function writes a given IOAPIC register.
  *
- *  This function is used to program a given IOAPIC register.
+ * This function is used to program a given IOAPIC register.
  *
  * @param[in]  ioapic_base	HVA of IOAPIC base virtual address.
  * @param[in]  offset		Address offset of the given IOAPIC register.
@@ -301,8 +301,7 @@ static void ioapic_set_routing(void *addr, uint32_t gsi)
 /**
  * @brief This function gets the number of physical IOAPIC pins.
  *
- *  This function get total interrupt pin number for specific
- *  physical IOAPIC.
+ * This function get total interrupt pin number for specific physical IOAPIC.
  *
  * @param[in]  ioapic_base HVA of Base address to physical IOAPIC
  *

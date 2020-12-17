@@ -333,7 +333,7 @@ static bool cmos_get_reg_val(uint8_t addr, uint32_t *value)
  * @param[in] addr The IO address of the accessing port.
  * @param[in] width The data width to read, not used here.
  *
- * @return N/A
+ * @return None
  *
  * @pre vcpu != NULL
  * @pre vcpu->vm != NULL
@@ -410,7 +410,7 @@ static void vrtc_read(struct acrn_vcpu *vcpu, uint16_t addr, __unused size_t wid
  * @param[in] width The data width to write.
  * @param[in] value The value to write.
  *
- * @return N/A
+ * @return None
  *
  * @pre vcpu != NULL
  * @pre vcpu->vm != NULL
@@ -445,7 +445,7 @@ static void vrtc_write(struct acrn_vcpu *vcpu, uint16_t addr, size_t width, uint
  *
  * @param[inout] vm A pointer to a virtual machine data structure whose vRTC is to be initialized.
  *
- * @return N/A
+ * @return None
  *
  * @pre vm != NULL
  *

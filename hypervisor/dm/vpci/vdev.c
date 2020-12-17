@@ -133,7 +133,7 @@ uint32_t pci_vdev_read_cfg(const struct pci_vdev *vdev, uint32_t offset, uint32_
  * @param[in] bytes The length of the register to write.
  * @param[in] val The value of the register to write.
  *
- * @return N/A
+ * @return None
  *
  * @pre vdev != NULL
  * @pre offset < PCI_REGMAX
@@ -338,7 +338,7 @@ static bool vbar_base_is_valid(uint64_t bar_base, uint64_t size)
  * @param[inout] vdev A vPCI device whose BAR base info is to update.
  * @param[in] idx The BAR index.
  *
- * @return N/A
+ * @return None
  *
  * @pre vdev != NULL
  * @pre 0 <= idx && idx <= 5
@@ -443,7 +443,7 @@ static void pci_vdev_update_bar_base(struct pci_vdev *vdev, uint32_t idx)
  * @param[in] idx The BAR index.
  * @param[in] val The value to write to the BAR register.
  *
- * @return N/A
+ * @return None
  *
  * @pre vdev != NULL
  * @pre 0 <= idx && idx <= 5

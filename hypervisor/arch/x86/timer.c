@@ -101,7 +101,7 @@ uint64_t rdtsc(void)
 /**
  * @brief Initialize the frequency of TSC by getting information from CPUID.
  *
- * @return n/a
+ * @return None
  *
  * @pre n/a
  *
@@ -180,9 +180,9 @@ uint32_t get_tsc_khz(void)
  *
  * @mode HV_INIT, HV_OPERATIONAL, HV_TERMINATION
  *
- * @remark calibrate_tsc() has been called once on any processor.
- *   The input argument a 32-bit integer while the returned value is 64-bit. Due to the difference in bit width,
- *   no given value in microseconds can cause overflow of the result even with a time stamp counter frequency of 5GHz
+ * @remark calibrate_tsc() has been called once on any processor. The input argument a 32-bit integer while the returned
+ *         value is 64-bit. Due to the difference in bit width, no given value in microseconds can cause overflow of the
+ *         result even with a time stamp counter frequency of 5GHz
  *
  * @reentrancy unspecified
  *
@@ -207,8 +207,8 @@ uint64_t us_to_ticks(uint32_t us)
  *
  * @mode HV_INIT, HV_OPERATIONAL, HV_TERMINATION
  *
- * @remark calibrate_tsc() has been called once on any processor.
- *   The input ticks is a 64bits number, and converted value also 64bits, so ticks <= (1UL << 54) to avoid overflow.
+ * @remark calibrate_tsc() has been called once on any processor. The input ticks is a 64bits number, and converted
+ *         value also 64bits, so ticks <= (1UL << 54) to avoid overflow.
  *
  * @reentrancy unspecified
  *
@@ -225,7 +225,7 @@ uint64_t ticks_to_us(uint64_t ticks)
  *
  * @param[in] us: Number of microseconds to delay before returning.
  *
- * @return n/a
+ * @return None
  *
  * @pre n/a
  *

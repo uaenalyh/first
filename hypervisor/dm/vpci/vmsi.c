@@ -82,7 +82,7 @@
  * @param[in] vdev A vPCI device associated with a physical PCI device whose MSI control register is to write
  * @param[in] enable A boolean value to indicate the operation type: enable or disable MSI
  *
- * @return N/A
+ * @return None
  *
  * @pre vdev != NULL
  * @pre vdev->pbdf != 0
@@ -141,7 +141,7 @@ static inline void enable_disable_msi(const struct pci_vdev *vdev, bool enable)
  *
  * @param[in] vdev A vPCI device associated with a physical PCI device whose MSI control register is to write
  *
- * @return N/A
+ * @return None
  *
  * @pre vdev != NULL
  * @pre vdev->vpci != NULL
@@ -383,7 +383,7 @@ void vmsi_write_cfg(struct pci_vdev *vdev, uint32_t offset, uint32_t bytes, uint
  *
  * @param[in] vdev A vPCI device which is associated with a physical PCI device
  *
- * @return N/A
+ * @return None
  *
  * @pre vdev != NULL
  * @pre vdev->vpci != NULL
@@ -420,7 +420,7 @@ void deinit_vmsi(const struct pci_vdev *vdev)
  *
  * @param[inout] vdev A vPCI device which is associated with a physical PCI device
  *
- * @return N/A
+ * @return None
  *
  * @pre vdev != NULL
  *

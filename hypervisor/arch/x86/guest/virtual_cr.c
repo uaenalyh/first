@@ -138,7 +138,10 @@ static uint64_t cr4_always_off_mask;
  *
  * @param[inout] vcpu pointer to vcpu data structure whose virtual PDPTRs are to be reloaded.
  *
- * @return 0 if no error happened, otherwise return -EFAULT
+ * @return An error code indicating if the operation succeeds or not.
+ *
+ * @retval 0 No error happened
+ * @retval -EFAULT Loading guest PDPTR fails
  *
  * @pre vcpu != NULL
  *
@@ -227,7 +230,10 @@ static int32_t load_pdptrs(const struct acrn_vcpu *vcpu)
  *
  * @param[in] cr0 the value to be written to CR0
  *
- * @return true (1) if valid otherwise false (0)
+ * @return Whether the given value is valid when written to the given vCPU
+ *
+ * @retval true \a cr0 is a valid new value for guest CR0
+ * @retval false \a cr0 is an invalid new value for guest CR0
  *
  * @pre vcpu != NULL
  *
@@ -541,7 +547,10 @@ static void vmx_write_cr0(struct acrn_vcpu *vcpu, uint64_t cr0, bool is_init)
  *
  * @param[in] cr4 the value to be written to CR4
  *
- * @return true (1) if valid otherwise false (0)
+ * @return Whether the given value is valid when written to the given vCPU
+ *
+ * @retval true \a cr4 is a valid new value for guest CR4
+ * @retval false \a cr4 is an invalid new value for guest CR4
  *
  * @pre vcpu != NULL
  *
@@ -1009,8 +1018,8 @@ void vcpu_set_cr4(struct acrn_vcpu *vcpu, uint64_t val, bool is_init)
  *
  * @return 0 if no error happened, otherwise return -EINVAL (-22)
  *
- * @return -EINVAL when the register causes vmexit is not CR0 or CR4
- * @return 0 otherwise
+ * @retval -EINVAL when the VM-exit is not caused by moving to CR0, moving to CR4 or LMSW
+ * @retval 0 otherwise
  *
  * @pre vcpu != NULL
  *

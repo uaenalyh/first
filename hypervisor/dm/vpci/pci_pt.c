@@ -124,7 +124,7 @@ static inline enum pci_bar_type pci_get_bar_type(uint32_t val)
  * @param[inout] vdev A vPCI device whose BAR space is to unmap.
  * @param[in] idx The BAR index.
  *
- * @return N/A
+ * @return None
  *
  * @pre vdev != NULL
  * @pre vdev->vpci != NULL
@@ -172,7 +172,7 @@ static void vdev_pt_unmap_mem_vbar(struct pci_vdev *vdev, uint32_t idx)
  * @param[inout] vdev A vPCI device whose BAR space is to remap.
  * @param[in] idx The BAR index.
  *
- * @return N/A
+ * @return None
  *
  * @pre vdev != NULL
  * @pre vdev->vpci != NULL
@@ -234,7 +234,7 @@ static void vdev_pt_map_mem_vbar(struct pci_vdev *vdev, uint32_t idx)
  * @param[in] idx The BAR index.
  * @param[in] val The value to write to the BAR register.
  *
- * @return N/A
+ * @return None
  *
  * @pre vdev != NULL
  * @pre vdev->vpci != NULL
@@ -330,7 +330,7 @@ void vdev_pt_write_vbar(struct pci_vdev *vdev, uint32_t idx, uint32_t val)
  *
  * @param[inout] vdev A vPCI device associated with a physical PCI device
  *
- * @return N/A
+ * @return None
  *
  * @pre vdev != NULL
  * @pre vdev->vpci != NULL
