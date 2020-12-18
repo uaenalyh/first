@@ -77,6 +77,12 @@
 #define ACRN_REQUEST_LAPIC_RESET 9U
 
 /**
+ * @brief Virtual XCR0 reserved bits
+ *
+ */
+#define XCR0_EMULATED_RESERVED_BITS (~((1UL << 3U) - 1UL))
+
+/**
  * @brief This macro is used to pre-define load segment function which set selector, base, limit and
  *  attribute of specified selector.
  *
@@ -256,6 +262,69 @@ union xsave_header {
 };
 
 /**
+ * @brief This structure represents a legacy region of XSAVE area where attributes indicating
+ * the layout of an X87 area and SSE area are stored.
+ *
+ * @consistency None
+ *
+ * @alignment 64
+ *
+ * @remark None
+ */
+struct xsave_legacy {
+	uint16_t fcw;          /**< X87 FPU Control Word */
+	uint16_t fsw;          /**< X87 FPU Status Word */
+	uint8_t ftw;           /**< An abridged version of X87 FPU Tag Word */
+	uint8_t rsvd;          /**< reserved */
+	uint16_t fop;          /**< X87 FPU Opcode */
+	uint32_t fip;          /**< bits 31:0 of the FPU Instruction Pointer Offset */
+	uint16_t fip_1;        /**< X87 FPU Instruction Pointer Selector or bits 47:32 of the FPU Instruction Pointer
+				    Offset */
+	uint16_t fip_2;        /**< bits 63:48 of the FPU Instruction Pointer Offset or reserved */
+
+	uint32_t fdp;          /**< bits 31:0 of the X87 FPU Data Pointer Offset */
+	uint16_t fdp_1;        /**< X87 FPU Data Pointer Selector or or bits 47:32 of the FPU Data Pointer Offset */
+	uint16_t fdp_2;        /**< bits 63:48 of the FPU Data Pointer Offset or reserved */
+	uint32_t mxcsr;        /**< MXCSR register */
+	uint32_t mxcsr_mask;   /**< mask bit of MXCSR register */
+	uint8_t st0[10];       /**< X87 FPU ST0 register */
+	uint8_t st0_rsvd[6];   /**< reserved */
+	uint8_t st1[10];       /**< X87 FPU ST1 register */
+	uint8_t st1_rsvd[6];   /**< reserved */
+	uint8_t st2[10];       /**< X87 FPU ST2 register */
+	uint8_t st2_rsvd[6];   /**< reserved */
+	uint8_t st3[10];       /**< X87 FPU ST3 register */
+	uint8_t st3_rsvd[6];   /**< reserved */
+	uint8_t st4[10];       /**< X87 FPU ST4 register */
+	uint8_t st4_rsvd[6];   /**< reserved */
+	uint8_t st5[10];       /**< X87 FPU ST5 register */
+	uint8_t st5_rsvd[6];   /**< reserved */
+	uint8_t st6[10];       /**< X87 FPU ST6 register */
+	uint8_t st6_rsvd[6];   /**< reserved */
+	uint8_t st7[10];       /**< X87 FPU ST7 register */
+	uint8_t st7_rsvd[6];   /**< reserved */
+
+	uint8_t xmm0[16];      /**< XMM0 register */
+	uint8_t xmm1[16];      /**< XMM1 register */
+	uint8_t xmm2[16];      /**< XMM2 register */
+	uint8_t xmm3[16];      /**< XMM3 register */
+	uint8_t xmm4[16];      /**< XMM4 register */
+	uint8_t xmm5[16];      /**< XMM5 register */
+	uint8_t xmm6[16];      /**< XMM6 register */
+	uint8_t xmm7[16];      /**< XMM7 register */
+	uint8_t xmm8[16];      /**< XMM8 register */
+	uint8_t xmm9[16];      /**< XMM9 register */
+	uint8_t xmm10[16];     /**< XMM10 register */
+	uint8_t xmm11[16];     /**< XMM11 register */
+	uint8_t xmm12[16];     /**< XMM12 register */
+	uint8_t xmm13[16];     /**< XMM13 register */
+	uint8_t xmm14[16];     /**< XMM14 register */
+	uint8_t xmm15[16];     /**< XMM15 register */
+	uint8_t padding[XSAVE_LEGACY_AREA_RESERVED_SIZE];     /* Reserved padding to align the size of the
+								 structure of legacy region to 512bit. */
+} __aligned(64) __packed;
+
+/**
  * @brief This structure is used to store register values of defined state components.
  *
  * @consistency None
@@ -268,7 +337,7 @@ struct xsave_area {
 	/**
 	 * @brief The 512 byte legacy region in an XSAVE area.
 	 */
-	uint64_t legacy_region[XSAVE_LEGACY_AREA_SIZE / sizeof(uint64_t)];
+	struct xsave_legacy legacy_region;
 	/**
 	 * @brief The XSAVE header.
 	 */

@@ -245,11 +245,6 @@
  * manage the BNDCFGU and BNDSTATUS registers
  */
 #define XCR0_BNDCSR (1UL << 4U)
-/**
- * @brief XCR0 reserved bits
- *
- */
-#define XCR0_RESERVED_BITS ((~((1UL << 10U) - 1UL)) | (1UL << 8U))
 /*
  * Entries in the Interrupt Descriptor Table (IDT)
  */
@@ -328,6 +323,14 @@
  */
 #define XSAVE_LEGACY_AREA_SIZE 512U
 /**
+ * @brief The defined size of the legacy region of an XSAVE area.
+ */
+#define XSAVE_LEGACY_AREA_DEFINED_SIZE 416U
+/**
+ * @brief The reserved size of the legacy region of an XSAVE area.
+ */
+#define XSAVE_LEGACY_AREA_RESERVED_SIZE (XSAVE_LEGACY_AREA_SIZE - XSAVE_LEGACY_AREA_DEFINED_SIZE)
+/**
  * @brief The size of the XSAVE header of an XSAVE area.
  */
 #define XSAVE_HEADER_AREA_SIZE 64U
@@ -343,6 +346,11 @@
  * If this bit is set, the format is compacted format.
  */
 #define XSAVE_COMPACTED_FORMAT (1UL << 63U)
+
+/**
+ * @brief The X87 bit in statement-component bitmap.
+ */
+#define XSAVE_X87_BV		(1UL << 0)
 /**
  * @brief The initial value of XCR0.
  */

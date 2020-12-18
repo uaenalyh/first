@@ -199,6 +199,15 @@
  */
 
 /**
+ * @brief The initial value of FPU Control Word field in the legacy region of an XSAVE area following STARTUP.
+ */
+#define XSAVE_STARTUP_FPU_CONTROL_WORD		0x40U
+/**
+ * @brief The initial value of FPU Tag Word field in the legacy region of an XSAVE area following STARTUP.
+ */
+#define XSAVE_STARTUP_FPU_TAG_WORD		0xFFU
+
+/**
  * @brief Structure to define stack frame
  *
  * The stack_frame is linked with the sequence of stack operation.
@@ -678,7 +687,16 @@ static void init_xsave(struct acrn_vcpu *vcpu)
 	 *  With this config, the first time a vcpu is scheduled in, it will
 	 *  initialize all the xsave componets.
 	 */
-	ectx->xs_area.xsave_hdr.hdr.xcomp_bv |= XSAVE_COMPACTED_FORMAT;
+	/** Set ectx->xs_area.xsave_hdr.hdr.xcomp_bv to ectx->xs_area.xsave_hdr.hdr.xcomp_bv |
+	 *  XSAVE_COMPACTED_FORMAT | XSAVE_X87_BV. */
+	ectx->xs_area.xsave_hdr.hdr.xcomp_bv |= XSAVE_COMPACTED_FORMAT | XSAVE_X87_BV;
+	/** Set ectx->xs_area.xsave_hdr.hdr.xstate_bv to ectx->xs_area.xsave_hdr.hdr.xstate_bv | XSAVE_X87_BV. */
+	ectx->xs_area.xsave_hdr.hdr.xstate_bv |= XSAVE_X87_BV;
+
+	/** Set ectx->xs_area.legacy_region.fcw to XSAVE_STARTUP_FPU_CONTROL_WORD. */
+	ectx->xs_area.legacy_region.fcw = XSAVE_STARTUP_FPU_CONTROL_WORD;
+	/** Set ectx->xs_area.legacy_region.ftw to XSAVE_STARTUP_FPU_TAG_WORD. */
+	ectx->xs_area.legacy_region.ftw = XSAVE_STARTUP_FPU_TAG_WORD;
 }
 
 /**

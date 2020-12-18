@@ -779,8 +779,8 @@ static int32_t xsetbv_vmexit_handler(struct acrn_vcpu *vcpu)
 			 *  - vcpu
 			 *  - 0 */
 			vcpu_inject_gp(vcpu, 0U);
-		/** If any of the reserved bits(specified by XCR0_RESERVED_BITS) of val64 is not 0 */
-		} else if ((val64 & XCR0_RESERVED_BITS) != 0UL) {
+		/** If any of the reserved bits(specified by XCR0_EMULATED_RESERVED_BITS) of val64 is not 0. */
+		} else if ((val64 & XCR0_EMULATED_RESERVED_BITS) != 0UL) {
 			/** Call vcpu_inject_gp() with the following parameters, in order
 			 *  to inject GP to the vcpu with error code 0.
 			 *  - vcpu
