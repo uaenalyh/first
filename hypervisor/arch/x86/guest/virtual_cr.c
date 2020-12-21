@@ -1094,8 +1094,8 @@ int32_t cr_access_vmexit_handler(struct acrn_vcpu *vcpu)
 	default:
 		/** This is unhandled CR access */
 		ASSERT(false, "Unhandled CR access");
-		/** Set the ret to -EINVAL */
-		ret = -EINVAL;
+		/** Set the ret to -ERANGE */
+		ret = -ERANGE;
 		/** go out of the switch */
 		break;
 	}

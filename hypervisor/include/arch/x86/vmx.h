@@ -660,6 +660,10 @@
  */
 #define VMX_EXIT_REASON_ENTRY_FAILURE_MSR_LOADING         0x00000022U
 /**
+ * @brief VM exit reason 35 for reserved.
+ */
+#define VMX_EXIT_REASON_35_RESERVED         0x00000023U
+/**
  * @brief VM exit reason field for MWAIT instruction.
  */
 #define VMX_EXIT_REASON_MWAIT        0x00000024U
@@ -667,6 +671,10 @@
  * @brief VM exit reason field for monitor trap flag.
  */
 #define VMX_EXIT_REASON_MONITOR_TRAP 0x00000025U
+/**
+ * @brief VM exit reason 38 for reserved.
+ */
+#define VMX_EXIT_REASON_38_RESERVED         0x00000026U
 /**
  * @brief VM exit reason field for MONITOR instruction.
  */
@@ -679,6 +687,10 @@
  * @brief VM exit reason field for VM entry failure due to machine-check event.
  */
 #define VMX_EXIT_REASON_ENTRY_FAILURE_MACHINE_CHECK 0x00000029U
+/**
+ * @brief VM exit reason 42 for reserved.
+ */
+#define VMX_EXIT_REASON_42_RESERVED         0x0000002AU
 /**
  * @brief VM exit reason field for TPR below threshold.
  */

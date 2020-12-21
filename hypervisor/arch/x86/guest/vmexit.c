@@ -285,6 +285,12 @@ const struct vm_exit_dispatch dispatch_table[NR_VMX_EXIT_REASONS] = {
 	[VMX_EXIT_REASON_ENTRY_FAILURE_MSR_LOADING] = {
 		.handler = unexpected_vmexit_handler},
 	/**
+	 * @brief VM exit handler for reserved vmexit reason
+	 * is unexpected_vmexit_handler and the exit qualification information is
+	 * not necessary for the handler. */
+	[VMX_EXIT_REASON_35_RESERVED] = {
+		.handler = unexpected_vmexit_handler},
+	/**
 	 * @brief VM exit handler for MWAIT instruction
 	 * is undefined_vmexit_handler and the exit qualification information is
 	 * not necessary for the handler. */
@@ -295,6 +301,12 @@ const struct vm_exit_dispatch dispatch_table[NR_VMX_EXIT_REASONS] = {
 	 * is unexpected_vmexit_handler and the exit qualification information is
 	 * not necessary for the handler. */
 	[VMX_EXIT_REASON_MONITOR_TRAP] = {
+		.handler = unexpected_vmexit_handler},
+	/**
+	 * @brief VM exit handler for reserved vmexit reason
+	 * is unexpected_vmexit_handler and the exit qualification information is
+	 * not necessary for the handler. */
+	[VMX_EXIT_REASON_38_RESERVED] = {
 		.handler = unexpected_vmexit_handler},
 	/**
 	 * @brief VM exit handler for MONITOR instruction
@@ -313,6 +325,12 @@ const struct vm_exit_dispatch dispatch_table[NR_VMX_EXIT_REASONS] = {
 	 * is unexpected_vmexit_handler and the exit qualification information is
 	 * not necessary for the handler. */
 	[VMX_EXIT_REASON_ENTRY_FAILURE_MACHINE_CHECK] = {
+		.handler = unexpected_vmexit_handler},
+	/**
+	 * @brief VM exit handler for reserved vmexit reason
+	 * is unexpected_vmexit_handler and the exit qualification information is
+	 * not necessary for the handler. */
+	[VMX_EXIT_REASON_42_RESERVED] = {
 		.handler = unexpected_vmexit_handler},
 	/**
 	 * @brief VM exit handler for TPR below threshold
@@ -559,8 +577,8 @@ int32_t vmexit_handler(struct acrn_vcpu *vcpu)
 			/** Logging the following information with a log level of LOG_ERROR.
 			  *  - vcpu->arch.exit_reason */
 			pr_err("Invalid Exit Reason: 0x%016lx ", vcpu->arch.exit_reason);
-			/** Set ret to -EINVAL */
-			ret = -EINVAL;
+			/** Set ret to -ERANGE */
+			ret = -ERANGE;
 		} else {
 			/** Set dispatch to dispatch table entry of the relative exit reason,
 			 *  which is the element with the index 'basic_exit_reason' in the
