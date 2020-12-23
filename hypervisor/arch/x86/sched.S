@@ -14,28 +14,28 @@
  * It make sure the execution context return to the same point of next thread_obj when it got
  * scheduled last time.
  */
-    .text
+.text
 
-   .code64
-   .align       8
-   .global      arch_switch_to
+.code64
+.align		8
+.global		arch_switch_to
 arch_switch_to:
 	pushf
-	pushq %rbx
-	pushq %rbp
-	pushq %r12
-	pushq %r13
-	pushq %r14
-	pushq %r15
-	pushq %rdi
-	movq %rsp, (%rdi)
-	movq (%rsi), %rsp
-	popq %rdi
-	popq %r15
-	popq %r14
-	popq %r13
-	popq %r12
-	popq %rbp
-	popq %rbx
+	pushq	%rbx
+	pushq	%rbp
+	pushq	%r12
+	pushq	%r13
+	pushq	%r14
+	pushq	%r15
+	pushq	%rdi
+	movq	%rsp, (%rdi)
+	movq	(%rsi), %rsp
+	popq	%rdi
+	popq	%r15
+	popq	%r14
+	popq	%r13
+	popq	%r12
+	popq	%rbp
+	popq	%rbx
 	popf
 	retq

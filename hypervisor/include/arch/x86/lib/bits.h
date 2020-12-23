@@ -112,8 +112,8 @@ static inline uint16_t fls32(uint32_t value)
 	uint32_t ret;
 	/** Find the most significant bit set in \a value.
 	 *  - Instruction template:
-	 *    "bsrl %1,%0\n\t"
-	 *    "jnz 1f\n\t"
+	 *    "bsrl %1,%0\n"
+	 *    "jnz 1f\n"
 	 *    "mov %2,%0\n"
 	 *    "1:"
 	 *  - Input operands: The first input operand holds value, INVALID_BIT_INDEX is the second input operand
@@ -121,9 +121,9 @@ static inline uint16_t fls32(uint32_t value)
 	 *  - Output operands: The index of the most significant bit which is set in \a value is stored to variable
 	 *    ret.
 	 *  - Clobbers: None */
-	asm volatile("bsrl %1,%0\n\t"
-		     "jnz 1f\n\t"
-		     "mov %2,%0\n"
+	asm volatile("	bsrl	%1, %0\n"
+		     "	jnz	1f\n"
+		     "	mov	%2, %0\n"
 		     "1:"
 		     : "=r"(ret)
 		     : "rm"(value), "i"(INVALID_BIT_INDEX));
@@ -159,8 +159,8 @@ static inline uint16_t ffs64(uint64_t value)
 	uint64_t ret;
 	/** Find the least significant bit set in \a value.
 	 *  - Instruction template:
-	 *    "bsfq %1,%0\n\t"
-	 *    "jnz 1f\n\t"
+	 *    "bsfq %1,%0\n"
+	 *    "jnz 1f\n"
 	 *    "mov %2,%0\n"
 	 *    "1:"
 	 *  - Input operands: The first input operand holds value, INVALID_BIT_INDEX is the second input operand
@@ -168,9 +168,9 @@ static inline uint16_t ffs64(uint64_t value)
 	 *  - Output operands: The index of the least significant bit which is set in \a value is stored to variable
 	 *    ret.
 	 *  - Clobbers: None */
-	asm volatile("bsfq %1,%0\n\t"
-		     "jnz 1f\n\t"
-		     "mov %2,%0\n"
+	asm volatile("	bsfq	%1, %0\n"
+		     "	jnz	1f\n"
+		     "	mov	%2, %0\n"
 		     "1:"
 		     : "=r"(ret)
 		     : "rm"(value), "i"(INVALID_BIT_INDEX));
@@ -183,7 +183,7 @@ static inline uint16_t ffs64(uint64_t value)
 	{                                                                                                           \
 		uint16_t nr;                                                                                        \
 		nr = nr_arg & ((8U * sizeof(op_type)) - 1U);                                                        \
-		asm volatile(lock "or" op_len " %1,%0" : "+m"(*addr) : "r"((op_type)(1UL << nr)) : "cc", "memory"); \
+		asm volatile(lock "or" op_len " %1, %0" : "+m"(*addr) : "r"((op_type)(1UL << nr)) : "cc", "memory"); \
 	}
 
 /**
@@ -260,13 +260,13 @@ build_bitmap_set(bitmap_set_lock, "q", uint64_t, BUS_LOCK)
 
 #define build_bitmap_clear(name, op_len, op_type, lock)                  \
 	static inline void name(uint16_t nr_arg, volatile op_type *addr) \
-	{                                                                \
-		uint16_t nr;                                             \
-		nr = nr_arg & ((8U * sizeof(op_type)) - 1U);             \
-		asm volatile(lock "and" op_len " %1,%0"                  \
-			     : "+m"(*addr)                               \
-			     : "r"((op_type)(~(1UL << (nr))))            \
-			     : "cc", "memory");                          \
+	{								 \
+		uint16_t nr;						 \
+		nr = nr_arg & ((8U * sizeof(op_type)) - 1U);		 \
+		asm volatile(lock "and" op_len "	%1, %0"		 \
+			     : "+m"(*addr)				 \
+			     : "r"((op_type)(~(1UL << (nr))))		 \
+			     : "cc", "memory");				 \
 	}
 
 /**
@@ -378,12 +378,13 @@ static inline bool bitmap_test(uint16_t nr, const volatile uint64_t *addr)
 	int32_t ret = 0;
 	/** Test whether the (\a nr-th & 63) bit is set in the integer pointed by \a addr.
 	 *  - Instruction template:
-	 *    "btq %q2,%1\n\tsbbl %0, %0"
+	 *    "btq %q2,%1\nsbbl %0, %0"
 	 *  - Input operands: The first memory input operand holds *addr, the second input operand holds
 	 *    (uint64_t)(nr & 0x3f).
 	 *  - Output operands: Whether the (\a nr-th & 63) bit is set in \a *addr is stored to variable ret.
 	 *  - Clobbers: memory, cc */
-	asm volatile("btq %q2,%1\n\tsbbl %0, %0"
+	asm volatile("btq	%q2, %1\n"
+		     "sbbl	%0, %0"
 		     : "=r"(ret)
 		     : "m"(*addr), "r"((uint64_t)(nr & 0x3fU))
 		     : "cc", "memory");
@@ -393,15 +394,16 @@ static inline bool bitmap_test(uint16_t nr, const volatile uint64_t *addr)
 
 #define build_bitmap_testandset(name, op_len, op_type, lock)             \
 	static inline bool name(uint16_t nr_arg, volatile op_type *addr) \
-	{                                                                \
-		uint16_t nr;                                             \
-		int32_t ret = 0;                                         \
-		nr = nr_arg & ((8U * sizeof(op_type)) - 1U);             \
-		asm volatile(lock "bts" op_len " %2,%1\n\tsbbl %0,%0"    \
-			     : "=r"(ret), "=m"(*addr)                    \
-			     : "r"((op_type)nr)                          \
-			     : "cc", "memory");                          \
-		return (ret != 0);                                       \
+	{								 \
+		uint16_t nr;						 \
+		int32_t ret = 0;					 \
+		nr = nr_arg & ((8U * sizeof(op_type)) - 1U);		 \
+		asm volatile(lock "bts" op_len "	%2, %1\n"	 \
+			     "sbbl			%0, %0"		 \
+			     : "=r"(ret), "=m"(*addr)			 \
+			     : "r"((op_type)nr)				 \
+			     : "cc", "memory");				 \
+		return (ret != 0);					 \
 	}
 
 /**
@@ -443,7 +445,7 @@ static inline bool bitmap_test(uint16_t nr, const volatile uint64_t *addr)
  *
  * The fourth and fifth sequence are composed into the instruction template listing below:
  * - Instruction template
- *   BUS_LOCK "btsq %2,%1\n\t
+ *   BUS_LOCK "btsq %2,%1\n
  *   sbbl %0,%0"
  *
  * Input operands: register operand holds the the value calculated by bitwise AND nr_arg with 63.
@@ -455,15 +457,16 @@ build_bitmap_testandset(bitmap_test_and_set_lock, "q", uint64_t, BUS_LOCK)
 
 #define build_bitmap_testandclear(name, op_len, op_type, lock)           \
 	static inline bool name(uint16_t nr_arg, volatile op_type *addr) \
-	{                                                                \
-		uint16_t nr;                                             \
-		int32_t ret = 0;                                         \
-		nr = nr_arg & ((8U * sizeof(op_type)) - 1U);             \
-		asm volatile(lock "btr" op_len " %2,%1\n\tsbbl %0,%0"    \
-			     : "=r"(ret), "=m"(*addr)                    \
-			     : "r"((op_type)nr)                          \
-			     : "cc", "memory");                          \
-		return (ret != 0);                                       \
+	{								 \
+		uint16_t nr;						 \
+		int32_t ret = 0;					 \
+		nr = nr_arg & ((8U * sizeof(op_type)) - 1U);		 \
+		asm volatile(lock "btr" op_len "	%2, %1\n"	 \
+			     "	sbbl			%0, %0"		 \
+			     : "=r"(ret), "=m"(*addr)			 \
+			     : "r"((op_type)nr)				 \
+			     : "cc", "memory");				 \
+		return (ret != 0);					 \
 	}
 
 /**
@@ -506,7 +509,7 @@ build_bitmap_testandset(bitmap_test_and_set_lock, "q", uint64_t, BUS_LOCK)
  *
  * The fourth and fifth sequence are composed into the instruction template listing below:
  * - Instruction template
- *   BUS_LOCK "btrq %2,%1\n\t
+ *   BUS_LOCK "btrq %2,%1\n
  *   sbbl %0,%0"
  *
  * Input operands: register operand holds the the value calculated by bitwise AND nr_arg with 63.

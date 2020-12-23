@@ -138,13 +138,13 @@ static uint8_t sanitized_page[PAGE_SIZE] __aligned(PAGE_SIZE);
  * If the "invept" succeed, then set the error code to be 0.
  */
 #define VMFAIL_INVALID_EPT_VPID                   \
-	"       jnc 1f\n"                         \
-	"       mov $1, %0\n" /* CF: error = 1 */ \
-	"       jmp 3f\n"                         \
-	"1:     jnz 2f\n"                         \
-	"       mov $2, %0\n" /* ZF: error = 2 */ \
-	"       jmp 3f\n"                         \
-	"2:     mov $0, %0\n"                     \
+	"	jnc	1f\n"                         \
+	"	mov	$1, %0\n" /* CF: error = 1 */ \
+	"	jmp	3f\n"                         \
+	"1:	jnz	2f\n"                         \
+	"	mov	$2, %0\n" /* ZF: error = 2 */ \
+	"	jmp	3f\n"                         \
+	"2:	mov	$0, %0\n"                     \
 	"3:"
 
 /**

@@ -31,175 +31,176 @@
  * the macros involved are changed.
  */
 
-    .extern     init_secondary_pcpu
+.extern		init_secondary_pcpu
 
-    .section     .trampoline_reset,"ax"
+.section	.trampoline_reset,"ax"
 
-   .align   4
-   .code16
-   .global      trampoline_start16
-   .org 0
+.align		4
+.code16
+.global		trampoline_start16
+.org		0
 trampoline_start16:
 
-    /* Disable local interrupts */
-    cli
+	/* Disable local interrupts */
+	cli
 
-    /*
-     * There are two paths system could come here:
-     *   - AP startup
-     *     Silicon will set AP to real mode and setup CS:IP before
-     *     jmp to trampoline_start16. And the IP is always 0 for sure.
-     *   - BSP wakeup from S3
-     *     Some bootloader (like ABL) doesn't guarante IP is set to
-     *     zero before jump to trampoline_start16 after system resume
-     *     from S3.
-     *
-     * To make trampoline code could work with all these cases, a far
-     * jump is issued here as fixup. It will update the CS:IP according
-     * to where the trampoline code is located.
-     *
-     * Here, we issue a far jump with "JMP ptr16:16" format (please refer
-     * sdm vol2A - JMP instruction description). The jump target is set
-     * to trampoline_fixup_target_addr. From trampoline_fixup_target_addr,
-     * The CS has same value for both AP startup and BSP wakeup from S3.
-     *
-     * Because the limitation of real mode (can't access ip register
-     * directly. So can't setup the trampoline_fixup_ip and
-     * trampoline_fixup_cs), we have to update the trampoline_fixup_ip
-     * and trampoline_fixup_cs when we preparing the trampoline code.
-     *
-     * Refer to preparing_trampoline() for fixup CS:IP setup
-     */
-    .byte 0xea	/* Opcode of "JMP ptr16:16" */
-    .global trampoline_fixup_ip
+	/*
+	 * There are two paths system could come here:
+	 *   - AP startup
+	 *     Silicon will set AP to real mode and setup CS:IP before
+	 *     jmp to trampoline_start16. And the IP is always 0 for sure.
+	 *   - BSP wakeup from S3
+	 *     Some bootloader (like ABL) doesn't guarante IP is set to
+	 *     zero before jump to trampoline_start16 after system resume
+	 *     from S3.
+	 *
+	 * To make trampoline code could work with all these cases, a far
+	 * jump is issued here as fixup. It will update the CS:IP according
+	 * to where the trampoline code is located.
+	 *
+	 * Here, we issue a far jump with "JMP ptr16:16" format (please refer
+	 * sdm vol2A - JMP instruction description). The jump target is set
+	 * to trampoline_fixup_target_addr. From trampoline_fixup_target_addr,
+	 * The CS has same value for both AP startup and BSP wakeup from S3.
+	 *
+	 * Because the limitation of real mode (can't access ip register
+	 * directly. So can't setup the trampoline_fixup_ip and
+	 * trampoline_fixup_cs), we have to update the trampoline_fixup_ip
+	 * and trampoline_fixup_cs when we preparing the trampoline code.
+	 *
+	 * Refer to preparing_trampoline() for fixup CS:IP setup
+	 */
+	.byte	0xea	/* Opcode of "JMP ptr16:16" */
+	.global	trampoline_fixup_ip
 trampoline_fixup_ip:
-    .word   0	/* "EIP is intruction following JUMP instruction" */
-    .global trampoline_fixup_cs
+	.word	0	/* "EIP is the instruction following JUMP instruction" */
+	.global	trampoline_fixup_cs
 trampoline_fixup_cs:
-    .word   0	/* CS */
+	.word	0	/* CS */
 
-    .global trampoline_fixup_target
+	.global	trampoline_fixup_target
 trampoline_fixup_target:
-    mov %cs, %ax
-    mov %ax, %ds
+	mov	%cs, %ax
+	mov	%ax, %ds
 
-    /* Set DE, PAE, MCE and OS support bits in CR4 */
+	/* Set DE, PAE, MCE and OS support bits in CR4 */
 
-    /* 0x00000668 =
-     *    (CR4_DE | CR4_PAE | CR4_MCE | CR4_OSFXSR | CR4_OSXMMEXCPT) */
-    movl    $0x00000668, %eax
-    mov     %eax, %cr4
+	/* 0x00000668 =
+	 *    (CR4_DE | CR4_PAE | CR4_MCE | CR4_OSFXSR | CR4_OSXMMEXCPT) */
+	movl	$0x00000668, %eax
+	mov	%eax, %cr4
 
-    /* Set CR3 to PML4 table address */
+	/* Set CR3 to PML4 table address */
 
-    movl    $cpu_boot_page_tables_ptr, %ebx
-    mov     (%ebx), %eax
-    mov     %eax, %cr3
+	movl	$cpu_boot_page_tables_ptr, %ebx
+	mov	(%ebx), %eax
+	mov	%eax, %cr3
 
-    /* Set LME bit in EFER */
+	/* Set LME bit in EFER */
 
-    /* 0xc0000080 = MSR_IA32_EFER */
-    movl    $0xc0000080, %ecx
-    rdmsr
-    /* 0x00000100 = MSR_IA32_EFER_LME_BIT */
-    orl     $0x00000100, %eax
-    wrmsr
+	/* 0xc0000080 = MSR_IA32_EFER */
+	movl	$0xc0000080, %ecx
+	rdmsr
+	/* 0x00000100 = MSR_IA32_EFER_LME_BIT */
+	orl	$0x00000100, %eax
+	wrmsr
 
-    /* 0xc0000080 = MSR_IA32_EFER */
-    movl    $0xc0000080, %ecx
-    rdmsr
-    /* 0x00000800 = MSR_IA32_EFER_NXE_BIT */
-    orl     $0x00000800, %eax
-    wrmsr
+	/* 0xc0000080 = MSR_IA32_EFER */
+	movl	$0xc0000080, %ecx
+	rdmsr
+	/* 0x00000800 = MSR_IA32_EFER_NXE_BIT */
+	orl	$0x00000800, %eax
+	wrmsr
 
-    /* Enable paging, protection, numeric error and co-processor
-       monitoring in CR0 to enter long mode */
+	/* Enable paging, protection, numeric error and co-processor
+	 * monitoring in CR0 to enter long mode */
 
-    mov     %cr0, %ebx
-    /* 0x80000023 = (CR0_PG | CR0_PE | CR0_MP | CR0_NE) */
-    orl     $0x80000023, %ebx
-    mov     %ebx, %cr0
+	mov	%cr0, %ebx
+	/* 0x80000023 = (CR0_PG | CR0_PE | CR0_MP | CR0_NE) */
+	orl	$0x80000023, %ebx
+	mov	%ebx, %cr0
 
-    /* Load temportary GDT pointer value */
-    lgdt    (trampoline_gdt_ptr - trampoline_start16)
+	/* Load temportary GDT pointer value */
+	lgdt	(trampoline_gdt_ptr - trampoline_start16)
 
-    /* Perform a long jump based to start executing in 64-bit mode */
+	/* Perform a long jump based to start executing in 64-bit mode */
 
-    movl    $trampoline_start64_fixup, %ebx
-    ljmpl   *(%ebx)
+	movl	$trampoline_start64_fixup, %ebx
+	ljmpl	*(%ebx)
 
-    .align 8
-    .global trampoline_start64_fixup
+.align		8
+.global		trampoline_start64_fixup
 trampoline_start64_fixup:
-    .long   trampoline_start64
-    /* 0x0008 = HOST_GDT_RING0_CODE_SEL */
-    .word   0x0008
+	.long	trampoline_start64
+	/* 0x0008 = HOST_GDT_RING0_CODE_SEL */
+	.word	0x0008
 
-    .code64
+.code64
 trampoline_start64:
 
-    /* Set up all other data segment registers */
-    /* 0x0010 = HOST_GDT_RING0_DATA_SEL */
-    movl    $0x0010, %eax
-    mov     %eax, %ss
-    mov     %eax, %ds
-    mov     %eax, %es
-    mov     %eax, %fs
-    mov     %eax, %gs
+	/* Set up all other data segment registers */
+	/* 0x0010 = HOST_GDT_RING0_DATA_SEL */
+	movl	$0x0010, %eax
+	mov	%eax, %ss
+	mov	%eax, %ds
+	mov	%eax, %es
+	mov	%eax, %fs
+	mov	%eax, %gs
 
-    movq    secondary_cpu_stack(%rip), %rsp
+	movq	secondary_cpu_stack(%rip), %rsp
 
-    /* Jump to C entry */
-    movq    main_entry(%rip), %rax
-    jmp     *%rax
+	/* Jump to C entry */
+	movq	main_entry(%rip), %rax
+	jmp	*%rax
 
 /* main entry */
-    .align  8
-    .global main_entry
+.align		8
+.global		main_entry
 main_entry:
-    .quad   init_secondary_pcpu /* default entry is AP start entry */
+	.quad	init_secondary_pcpu /* default entry is AP start entry */
 
-    .global secondary_cpu_stack
+.global secondary_cpu_stack
 secondary_cpu_stack:
-    .quad   0
+	.quad	0
 
 /* GDT table */
-    .align  4
+.align  4
 trampoline_gdt:
-    .quad   0x0000000000000000
-    .quad   0x00af9b000000ffff
-    .quad   0x00cf93000000ffff
+	.quad	0x0000000000000000
+	.quad	0x00af9b000000ffff
+	.quad	0x00cf93000000ffff
 trampoline_gdt_end:
 
 /* GDT pointer */
-    .align  2
-    .global trampoline_gdt_ptr
+.align		2
+.global		trampoline_gdt_ptr
 trampoline_gdt_ptr:
-    .short  (trampoline_gdt_end - trampoline_gdt) - 1
-    .quad   trampoline_gdt
+	.short	(trampoline_gdt_end - trampoline_gdt) - 1
+	.quad	trampoline_gdt
 
 /* PML4 and PDPT tables initialized to map first 4 GBytes of memory */
 /* Assumes CPU supports 1GB large pages */
-    .align  4
-    .global cpu_boot_page_tables_ptr
+.align  4
+.global cpu_boot_page_tables_ptr
 cpu_boot_page_tables_ptr:
-    .long cpu_boot_page_tables_start
+	.long	cpu_boot_page_tables_start
 
-    /*0x1000 = PAGE_SIZE*/
-    .align  0x1000
-    .global cpu_boot_page_tables_start
+/*0x1000 = PAGE_SIZE*/
+.align  0x1000
+.global cpu_boot_page_tables_start
 cpu_boot_page_tables_start:
-    /* 0x3 = (PAGE_PRESENT | PAGE_RW) */
-    .quad   trampoline_pdpt_addr + 0x3
-    /*0x1000 = PAGE_SIZE*/
-    .align  0x1000
-    .global trampoline_pdpt_addr
-trampoline_pdpt_addr:
-    address = 0
-    .rept   4
-    /* 0x83 = (PAGE_PRESENT | PAGE_PS | PAGE_RW) */
-    .quad   address + 0x83
-    address = address + 0x40000000
-    .endr
+	/* 0x3 = (PAGE_PRESENT | PAGE_RW) */
+	.quad	trampoline_pdpt_addr + 0x3
 
-    .end
+/*0x1000 = PAGE_SIZE*/
+.align  0x1000
+.global trampoline_pdpt_addr
+trampoline_pdpt_addr:
+	address = 0
+.rept   4
+	/* 0x83 = (PAGE_PRESENT | PAGE_PS | PAGE_RW) */
+	.quad	address + 0x83
+	address = address + 0x40000000
+.endr
+
+.end
