@@ -167,7 +167,9 @@ secondary_cpu_stack:
 .align  4
 trampoline_gdt:
 	.quad	0x0000000000000000
+	/* Descriptor of a 4GB execute/read non-conforming code segment based at 0, with DPL = 0 */
 	.quad	0x00af9b000000ffff
+	/* Descriptor of a 4GB read/write data segment based at 0, with DPL = 0 */
 	.quad	0x00cf93000000ffff
 trampoline_gdt_end:
 

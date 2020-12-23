@@ -25,6 +25,7 @@ HOST_IDTR:
 .macro	interrupt_descriptor entry, dpl=0 ist=0
 	/* 0x0008 = HOST_GDT_RING0_CODE_SEL */
 	.long	0x0008 << 16
+	/* 0x00008e00 represents a present interrupt gate. 13 is the offset of the DPL field in the descriptor. */
 	.long	0x00008e00 + (dpl << 13) + ist
 	.quad	entry
 .endm
@@ -32,6 +33,7 @@ HOST_IDTR:
 .macro	trap_descriptor entry, dpl=0, ist=0
 	/* 0x0008 = HOST_GDT_RING0_CODE_SEL */
 	.long	0x0008 << 16
+	/* 0x00008e00 represents a present trap gate. 13 is the offset of the DPL field in the descriptor. */
 	.long	0x00008f00 + (dpl <<13) + ist
 	.quad	entry
 .endm
@@ -87,6 +89,8 @@ interrupt_descriptor	excp_rsvd_29
 interrupt_descriptor	excp_rsvd_30
 interrupt_descriptor	excp_rsvd_31
 
+/* There are 256 vectors defined for exceptions and interrupts. (0x100 - 0x20) gives the number of vectors for external
+ * interrupts (which starts from 0x20). */
 vector = 0x20
 .rept	(0x100 - 0x20)
 	_external_interrupt_descriptor vector
@@ -224,6 +228,8 @@ excp_rsvd_09:
 excp_rsvd_0f:
 	_rsvd_vector 0x0f
 
+/* 0x15 is the first vector that is reserved for future exceptions. (0x20 - 0x15) gives the number of this kind of
+ * vectors. */
 vector = 0x15
 .rept	(0x20 - 0x15)
 	_rsvd_vector vector
@@ -245,7 +251,9 @@ external_interrupt_\vector\():
 	jmp	external_interrupt_save_frame
 .endm
 
-vector =0x20
+/* There are 256 vectors defined for exceptions and interrupts. (0x100 - 0x20) gives the number of vectors for external
+ * interrupts (which starts from 0x20). */
+vector = 0x20
 .rept	(0x100 - 0x20)
 	_external_interrupt vector
 	vector = vector + 1

@@ -144,7 +144,9 @@ boot_regs:
 .align		4
 cpu_primary32_gdt:
 	.quad	0x0000000000000000
+	/* Descriptor of a 4GB execute/read non-conforming code segment based at 0, with DPL = 0 */
 	.quad	0x00af9b000000ffff
+	/* Descriptor of a 4GB read/write data segment based at 0, with DPL = 0 */
 	.quad	0x00cf93000000ffff
 cpu_primary32_gdt_end:
 
@@ -180,5 +182,6 @@ cpu_primary32_pdt_addr:
 .rept	2048
 	/* 0x83 = (PAGE_PS | PAGE_PRESENT | PAGE_RW) */
 	.quad	address + 0x83
+	/* 0x200000 is the size of a 2-MB page frame */
 	address = address + 0x200000
 .endr
