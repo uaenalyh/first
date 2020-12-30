@@ -1265,8 +1265,8 @@ int32_t vlapic_x2apic_write(struct acrn_vcpu *vcpu, uint32_t msr, uint64_t val)
 	case MSR_IA32_EXT_APIC_ICR:
 		/** Set lapic->icr_hi.v to be (uint32_t)(val >> 32UL) */
 		lapic->icr_hi.v = (uint32_t)(val >> 32UL);
-		/** Set lapic->icr_lo.v to be (uint32_t)(val & APIC_ICR_MASK) */
-		lapic->icr_lo.v = (uint32_t)(val & APIC_ICR_MASK);
+		/** Set lapic->icr_lo.v to be (uint32_t)(val & (APIC_ICR_MASK | APIC_LEVEL_MASK)) */
+		lapic->icr_lo.v = (uint32_t)(val & (APIC_ICR_MASK | APIC_LEVEL_MASK));
 		/** Call vlapic_x2apic_pt_icr_access with the following parameters, in order to
 		 *  handle writing to virtual LAPIC ICR and assign the return value of
 		 *  vlapic_x2apic_pt_icr_access to error
