@@ -54,7 +54,7 @@
 
 #define ACPI_OEM_ID               "ACRN  " /**< Pre-defined ACPI OEM ID */
 #define ACPI_ASL_COMPILER_ID      "INTL"  /**< Pre-defined ACPI ASL compiler ID */
-#define ACPI_ASL_COMPILER_VERSION 0x20190802U /**< Pre-defined ACPI ASL compiler version */
+#define ACPI_ASL_COMPILER_VERSION 0x0U /**< Pre-defined ACPI ASL compiler version */
 
 struct acrn_vm; /**< Declare the VM data structure, which is used in this file */
 
@@ -75,7 +75,6 @@ struct acpi_table_info {
 
 	struct {
 		struct acpi_table_madt madt; /**< data structure of MADT table  */
-		struct acpi_madt_local_apic_nmi lapic_nmi; /**< data structure of LAPIC with NMI APCI */
 		struct acpi_madt_local_apic lapic_array[MAX_PCPU_NUM]; /**< data structure of LAPIC ACPI array */
 	} __packed;
 };

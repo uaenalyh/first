@@ -199,9 +199,9 @@ static uint64_t create_zero_page(struct acrn_vm *vm)
 	/** Call memset with the following parameters, in order to clear the zeropage, and discard its return value.
 	 *  - zeropage
 	 *  - 0
-	 *  - MEM_2K
+	 *  - MEM_4K
 	 */
-	(void)memset(zeropage, 0U, MEM_2K);
+	(void)memset(zeropage, 0U, MEM_4K);
 
 	/** Set hva to gpa2hva(vm, sw_kernel->kernel_load_addr); so it points to the zeropage of the guest image) */
 	hva = (struct zero_page *)gpa2hva(vm, sw_kernel->kernel_load_addr);

@@ -78,12 +78,8 @@ struct acrn_vm_config vm_configs[CONFIG_MAX_VM_NUM] = {
 			.name = "ClearLinux", /**< Name of guest OS */
 			.kernel_type = KERNEL_BZIMAGE, /**< Image format of Linux kernel */
 			.kernel_mod_tag = "linux", /**< Module tag of Linux */
-			.bootargs = VM1_CONFIG_OS_BOOTARG_CONSOLE	\
-				VM1_CONFIG_OS_BOOTARG_MAXCPUS		\
-				VM1_CONFIG_OS_BOOTARG_ROOT		\
-				"rw rootwait noxsave nohpet console=hvc0 \
-				no_timer_check ignore_loglevel log_buf_len=16M \
-				consoleblank=0 tsc=reliable xapic_phys intel_iommu=off panic=0"
+			.bootargs = VM1_CONFIG_OS_BOOTARG_ROOT
+				"rw rootwait nohpet no_timer_check x2apic_phys noapic intel_iommu=off"
 		},
 		.vuart[0] = { /**< Configurations of first virtual UART device */
 			.type = VUART_LEGACY_PIO, /**< Port I/O based type */

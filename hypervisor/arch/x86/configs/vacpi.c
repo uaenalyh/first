@@ -49,31 +49,23 @@ static struct acpi_table_info acpi_table_template[CONFIG_MAX_VM_NUM] = {
 			.header.asl_compiler_revision = ACPI_ASL_COMPILER_VERSION, /**< ASL compiler version */
 			.header.signature = ACPI_SIG_XSDT, /**< table signature */
 			.header.oem_id = ACPI_OEM_ID, /**< OEM identification */
-			.header.oem_table_id = "ACRNXSDT", /**< OEM table identification */
+			.header.oem_table_id = "VIRTNUC7", /**< OEM table identification */
 			.header.asl_compiler_id = ACPI_ASL_COMPILER_ID, /**< ASL compiler vendor ID */
 
 			.table_offset_entry[0] = ACPI_MADT_ADDR, /**< Array of pointers to ACPI tables */
 		},
 		/** Multipile ACPI Description Table  ('APIC') */
 		.madt = {
-			.header.revision = 0x3U, /**< ACPI Specification minor version number */
+			.header.revision = 0x4U, /**< ACPI Specification minor version number */
 			.header.oem_revision = 0x1U, /**< OEM revision number */
 			.header.asl_compiler_revision = ACPI_ASL_COMPILER_VERSION, /**< ASL compiler version */
 			.header.signature = ACPI_SIG_MADT, /**< table signature */
 			.header.oem_id = ACPI_OEM_ID, /**< OEM identification */
-			.header.oem_table_id = "ACRNMADT", /**< OEM table identification */
+			.header.oem_table_id = "VIRTNUC7", /**< OEM table identification */
 			.header.asl_compiler_id = ACPI_ASL_COMPILER_ID, /**< ASL compiler vendor ID */
 
 			.address = 0xFEE00000U, /**< Local APIC Address */
-			.flags = 0x1U, /**<  PC-AT Compatibility=1 */
-		},
-		/** NMI (Non-maskable Interrupt) config info */
-		.lapic_nmi = {
-			.header.type = ACPI_MADT_TYPE_LOCAL_APIC_NMI, /**< Sub table type */
-			.header.length = sizeof(struct acpi_madt_local_apic_nmi), /**< Length of table */
-			.processor_id = 0xFFU, /**< ACPI processor id */
-			.flags = 0x5U, /**< MPS INTI flag: 0101 Edge-triggered, High level active */
-			.lint = 0x1U, /**< NMI number */
+			.flags = 0x0U, /**<  PC-AT Compatibility=1 */
 		},
 		/** LAPIC array: one physical CPU matches one LAPIC */
 		.lapic_array = {
@@ -216,8 +208,8 @@ void build_vacpi(struct acrn_vm *vm)
 	/** Set madt to &acpi_table_template[vm->vm_id].madt */
 	madt = &acpi_table_template[vm->vm_id].madt;
 	/** Set madt->header.length to the total MADT table length */
-	madt->header.length = sizeof(struct acpi_table_madt) + sizeof(struct acpi_madt_local_apic_nmi) +
-		(sizeof(struct acpi_madt_local_apic) * (size_t)vm->hw.created_vcpus);
+	madt->header.length = sizeof(struct acpi_table_madt) + (sizeof(struct acpi_madt_local_apic) *
+		(size_t)vm->hw.created_vcpus);
 	/** Set madt->header.checksum to the return value of calculate_checksum8(madt, madt->header.length) */
 	madt->header.checksum = calculate_checksum8(madt, madt->header.length);
 
