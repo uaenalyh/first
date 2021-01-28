@@ -520,12 +520,20 @@ test_build_job:
     - cp ../build/acrn-unit-test/host/bin/vp-dm.32.out ../../acrn-sliced-mainline/image/hsi_vm_control.32.out
     - make clean
     - cd ../../acrn-hypervisor && git reset --hard && cd ../acrn-sas-test-code/host
+    - /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0 "make vp-dm RELEASE=0 MODULE_GROUP_OBJ=VP_DM_HSI_NON_SAFETY_GROUP"
+    - if [ $? -ne 0 ]; then exit 1; fi
+    - cp ../build/acrn-unit-test/host/bin/vp-dm.32.out ../../acrn-sliced-mainline/image/hsi_non_safety.32.out
+    - make clean
+    - cd ../../acrn-hypervisor && git reset --hard && cd ../acrn-sas-test-code/host
     - /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0 "make vp-dm RELEASE=0 MODULE_GROUP_OBJ=VP_DM_VPCI_INIT_GROUP"
     - if [ $? -ne 0 ]; then exit 1; fi
     - cp ../build/acrn-unit-test/host/bin/vp-dm.32.out ../../acrn-sliced-mainline/image/vp-dm-vpci_init.32.out
     - make clean && cd guest
     - /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0 "make VM=safety x86/stitched.raw"
     - cp x86/stitched.raw ../../../acrn-sliced-mainline/image/hsi_vm_control.raw && cd ../
+    - make clean
+    - /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0 "make x86/stitched.bzimage HSI=nonsafety"
+    - cp x86/stitched.bzimage ../../../acrn-sliced-mainline/image/hsi_non_safety.bzimage && cd ../
     - make clean
     - cd ../../acrn-hypervisor && git reset --hard && cd ../acrn-sas-test-code/host
     - /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0 "make vp-dm RELEASE=0 MODULE_GROUP_OBJ=VPDM_MMU_INV_GROUP"
