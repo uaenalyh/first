@@ -19,6 +19,7 @@
 #include <pgtable.h>
 #include <trace.h>
 #include <logmsg.h>
+#include <virq.h>
 
 /**
  * @defgroup vp-base_vcr vp-base.vcr

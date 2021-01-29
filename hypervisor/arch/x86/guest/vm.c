@@ -26,6 +26,7 @@
 #include <vboot_info.h>
 #include <board.h>
 #include <vacpi.h>
+#include <virq.h>
 
 /**
  * @defgroup vp-base_vm vp-base.vm

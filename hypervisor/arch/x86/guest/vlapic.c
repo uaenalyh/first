@@ -43,6 +43,7 @@
 #include <vm.h>
 #include <ept.h>
 #include <trace.h>
+#include <virq.h>
 #include <logmsg.h>
 #include "vlapic_priv.h"
 

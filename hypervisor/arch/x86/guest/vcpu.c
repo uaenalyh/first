@@ -17,6 +17,7 @@
 #include <vm.h>
 #include <vmcs.h>
 #include <mmu.h>
+#include <virq.h>
 
 /**
  * @defgroup vp-base_vcpu vp-base.vcpu
@@ -1578,9 +1579,6 @@ static uint64_t build_stack_frame(struct acrn_vcpu *vcpu)
  */
 void reset_vcpu(struct acrn_vcpu *vcpu)
 {
-	/** Declare the following local variables of type int32_t.
-	 *  - i representing counter for loop. */
-	int32_t i;
 	/** Declare the following local variables of type struct acrn_vlapic *.
 	 *  - vlapic representing pointer that points to vlapic of the vcpu. */
 	struct acrn_vlapic *vlapic;

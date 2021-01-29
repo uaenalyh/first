@@ -17,7 +17,7 @@
 #include <dump.h>
 #include <logmsg.h>
 #include <vcpu.h>
-
+#include <virq.h>
 
 /**
  * @defgroup hwmgmt_irq hwmgmt.irq
@@ -93,7 +93,7 @@ static spinlock_t exception_spinlock = {
  *
  * @threadsafety when \a ctx is different among parallel invocation.
  */
-void dispatch_interrupt(const struct intr_excp_ctx *ctx)
+void dispatch_interrupt(__unused const struct intr_excp_ctx *ctx)
 {
 	/** Call panic with the following parameters, in order to output fatal failure log and could halt
 	 *  current physical CPU.

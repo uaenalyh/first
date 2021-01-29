@@ -17,7 +17,7 @@ codescan: $(C_CODESCAN)
 
 $(C_CODESCAN): %.c.codescan: %.c $(VERSION) $(HV_OBJDIR)/$(HV_CONFIG_H) $(TARGET_ACPI_INFO_HEADER)
 	@echo "CODESCAN" $*.c
-	@clang-tidy $< -header-filter=.* --checks=-*,acrn-c-* -- $(patsubst %, -I%, $(INCLUDE_PATH)) -I. $(filter-out -m% -f%,$(CFLAGS) $(ARCH_CFLAGS)) >> $(TMP_SCAN_OUT) 2>>$(TMP_SCAN_ERR) | true
+	@clang-tidy $< -header-filter=.* --checks=-*,acrn-c-* -- $(patsubst %, -I%, $(INCLUDE_PATH)) -I. $(filter-out -m%,$(CFLAGS) $(ARCH_CFLAGS)) >> $(TMP_SCAN_OUT) 2>>$(TMP_SCAN_ERR) | true
 
 ifdef QEMU
 

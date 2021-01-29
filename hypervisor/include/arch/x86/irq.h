@@ -63,7 +63,7 @@ void init_default_irqs(uint16_t cpu_id);
 
 void dispatch_exception(struct intr_excp_ctx *ctx);
 
-void dispatch_interrupt(const struct intr_excp_ctx *ctx);
+void dispatch_interrupt(__unused const struct intr_excp_ctx *ctx);
 
 void handle_nmi(struct intr_excp_ctx *ctx);
 

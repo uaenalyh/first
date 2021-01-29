@@ -16,6 +16,7 @@
 #include <pgtable.h>
 #include <trace.h>
 #include <logmsg.h>
+#include <virq.h>
 
 /**
  * @addtogroup vp-dm_io-req

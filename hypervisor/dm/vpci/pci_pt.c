@@ -255,11 +255,6 @@ void vdev_pt_write_vbar(struct pci_vdev *vdev, uint32_t idx, uint32_t val)
 	/** Declare the following local variables of type uint32_t.
 	 *  - update_idx representing the index of the BAR whose base address is to update, initialized as 'idx'. */
 	uint32_t update_idx = idx;
-	/** Declare the following local variables of type uint32_t.
-	 *  - offset representing the BAR position in the configuration space, initialized as the value returned by
-	 *  pci_bar_offset with idx being the parameter, which gets the offset according to the given BAR index.
-	 */
-	uint32_t offset = pci_bar_offset(idx);
 	/** Declare the following local variables of type 'struct pci_bar *'.
 	 *  - vbar representing a pointer to the BAR info, initialized as &vdev->bar[idx]. */
 	struct pci_bar *vbar = &vdev->bar[idx];

@@ -15,6 +15,7 @@
 #include <logmsg.h>
 #include <console.h>
 #include <errno.h>
+#include <virq.h>
 
 /**
  * @defgroup vp-base_hv-main vp-base.hv-main

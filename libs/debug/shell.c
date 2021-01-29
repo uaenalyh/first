@@ -1035,7 +1035,7 @@ void set_idt_entry_offset(int vec, uint64_t addr, uint64_t idt_base, bool is_sav
 	if (is_save) {
 		save_exception_entry = idt_desc[vec].fields.low32.bits.offset_15_0
 			| (idt_desc[vec].fields.high32.bits.offset_31_16 << 16U)
-			| (idt_desc[vec].fields.offset_63_32 << 32U);
+			| ((uint64_t)idt_desc[vec].fields.offset_63_32 << 32U);
 	}
 
 	idt_desc[vec].fields.offset_63_32 = addr >> 32U;
@@ -1095,7 +1095,6 @@ static int shell_inject_mc(__unused int argc, __unused char **argv)
 	uint64_t hpa;
 	uint64_t *hva;
 	uint64_t idt_base;
-	struct host_idt_descriptor *idtd;
 
 	idt_base = sidt();
 	set_idt_entry_offset(IDT_MC, (uint64_t)&mc_fault, idt_base, true);

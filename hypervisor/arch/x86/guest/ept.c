@@ -11,6 +11,7 @@
 #include <ept.h>
 #include <logmsg.h>
 #include <trace.h>
+#include <virq.h>
 
 /**
  * @addtogroup vp-base_guest-mem
