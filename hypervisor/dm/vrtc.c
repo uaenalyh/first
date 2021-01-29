@@ -289,10 +289,10 @@ static void vrtc_read(struct acrn_vcpu *vcpu, uint16_t addr, __unused size_t wid
 				panic("read rtc timeout, system exception!");
 			} else {
 				/** Call fatal_error_shutdown_vm with the following parameters, in order to shutdown the
-				 *  VM if the VM is not safety VM.
-				 *  - vm
+				 *  VM (corresponding to \a vcpu) if the VM is not safety VM.
+				 *  - vcpu
 				 */
-				fatal_error_shutdown_vm(vm);
+				fatal_error_shutdown_vm(vcpu);
 			}
 		}
 	}
