@@ -351,9 +351,8 @@ void vcpu_queue_exception(struct acrn_vcpu *vcpu, uint32_t vector_arg, uint32_t 
  *
  * @param[inout] vcpu A pointer points to a vcpu structure which representing the vCPU
  * where the exception to be injected.
- * @param[in] vector The vector number of the exception.
  *
- * @return None
+ * @return true (1) if exception is injected otherwise false (0)
  *
  * @pre vcpu != NULL
  *
@@ -365,8 +364,20 @@ void vcpu_queue_exception(struct acrn_vcpu *vcpu, uint32_t vector_arg, uint32_t 
  *
  * @threadsafety when \a vcpu is different among parallel invocation.
  */
-static void vcpu_inject_exception(struct acrn_vcpu *vcpu, uint32_t vector)
+static bool vcpu_inject_exception(struct acrn_vcpu *vcpu)
 {
+	/** Declare the following local variables of type 'uint32_t'.
+	 *  - vector representing exception vector to be injected,
+	 *  initialized as vcpu->arch.exception_info.exception.
+	 */
+	uint32_t vector = vcpu->arch.exception_info.exception;
+
+	/** Declare the following local variables of type 'bool'.
+	 *  - injected representing exception vector is already injected,
+	 *  initialized as false.
+	 */
+	bool injected = false;
+
 	/** If return value of bitmap_test_and_clear_lock(ACRN_REQUEST_EXCP, &vcpu->arch.pending_req)
 	 * is true */
 	if (bitmap_test_and_clear_lock(ACRN_REQUEST_EXCP, &vcpu->arch.pending_req)) {
@@ -393,10 +404,13 @@ static void vcpu_inject_exception(struct acrn_vcpu *vcpu, uint32_t vector)
 		/** Set 'vcpu->arch.exception_info.exception' to 'VECTOR_INVALID' */
 		vcpu->arch.exception_info.exception = VECTOR_INVALID;
 
-		/** Call vcpu_retain_rip() with the following parameters, in order to retain the guest RIP.
-		 *  - vcpu
-		 */
-		vcpu_retain_rip(vcpu);
+		/* If return value of get_exception_type(vector) is EXCEPTION_FAULT */
+		if (get_exception_type(vector) == EXCEPTION_FAULT) {
+			/** Call vcpu_retain_rip() with the following parameters, in order to retain the guest RIP.
+			 *  - vcpu
+			 */
+			vcpu_retain_rip(vcpu);
+		}
 
 		/** If return value of get_exception_type() with vector being parameter is EXCEPTION_FAULT */
 		if (get_exception_type(vector) == EXCEPTION_FAULT) {
@@ -407,43 +421,11 @@ static void vcpu_inject_exception(struct acrn_vcpu *vcpu, uint32_t vector)
 			 */
 			vcpu_set_rflags(vcpu, vcpu_get_rflags(vcpu) | HV_ARCH_VCPU_RFLAGS_RF);
 		}
+		/** Set injected to true. */
+		injected = true;
 	}
-}
-
-/**
- * @brief Inject the low priority exception to the target vCPU.
- *
- * The function is used to inject the low priority exception to the target vCPU.
- *
- * @param[inout] vcpu A pointer points to a vcpu structure which representing the vCPU
- * where the exception to be injected.
- *
- * @return None
- *
- * @pre vcpu != NULL
- *
- * @post None
- *
- * @mode HV_SUBMODE_INIT_ROOT, HV_OPERATIONAL
- *
- * @reentrancy Unspecified
- *
- * @threadsafety when \a vcpu is different among parallel invocation.
- */
-static void vcpu_inject_lo_exception(struct acrn_vcpu *vcpu)
-{
-	/** Declare the following local variables of type 'uint32_t'.
-	 *  - vector representing exception vector to be injected,
-	 *  initialized as vcpu->arch.exception_info.exception.
-	 */
-	uint32_t vector = vcpu->arch.exception_info.exception;
-
-	/** Call vcpu_inject_exception() with the following parameters, in order to inject exception
-	 *  with vector to the target vcpu.
-	 *  - vcpu
-	 *  - vector
-	 */
-	vcpu_inject_exception(vcpu, vector);
+		/** Return injected. */
+		return injected;
 }
 
 /**
@@ -630,59 +612,60 @@ int32_t acrn_handle_pending_request(struct acrn_vcpu *vcpu)
 			 */
 			invept(vcpu->vm->arch_vm.nworld_eptp);
 		}
-
-		/** If return value of bitmap_test_and_clear_lock(ACRN_REQUEST_NMI, pending_req_bits) is true */
-		if (bitmap_test_and_clear_lock(ACRN_REQUEST_NMI, pending_req_bits)) {
-			/** Call exec_vmwrite32() with the following parameters, in order to
-			 *  write VMX_INT_INFO_VALID | (VMX_INT_TYPE_NMI << 8U) | IDT_NMI
-			 *  to the VMCS field VMX_ENTRY_INT_INFO_FIELD.
-			 *  - VMX_ENTRY_INT_INFO_FIELD
-			 *  - VMX_INT_INFO_VALID | (VMX_INT_TYPE_NMI << 8U) | IDT_NMI
-			 */
-			exec_vmwrite32(VMX_ENTRY_INT_INFO_FIELD,
-				VMX_INT_INFO_VALID | (VMX_INT_TYPE_NMI << 8U) | IDT_NMI);
-			/** Set 'injected' to 'true' */
-			injected = true;
-			/** If return value of bitmap_test(ACRN_REQUEST_EXCP, pending_req_bits) is true */
-			if (bitmap_test(ACRN_REQUEST_EXCP, pending_req_bits)) {
-				/** Call vcpu_retain_rip() with the following parameters, in order
-				 *  to retain guest RIP of the target vCPU.
-				 *  - vcpu
-				 */
-				vcpu_retain_rip(vcpu);
-			}
-		} else {
-			/* handling pending vector injection:
-			 * there are many reason inject failed, we need re-inject again
-			 * here should take care
-			 * - SW exception (not maskable by IF)
-			 * - external interrupt, if IF clear, will keep in IDT_VEC_INFO_FIELD
-			 *   at next vm exit?
-			 */
-			/** If bit 31(valid interrupt) of arch->idt_vectoring_info is not clear. */
-			if ((arch->idt_vectoring_info & VMX_INT_INFO_VALID) != 0U) {
-				/** Call exec_vmwrite() with the following parameters, in order
-				 *  to write arch->idt_vectoring_info to the VMCS field:
-				 * 'VM-entry interruption-information'.
-				 *  - VMX_ENTRY_INT_INFO_FIELD
-				 *  - arch->idt_vectoring_info
-				 */
-				exec_vmwrite32(VMX_ENTRY_INT_INFO_FIELD, arch->idt_vectoring_info);
-				/** Set 'arch->idt_vectoring_info' to '0' */
-				arch->idt_vectoring_info = 0U;
-				/** Set 'injected' to 'true' */
-				injected = true;
-			}
-		}
+		/** Call vcpu_inject_exception() with vcpu being parameters, in order
+		 *  to inject exception to the target vCPU, and then set
+		 *  injected to its return value.
+		 */
+		injected = vcpu_inject_exception(vcpu);
 
 		/** If injected is false */
 		if (!injected) {
-			/** Call vcpu_inject_lo_exception() with the following parameters, in order
-			 *  to inject low priority exception to the target vCPU.
-			 *  - vcpu
-			 */
-			vcpu_inject_lo_exception(vcpu);
+			/** If return value of bitmap_test_and_clear_lock(ACRN_REQUEST_NMI, pending_req_bits) is true */
+			if (bitmap_test_and_clear_lock(ACRN_REQUEST_NMI, pending_req_bits)) {
+				/** Call exec_vmwrite32() with the following parameters, in order to
+				 *  write VMX_INT_INFO_VALID | (VMX_INT_TYPE_NMI << 8U) | IDT_NMI
+				 *  to the VMCS field VMX_ENTRY_INT_INFO_FIELD.
+				 *  - VMX_ENTRY_INT_INFO_FIELD
+				 *  - VMX_INT_INFO_VALID | (VMX_INT_TYPE_NMI << 8U) | IDT_NMI
+				 */
+				exec_vmwrite32(VMX_ENTRY_INT_INFO_FIELD,
+					VMX_INT_INFO_VALID | (VMX_INT_TYPE_NMI << 8U) | IDT_NMI);
+				/** Set 'injected' to 'true' */
+				injected = true;
+				/** If return value of bitmap_test(ACRN_REQUEST_EXCP, pending_req_bits) is true */
+				if (bitmap_test(ACRN_REQUEST_EXCP, pending_req_bits)) {
+					/** Call vcpu_retain_rip() with the following parameters, in order
+					 *  to retain guest RIP of the target vCPU.
+					 *  - vcpu
+					 */
+					vcpu_retain_rip(vcpu);
+				}
+			} else {
+				/* handling pending vector injection:
+				* there are many reason inject failed, we need re-inject again
+				* here should take care
+				* - SW exception (not maskable by IF)
+				* - external interrupt, if IF clear, will keep in IDT_VEC_INFO_FIELD
+				*   at next vm exit?
+				*/
+				/** If bit 31(valid interrupt) of arch->idt_vectoring_info is not clear. */
+				if ((arch->idt_vectoring_info & VMX_INT_INFO_VALID) != 0U) {
+					/** Call exec_vmwrite() with the following parameters, in order
+					 *  to write arch->idt_vectoring_info to the VMCS field:
+					 * 'VM-entry interruption-information'.
+					 *  - VMX_ENTRY_INT_INFO_FIELD
+					 *  - arch->idt_vectoring_info
+					 */
+					exec_vmwrite32(VMX_ENTRY_INT_INFO_FIELD, arch->idt_vectoring_info);
+					/** Set 'arch->idt_vectoring_info' to '0' */
+					arch->idt_vectoring_info = 0U;
+					/** Set 'injected' to 'true' */
+					injected = true;
+				}
+			}
 		}
+
+
 	}
 	/** Return ret */
 	return ret;
