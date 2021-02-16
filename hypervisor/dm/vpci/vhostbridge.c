@@ -125,6 +125,14 @@ static void init_vhostbridge(struct pci_vdev *vdev)
 	 *  - PCIS_BRIDGE_HOST
 	 */
 	pci_vdev_write_cfg_u8(vdev, PCIR_SUBCLASS, (uint8_t)PCIS_BRIDGE_HOST);
+
+	/** Call pci_vdev_write_cfg_u8 with the following parameters, in order to write the Interrupt Line register in
+	 *  the virtual configuration space of the given vPCI device.
+	 *  - vdev
+	 *  - PCIR_INTERRUPT_LINE
+	 *  - INTERRUPT_LINE_NO_CONNECTION
+	 */
+	pci_vdev_write_cfg_u8(vdev, PCIR_INTERRUPT_LINE, INTERRUPT_LINE_NO_CONNECTION);
 }
 
 /**

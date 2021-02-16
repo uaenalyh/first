@@ -96,6 +96,31 @@
 #define PCIR_MSI_ADDR_HIGH      0x8U /**< Pre-defined the offset of high 32bits MSI address register. */
 #define PCIR_MSI_DATA           0x8U /**< Pre-defined the offset of MSI data register within MSI capability */
 #define PCIR_MSI_DATA_64BIT     0xCU /**< Pre-defined the offset of high 32bits MSI data register. */
+#define PCIR_INTERRUPT_PIN      0x3DU /**< Pre-defined the offset of Interrupt Pin register. */
+#define PCIR_INTERRUPT_LINE     0x3CU /**< Pre-defined the offset of Interrupt Line register. */
+
+/**
+ * @brief The value of the interrupt line fields of the PCI configuration space.
+ *
+ * The value 255 is defined as meaning "unknown" or "no connection" to the interrupt controller.
+ */
+#define INTERRUPT_LINE_NO_CONNECTION	0xFFU
+/**
+ * @brief The mask value of the deliver mode of the message data register
+ */
+#define MSI_DATA_DELIVER_MODE_MASK	(7U << 8)
+/**
+ * @brief The bit of the Trigger Mode of the message data register.
+ */
+#define MSI_DATA_TRIGGER_MODE		(1U << 15)
+/**
+ * @brief The bit of the Level For Trigger Mode of the message data register.
+ */
+#define MSI_DATA_LEVEL_TRIGGER_MODE	(1U << 14)
+/**
+ * @brief The initial value of the message address register of the assigned device PCI configuration space.
+ */
+#define MSG_INITIAL_VALUE		0xFEE00000U
 
 /**
  * @brief Pre-defined the mask of "multiple message capable" fields in MSI control register.

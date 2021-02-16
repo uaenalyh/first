@@ -750,6 +750,14 @@ static void init_default_cfg(struct pci_vdev *vdev)
 		}
 	}
 
+	/** Call pci_vdev_write_cfg with the following parameters, in order to write the Interrupt Pin register in
+	 *  the virtual configuration space of the given vPCI device.
+	 *  - vdev
+	 *  - PCIR_INTERRUPT_PIN
+	 *  - 1
+	 *  - 0
+	 */
+	pci_vdev_write_cfg(vdev, PCIR_INTERRUPT_PIN, 1U, 0U);
 	/** Set val to the value returned by pci_vdev_read_cfg with vdev, PCIR_CAP_PTR and 1 being the parameters,
 	 *  to get the PCI device's class number. */
 	val = pci_vdev_read_cfg(vdev, PCIR_CLASS, 1U);

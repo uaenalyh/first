@@ -211,58 +211,62 @@ static void remap_vmsi(const struct pci_vdev *vdev)
 	/** Set info.vmsi_data.full to vmsi_msgdata */
 	info.vmsi_data.full = vmsi_msgdata;
 
-	/** Call ptirq_msix_remap with the following parameters, in order to calculate the physical MSI message data
-	 *  and message address according to its virtual MSI data and address.
-	 *  - vm
-	 *  - vdev->bdf.value
-	 *  - pbdf.value
-	 *  - 0
-	 *  - &info
+	/** If the remmaping vector number is in the range [0x10,0xfe]
 	 */
-	ptirq_msix_remap(vm, vdev->bdf.value, pbdf.value, 0U, &info);
-	/** Call pci_pdev_write_cfg with the following parameters, in order to write the calculated physical MSI
-	 *  message address to its physical register.
-	 *  - pbdf
-	 *  - capoff + PCIR_MSI_ADDR
-	 *  - 4
-	 *  - (uint32_t)info.pmsi_addr.full
-	 */
-	pci_pdev_write_cfg(pbdf, capoff + PCIR_MSI_ADDR, 0x4U, (uint32_t)info.pmsi_addr.full);
-	/** If the MSI address is 64bits */
-	if (vdev->msi.is_64bit) {
-		/** Call pci_pdev_write_cfg with the following parameters, in order to write the calculated physical MSI
-		 *  message address (high 32bits) to its physical register.
-		 * - pbdf
-		 * - capoff + PCIR_MSI_ADDR_HIGH
-		 * - 4
-		 * - (uint32_t)(info.pmsi_addr.full >> 32U)
+	if ((info.vmsi_data.bits.vector >= 0x10U) && (info.vmsi_data.bits.vector <= 0xfeU)) {
+		/** Call ptirq_msix_remap with the following parameters, in order to calculate the physical MSI message
+		 * data and message address according to its virtual MSI data and address.
+		 *  - vm
+		 *  - vdev->bdf.value
+		 *  - pbdf.value
+		 *  - 0
+		 *  - &info
 		 */
-		pci_pdev_write_cfg(
-			pbdf, capoff + PCIR_MSI_ADDR_HIGH, 0x4U, (uint32_t)(info.pmsi_addr.full >> 32U));
-		/** Call pci_pdev_write_cfg with the following parameters, in order to write the calculated physical MSI
-		 *  message data to its physical register.
-		 * - pbdf
-		 * - capoff + PCIR_MSI_DATA_64BIT
-		 * - 2
-		 * - info.pmsi_data.full
+		ptirq_msix_remap(vm, vdev->bdf.value, pbdf.value, 0U, &info);
+		/** Call pci_pdev_write_cfg with the following parameters, in order to write the calculated physical
+		 * MSI message address to its physical register.
+		 *  - pbdf
+		 *  - capoff + PCIR_MSI_ADDR
+		 *  - 4
+		 *  - (uint32_t)info.pmsi_addr.full
 		 */
-		pci_pdev_write_cfg(pbdf, capoff + PCIR_MSI_DATA_64BIT, 0x2U, (uint16_t)info.pmsi_data.full);
-	} else {
-		/** Call pci_pdev_write_cfg with the following parameters, in order to write the calculated physical MSI
-		 *  message data to its physical register.
-		 * - pbdf
-		 * - capoff + PCIR_MSI_DATA
-		 * - 2
-		 * - info.pmsi_data.full
-		 */
-		pci_pdev_write_cfg(pbdf, capoff + PCIR_MSI_DATA, 0x2U, (uint16_t)info.pmsi_data.full);
-	}
+		pci_pdev_write_cfg(pbdf, capoff + PCIR_MSI_ADDR, 0x4U, (uint32_t)info.pmsi_addr.full);
+		/** If the MSI address is 64bits */
+		if (vdev->msi.is_64bit) {
+			/** Call pci_pdev_write_cfg with the following parameters, in order to write the calculated
+			 * physical MSI message address (high 32bits) to its physical register.
+			 * - pbdf
+			 * - capoff + PCIR_MSI_ADDR_HIGH
+			 * - 4
+			 * - (uint32_t)(info.pmsi_addr.full >> 32U)
+			 */
+			pci_pdev_write_cfg(
+				pbdf, capoff + PCIR_MSI_ADDR_HIGH, 0x4U, (uint32_t)(info.pmsi_addr.full >> 32U));
+			/** Call pci_pdev_write_cfg with the following parameters, in order to write the calculated
+			 * physical MSI  message data to its physical register.
+			 * - pbdf
+			 * - capoff + PCIR_MSI_DATA_64BIT
+			 * - 2
+			 * - info.pmsi_data.full
+			 */
+			pci_pdev_write_cfg(pbdf, capoff + PCIR_MSI_DATA_64BIT, 0x2U, (uint16_t)info.pmsi_data.full);
+		} else {
+			/** Call pci_pdev_write_cfg with the following parameters, in order to write the calculated
+			 * physical MSI message data to its physical register.
+			 * - pbdf
+			 * - capoff + PCIR_MSI_DATA
+			 * - 2
+			 * - info.pmsi_data.full
+			 */
+			pci_pdev_write_cfg(pbdf, capoff + PCIR_MSI_DATA, 0x2U, (uint16_t)info.pmsi_data.full);
+		}
 
-	/** Call enable_disable_msi with the following parameters, in order to enable the MSI.
-	 *  - vdev
-	 *  - true
-	 */
-	enable_disable_msi(vdev, true);
+		/** Call enable_disable_msi with the following parameters, in order to enable the MSI.
+		 *  - vdev
+		 *  - true
+		 */
+		enable_disable_msi(vdev, true);
+	}
 }
 
 /**
@@ -294,6 +298,25 @@ void vmsi_write_cfg(struct pci_vdev *vdev, uint32_t offset, uint32_t bytes, uint
 	/** Declare the following local variables of type uint32_t.
 	 *  - msgctrl representing the value of the MSI control register, not initialized. */
 	uint32_t msgctrl;
+	/** Declare the following local variables of type uint32_t.
+	 *  - old representing the value of the \a bytes value located in the vPCI configurations space,
+	 *  not initialized. */
+	uint32_t old;
+	/** Declare the following local variables of type uint32_t.
+	 *  - ro_mask representing the MSI read-only bit, initialized as ~0. */
+	uint32_t ro_mask = ~0U;
+
+	/** Declare the following local variables of type const uint8_t [10U].
+	 *  - msi_32_ro_mask representing the 32-bit MSI read-only bit. */
+	static const uint8_t msi_32_ro_mask[10U] = {0xffU, 0xffU, 0xfeU, 0xffU,
+						    0xffU, 0x0fU, 0xf0U, 0xffU,
+						    0x00U, 0xffU};
+	/** Declare the following local variables of type const uint8_t [14U].
+	 *  - msi_64_ro_mask representing the 64-bit MSI read-only bit. */
+	static const uint8_t msi_64_ro_mask[14U] = {0xffU, 0xffU, 0xfeU, 0xffU,
+						    0xffU, 0x0fU, 0xf0U, 0xffU,
+						    0xffU, 0xffU, 0xffU, 0xffU,
+						    0x00U, 0xffU};
 
 	/** Call enable_disable_msi with the following parameters, in order to disable the physical MSI of the
 	 *  physical PCI device associated with the given vPCI device. It is required to disable MSI before remapping
@@ -302,27 +325,54 @@ void vmsi_write_cfg(struct pci_vdev *vdev, uint32_t offset, uint32_t bytes, uint
 	 *  - false
 	 */
 	enable_disable_msi(vdev, false);
-	/** Call pci_vdev_write_cfg with the following parameters, in order to write 'val' into the
-	 *  given vPCI configuration space. It is used to update the virtual MSI capability structure first.
-	 * - vdev
-	 * - offset
-	 * - bytes
-	 * - val
-	 */
-	pci_vdev_write_cfg(vdev, offset, bytes, val);
-
-	/** Set msgctrl to the value returned by pci_vdev_read_cfg with vdev, vdev->msi.capoff + PCIR_MSI_CTRL and 2
-	 *  being the parameters, to get the MSI control register status, which includes the bit of enabling or
-	 *  disabling MSI.
-	 */
-	msgctrl = pci_vdev_read_cfg(vdev, vdev->msi.capoff + PCIR_MSI_CTRL, 2U);
-	/** If the enabling MSI bit in msgctrl is set by guest VM */
-	if ((msgctrl & PCIM_MSICTRL_MSI_ENABLE) != 0U) {
-		/** Call remap_vmsi with the following parameters, in order to remap the virtual MSI data/address to
-		 *  the phyiscal MSI data/address.
-		 *  - vdev
+	/** If MSI is 64bit */
+	if (vdev->msi.is_64bit) {
+		/** Call memcpy_s with the following parameters, in order to set ro_mask to 64bit MSI read-only mask.
+		 *  - &ro_mask
+		 *  - bytes
+		 *  - &msi_64_ro_mask[offset - vdev->msi.capoff]
+		 *  - bytes
 		 */
-		remap_vmsi(vdev);
+		(void)memcpy_s((void *)&ro_mask, bytes, (void *)&msi_64_ro_mask[offset - vdev->msi.capoff], bytes);
+	} else {
+		/** Call memcpy_s with the following parameters, in order to set ro_mask to 32bit MSI read-only mask.
+		 *  - &ro_mask
+		 *  - bytes
+		 *  - &msi_32_ro_mask[offset - vdev->msi.capoff]
+		 *  - bytes
+		 */
+		(void)memcpy_s((void *)&ro_mask, bytes, (void *)&msi_32_ro_mask[offset - vdev->msi.capoff], bytes);
+	}
+
+	/* If there is any bit that is not set in ro_mask. */
+	if (ro_mask != ~0U) {
+		/** Set old to the value returned by pci_vdev_read_cfg with vdev, offset and bytes being the
+		 *  parameters, which reads a bytes value from the configuration space of the given vPCI device.
+		 */
+		old = pci_vdev_read_cfg(vdev, offset, bytes);
+		/** Call pci_vdev_write_cfg with the following parameters, in order to write 'active_val' into the
+		 *  given vPCI configuration space, where active_val is calculated by
+		 *  (old & ro_mask) | (val & ~ro_mask).
+		 * - vdev
+		 * - offset
+		 * - bytes
+		 * - (old & ro_mask) | (val & ~ro_mask)
+		 */
+		pci_vdev_write_cfg(vdev, offset, bytes, (old & ro_mask) | (val & ~ro_mask));
+
+		/** Set msgctrl to the value returned by pci_vdev_read_cfg with vdev, vdev->msi.capoff + PCIR_MSI_CTRL
+		 *  and 2 being the parameters to get the MSI control register status, which includes the bit of
+		 *  enabling or disabling MSI.
+		 */
+		msgctrl = pci_vdev_read_cfg(vdev, vdev->msi.capoff + PCIR_MSI_CTRL, 2U);
+		/** If the enabling MSI bit in msgctrl is set by guest VM */
+		if ((msgctrl & PCIM_MSICTRL_MSI_ENABLE) != 0U) {
+			/** Call remap_vmsi with the following parameters, in order to remap the virtual MSI
+			 *  data/address to the phyiscal MSI data/address.
+			 *  - vdev
+			 */
+			remap_vmsi(vdev);
+		}
 	}
 }
 
@@ -388,7 +438,10 @@ void init_vmsi(struct pci_vdev *vdev)
 	/** Declare the following local variables of type uint32_t.
 	 *  - val representing a register value in the configuration space of the given vPCI, not initialized. */
 	uint32_t val;
-
+	/** Declare the following local variables of type uint32_t.
+	 *  - msi_data_addr representing the MSI data register address in the configuration space of the given
+	 *  vPCI, not initialized. */
+	uint32_t msi_data_addr;
 	/** Set val to the value returned by pci_vdev_read_cfg with vdev, PCIR_CAP_PTR and 1 being the parameters,
 	 *  which reads the register of PCIR_CAP_PTR to get the offset of the first capability structure.
 	 */
@@ -438,6 +491,44 @@ void init_vmsi(struct pci_vdev *vdev)
 		 * - val
 		 */
 		pci_vdev_write_cfg(vdev, vdev->msi.capoff, 4U, val);
+
+		/** Call pci_vdev_write_cfg with the following parameters, in order to write MSG_INITIAL_VALUE into the
+		 *  given vPCI configuration space to update the virtual MSI capability structure.
+		 * - vdev
+		 * - vdev->msi.capoff + PCIR_MSI_ADDR
+		 * - 4
+		 * - MSG_INITIAL_VALUE
+		 */
+		pci_vdev_write_cfg(vdev, vdev->msi.capoff + PCIR_MSI_ADDR, 4U, MSG_INITIAL_VALUE);
+
+		/** If MSI is 64bit */
+		if (vdev->msi.is_64bit) {
+			/** Set msi_data_addr to the value, where the value is calculated by plusing
+			 *  PCIR_MSI_DATA_64BIT and msi.capoff */
+			msi_data_addr = vdev->msi.capoff + PCIR_MSI_DATA_64BIT;
+		} else {
+			/** Set msi_data_addr to the value, where the value is calculated by plusing
+			 *  PCIR_MSI_DATA and msi.capoff */
+			msi_data_addr = vdev->msi.capoff + PCIR_MSI_DATA;
+		}
+
+		/** Set val to the value returned by pci_vdev_read_cfg with vdev, msi_data_addr, and 4 being the
+		 *  parameters, in order to read the register of the msi_data_addr to get the value of MSI data
+		 *  register. */
+		val = pci_vdev_read_cfg(vdev, msi_data_addr, 4U);
+		/* Clear the bit MSI_DATA_TRIGGER_MODE and MSI_DATA_LEVEL_TRIGGER_MODE. Clear all of the bits in
+		 * MSI_DATA_DELIVER_MODE_MASK. */
+		val &= (~(MSI_DATA_TRIGGER_MODE | MSI_DATA_LEVEL_TRIGGER_MODE | MSI_DATA_DELIVER_MODE_MASK));
+		/* Set the bit MSI_DATA_LEVEL_TRIGGER_MODE of val */
+		val |= MSI_DATA_LEVEL_TRIGGER_MODE;
+		/** Call pci_vdev_write_cfg with the following parameters, in order to write val into the
+		 *  given vPCI configuration space to update the virtual MSI capability structure.
+		 * - vdev
+		 * - msi_data_addr
+		 * - 4
+		 * - val
+		 */
+		pci_vdev_write_cfg(vdev, msi_data_addr, 4U, val);
 	}
 }
 
