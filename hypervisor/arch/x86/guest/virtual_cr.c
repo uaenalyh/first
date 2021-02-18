@@ -78,10 +78,10 @@
 /**
  * @brief CR4 bits hypervisor wants to trap to track status change.
  *
- * The hypervisor will trap CR4.PSE, CR4.PAE, CR4.VMXE, CR4.PCIDE, CR4.SMEP, CR4.SMAP, CR4.PKE, CR4.SMXE to
+ * The hypervisor will trap CR4.PSE, CR4.PAE, CR4.VMXE, CR4.PCIDE, CR4.SMEP, CR4.SMAP, CR4.PKE, CR4.SMXE, CR4.DE to
  * track the status change. This macro marks these bits.
  */
-#define CR4_TRAP_MASK (CR4_PSE | CR4_PAE | CR4_VMXE | CR4_PCIDE | CR4_SMEP | CR4_SMAP | CR4_PKE | CR4_SMXE)
+#define CR4_TRAP_MASK (CR4_PSE | CR4_PAE | CR4_VMXE | CR4_PCIDE | CR4_SMEP | CR4_SMAP | CR4_PKE | CR4_SMXE | CR4_DE)
 /**
  * @brief These CR4 bits are reserved according to the SDM and shall not be changed by the guests.
  *
@@ -541,9 +541,9 @@ static bool is_cr4_write_valid(struct acrn_vcpu *vcpu, uint64_t cr4)
 		ret = false;
 	/** If no always off bit is set */
 	} else {
-		/** If CR4 has CR4.VMXE or CR4.SMXE or CR4.PKE or CR4_PCE set */
+		/** If CR4 has CR4.VMXE or CR4.SMXE or CR4.PKE or CR4_PCE or CR4_DE set */
 		if (((cr4 & CR4_VMXE) != 0UL) || ((cr4 & CR4_SMXE) != 0UL) || ((cr4 & CR4_PKE) != 0UL)
-		 || ((cr4 & CR4_PCE) != 0UL)) {
+		 || ((cr4 & CR4_PCE) != 0UL) || ((cr4 & CR4_DE) != 0UL)) {
 			/** Set the ret to false */
 			ret = false;
 		/** If the corresponding if condition does not meet */
