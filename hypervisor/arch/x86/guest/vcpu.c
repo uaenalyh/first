@@ -1027,7 +1027,7 @@ void init_vcpu_protect_mode_regs(struct acrn_vcpu *vcpu, uint64_t vgdt_base_gpa)
 	 *  - &init_vgdt: start virtual linear address of HV memory region which data is stored in
 	 *  - vgdt_base_gpa: start guest physical address of guest memory region which data will be copied into
 	 *  - sizeof(init_vgdt): size of memory which date will be copied */
-	(void)copy_to_gpa(vcpu->vm, &init_vgdt, vgdt_base_gpa, sizeof(init_vgdt));
+	copy_to_gpa(vcpu->vm, &init_vgdt, vgdt_base_gpa, sizeof(init_vgdt));
 
 	/** Call set_vcpu_regs() with the following parameters, in order to set the registers of the target vcpu.
 	 *  - vcpu: target vcpu to set

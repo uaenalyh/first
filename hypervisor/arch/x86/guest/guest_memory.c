@@ -348,7 +348,7 @@ int32_t copy_from_gpa(struct acrn_vm *vm, void *h_ptr, uint64_t gpa, uint32_t si
  * @param[in] gpa The start guest memory address which data will be stored into.
  * @param[in] size The size (bytes) of copied region.
  *
- * @return 0 if no error happens otherwise return -EINVAL.
+ * @return None
  *
  * @pre vm != NULL
  * @pre hptr != NULL
@@ -363,17 +363,17 @@ int32_t copy_from_gpa(struct acrn_vm *vm, void *h_ptr, uint64_t gpa, uint32_t si
  * @reentrancy Unspecified
  * @threadsafety Yes
  */
-int32_t copy_to_gpa(struct acrn_vm *vm, void *h_ptr, uint64_t gpa, uint32_t size)
+void copy_to_gpa(struct acrn_vm *vm, void *h_ptr, uint64_t gpa, uint32_t size)
 {
 	/** Call copy_gpa with the following parameters, in order to
-	 *  copy data from host memory to guest memory.
+	 *  copy data from host memory to guest memory, and discard its return value.
 	 *  - \a vm
 	 *  - \a h_ptr
 	 *  - \a gpa
 	 *  - \a size
 	 *  - false
 	 */
-	return copy_gpa(vm, h_ptr, gpa, size, false);
+	(void)copy_gpa(vm, h_ptr, gpa, size, false);
 }
 
 /**

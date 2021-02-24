@@ -182,26 +182,26 @@ void build_vacpi(struct acrn_vm *vm)
 	/** Set rsdp->extended_checksum to the return value of calculate_checksum8(rsdp, ACPI_RSDP_XCHECKSUM_LENGTH) */
 	rsdp->extended_checksum = calculate_checksum8(rsdp, ACPI_RSDP_XCHECKSUM_LENGTH);
 	/** Call copy_to_gpa with the following parameters, in order to copy the RSDP table to guest fixed memory
-	 *  space which is for ACPI table, and discard its return value.
+	 *  space which is for ACPI table.
 	 *  - vm
 	 *  - rsdp
 	 *  - ACPI_RSDP_ADDR
 	 *  - ACPI_RSDP_XCHECKSUM_LENGTH
 	 */
-	(void)copy_to_gpa(vm, rsdp, ACPI_RSDP_ADDR, ACPI_RSDP_XCHECKSUM_LENGTH);
+	copy_to_gpa(vm, rsdp, ACPI_RSDP_ADDR, ACPI_RSDP_XCHECKSUM_LENGTH);
 
 	/** Set xsdt to &acpi_table_template[vm->vm_id].xsdt */
 	xsdt = &acpi_table_template[vm->vm_id].xsdt;
 	/** Set xsdt->header.checksum to the return value of calculate_checksum8(xsdt, xsdt->header.length) */
 	xsdt->header.checksum = calculate_checksum8(xsdt, xsdt->header.length);
 	/** Call copy_to_gpa with the following parameters, in order to copy the XSDT table to guest fixed memory
-	 *  space which is for ACPI table, and discard its return value.
+	 *  space which is for ACPI table.
 	 *  - vm
 	 *  - xsdt
 	 *  - ACPI_XSDT_ADDR
 	 *  - xsdt->header.length
 	 */
-	(void)copy_to_gpa(vm, xsdt, ACPI_XSDT_ADDR, xsdt->header.length);
+	copy_to_gpa(vm, xsdt, ACPI_XSDT_ADDR, xsdt->header.length);
 
 	/** For each i ranging from 0 to vm->hw.created_vcpus - 1 [with a step of 1] */
 	for (i = 0U; i < vm->hw.created_vcpus; i++) {
@@ -222,13 +222,13 @@ void build_vacpi(struct acrn_vm *vm)
 	madt->header.checksum = calculate_checksum8(madt, madt->header.length);
 
 	/** Call copy_to_gpa with the following parameters, in order to copy MADT table/its sub tables to
-	 *  guest fixed memory space which is for ACPI table, and discard its return value.
+	 *  guest fixed memory space which is for ACPI table.
 	 *  - vm
 	 *  - madt
 	 *  - ACPI_MADT_ADDR
 	 *  - madt->header.length
 	 */
-	(void)copy_to_gpa(vm, madt, ACPI_MADT_ADDR, madt->header.length);
+	copy_to_gpa(vm, madt, ACPI_MADT_ADDR, madt->header.length);
 }
 
 /**

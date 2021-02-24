@@ -28,7 +28,7 @@ struct acrn_vm;
 
 int32_t copy_from_gpa(struct acrn_vm *vm, void *h_ptr, uint64_t gpa, uint32_t size);
 
-int32_t copy_to_gpa(struct acrn_vm *vm, void *h_ptr, uint64_t gpa, uint32_t size);
+void copy_to_gpa(struct acrn_vm *vm, void *h_ptr, uint64_t gpa, uint32_t size);
 
 void *gpa2hva(struct acrn_vm *vm, uint64_t x);
 

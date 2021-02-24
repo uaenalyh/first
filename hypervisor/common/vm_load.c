@@ -410,24 +410,24 @@ void direct_boot_sw_loader(struct acrn_vm *vm)
 	init_vcpu_protect_mode_regs(vcpu, get_guest_gdt_base_gpa(vcpu->vm));
 
 	/** Call copy_to_gpa with the following parameters, in order to copy the guest kernel image to its run-time
-	 *  location , and discard its return value.
+	 *  location.
 	 *  - vm
 	 *  - sw_kernel->kernel_src_addr
 	 *  - sw_kernel->kernel_load_addr
 	 *  - sw_kernel->kernel_size
 	 */
-	(void)copy_to_gpa(vm, sw_kernel->kernel_src_addr, sw_kernel->kernel_load_addr, sw_kernel->kernel_size);
+	copy_to_gpa(vm, sw_kernel->kernel_src_addr, sw_kernel->kernel_load_addr, sw_kernel->kernel_size);
 
 	/** If bootargs_info->size is not 0, which means the guest OS contains boot arguments info */
 	if (bootargs_info->size != 0U) {
 		/** Call copy_to_gpa with the following parameters, in order to copy guest OS boot arguments to its
-		 *  loading location, and discard its return value.
+		 *  loading location.
 		 *  - vm
 		 *  - bootargs_info->src_addr
 		 *  - bootargs_info->load_addr
 		 *  - strnlen_s((char *)bootargs_info->src_addr, MAX_BOOTARGS_SIZE) + 1
 		 */
-		(void)copy_to_gpa(vm, bootargs_info->src_addr, bootargs_info->load_addr,
+		copy_to_gpa(vm, bootargs_info->src_addr, bootargs_info->load_addr,
 			(strnlen_s((char *)bootargs_info->src_addr, MAX_BOOTARGS_SIZE) + 1U));
 	}
 	/** Depending on vm->sw.kernel_type */
