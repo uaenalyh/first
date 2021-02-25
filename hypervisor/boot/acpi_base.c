@@ -139,8 +139,8 @@ uint16_t parse_madt(uint32_t lapic_id_array[MAX_PCPU_NUM])
 uint16_t parse_madt_ioapic(struct ioapic_info *ioapic_id_array)
 {
 
-	/** Set ioapic_id_array->id to 0H */
-	ioapic_id_array->id = 0U;
+	/** Set ioapic_id_array->id to 2H */
+	ioapic_id_array->id = 2U;
 	/**
 	 * Set ioapic_id_array->addr to FEC00000H,
 	 * which is the default IOAPIC MMIO base address according to IOAPIC specification.

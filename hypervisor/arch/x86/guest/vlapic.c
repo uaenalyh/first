@@ -1095,15 +1095,6 @@ static int32_t vlapic_x2apic_pt_icr_access(struct acrn_vm *vm, uint64_t val)
 				switch (mode) {
 				/** If Delivery Mode is INIT */
 				case APIC_DELMODE_INIT:
-					/** Call vlapic_process_init_sipi with the following parameters, in order to
-				         *  process the INIT Delivery Mode case.
-				         *  - target_vcpu
-				         *  - mode
-				         *  - icr_low
-				         */
-					vlapic_process_init_sipi(target_vcpu, mode, icr_low);
-					/** End of case */
-					break;
 				/** If Delivery Mode is Start Up */
 				case APIC_DELMODE_STARTUP:
 					/** Call vlapic_process_init_sipi with the following parameters, in order to
