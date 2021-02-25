@@ -494,6 +494,8 @@ static void vmx_write_cr0(struct acrn_vcpu *vcpu, uint64_t cr0)
 
 			/** Set cr0_vmx to be (cr0_vmx & ~(CR0_CD | CR0_NW)) */
 			cr0_vmx &= ~(CR0_CD | CR0_NW);
+			/** Set cr0_mask to be (cr0_mask | CR0_NE) */
+			cr0_mask |= CR0_NE;
 			/** Configure the VMX_GUEST_CR0 in VMCS to be cr0_vmx & 0xFFFFFFFFUL */
 			exec_vmwrite(VMX_GUEST_CR0, cr0_vmx & 0xFFFFFFFFUL);
 			/** Configure the VMX_CR0_READ_SHADOW in VMCS to be cr0_mask & 0xFFFFFFFFUL */
