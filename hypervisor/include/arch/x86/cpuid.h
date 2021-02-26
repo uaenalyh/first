@@ -87,6 +87,12 @@
  */
 #define CPUID_ECX_SDBG			(1U << 11U)
 /**
+ * @brief A bit representing whether the processor supports changing IA32_MISC_ENABLE[23].
+ *
+ * This bit is fetched from CPUID(EAX=1H,ECX=0H):ECX[14].
+ */
+#define CPUID_ECX_xTPR			(1U << 14U)
+/**
  * @brief A bit representing whether the processor supports Perfmon and Debug Capability.
  *
  * This bit is fetched from CPUID(EAX=1H,ECX=0H):ECX[15].

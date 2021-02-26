@@ -819,6 +819,9 @@ static void guest_cpuid_01h(struct acrn_vcpu *vcpu, uint32_t *eax, uint32_t *ebx
 	/** Clear Thermal Monitor 2 Bit (Bit 8) in guest CPUID.1H:ECX */
 	*ecx &= ~CPUID_ECX_TM2;
 
+	/** Clear xTPR Update Control Bit (Bit 14) in guest CPUID.1H:ECX */
+	*ecx &= ~CPUID_ECX_xTPR;
+
 	/** Clear Perfmon and Debug Capability Bit (Bit 15) in guest CPUID.1H:ECX */
 	*ecx &= ~CPUID_ECX_PDCM;
 
