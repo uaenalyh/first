@@ -92,24 +92,24 @@ test_srs_build_job:
     - echo "start to test srs lauching acrn unit test ..."
     - pwd
     - cd ../acrn-hypervisor/
-    - git reset --hard && git checkout SRS_CItest && git pull
+    - git reset --hard && git checkout huihuang_SRS_ci && git pull
     - python3 /opt/modify_script.py vm1
     - cd hypervisor
     - make clean
     - /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0 "make RELEASE=0"
     - if [ $? -ne 0 ]; then exit 1; fi
     - mv build/acrn.32.out /var/lib/tftpboot/acrn_srs/srs/acrn_pci_vm1.32.out
-    - git reset --hard && git checkout SRS_CItest && git pull
+    - git reset --hard && git checkout huihuang_SRS_ci && git pull
     - python3 /opt/modify_script.py vm0
     - make clean
     - /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0 "make RELEASE=0"
     - mv build/acrn.32.out /var/lib/tftpboot/acrn_srs/srs/acrn_pci_vm0.32.out
-    - git reset --hard && git checkout SRS_CItest && git pull
+    - git reset --hard && git checkout huihuang_SRS_ci && git pull
     - python3 /opt/modify_script_safety_ananysis.py
     - make clean
     - /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0 "make RELEASE=0"
     - mv build/acrn.32.out /var/lib/tftpboot/acrn_srs/srs/acrn_low_direct.32.out
-    - git reset --hard && git checkout SRS_CItest && git pull
+    - git reset --hard && git checkout huihuang_SRS_ci && git pull
     - make clean
     - /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0 "make RELEASE=0"
     - if [ $? -ne 0 ]; then exit 1; fi
