@@ -1584,6 +1584,13 @@ void reset_vcpu(struct acrn_vcpu *vcpu)
 	 *  - vlapic: the target vlapic to reset */
 	vlapic_reset(vlapic);
 
+	/** Call vcpu_make_request with following parameters in order to
+	 *  initialize the LAPIC of the physical CPU corresponding to the vCPU.
+	 *  - vcpu
+	 *  - ACRN_REQUEST_LAPIC_RESET
+	 */
+	vcpu_make_request(vcpu, ACRN_REQUEST_LAPIC_RESET);
+
 	/** Call reset_vcpu_regs() with the following parameters, in order to reset the vcpu registers.
 	 *  -vcpu: the target vcpu to reset */
 	reset_vcpu_regs(vcpu);
@@ -1613,10 +1620,6 @@ void reset_vcpu(struct acrn_vcpu *vcpu)
  */
 void pause_vcpu(struct acrn_vcpu *vcpu)
 {
-	/** Declare the following local variables of type uint16_t.
-	 *  - pcpu_id representing id of the pcpu, initialized as pcpuid_from_vcpu(vcpu). */
-	uint16_t pcpu_id = pcpuid_from_vcpu(vcpu);
-
 	/** Logging the following information with a log level of LOG_DEBUG.
 	 *  - vcpu->vcpu_id: id of the vcpu
 	 */
@@ -1635,8 +1638,8 @@ void pause_vcpu(struct acrn_vcpu *vcpu)
 			 *  - &vcpu->thread_obj: address of the target thread. */
 			sleep_thread(&vcpu->thread_obj);
 
-			/** If pcpu_id is different with return value of get_cpu_id(). */
-			if (pcpu_id != get_pcpu_id()) {
+			/** If return value of pcpuid_from_vcpu(vcpu) is different with return value of get_cpu_id(). */
+			if (pcpuid_from_vcpu(vcpu) != get_pcpu_id()) {
 				/** Until vcpu->running is false */
 				while (vcpu->running) {
 					/** Call asm_pause(), in order to pause current physical CPU. */
