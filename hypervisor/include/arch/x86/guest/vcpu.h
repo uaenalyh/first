@@ -375,8 +375,8 @@ struct msr_store_area {
  *
  * The detailed arch information includes vmcs pagesize, msr bitmap pagesize, vlapic structure,
  * current context, cpu_context structures, guest msr array, vpid, exception_info structure,
- * irq_window_enabled flag, nrexit, vcpu context information which including exit_reason,
- * idt_vector, exit_qualification and inst_len, cpu_mode information, nr_sipi, interrupt injection
+ * nrexit, vcpu context information which including exit_reason, idt_vector,
+ * exit_qualification and inst_len, cpu_mode information, nr_sipi, interrupt injection
  * information, msr_store_area structure and eoi_exit_bitmap .
  *
  * @consistency None
@@ -423,7 +423,6 @@ struct acrn_vcpu_arch {
 		uint32_t error;
 	} exception_info;
 
-	bool irq_window_enabled; /**< whether the irq window is enabled. */
 	uint32_t nrexits;      /**< vmexit number */
 
 	uint32_t exit_reason;        /**< vmexit number */

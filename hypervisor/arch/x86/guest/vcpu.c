@@ -556,11 +556,8 @@ uint64_t vcpu_get_guest_msr(const struct acrn_vcpu *vcpu, uint32_t msr)
 	 *  - val representing the msr result, initialized as OUL. */
 	uint64_t val = 0UL;
 
-	/** If index less than NUM_GUEST_MSRS */
-	if (index < NUM_GUEST_MSRS) {
-		/** Set val to vcpu->arch.guest_msrs[index] */
-		val = vcpu->arch.guest_msrs[index];
-	}
+	/** Set val to vcpu->arch.guest_msrs[index] */
+	val = vcpu->arch.guest_msrs[index];
 
 	/** Return the result of the target msr */
 	return val;
@@ -594,11 +591,8 @@ void vcpu_set_guest_msr(struct acrn_vcpu *vcpu, uint32_t msr, uint64_t val)
 	 *  - index representing sequence number of the target msr, initialized as vmsr_get_guest_msr_index(msr). */
 	uint32_t index = vmsr_get_guest_msr_index(msr);
 
-	/** If index less than NUM_GUEST_MSRS */
-	if (index < NUM_GUEST_MSRS) {
-		/** Set vcpu->arch.guest_msrs[index] to the input parameter val */
-		vcpu->arch.guest_msrs[index] = val;
-	}
+	/** Set vcpu->arch.guest_msrs[index] to the input parameter val */
+	vcpu->arch.guest_msrs[index] = val;
 }
 
 /**
@@ -665,9 +659,6 @@ static void set_vcpu_mode(struct acrn_vcpu *vcpu, uint32_t cs_attr, uint64_t ia3
  */
 static void init_xsave(struct acrn_vcpu *vcpu)
 {
-	/** Declare the following local variables of struct type cpuinfo_x86 *.
-	 *  - cpu_info representing pointer which points to cpu information, initialized as get_pcpu_info(). */
-	struct cpuinfo_x86 *cpu_info = get_pcpu_info();
 	/** Declare the following local variables of type struct ext_context *.
 	 *  - ectx representing pointer which points to extend context of the running vcpu, initialized
 	 *	as &vcpu->arch.context.ext_ctx. */
@@ -820,20 +811,12 @@ void set_vcpu_regs(struct acrn_vcpu *vcpu, struct acrn_vcpu_regs *vcpu_regs)
 	 *  - vcpu_regs->gprs.rsp: the rsp to set */
 	vcpu_set_rsp(vcpu, vcpu_regs->gprs.rsp);
 
-	/** If vcpu_regs->rflags is 0h, meaning a value for RFLAGS is not given */
-	if (vcpu_regs->rflags == 0UL) {
-		/** Call vcpu_set_rflags() with the following parameters, in order to set the rflags to 02h.
-		 *  - vcpu: the target vcpu
-		 *  - 0x02UL: the value of the rflags
-		 */
-		vcpu_set_rflags(vcpu, 0x02UL);
-	} else {
-		/** Call vcpu_set_rflags() with the following parameters, in order to clear bit CF(0),
-		 *  PF(2), AF(4), ZF(6), SF(7) and OF(11).
-		 *  - vcpu: the target vcpu
-		 *  - vcpu_regs->rflags & ~(0x8d5UL): the value of the rflags to set */
-		vcpu_set_rflags(vcpu, vcpu_regs->rflags & ~(0x8d5UL));
-	}
+	/** Call vcpu_set_rflags() with the following parameters, in order to
+	 *  set the rflags to 02h, which is the initial value of EFLAGS register.
+	 *  - vcpu: the target vcpu
+	 *  - 0x02UL: the value of the rflags
+	 */
+	vcpu_set_rflags(vcpu, 0x02UL);
 
 	/** Set ctx->cr0 to vcpu_regs->cr0. */
 	ctx->cr0 = vcpu_regs->cr0;
@@ -1300,14 +1283,11 @@ int32_t run_vcpu(struct acrn_vcpu *vcpu)
 		 *  - vcpu->vcpu_id: vcpu id */
 		pr_info("VM %d Starting VCPU %hu", vcpu->vm->vm_id, vcpu->vcpu_id);
 
-		/** If vpid of the vcpu->arch is not 0 */
-		if (vcpu->arch.vpid != 0U) {
-			/** Call exec_vmwrite16 with the following parameters, in order to set vpid to vmcs field.
-			 *  - VMX_VPID: address of VPID in VMCS field
-			 *  - vcpu->arch.vpid:  vpid in the context
-			 */
-			exec_vmwrite16(VMX_VPID, vcpu->arch.vpid);
-		}
+		/** Call exec_vmwrite16 with the following parameters, in order to set vpid to vmcs field.
+		 *  - VMX_VPID: address of VPID in VMCS field
+		 *  - vcpu->arch.vpid:  vpid in the context
+		 */
+		exec_vmwrite16(VMX_VPID, vcpu->arch.vpid);
 
 		/** Call flush_vpid_global(), in order to invalidate all mappings (linear mappings,
 		 *  guest-physical mappings and combined mappings) in the TLBs and paging-structure
@@ -1586,15 +1566,6 @@ void reset_vcpu(struct acrn_vcpu *vcpu)
 
 	/** Set exception information of vcpu->arch to VECTOR_INVALID */
 	vcpu->arch.exception_info.exception = VECTOR_INVALID;
-
-	/** Set irq_window_enabled of vcpu->arch to false */
-	vcpu->arch.irq_window_enabled = false;
-	/** Call memset() with the following parameters, in order to set PAGE_SIZE bytes
-	 *  starting from &vcpu->arch.vmcs to 0.
-	 *  - (void *)vcpu->arch.vmcs: The address of the memory block to fill
-	 *  - 0: The value to be set to each byte of the specified memory block.
-	 *  - PAGE_SIZE: The number of bytes to be set */
-	(void)memset((void *)vcpu->arch.vmcs, 0U, PAGE_SIZE);
 
 	/** Call memset() with the following parameters, in order to set
 	 *  sizeof(struct run_context) bytes starting from &vcpu->arch.context to 0.
