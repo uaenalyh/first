@@ -245,7 +245,7 @@ void vcpu_thread(struct thread_object *obj)
  *
  * @mode HV_SUBMODE_INIT_ROOT, HV_OPERATIONAL
  *
- * @remark The function shall be called after switch_to_idle().
+ * @remark The function shall be called after run_idle_thread().
  *
  * @reentrancy Unspecified
  *

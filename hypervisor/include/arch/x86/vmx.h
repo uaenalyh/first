@@ -906,6 +906,11 @@
 
 /**
  * @brief Bit field in the IA32_VMX_EXIT_CTLS MSR that determines whether
+ * DR7 and the IA32_DEBUGCTL MSR are saved on VM exit.
+ */
+#define VMX_EXIT_CTLS_SAVE_DEBUGCTL (1U << 2U)
+/**
+ * @brief Bit field in the IA32_VMX_EXIT_CTLS MSR that determines whether
  * a logical processor is in 64-bit mode after the next VM exit.
  */
 #define VMX_EXIT_CTLS_HOST_ADDR64 (1U << 9U)
@@ -935,6 +940,11 @@
  */
 #define VMX_EXIT_CTLS_LOAD_EFER   (1U << 21U)
 
+/**
+ * @brief Bit field in the IA32_VMX_EXIT_CTLS MSR that determines whether
+ * DR7 and the IA32_DEBUGCTL MSR are loaded on VM entry.
+ */
+#define VMX_ENTRY_CTLS_LOAD_DEBUGCTL (1U << 2U)
 /**
  * @brief Bit field in the IA32_VMX_ENTRY_CTLS MSR that determines whether
  * a logical processor is in IA-32e mode after VM entry.

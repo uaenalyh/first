@@ -759,14 +759,9 @@ static void init_exec_ctrl(struct acrn_vcpu *vcpu)
 		VMX_PROCBASED_CTLS2_VAPIC | VMX_PROCBASED_CTLS2_EPT | VMX_PROCBASED_CTLS2_RDTSCP |
 			VMX_PROCBASED_CTLS2_UNRESTRICT);
 
-	/** If virtual processor identifier of the vcpu(specified by vcpu->arch.vpid) is not 0 */
-	if (vcpu->arch.vpid != 0U) {
-		/** Bitwise OR value32 by VMX_PROCBASED_CTLS2_VPID */
-		value32 |= VMX_PROCBASED_CTLS2_VPID;
-	} else {
-		/** Bitwise AND value32 by ~VMX_PROCBASED_CTLS2_VPID */
-		value32 &= ~VMX_PROCBASED_CTLS2_VPID;
-	}
+	/** Bitwise OR value32 by VMX_PROCBASED_CTLS2_VPID */
+	value32 |= VMX_PROCBASED_CTLS2_VPID;
+
 	/*
 	 * This field exists only on processors that support
 	 * the 1-setting  of the "use TPR shadow"
@@ -969,16 +964,11 @@ static void init_entry_ctrl(const struct acrn_vcpu *vcpu)
 	 */
 	/** Set "value32" to (VMX_ENTRY_CTLS_LOAD_EFER | VMX_ENTRY_CTLS_LOAD_PAT) */
 	value32 = (VMX_ENTRY_CTLS_LOAD_EFER | VMX_ENTRY_CTLS_LOAD_PAT);
-
-	/** If the return value of get_vcpu_mode(vcpu) is CPU_MODE_64BIT) */
-	if (get_vcpu_mode(vcpu) == CPU_MODE_64BIT) {
-		/** Bitwise OR value32 by VMX_ENTRY_CTLS_IA32E_MODE */
-		value32 |= (VMX_ENTRY_CTLS_IA32E_MODE);
-	}
-
 	/** Set "value32" to return value of check_vmx_ctrl(MSR_IA32_VMX_ENTRY_CTLS, value32) */
 	value32 = check_vmx_ctrl(MSR_IA32_VMX_ENTRY_CTLS, value32);
 
+	/** Bitwise AND value32 by ~VMX_ENTRY_CTLS_LOAD_DEBUGCTL */
+	value32 &= ~VMX_ENTRY_CTLS_LOAD_DEBUGCTL;
 	/** Call exec_vmwrite32() with the following parameters, in order to write value32
 	 *  to the field 'VM-entry controls' in current VMCS.
 	 *  - VMX_ENTRY_CONTROLS
@@ -1061,6 +1051,8 @@ static void init_exit_ctrl(const struct acrn_vcpu *vcpu)
 		VMX_EXIT_CTLS_ACK_IRQ | VMX_EXIT_CTLS_SAVE_PAT | VMX_EXIT_CTLS_LOAD_PAT | VMX_EXIT_CTLS_LOAD_EFER |
 			VMX_EXIT_CTLS_SAVE_EFER | VMX_EXIT_CTLS_HOST_ADDR64);
 
+	/** Bitwise AND value32 by ~VMX_EXIT_CTLS_SAVE_DEBUGCTL */
+	value32 &= ~VMX_EXIT_CTLS_SAVE_DEBUGCTL;
 	/** Call exec_vmwrite32() with the following parameters, in order to write value32
 	 *  to VM-exit controls field in the VMCS.
 	 *  - VMX_EXIT_CONTROLS
@@ -1139,17 +1131,11 @@ void init_vmcs(struct acrn_vcpu *vcpu)
 	 *  - 4U */
 	(void)memcpy_s(vcpu->arch.vmcs, 4U, (void *)&vmx_rev_id, 4U);
 
-	/** If vcpu->arch.vmcs is not NULL */
-	if ((void *)vcpu->arch.vmcs != NULL) {
-		/** Set vmcs_pa to return value of hva2hpa(vcpu->arch.vmcs) */
-		vmcs_pa = hva2hpa(vcpu->arch.vmcs);
-		/** Call exec_vmclear with the following parameters, in order to clear VMCS field of the vCPU.
-		 *  - &vmcs_pa */
-		exec_vmclear((void *)&vmcs_pa);
-	}
-
 	/** Set vmcs_pa to return value of hva2hpa(vcpu->arch.vmcs) */
 	vmcs_pa = hva2hpa(vcpu->arch.vmcs);
+	/** Call exec_vmclear with the following parameters, in order to clear VMCS field of the vCPU.
+	 *  - &vmcs_pa */
+	exec_vmclear((void *)&vmcs_pa);
 	/** Call exec_vmptrld() with the following parameters, in order to load VMCS pointer from
 	 *  memory pointed by '&vmcs_pa'.
 	 *  - &vmcs_pa
