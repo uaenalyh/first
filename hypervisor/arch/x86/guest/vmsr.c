@@ -681,7 +681,6 @@ void init_msr_emulation(struct acrn_vcpu *vcpu)
 	 *  - INTERCEPT_WRITE
 	 */
 	enable_msr_interception(msr_bitmap, MSR_IA32_EFER, INTERCEPT_WRITE);
-
 	/** Call enable_msr_interception with the following parameters, in order to update 'msr_bitmap'
 	 *  according to the specified MSR IA32_MCG_STATUS and the specified mode INTERCEPT_WRITE.
 	 *  - msr_bitmap
@@ -1885,6 +1884,10 @@ int32_t wrmsr_vmexit_handler(struct acrn_vcpu *vcpu)
 		/** End of case */
 		break;
 	}
+	/** 'msr' is MSR_IA32_P5_MC_ADDR */
+	case MSR_IA32_P5_MC_ADDR:
+	/** 'msr' is MSR_IA32_P5_MC_TYPE */
+	case MSR_IA32_P5_MC_TYPE:
 	/** 'msr' is MSR_IA32_MCG_STATUS */
 	case MSR_IA32_MCG_STATUS:
 	/** 'msr' is MSR_IA32_BIOS_SIGN_ID */
