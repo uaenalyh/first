@@ -31,6 +31,7 @@ build_job:
   script:
     - echo "start to build ..."
     - pwd
+    - python3 /opt/modify_bootargs.py
     - cd hypervisor
     - make clean
     - make RELEASE=0
