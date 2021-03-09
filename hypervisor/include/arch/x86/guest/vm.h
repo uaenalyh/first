@@ -164,8 +164,6 @@ struct acrn_vm {
 	spinlock_t vm_lock; /**< The lock that protects VM state updates */
 	struct vm_io_handler_desc emul_pio[EMUL_PIO_IDX_MAX]; /**< emulated port I/O handler descriptor */
 
-	uint8_t uuid[16]; /**< the UUID of this VM */
-
 	uint32_t vcpuid_entry_nr;  /**< the vCPUID entries number */
 	uint32_t vcpuid_level;  /**< the maximum leaf of basic function vCPUID information */
 	uint32_t vcpuid_xlevel; /**< the maximum leaf of extended function vCPUID information */
