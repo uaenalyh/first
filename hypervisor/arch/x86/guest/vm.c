@@ -802,10 +802,14 @@ void prepare_vm(uint16_t vm_id, const struct acrn_vm_config *vm_config)
 
 	/** If err equals 0, which means the create_vm has done successfully. */
 	if (err == 0) {
-		/** Call build_vacpi with the following parameters, in order to build ACPI tables for the created VM.
-		 *  - vm
-		 */
-		build_vacpi(vm);
+		/** If 'vm' is not a safety VM */
+		if (!is_safety_vm(vm)) {
+			/** Call build_vacpi with the following parameters, in order to
+			 *  build ACPI tables for the created VM.
+			 *  - vm
+			 */
+			build_vacpi(vm);
+		}
 
 		/** Call direct_boot_sw_loader with the following parameters, in order to load the guest OS
 		 *  image and boot arguments. And fill their information into the created VM data structure.
