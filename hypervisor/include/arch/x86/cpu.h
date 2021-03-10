@@ -900,14 +900,11 @@ static inline uint16_t get_pcpu_id(void)
  * - MSR_IA32_EXT_APIC_LDR
  * - MSR_IA32_EXT_XAPICID
  * - MSR_IA32_TSC_DEADLINE
- * - VMX_TSC_OFFSET_FULL
  * @post N/A
  *
- * @remark early_init_lapic interface should have been called once on the logical processor before msr_read reads from
- * below MSRs:
- * - MSR_IA32_EXT_APIC_LDR
- * - MSR_IA32_EXT_XAPICID
- * - MSR_IA32_APIC_BASE
+ * @remark early_init_lapic should have been called once on the logical processor before msr_read reads from
+ * below MSRs address:
+ * 802H, 803H, 808H, 80AH, 80DH-828H, 82FH, 830H, 832H-839H, 83EH.
  *
  * @mode HV_SUBMODE_INIT_PRE_SMP, HV_SUBMODE_INIT_ROOT, HV_OPERATIONAL, HV_SUBMODE_INIT_ROOT, HV_SUBMODE_INIT_POST_SMP
  *
@@ -960,14 +957,9 @@ static inline uint64_t msr_read(uint32_t reg_num)
  * - (reg_num == MSR_IA32_EXT_APIC_ICR) && ((value64 & FFF32000H) == 0)
  * @post N/A
  *
- * @remark early_init_lapic has been called once on the logical processor before msr_write writes to below MSRs:
- * - MSR_IA32_EXT_APIC_ICR
- * - MSR_IA32_EXT_APIC_EOI
- * - MSR_IA32_EXT_APIC_LVT_CMCI
- * - MSR_IA32_EXT_APIC_LVT_THERMAL
- * - MSR_IA32_EXT_APIC_LVT_PMI
- * - MSR_IA32_EXT_APIC_LVT_LINT0
- * - MSR_IA32_EXT_APIC_LVT_LINT1
+ * @remark early_init_lapic should have been called once on the logical processor before msr_write writes to
+ * below MSRs address:
+ * 808H, 80BH, 80FH, 828H, 830H, 832H-838H, 83EH-83FH.
  *
  * @mode HV_SUBMODE_INIT_PRE_SMP, HV_SUBMODE_INIT_ROOT, HV_OPERATIONAL, HV_SUBMODE_INIT_ROOT, HV_SUBMODE_INIT_POST_SMP
  *

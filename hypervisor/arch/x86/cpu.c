@@ -823,7 +823,7 @@ static bool start_pcpu(uint16_t pcpu_id)
  * @retval true if all cpus set in mask are started
  * @retval false if there are any cpus set in mask aren't started
  *
- * @pre (mask & ~(1 << get_pcpu_nums()) - 1) == 0
+ * @pre (mask & ~(1 << get_pcpu_nums() - 1)) == 0
  * @post N/A
  *
  * @mode HV_SUBMODE_INIT_PRE_SMP
@@ -1022,7 +1022,7 @@ static bool is_any_pcpu_active(uint64_t mask)
  *
  * @return None
  *
- * @pre (mask & ~(1 << get_pcpu_nums()) - 1) == 0
+ * @pre (mask & ~(1 << get_pcpu_nums() - 1)) == 0
  * @post N/A
  *
  * @mode HV_OPERATIONAL
@@ -1303,46 +1303,35 @@ static void init_pcpu_xsave(void)
 
 	/** If the current CPU ID is BOOT_CPU_ID */
 	if (get_pcpu_id() == BOOT_CPU_ID) {
-		/** Call cpuid with the following parameters, in order to get feature information of the BP.
-		 *  - CPUID_FEATURES
-		 *  - &unused
-		 *  - &unused
+		/** Set cpu_info to the return value of get_pcpu_info(), which contains CPU information data. */
+		cpu_info = get_pcpu_info();
+		/** Set OSXSAVE Bit (Bit 27) of 'cpu_info->cpuid_leaves[FEAT_1_ECX]' to 1 */
+		cpu_info->cpuid_leaves[FEAT_1_ECX] |= CPUID_ECX_OSXSAVE;
+
+		/** Call write_xcr with the following parameters, in order to write XCR0_INIT to physical XCR0.
+		 *  - 0
+		 *  - XCR0_INIT */
+		write_xcr(0, XCR0_INIT);
+		/** Call msr_write with the following parameters, in order to write XSS_INIT to physical
+		 *  MSR_IA32_XSS.
+		 *  - MSR_IA32_XSS
+		 *  - XSS_INIT */
+		msr_write(MSR_IA32_XSS, XSS_INIT);
+
+		/** Call cpuid_subleaf with the following parameters,
+		 *  in order to get the physical processor information for CPUID.(EAX=DH,ECX=1H)
+		 *  and set 'xsave_area_size' to physical CPUID.(EAX=DH,ECX=1H):EBX.
+		 *  - CPUID_XSAVE_FEATURES
+		 *  - 1
+		 *  - &eax
+		 *  - &xsave_area_size
 		 *  - &ecx
 		 *  - &unused */
-		cpuid(CPUID_FEATURES, &unused, &unused, &ecx, &unused);
-
-		/** If OSXSAVE Bit (Bit 27) of 'ecx' is 1. */
-		if ((ecx & CPUID_ECX_OSXSAVE) != 0U) {
-			/** Set cpu_info to the return value of get_pcpu_info(), which contains CPU information data. */
-			cpu_info = get_pcpu_info();
-			/** Set OSXSAVE Bit (Bit 27) of 'cpu_info->cpuid_leaves[FEAT_1_ECX]' to 1 */
-			cpu_info->cpuid_leaves[FEAT_1_ECX] |= CPUID_ECX_OSXSAVE;
-
-			/** Call write_xcr with the following parameters, in order to write XCR0_INIT to physical XCR0.
-			 *  - 0
-			 *  - XCR0_INIT */
-			write_xcr(0, XCR0_INIT);
-			/** Call msr_write with the following parameters, in order to write XSS_INIT to physical
-			 *  MSR_IA32_XSS.
-			 *  - MSR_IA32_XSS
-			 *  - XSS_INIT */
-			msr_write(MSR_IA32_XSS, XSS_INIT);
-
-			/** Call cpuid_subleaf with the following parameters,
-			 *  in order to get the physical processor information for CPUID.(EAX=DH,ECX=1H)
-			 *  and set 'xsave_area_size' to physical CPUID.(EAX=DH,ECX=1H):EBX.
-			 *  - CPUID_XSAVE_FEATURES
-			 *  - 1
-			 *  - &eax
-			 *  - &xsave_area_size
-			 *  - &ecx
-			 *  - &unused */
-			cpuid_subleaf(CPUID_XSAVE_FEATURES, 1U, &eax, &xsave_area_size, &ecx, &unused);
-			/** If xsave_area_size is greater than XSAVE_STATE_AREA_SIZE */
-			if (xsave_area_size > XSAVE_STATE_AREA_SIZE) {
-				/** Call panic in order to enter safety state. */
-				panic("XSAVE area (%d bytes) exceeds the pre-allocated 4K region\n", xsave_area_size);
-			}
+		cpuid_subleaf(CPUID_XSAVE_FEATURES, 1U, &eax, &xsave_area_size, &ecx, &unused);
+		/** If xsave_area_size is greater than XSAVE_STATE_AREA_SIZE */
+		if (xsave_area_size > XSAVE_STATE_AREA_SIZE) {
+			/** Call panic in order to enter safety state. */
+			panic("XSAVE area (%d bytes) exceeds the pre-allocated 4K region\n", xsave_area_size);
 		}
 	}
 }

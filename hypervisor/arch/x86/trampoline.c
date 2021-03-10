@@ -165,9 +165,9 @@ void write_trampoline_stack_sym(uint16_t pcpu_id)
 	 *  - stack_sym_addr representing stack start address of the physical CPU, where the physical CPU id is
 	 *  \a pcpu_id, not initialized. */
 	uint64_t stack_sym_addr;
-	/** Set hva to the address calculated by plusing the x and the y, where the x is
-	 *  hpa2hva(trampoline_start16_paddr), where the y is trampoline_relo_addr(secondary_cpu_stack). */
-	hva = (uint64_t *)(hpa2hva(trampoline_start16_paddr) + trampoline_relo_addr(secondary_cpu_stack));
+	/** Set hva to the host virtual address translated from the value, where the value is calculated
+	 *  by plusing trampoline_start16_paddr and trampoline_relo_addr(secondary_cpu_stack). */
+	hva = (uint64_t *)(hpa2hva(trampoline_start16_paddr + trampoline_relo_addr(secondary_cpu_stack)));
 
 	/** Set stack_sym_addr to the address of the stack field of the pcpu_id-th element in the per-CPU region, where
 	 *  pcpu_id is calculated by subtracting 1 from CONFIG_STACK_SIZE, where the CPU's id is pcpu_id.  */
