@@ -1291,8 +1291,9 @@ int32_t run_vcpu(struct acrn_vcpu *vcpu)
 	if (bitmap_test_and_clear_lock(CPU_REG_CR0, &vcpu->reg_updated)) {
 		/** Call vcpu_set_cr0() with the following parameters, in order to set cr0 to the vcpu.
 		 *  - vcpu: the target vcpu to set
-		 *  - ctx->cr0:  cr0 to set*/
-		vcpu_set_cr0(vcpu, ctx->cr0);
+		 *  - ctx->cr0:  cr0 to set
+		 *  - false */
+		vcpu_set_cr0(vcpu, ctx->cr0, false);
 	}
 
 	/** If calls to bitmap_test_and_set_lock with CPU_REG_CR4 and &vcpu->reg_updated
@@ -1301,8 +1302,9 @@ int32_t run_vcpu(struct acrn_vcpu *vcpu)
 	if (bitmap_test_and_clear_lock(CPU_REG_CR4, &vcpu->reg_updated)) {
 		/** Call vcpu_set_cr4() with the following parameters, in order to set cr4 to the vcpu.
 		 *  - vcpu: the target vcpu to set
-		 *  - ctx->cr4:  cr4 to set */
-		vcpu_set_cr4(vcpu, ctx->cr4);
+		 *  - ctx->cr4:  cr4 to set
+		 *  - false */
+		vcpu_set_cr4(vcpu, ctx->cr4, false);
 	}
 
 	/** Set vcpu->arch.vcpu_powerup to true; */

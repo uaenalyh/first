@@ -80,12 +80,14 @@ static void init_guest_vmx(struct acrn_vcpu *vcpu, uint64_t cr0, uint64_t cr3, u
 	uint64_t misc_enable;
 	/** Call vcpu_set_cr4() with the following parameters, in order to set \a cr4 to virtual CR4 of the \a vcpu.
 	 *  - vcpu
-	 *  - cr4 */
-	vcpu_set_cr4(vcpu, cr4);
+	 *  - cr4
+	 *  - true */
+	vcpu_set_cr4(vcpu, cr4, true);
 	/** Call vcpu_set_cr0() with the following parameters, in order to set \a cr0 to virtual CR0 of the \a vcpu.
 	 *  - vcpu
-	 *  - cr0 */
-	vcpu_set_cr0(vcpu, cr0);
+	 *  - cr0
+	 *  - true */
+	vcpu_set_cr0(vcpu, cr0, true);
 	/** Call exec_vmwrite() with the following parameters, in order to write \a cr3 into the field
 	 *  'GUEST CR3' in current VMCS.
 	 *  - VMX_GUEST_CR3

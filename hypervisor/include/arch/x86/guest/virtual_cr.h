@@ -54,10 +54,11 @@ uint64_t vcpu_get_cr0(struct acrn_vcpu *vcpu);
  *
  * @param[inout] vcpu pointer to vcpu data structure
  * @param[in] val the value set CR0
+ * @param[in] is_init indicate if the guest CR0 write is for initializing
  *
  * @return None
  */
-void vcpu_set_cr0(struct acrn_vcpu *vcpu, uint64_t val);
+void vcpu_set_cr0(struct acrn_vcpu *vcpu, uint64_t val, bool is_init);
 
 /**
  * @brief set vcpu CR2 value
@@ -89,10 +90,11 @@ uint64_t vcpu_get_cr4(struct acrn_vcpu *vcpu);
  *
  * @param[inout] vcpu pointer to vcpu data structure
  * @param[in] val the value set CR4
+ * @param[in] is_init indicate if the guest CR4 write is for initializing
  *
  * @return None
  */
-void vcpu_set_cr4(struct acrn_vcpu *vcpu, uint64_t val);
+void vcpu_set_cr4(struct acrn_vcpu *vcpu, uint64_t val, bool is_init);
 
 /**
  * @brief VM-Exit handler for VCRs access
