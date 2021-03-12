@@ -707,14 +707,14 @@ static void init_default_cfg(struct pci_vdev *vdev)
 	const struct cap_info caps[2] = { {0x01U, 8U}, {0x13U, 4U} };
 	/** Declare the following local variables of type 'const struct unused_fields'.
 	 *  - eth_unused representing the device specific unused fields info of the ethernet controller, initialized
-	 *  as {0x90U, 16U}.
+	 *  as {0x80U, 4U}, {0x84U, 4U}, {0x90U, 16U}.
 	 */
-	const struct unused_fields eth_unused[] = { {0x90U, 16U} };
+	const struct unused_fields eth_unused[] = { {0x80U, 4U}, {0x84U, 4U}, {0x90U, 16U} };
 	/** Declare the following local variables of type 'const struct unused_fields'.
 	 *  - usb_unused representing the device specific unused fields info of the USB controller, initialized
-	 *  as {0x9CU, 4U}, {0xA0U, 2U}, {0xA8U, 8U}, {0xf8U, 4U}.
+	 *  as {0x90U, 4U}, {0x9CU, 4U}, {0xA0U, 2U}, {0xA8U, 8U}, {0xf8U, 4U}.
 	 */
-	const struct unused_fields usb_unused[] = { {0x9CU, 4U}, {0xA0U, 2U}, {0xA8U, 8U}, {0xf8U, 4U} };
+	const struct unused_fields usb_unused[] = { {0x90U, 4U}, {0x9CU, 4U}, {0xA0U, 2U}, {0xA8U, 8U}, {0xf8U, 4U} };
 
 	/** Declare the following local variables of type uint8_t.
 	 *  - offset representing the address of the PCI configuration register, not initialized.
