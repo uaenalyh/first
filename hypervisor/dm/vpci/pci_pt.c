@@ -48,7 +48,7 @@
  * improve the readability of the code.
  *
  * Following functions are internal APIs used by other source files within vPCI:
- * - init_vdev_pt: initialize the BAR and command registers of the vPCI device associated with a physical PCI device
+ * - init_vdev_pt: initialize the BAR registers of the vPCI device associated with a physical PCI device
  * - vdev_pt_write_vbar: write a BAR register of the vPCI device associated with a physical PCI device
  *
  * Helper functions:
@@ -307,10 +307,10 @@ void vdev_pt_write_vbar(struct pci_vdev *vdev, uint32_t idx, uint32_t val)
 }
 
 /**
- * @brief Initialize BAR and command registers of the given vPCI device associated with a physical PCI device.
+ * @brief Initialize BAR registers of the given vPCI device associated with a physical PCI device.
  *
- * This function is called to initialize BAR and command registers of the given vPCI device associated with a physical
- * PCI device. It is mainly focused on the BAR virtualization. Following is BAR related information:
+ * This function is called to initialize BAR registers of the given vPCI device associated with a physical
+ * PCI device. It is focused on the BAR virtualization. Following is BAR related information:
  *
  * PCI BARs number: up to 6 bars at byte offset 0x10~0x24 for type 0 PCI device, 2 bars at byte offset 0x10-0x14 for
  * type 1 PCI device; all of them are located in the PCI configuration space header.
@@ -359,9 +359,6 @@ void init_vdev_pt(struct pci_vdev *vdev)
 	/** Declare the following local variables of type 'struct pci_bar *'.
 	 *  - vbar representing a pointer to a BAR's info structure, not initialized. */
 	struct pci_bar *vbar;
-	/** Declare the following local variables of type uint16_t.
-	 *  - pci_command representing the value of the PCI command register, not initialized. */
-	uint16_t pci_command;
 	/** Declare the following local variables of type uint32_t.
 	 *  - size32 representing the size of a BAR, not initialized.
 	 *  - offset representing the offset of a BAR in PCI configuration space, not initialized.
@@ -558,22 +555,6 @@ void init_vdev_pt(struct pci_vdev *vdev)
 			}
 		}
 	}
-
-	/** Set pci_command to the value returned by pci_pdev_read_cfg with vdev->pbdf, PCIR_COMMAND and 2H being the
-	 *  parameters, which reads the command register for the physical PCI device associated with the vPCI device.
-	 */
-	pci_command = (uint16_t)pci_pdev_read_cfg(vdev->pbdf, PCIR_COMMAND, 2U);
-
-	/** Bitwise OR pci_command by 400H, which is used to disable legacy interrupt. */
-	pci_command |= 0x400U;
-	/** Call pci_pdev_write_cfg with the following parameters, in order to update the command register
-	 *  to the physical PCI device to disable the legacy interrupt.
-	 *  - pbdf
-	 *  - offset
-	 *  - 2
-	 *  - pci_command
-	 */
-	pci_pdev_write_cfg(vdev->pbdf, PCIR_COMMAND, 2U, pci_command);
 }
 
 /**

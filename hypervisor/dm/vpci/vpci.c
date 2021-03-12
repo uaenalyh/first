@@ -697,6 +697,9 @@ static void remove_vdev_pt_iommu_domain(const struct pci_vdev *vdev)
  */
 static void init_default_cfg(struct pci_vdev *vdev)
 {
+	/** Declare the following local variables of type uint16_t.
+	 *  - pci_command representing the value of the PCI command register, not initialized. */
+	uint16_t pci_command;
 	/** Declare the following local variables of type 'const struct cap_info [2]'.
 	 *  - caps representing two capabilities (PM and Advanced Features which will be hidden) ID and length,
 	 *  initialized as {0x01U, 8U}, {0x13U, 4U}.
@@ -726,6 +729,22 @@ static void init_default_cfg(struct pci_vdev *vdev)
 	/** Declare the following local variables of type uint32_t.
 	 *  - val representing the value as 4bytes reading from the PCI configuration space, not initialized. */
 	uint32_t val;
+
+	/** Set pci_command to the value returned by pci_pdev_read_cfg with vdev->pbdf, PCIR_COMMAND and 2H being the
+	 *  parameters, which reads the command register for the physical PCI device associated with the vPCI device.
+	 */
+	pci_command = (uint16_t)pci_pdev_read_cfg(vdev->pbdf, PCIR_COMMAND, 2U);
+
+	/** Bitwise OR pci_command by 400H, which is used to disable legacy interrupt. */
+	pci_command |= 0x400U;
+	/** Call pci_pdev_write_cfg with the following parameters, in order to update the command register
+	 *  to the physical PCI device to disable the legacy interrupt.
+	 *  - pbdf
+	 *  - offset
+	 *  - 2
+	 *  - pci_command
+	 */
+	pci_pdev_write_cfg(vdev->pbdf, PCIR_COMMAND, 2U, pci_command);
 
 	/** For each index ranging from 0 to max_index (63) [with a step of 1] */
 	for (index = 0U; index < max_index; index++) {
