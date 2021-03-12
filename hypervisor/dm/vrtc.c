@@ -90,7 +90,7 @@
 /**
 * @brief Local spinlock_t variable used to avoid the physical RTC is accessed by different guest VMs in parallel.
 **/
-static spinlock_t cmos_lock = { .head = 0U, .tail = 0U };
+static spinlock_t cmos_lock;
 
 /**
  * @brief Read a value from RTC register according to the given register address
@@ -471,6 +471,12 @@ void vrtc_init(struct acrn_vm *vm)
 	 *  - vrtc_write
 	 */
 	register_pio_emulation_handler(vm, RTC_PIO_IDX, &range, vrtc_read, vrtc_write);
+
+	/** Call spinlock_init with the following parameters, in order to initialize the RTC lock
+	 *  to prevent simultaneous access to the physical RTC.
+	 *  - &cmos_lock
+	 */
+	spinlock_init(&cmos_lock);
 }
 
 /**
