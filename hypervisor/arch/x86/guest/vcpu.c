@@ -688,10 +688,11 @@ static void init_xsave(struct acrn_vcpu *vcpu)
 	 *  initialize all the xsave componets.
 	 */
 	/** Set ectx->xs_area.xsave_hdr.hdr.xcomp_bv to ectx->xs_area.xsave_hdr.hdr.xcomp_bv |
-	 *  XSAVE_COMPACTED_FORMAT | XSAVE_X87_BV. */
-	ectx->xs_area.xsave_hdr.hdr.xcomp_bv |= XSAVE_COMPACTED_FORMAT | XSAVE_X87_BV;
-	/** Set ectx->xs_area.xsave_hdr.hdr.xstate_bv to ectx->xs_area.xsave_hdr.hdr.xstate_bv | XSAVE_X87_BV. */
-	ectx->xs_area.xsave_hdr.hdr.xstate_bv |= XSAVE_X87_BV;
+	 *  XSAVE_COMPACTED_FORMAT | XSAVE_X87_BV | XCR0_SSE. */
+	ectx->xs_area.xsave_hdr.hdr.xcomp_bv |= XSAVE_COMPACTED_FORMAT | XSAVE_X87_BV | XCR0_SSE;
+	/** Set ectx->xs_area.xsave_hdr.hdr.xstate_bv to ectx->xs_area.xsave_hdr.hdr.xstate_bv |
+	 *  (XSAVE_X87_BV | XCR0_SSE). */
+	ectx->xs_area.xsave_hdr.hdr.xstate_bv |= (XSAVE_X87_BV | XCR0_SSE);
 
 	/** Set ectx->xs_area.legacy_region.fcw to XSAVE_STARTUP_FPU_CONTROL_WORD. */
 	ectx->xs_area.legacy_region.fcw = XSAVE_STARTUP_FPU_CONTROL_WORD;
@@ -1708,6 +1709,11 @@ void save_xsave_area(struct ext_context *ectx)
 	/** Call read_xcr() with 0 being parameter, in order to read host CR0,
 	 *  and set ectx->xcr0 to its return value */
 	ectx->xcr0 = read_xcr(0);
+	/** Call write_xcr() with the following parameters, in order to
+	 *  write (ectx->xcr0 | XCR0_SSE | XCR0_AVX) into the XCR0.
+	 *  - 0
+	 *  - (ectx->xcr0 | XCR0_SSE | XCR0_AVX) */
+	write_xcr(0, (ectx->xcr0 | XCR0_SSE | XCR0_AVX));
 	/** Call msr_read() with MSR_IA32_XSS being parameter, in order to read host
 	 *  MSR with index of MSR_IA32_XSS and set ectx->xss to its return value */
 	ectx->xss = msr_read(MSR_IA32_XSS);
@@ -1741,8 +1747,8 @@ void rstore_xsave_area(const struct ext_context *ectx)
 {
 	/** Call write_xcr with the following parameters, in order write xcr0 of extend context to target xcr0.
 	 *  - 0: number of xcr
-	 *  - ectx->xcr0: value to write to the xcr0 */
-	write_xcr(0, ectx->xcr0);
+	 *  - (ectx->xcr0 | XCR0_SSE | XCR0_AVX): value to write to the xcr0 */
+	write_xcr(0, (ectx->xcr0 | XCR0_SSE | XCR0_AVX));
 	/** Call msr_write() with the following parameters, in order to write xss of extend context to MSR_IA32_XSS.
 	 *  - MSR_IA32_XSS: target MSR to write
 	 *  - ectx->xss: value to write to the msr */
@@ -1753,6 +1759,10 @@ void rstore_xsave_area(const struct ext_context *ectx)
 	 *  - Output operands: N/A
 	 *  - Clobbers memory */
 	asm volatile("xrstors %0" : : "m"(ectx->xs_area), "d"(UINT32_MAX), "a"(UINT32_MAX) : "memory");
+	/** Call write_xcr with the following parameters, in order write xcr0 of extend context to target xcr0.
+	 *  - 0: number of xcr
+	 *  - ectx->xcr0: value to write to the xcr0 */
+	write_xcr(0, ectx->xcr0);
 }
 
 /**
