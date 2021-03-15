@@ -25,8 +25,6 @@
 #define MULTIBOOT_HEADER_MAGIC 0x1badb002
 #define MULTIBOOT_HEADER_FLAGS 0x00000002 /*flags bit 1 : enable mem_*, mmap_**/
 
-    .extern cpu_primary_save32
-    .extern cpu_primary_save64
     .section    multiboot_header, "a"
 
     .align     4
@@ -49,26 +47,11 @@ cpu_primary_start_32:
     movl    %eax, (boot_regs)
     movl    %ebx, (boot_regs+4)
 
-    /* Save boot context from 32bit mode */
-    call cpu_primary_save_32
-
     /* Disable interrupts */
     cli
 
     /* Clear direction flag */
     cld
-
-    /* detect whether it is in long mode
-     *
-     *     0xc0000080 = MSR_IA32_EFER
-     */
-    movl    $0xc0000080, %ecx
-    rdmsr
-    /* 0x400 = MSR_IA32_EFER_LMA_BIT */
-    test     $0x400, %eax
-
-    /* jump to 64bit entry if it is already in long mode */
-    jne      cpu_primary_start_64
 
     /* Disable paging */
     mov     %cr0, %ebx
@@ -95,11 +78,10 @@ cpu_primary_start_32:
     orl     $0x00000100, %eax
     wrmsr
 
-    /* Enable paging, protection, numeric error and co-processor
-       monitoring in CR0 to enter long mode */
-    mov     %cr0, %ebx
-    /* 0x80000023 = (CR0_PG | CR0_PE | CR0_MP | CR0_NE) */
-    orl     $0x80000023, %ebx
+    /** Enable paging, protection, numeric error and co-processor
+     *  monitoring in CR0 to enter long mode,
+     * 0x80000033 = (CR0_PG | CR0_PE | CR0_MP | CR0_NE | CR0_ET) */
+    movl    $0x80000033, %ebx
     mov     %ebx, %cr0
 
     /* Load temportary GDT pointer value */
@@ -110,18 +92,9 @@ cpu_primary_start_32:
     /* 0x0008 = HOST_GDT_RING0_CODE_SEL */
     ljmp    $0x0008, $primary_start_long_mode
 
+
     .code64
     .org 0x200
-    .global     cpu_primary_start_64
-cpu_primary_start_64:
-    /* save the MULTBOOT magic number & MBI */
-    lea     boot_regs(%rip), %rax
-    movl    %edi, (%rax)
-    movl    %esi, 4(%rax)
-
-    /* Save boot context from 64bit mode */
-    call cpu_primary_save_64
-
 primary_start_long_mode:
 
     /* Initialize temporary stack pointer */
