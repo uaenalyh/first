@@ -337,6 +337,9 @@ static bool cmos_get_reg_val(uint8_t addr, uint32_t *value)
  *
  * @pre vcpu != NULL
  * @pre vcpu->vm != NULL
+ * @pre addr == 70H || addr == 71H
+ * @pre width == 1H || width == 2H || width == 4H
+ * @pre vcpu->vm->vrtc_offset >= 0H && vcpu->vm->vrtc_offset <= FFH
  *
  * @post N/A
  *
@@ -411,6 +414,9 @@ static void vrtc_read(struct acrn_vcpu *vcpu, uint16_t addr, __unused size_t wid
  *
  * @pre vcpu != NULL
  * @pre vcpu->vm != NULL
+ * @pre addr == 70H || addr == 71H
+ * @pre width == 1H || width == 2H || width == 4H
+ * @pre vcpu->vm->vrtc_offset >= 0H && vcpu->vm->vrtc_offset <= FFH
  *
  * @post N/A
  *

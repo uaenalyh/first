@@ -115,6 +115,8 @@ static void write_cfg(struct acrn_vpci *vpci, union pci_bdf bdf, uint32_t offset
  *
  * @pre vcpu != NULL
  * @pre vcpu->vm != NULL
+ * @pre addr == 0CF8H
+ * @pre bytes == 1 || bytes == 2 || bytes == 4
  *
  * @post Assign vcpu->vm->vpci->addr.value to vcpu->req.reqs.pio.value if 'bytes' == 4 and addr == 0CF8H; or assign
  * 0FFFFFFFFH to vcpu->req.reqs.pio.value.
@@ -167,6 +169,8 @@ static void pci_cfgaddr_io_read(struct acrn_vcpu *vcpu, uint16_t addr, size_t by
  *
  * @pre vcpu != NULL
  * @pre vcpu->vm != NULL
+ * @pre addr == 0CF8H
+ * @pre bytes == 1 || bytes == 2 || bytes == 4
  *
  * @post Assign (val & 80FFFFFCH) to vcpu->vm->vpci->addr.value if 'bytes' == 4 and addr == 0CF8H; or do nothing.
  *
@@ -300,6 +304,8 @@ static inline bool vpci_is_valid_access(uint32_t offset, uint32_t bytes)
  *
  * @pre vcpu != NULL
  * @pre vcpu->vm != NULL
+ * @pre addr == 0CF8H
+ * @pre bytes == 1 || bytes == 2 || bytes == 4
  *
  * @post The register value got from the PCI device configuration space will be set to the give vCPU's port IO request
  * field and returned to the guest VM.
@@ -386,6 +392,8 @@ static void pci_cfgdata_io_read(struct acrn_vcpu *vcpu, uint16_t addr, size_t by
  *
  * @pre vcpu != NULL
  * @pre vcpu->vm != NULL
+ * @pre addr == 0CF8H
+ * @pre bytes == 1 || bytes == 2 || bytes == 4
  *
  * @post N/A
  *
@@ -460,6 +468,7 @@ static void pci_cfgdata_io_write(struct acrn_vcpu *vcpu, uint16_t addr, size_t b
  * @return N/A.
  *
  * @pre vm != NULL
+ * @pre vm->vm_id < CONFIG_MAX_VM_NUM
  *
  * @post N/A
  *
@@ -541,6 +550,7 @@ void vpci_init(struct acrn_vm *vm)
  * @return N/A.
  *
  * @pre vm != NULL
+ * @pre vm->vm_id < CONFIG_MAX_VM_NUM
  *
  * @post N/A
  *
