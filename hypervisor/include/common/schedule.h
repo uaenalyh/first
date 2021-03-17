@@ -68,6 +68,7 @@ enum sched_notify_mode {
 	/**
 	 * @brief This notification mode means the scheduler
 	 * will use IPI signal to notify the specified target process.
+	 * It is not used in current scope, keeping it here for future scope extension.
 	 */
 	SCHED_NOTIFY_IPI,
 };

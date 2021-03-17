@@ -1609,9 +1609,6 @@ void reset_vcpu(struct acrn_vcpu *vcpu)
 	 *  - sizeof(struct run_context): The number of bytes to be set */
 	(void)memset((void *)(&vcpu->arch.context), 0U, sizeof(struct run_context));
 
-	/** Set notify mode of vcpu->thread_obj to SCHED_NOTIFY_IPI. */
-	vcpu->thread_obj.notify_mode = SCHED_NOTIFY_IPI;
-
 	/** Call vcpu_vlapic() with vcpu as parameter in order to get address of the
 	 *  vlapic structure associated with the vcpu and set vlapic to its return value. */
 	vlapic = vcpu_vlapic(vcpu);
@@ -1952,8 +1949,6 @@ int32_t prepare_vcpu(struct acrn_vm *vm, uint16_t pcpu_id)
 		vcpu->thread_obj.thread_entry = vcpu_thread;
 		/** Set pcpu_id of the vcpu->thread_obj to pcpu_id */
 		vcpu->thread_obj.pcpu_id = pcpu_id;
-		/** Set notify_mode of the vcpu->thread_obj to SCHED_NOTIFY_IPI */
-		vcpu->thread_obj.notify_mode = SCHED_NOTIFY_IPI;
 		/** Set host_sp of the vcpu->thread_obj to return value of build_stack_frame()
 		 *  with vcpu being parameter */
 		vcpu->thread_obj.host_sp = build_stack_frame(vcpu);
