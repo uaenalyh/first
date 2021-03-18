@@ -199,6 +199,15 @@ static void vdev_pt_map_mem_vbar(struct pci_vdev *vdev, uint32_t idx)
 
 	/** If vbar->base is not 0, which means it is a valid GPA. */
 	if (vbar->base != 0UL) {
+		/** Call ept_del_mr with the following parameters, in order to do the unmapping of the BAR
+		 *  space (BAR GPA base and its BAR size) in the EPT table.
+		 *  - vm
+		 *  - vm->arch_vm.nworld_eptp
+		 *  - vbar->base
+		 *  - vbar->size
+		 */
+		ept_del_mr(vm, (uint64_t *)(vm->arch_vm.nworld_eptp), vbar->base, /* GPA (new vbar) */
+			vbar->size);
 		/** Call ept_add_mr with the following parameters, in order to do the remapping of the BAR
 		 *  space (BAR base and its BAR size) between GPA and HPA in the EPT table.
 		 *  - vm
