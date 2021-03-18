@@ -39,6 +39,8 @@
 #define DMAR_IQA_REG    0x90U /**< Register offset of Invalidation Queue Address Register. */
 #define DMAR_IRTA_REG   0xb8U /**< Register offset of Interrupt Remapping Table Address Register. */
 
+#define DMAR_GSTS_REG_MASK   0x96FFFFFFU /**< Mask of GSTS_REG enable/disable bits*/
+
 /* Values for entry_type in ACPI_DMAR_DEVICE_SCOPE - device types */
 /**
  * @brief Data structure to enumerate different Device Scope Entry types.

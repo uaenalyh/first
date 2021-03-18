@@ -463,18 +463,18 @@ struct dmar_drhd_rt {
 	struct dmar_drhd *drhd;
 
 	/**
-	 * @brief The base address (host physical address) of the root table associated with this structure.
+	 * @brief The base address (host virtual address) of the root table associated with this structure.
 	 */
-	uint64_t root_table_addr;
+	struct dmar_entry *root_table_addr;
 	/**
-	 * @brief The base address (host physical address) of the interrupt remapping table associated with this
+	 * @brief The base address (host virtual address) of the interrupt remapping table associated with this
 	 *        structure.
 	 */
-	uint64_t ir_table_addr;
+	union dmar_ir_entry *ir_table_addr;
 	/**
-	 * @brief The base address (host physical address) of the invalidation queue associated with this structure.
+	 * @brief The base address (host virtual address) of the invalidation queue associated with this structure.
 	 */
-	uint64_t qi_queue;
+	struct dmar_entry *qi_queue;
 	/**
 	 * @brief The offset to the invalidation queue for the command that will be written next by software.
 	 */
@@ -1296,30 +1296,27 @@ static void dmar_disable_translation(struct dmar_drhd_rt *dmar_unit)
 	 *  protect the operations on \a dmar_unit.
 	 *  - &(dmar_unit->lock) */
 	spinlock_obtain(&(dmar_unit->lock));
-	/** If Translation Enable Bit (Bit 31) of 'dmar_unit->gcmd' is equal to 1, indicating that
-	 *  DMA remapping is enabled on the DRHD structure specified by \a dmar_unit */
-	if ((dmar_unit->gcmd & DMA_GCMD_TE) != 0U) {
-		/** Clear Translation Enable Bit (Bit 31) of 'dmar_unit->gcmd' */
-		dmar_unit->gcmd &= ~DMA_GCMD_TE;
-		/** Call iommu_write32 with the following parameters, in order to write 'dmar_unit->gcmd' to
-		 *  Global Command Register associated with \a dmar_unit.
-		 *  - dmar_unit
-		 *  - DMAR_GCMD_REG
-		 *  - dmar_unit->gcmd
-		 */
-		iommu_write32(dmar_unit, DMAR_GCMD_REG, dmar_unit->gcmd);
-		/* 32-bit register */
-		/** Call dmar_wait_completion with the following parameters, in order to wait until
-		 *  Translation Enable Status Bit (Bit 31) of Global Status Register associated with
-		 *  \a dmar_unit is updated to 0.
-		 *  - dmar_unit
-		 *  - DMAR_GSTS_REG
-		 *  - DMA_GSTS_TES
-		 *  - true
-		 *  - &status
-		 */
-		dmar_wait_completion(dmar_unit, DMAR_GSTS_REG, DMA_GSTS_TES, true, &status);
-	}
+
+	/** Clear Translation Enable Bit (Bit 31) of 'dmar_unit->gcmd' */
+	dmar_unit->gcmd &= ~DMA_GCMD_TE;
+	/** Call iommu_write32 with the following parameters, in order to write 'dmar_unit->gcmd' to
+	 *  Global Command Register associated with \a dmar_unit.
+	 *  - dmar_unit
+	 *  - DMAR_GCMD_REG
+	 *  - dmar_unit->gcmd
+	 */
+	iommu_write32(dmar_unit, DMAR_GCMD_REG, dmar_unit->gcmd);
+	/* 32-bit register */
+	/** Call dmar_wait_completion with the following parameters, in order to wait until
+	 *  Translation Enable Status Bit (Bit 31) of Global Status Register associated with
+	 *  \a dmar_unit is updated to 0.
+	 *  - dmar_unit
+	 *  - DMAR_GSTS_REG
+	 *  - DMA_GSTS_TES
+	 *  - true
+	 *  - &status
+	 */
+	dmar_wait_completion(dmar_unit, DMAR_GSTS_REG, DMA_GSTS_TES, true, &status);
 
 	/** Call spinlock_release with the following parameters, in order to release the spin lock that is used to
 	 *  protect the operations on \a dmar_unit.
@@ -1369,9 +1366,9 @@ static void dmar_register_hrhd(struct dmar_drhd_rt *dmar_unit)
 	 * register to control remapping hardware. Global Status Register is the corresponding read-only register to
 	 * report remapping hardware status.
 	 */
-	/** Set 'dmar_unit->gcmd' to the return value of 'iommu_read32(dmar_unit, DMAR_GSTS_REG)', which is the
-	 *  content in the Global Status Register associated with \a dmar_unit. */
-	dmar_unit->gcmd = iommu_read32(dmar_unit, DMAR_GSTS_REG);
+	/** Set 'dmar_unit->gcmd' to bitwise AND the return value of iommu_read32(dmar_unit, DMAR_GSTS_REG) by
+	 *  DMAR_GSTS_REG_MASK */
+	dmar_unit->gcmd = iommu_read32(dmar_unit, DMAR_GSTS_REG) & DMAR_GSTS_REG_MASK;
 
 	/** Call dmar_disable_translation with the following parameters, in order to disable DMA remapping on
 	 *  the DRHD structure specified by \a dmar_unit (if it's not disabled yet).
@@ -1416,9 +1413,9 @@ static void dmar_issue_qi_request(struct dmar_drhd_rt *dmar_unit, struct dmar_en
 	 *  not initialized. (This variable is only used for debug purpose.) */
 	__unused uint64_t start;
 
-	/** Set 'invalidate_desc_ptr' to 'dmar_unit->qi_queue + dmar_unit->qi_tail', which is the pointer to the
-	 *  invalidation descriptor in the invalidation queue to be written next by software. */
-	invalidate_desc_ptr = (struct dmar_entry *)(dmar_unit->qi_queue + dmar_unit->qi_tail);
+	/** Set 'invalidate_desc_ptr' to 'dmar_unit->qi_queue + dmar_unit->qi_tail / DMAR_QI_INV_ENTRY_SIZE', which is
+	 *  the pointer to the invalidation descriptor in the invalidation queue to be written next by software. */
+	invalidate_desc_ptr = dmar_unit->qi_queue + dmar_unit->qi_tail / DMAR_QI_INV_ENTRY_SIZE;
 
 	/** Set 'invalidate_desc_ptr->hi_64' to 'invalidate_desc.hi_64', which is the high 64-bits of the specified
 	 *  invalidation descriptor */
@@ -1432,11 +1429,11 @@ static void dmar_issue_qi_request(struct dmar_drhd_rt *dmar_unit, struct dmar_en
 	 */
 	dmar_unit->qi_tail = (dmar_unit->qi_tail + DMAR_QI_INV_ENTRY_SIZE) % DMAR_INVALIDATION_QUEUE_SIZE;
 
-	/** Set 'invalidate_desc_ptr' to 'dmar_unit->qi_queue + dmar_unit->qi_tail', which is the pointer to the
-	 *  invalidation descriptor in the invalidation queue to be written next by software.
+	/** Set 'invalidate_desc_ptr' to 'dmar_unit->qi_queue + dmar_unit->qi_tail / DMAR_QI_INV_ENTRY_SIZE', which is
+	 *  the pointer to the invalidation descriptor in the invalidation queue to be written next by software.
 	 *  It would be an Invalidation Wait Descriptor which is used to check whether hardware completes
 	 *  all invalidation requests or not. */
-	invalidate_desc_ptr = (struct dmar_entry *)(dmar_unit->qi_queue + dmar_unit->qi_tail);
+	invalidate_desc_ptr = dmar_unit->qi_queue + dmar_unit->qi_tail / DMAR_QI_INV_ENTRY_SIZE;
 
 	/** Set 'invalidate_desc_ptr->hi_64' to the return value of 'hva2hpa(&qi_status)', which is the
 	 *  host physical address of 'qi_status' and it specifies the Status Address field in the
@@ -1802,16 +1799,16 @@ static void dmar_set_intr_remap_table(struct dmar_drhd_rt *dmar_unit)
 
 	/** If 'dmar_unit->ir_table_addr' is equal to 0H, indicating that there is no interrupt remapping table
 	 *  allocated to the DRHD structure specified by \a dmar_unit */
-	if (dmar_unit->ir_table_addr == 0UL) {
-		/** Set 'dmar_unit->ir_table_addr' to the return value of 'hva2hpa(get_ir_table(dmar_unit->index))',
-		 *  which is the base address (host physical address) of the 4-KByte aligned interrupt remapping table
+	if (dmar_unit->ir_table_addr == NULL) {
+		/** Set 'dmar_unit->ir_table_addr' to the return value of 'get_ir_table(dmar_unit->index)',
+		 *  which is the base address (host virtual address) of the 4-KByte aligned interrupt remapping table
 		 *  allocated to the DRHD structure specified by \a dmar_unit */
-		dmar_unit->ir_table_addr = hva2hpa(get_ir_table(dmar_unit->index));
+		dmar_unit->ir_table_addr = (union dmar_ir_entry *)get_ir_table(dmar_unit->index);
 	}
 
-	/** Set 'address' to 'dmar_unit->ir_table_addr | DMAR_IR_ENABLE_EIM'
+	/** Set 'address' to return value of hva2hpa((void *)dmar_unit->ir_table_addr) bitwise OR DMAR_IR_ENABLE_EIM
 	 *  (Extended Interrupt Mode Enable field in 'address' is set to 1 to indicate that x2APIC mode is active.) */
-	address = dmar_unit->ir_table_addr | DMAR_IR_ENABLE_EIM;
+	address = hva2hpa((void *)dmar_unit->ir_table_addr) | DMAR_IR_ENABLE_EIM;
 
 	/* Set number of bits needed to represent the entries minus 1 */
 	/** Set 'size' to the subtraction of 1 from the index of most significant bit set in CONFIG_MAX_IR_ENTRIES,
@@ -2007,15 +2004,15 @@ static void dmar_set_root_table(struct dmar_drhd_rt *dmar_unit)
 
 	/** If 'dmar_unit->root_table_addr' is equal to 0H, indicating that there is no root table
 	 *  allocated to the DRHD structure specified by \a dmar_unit */
-	if (dmar_unit->root_table_addr == 0UL) {
-		/** Set 'dmar_unit->root_table_addr' to the return value of 'hva2hpa(get_root_table(dmar_unit->index))',
-		 *  which is the base address (host physical address) of the 4-KByte aligned root table
+	if (dmar_unit->root_table_addr == NULL) {
+		/** Set 'dmar_unit->root_table_addr' to the return value of 'get_root_table(dmar_unit->index)',
+		 *  which is the base address (host virtual address) of the 4-KByte aligned root table
 		 *  allocated to the DRHD structure specified by \a dmar_unit */
-		dmar_unit->root_table_addr = hva2hpa(get_root_table(dmar_unit->index));
+		dmar_unit->root_table_addr = (struct dmar_entry *)get_root_table(dmar_unit->index);
 	}
 
-	/** Set 'address' to dmar_unit->root_table_addr */
-	address = dmar_unit->root_table_addr;
+	/** Set 'address' to the return value of 'hva2hpa((void *)dmar_unit->root_table_addr)' */
+	address = hva2hpa((void *)dmar_unit->root_table_addr);
 
 	/** Call iommu_write64 with the following parameters, in order to write 'address' to
 	 *  Root Table Address Register associated with \a dmar_unit.
@@ -2083,17 +2080,17 @@ static void dmar_enable_qi(struct dmar_drhd_rt *dmar_unit)
 	 *  - &(dmar_unit->lock) */
 	spinlock_obtain(&(dmar_unit->lock));
 
-	/** Set 'dmar_unit->qi_queue' to the return value of 'hva2hpa(get_qi_queue(dmar_unit->index))',
-	 *  which is the base address (host physical address) of the 4-KByte aligned invalidation queue
+	/** Set 'dmar_unit->qi_queue' to the return value of 'get_qi_queue(dmar_unit->index)',
+	 *  which is the base address (host virtual address) of the 4-KByte aligned invalidation queue
 	 *  allocated to the DRHD structure specified by \a dmar_unit */
-	dmar_unit->qi_queue = hva2hpa(get_qi_queue(dmar_unit->index));
+	dmar_unit->qi_queue = (void *)get_qi_queue(dmar_unit->index);
 	/** Call iommu_write64 with the following parameters, in order to write 'dmar_unit->qi_queue' to
 	 *  Invalidation Queue Address Register associated with \a dmar_unit.
 	 *  - dmar_unit
 	 *  - DMAR_IQA_REG
-	 *  - dmar_unit->qi_queue
+	 *  - hva2hpa(dmar_unit->qi_queue)
 	 */
-	iommu_write64(dmar_unit, DMAR_IQA_REG, dmar_unit->qi_queue);
+	iommu_write64(dmar_unit, DMAR_IQA_REG, hva2hpa(dmar_unit->qi_queue));
 
 	/** Call iommu_write32 with the following parameters, in order to write 0 to
 	 *  Invalidation Queue Tail Register associated with \a dmar_unit.
@@ -2312,9 +2309,9 @@ int32_t add_iommu_device(struct iommu_domain *domain, uint8_t bus, uint8_t devfu
 	 */
 	dmar_unit = &dmar_drhd_units[1];
 
-	/** Set 'root_table' to the return value of 'hpa2hva(dmar_unit->root_table_addr)', which points to
+	/** Set 'root_table' to 'dmar_unit->root_table_addr', which points to
 	 *  the root table associated with 'dmar_unit' */
-	root_table = (struct dmar_entry *)hpa2hva(dmar_unit->root_table_addr);
+	root_table = dmar_unit->root_table_addr;
 
 	/** Set 'root_entry' to 'root_table + bus', which points to the root entry associated with \a bus */
 	root_entry = root_table + bus;
@@ -2476,9 +2473,9 @@ int32_t remove_iommu_device(const struct iommu_domain *domain, uint8_t bus, uint
 	/** Set 'sid.fields.devfun' to \a devfun */
 	sid.fields.devfun = devfun;
 
-	/** Set 'root_table' to the return value of 'hpa2hva(dmar_unit->root_table_addr)', which points to
+	/** Set 'root_table' to 'dmar_unit->root_table_addr', which points to
 	 *  the root table associated with 'dmar_unit' */
-	root_table = (struct dmar_entry *)hpa2hva(dmar_unit->root_table_addr);
+	root_table = dmar_unit->root_table_addr;
 	/** Set 'root_entry' to 'root_table + bus', which points to the root entry associated with \a bus */
 	root_entry = root_table + bus;
 
@@ -2862,9 +2859,9 @@ void dmar_assign_irte(struct intr_source intr_src, union dmar_ir_entry irte, uin
 	 *  requests processed through this entry */
 	effective_irte.bits.fpd = 0x0UL;
 
-	/** Set 'ir_table' to the return value of 'hpa2hva(dmar_unit->ir_table_addr)', which points to
+	/** Set 'ir_table' to 'dmar_unit->ir_table_addr', which points to
 	 *  the interrupt remapping table associated with 'dmar_unit' */
-	ir_table = (union dmar_ir_entry *)hpa2hva(dmar_unit->ir_table_addr);
+	ir_table = dmar_unit->ir_table_addr;
 	/** Set 'ir_entry' to 'ir_table + index', which points to the interrupt remapping entry associated with
 	 *  \a index */
 	ir_entry = ir_table + index;
@@ -2932,9 +2929,9 @@ void dmar_free_irte(__unused struct intr_source intr_src, uint16_t index)
 	 */
 	dmar_unit = &dmar_drhd_units[1];
 
-	/** Set 'ir_table' to the return value of 'hpa2hva(dmar_unit->ir_table_addr)', which points to
+	/** Set 'ir_table' to 'dmar_unit->ir_table_addr', which points to
 	 *  the interrupt remapping table associated with 'dmar_unit' */
-	ir_table = (union dmar_ir_entry *)hpa2hva(dmar_unit->ir_table_addr);
+	ir_table = dmar_unit->ir_table_addr;
 	/** Set 'ir_entry' to 'ir_table + index', which points to the interrupt remapping entry associated with
 	 *  \a index */
 	ir_entry = ir_table + index;
