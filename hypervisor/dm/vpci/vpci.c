@@ -1058,17 +1058,43 @@ static void vpci_write_pt_dev_cfg(struct pci_vdev *vdev, uint32_t offset, uint32
 		 * - val
 		 */
 		vmsi_write_cfg(vdev, offset, bytes, val);
-	/** If offset is PCIR_COMMAND */
-	} else if (offset == PCIR_COMMAND) {
-		/** Call pci_pdev_write_cfg with the following parameters, in order to write command register to
-		 *  the configuration space of the physical PCI device associated with the given vPCI device. But
-		 *  the legacy interrupt should be disabled, so the bit10 should be set by default.
-		 *  - vdev->pbdf
-		 *  - offset
-		 *  - bytes
-		 *  - val | 0x400U
-		 */
-		pci_pdev_write_cfg(vdev->pbdf, offset, bytes, val | 0x400U);
+	/** If offset is in the range between 04H and 07H, which includes command and status registers. */
+	} else if ((offset >= PCIR_COMMAND) && (offset < PCIR_REVID)) {
+		/** If offset is 05H and bytes is 1, which means the high byte of the command register. */
+		if ((offset == (PCIR_COMMAND + 1U)) && (bytes == 1U)) {
+			/** Call pci_pdev_write_cfg with the following parameters, in order to write command register
+			 *  to the configuration space of the physical PCI device associated with the given vPCI device.
+			 *  But the legacy interrupt should be disabled, so the bit2 should be set by default.
+			 *  - vdev->pbdf
+			 *  - offset
+			 *  - bytes
+			 *  - val | 0x4U
+			 */
+			pci_pdev_write_cfg(vdev->pbdf, offset, bytes, val | 0x4U);
+		/** If offset is 04H and bytes is 2 or 4, which means
+		 *  all the bytes of command register or command and status registers. */
+		} else if ((offset == PCIR_COMMAND) && ((bytes == 2U) || (bytes == 4U))) {
+			/** Call pci_pdev_write_cfg with the following parameters, in order to write command register
+			 *  or may includes status register to the configuration space of the physical PCI device
+			 *  associated with the given vPCI device. But the legacy interrupt should be disabled,
+			 *  so the bit10 should be set by default.
+			 *  - vdev->pbdf
+			 *  - offset
+			 *  - bytes
+			 *  - val | 0x400U
+			 */
+			pci_pdev_write_cfg(vdev->pbdf, offset, bytes, val | 0x400U);
+		} else {
+			/** Call pci_pdev_write_cfg with the following parameters, in order to write command or status
+			 *  register to the configuration space of the physical PCI device
+			 *  associated with the given vPCI device.
+			 *  - vdev->pbdf
+			 *  - offset
+			 *  - bytes
+			 *  - val
+			 */
+			pci_pdev_write_cfg(vdev->pbdf, offset, bytes, val);
+		}
 	} else {
 		/* ignore other writing */
 		/** Logging the following information with a log level of LOG_DEBUG.
