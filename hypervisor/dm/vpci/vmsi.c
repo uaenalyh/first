@@ -318,13 +318,6 @@ void vmsi_write_cfg(struct pci_vdev *vdev, uint32_t offset, uint32_t bytes, uint
 						    0xffU, 0xffU, 0xffU, 0xffU,
 						    0x00U, 0xffU};
 
-	/** Call enable_disable_msi with the following parameters, in order to disable the physical MSI of the
-	 *  physical PCI device associated with the given vPCI device. It is required to disable MSI before remapping
-	 *  the virtual MSI data/address to the phyiscal MSI data/address.
-	 *  - vdev
-	 *  - false
-	 */
-	enable_disable_msi(vdev, false);
 	/** If MSI is 64bit */
 	if (vdev->msi.is_64bit) {
 		/** Call memcpy_s with the following parameters, in order to set ro_mask to 64bit MSI read-only mask.
@@ -346,6 +339,13 @@ void vmsi_write_cfg(struct pci_vdev *vdev, uint32_t offset, uint32_t bytes, uint
 
 	/* If there is any bit that is not set in ro_mask. */
 	if (ro_mask != ~0U) {
+		/** Call enable_disable_msi with the following parameters, in order to disable the physical MSI of
+		 *  the physical PCI device associated with the given vPCI device. It is required to disable MSI
+		 *  before remapping the virtual MSI data/address to the phyiscal MSI data/address.
+		 *  - vdev
+		 *  - false
+		 */
+		enable_disable_msi(vdev, false);
 		/** Set old to the value returned by pci_vdev_read_cfg with vdev, offset and bytes being the
 		 *  parameters, which reads a bytes value from the configuration space of the given vPCI device.
 		 */
