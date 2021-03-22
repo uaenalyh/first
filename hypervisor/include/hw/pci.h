@@ -174,33 +174,6 @@ enum pci_bar_type {
 	PCIBAR_MEM64HI, /**< the high 32bits part of a 64bits MMIO BAR */
 };
 
-/**
- * @brief Get the offset of a BAR register in PCI configuration space.
- *
- * This function is called to get the offset of a BAR register in PCI configuration space.
- *
- * @param[in] idx The index of the BAR register in PCI configuration space.
- *
- * @return the offset of the BAR register corresponding with the given 'idx'
- *
- * @pre idx < PCI_BAR_COUNT
- *
- * @post N/A
- *
- * @mode HV_INIT, HV_OPERATIONAL
- *
- * @remark N/A
- *
- * @reentrancy unspecified
- * @threadsafety Yes
- */
-static inline uint32_t pci_bar_offset(uint32_t idx)
-{
-	/** Return the sum of PCIR_BARS and idx left-shifted by 2, which is the offset of the (idx + 1)'th BAR
-	 *  in the PCI configuration space */
-	return PCIR_BARS + (idx << 2U);
-}
-
 uint32_t pci_pdev_read_cfg(union pci_bdf bdf, uint32_t offset, uint32_t bytes);
 void pci_pdev_write_cfg(union pci_bdf bdf, uint32_t offset, uint32_t bytes, uint32_t val);
 

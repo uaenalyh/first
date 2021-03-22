@@ -10,6 +10,7 @@
 #include <pgtable.h>
 #include <io.h>
 #include <mmu.h>
+#include <vpci_priv.h>
 #include "lib.h"
 #include "config_debug.h"
 #include "uart16550_priv.h"

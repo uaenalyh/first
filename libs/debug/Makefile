@@ -5,6 +5,7 @@
 FILE_PATH := $(dir $(MKFL_NAME))
 SRCS += $(wildcard $(FILE_PATH)/*.c)
 OBJS += $(patsubst %.c,$(HV_OBJDIR)/%.o,$(SRCS))
+INCLUDE_PATH += dm/vpci
 
 .PHONY: default
 default: lib
