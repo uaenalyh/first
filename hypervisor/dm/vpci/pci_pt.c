@@ -284,32 +284,21 @@ void vdev_pt_write_vbar(struct pci_vdev *vdev, uint32_t idx, uint32_t val)
 		 *  - update_idx
 		 */
 		vdev_pt_unmap_mem_vbar(vdev, update_idx);
-		/** If 'val' is not 0FFFFFFFFH, the value to write is used to read BAR size */
-		if (val != ~0U) {
-			/** Call pci_vdev_write_bar with the following parameters, in order to write the BAR register
-			 *  in its virtual configuration space and update its BAR base info.
-			 *  - vdev
-			 *  - idx
-			 *  - val
-			 */
-			pci_vdev_write_bar(vdev, idx, val);
-			/** Call vdev_pt_map_mem_vbar with the following parameters, in order to remap the BAR space
-			 *  between the new GPA of BAR base and its HPA.
-			 *  - vdev
-			 *  - update_idx
-			 */
-			vdev_pt_map_mem_vbar(vdev, update_idx);
-		} else {
-			/** Call pci_vdev_write_cfg_u32 with the following parameters, in order to write the value
-			 *  0FFFFFFFFH to the BAR register in the virtual configuration space of the given vPCI device.
-			 *  - vdev
-			 *  - offset
-			 *  - val
-			 */
-			pci_vdev_write_cfg_u32(vdev, offset, val);
-			/** Set vdev->bar[update_idx].base to 0, which means it doesn't need do remapping. */
-			vdev->bar[update_idx].base = 0UL;
-		}
+
+		/** Call pci_vdev_write_bar with the following parameters, in order to write the BAR register
+		 *  in its virtual configuration space and update its BAR base info.
+		 *  - vdev
+		 *  - idx
+		 *  - val
+		 */
+		pci_vdev_write_bar(vdev, idx, val);
+		/** Call vdev_pt_map_mem_vbar with the following parameters, in order to remap the BAR space
+		 *  between the new GPA of BAR base and its HPA.
+		 *  - vdev
+		 *  - update_idx
+		 */
+		vdev_pt_map_mem_vbar(vdev, update_idx);
+
 		/** End of case */
 		break;
 	}

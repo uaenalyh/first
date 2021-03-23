@@ -244,13 +244,12 @@ struct pci_vdev *pci_find_vdev(struct acrn_vpci *vpci, union pci_bdf vbdf)
  * @brief Read a BAR register of the given vPCI device according to the given BAR index.
  *
  * This function is called to read a BAR register of the given vPCI device according to the given BAR index.
- * Generally, it will return the value of the BAR register, but if the value is 0FFFFFFFFH, it will return the size
- * of the BAR.
+ * It will return the value of the BAR register.
  *
  * @param[in] vdev A vPCI device whose BAR is to read.
  * @param[in] idx The BAR index.
  *
- * @return The BAR register's value or return the BAR size if value is 0FFFFFFFFH
+ * @return The BAR register's value
  *
  * @pre vdev != NULL
  * @pre 0 <= idx && idx <= 5
@@ -281,12 +280,7 @@ uint32_t pci_vdev_read_bar(const struct pci_vdev *vdev, uint32_t idx)
 	 *  its register offset.
 	 */
 	bar = pci_vdev_read_cfg_u32(vdev, offset);
-	/** If 'bar' is 0FFFFFFFFH, which is set by BAR writing in order to get its BAR size */
-	if (bar == ~0U) {
-		/** Set bar to vdev->bar[idx].mask, which is the BAR size. */
-		bar = vdev->bar[idx].mask;
-	}
-	/** Return the BAR register's value or the BAR size */
+	/** Return the BAR register's value */
 	return bar;
 }
 
