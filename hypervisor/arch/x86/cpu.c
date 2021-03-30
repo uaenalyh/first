@@ -320,6 +320,11 @@
 #define CPU_DOWN_TIMEOUT 100U /* millisecond */
 
 /**
+ * @brief The bit indicating the serial console as an enabled destination of debug logs.
+ */
+#define LOG_FLAG_STDOUT  1U
+
+/**
  * @brief An array that contains information will be holden by per CPU.
  */
 struct per_cpu_region per_cpu_data[MAX_PCPU_NUM] __aligned(PAGE_SIZE);
@@ -491,6 +496,14 @@ void init_pcpu_pre(bool is_bsp)
 		 *  before do initialization for physical UART. */
 		uart16550_init(true);
 
+		/** Call init_logmsg with the following parameters, in order to enable logs to the serial console.
+		 *  - LOG_FLAG_STDOUT
+		 */
+		init_logmsg(LOG_FLAG_STDOUT);
+
+		/** Call calibrate_tsc in order to initialize the frequency of TSC. */
+		calibrate_tsc();
+
 		/** Call bsp_init with the following parameters,
 		 *  in order to let BSP (Board Support Package) do the per-processor initialization. */
 		bsp_init();
@@ -603,10 +616,6 @@ void init_pcpu_post(uint16_t pcpu_id)
 		/* Print Hypervisor Banner */
 		/** Call print_hv_banner in order to print the boot message. */
 		print_hv_banner();
-
-		/* Calibrate TSC Frequency */
-		/** Call calibrate_tsc in order to initialize the frequency of TSC. */
-		calibrate_tsc();
 
 		/** Logging the following information with a log level of LOG_ACRN.
 		 *  - HV_FULL_VERSION
@@ -1157,12 +1166,12 @@ static void set_current_pcpu_id(uint16_t pcpu_id)
 static void print_hv_banner(void)
 {
 	/** Declare the following local variables of type const char *.
-	 *  - boot_msg representing the message will be printed, initialized as "ACRN Hypervisor\\n\\r". */
-	const char *boot_msg = "ACRN Hypervisor\n\r";
+	 *  - boot_msg representing the message will be printed, initialized as "ACRN Hypervisor". */
+	const char *boot_msg = "ACRN Hypervisor";
 
-	/** Call printf with the following parameters, in order to print the boot message.
+	/** Call pr_info with the following parameters, in order to print the boot message.
 	 *  - boot_msg */
-	printf(boot_msg);
+	pr_info(boot_msg);
 }
 
 /**

@@ -818,11 +818,11 @@ void init_paging(void)
 	 *  or high64_max_ram is less than 4G.
 	 */
 	if ((high64_max_ram > (CONFIG_PLATFORM_RAM_SIZE + PLATFORM_LO_MMIO_SIZE)) || (high64_max_ram < (1UL << 32U))) {
-		/** Logging the following information for debug purpose.
+		/** Logging the following information with a log level of LOG_ERROR for debug purpose.
 		 *  - high64_max_ram
 		 *  - CONFIG_PLATFORM_RAM_SIZE + PLATFORM_LO_MMIO_SIZE
 		 */
-		printf("ERROR!!! high64_max_ram: 0x%lx, top address space: 0x%lx\n", high64_max_ram,
+		pr_err("ERROR!!! high64_max_ram: 0x%lx, top address space: 0x%lx", high64_max_ram,
 			CONFIG_PLATFORM_RAM_SIZE + PLATFORM_LO_MMIO_SIZE);
 		/** Generate a panic with following message
 		 *  - "Please configure HV_ADDRESS_SPACE correctly!\n"

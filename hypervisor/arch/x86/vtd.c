@@ -536,6 +536,14 @@ struct intr_remap_table {
 };
 
 /**
+ * @brief The array that stores the root tables allocated to all DRHD structures
+ *
+ * The number of elements in this array is DRHD_COUNT and this array has an
+ * alignment of 4096 bytes. It's initialized as all 0s.
+ */
+static struct page root_tables[DRHD_COUNT] __aligned(PAGE_SIZE);
+
+/**
  * @brief Get the 4-KByte aligned root table for the specified DRHD structure.
  *
  * For each DRHD structure present in the platform, there is a DRHD index allocated to it by hypervisor.
@@ -562,16 +570,18 @@ struct intr_remap_table {
  */
 static inline uint8_t *get_root_table(uint32_t dmar_index)
 {
-	/** Declare the following static array of type 'struct page'.
-	 *  - root_tables representing an array that stores the root tables allocated to all DRHD structures
-	 *  (the number of elements in this array is DRHD_COUNT and this array has an alignment of 4096 Bytes),
-	 *  initialized as all 0s.
-	 */
-	static struct page root_tables[DRHD_COUNT] __aligned(PAGE_SIZE);
 	/** Return root_tables[dmar_index].contents, which points to the root table whose corresponding
 	 *  DRHD index is \a dmar_index */
 	return root_tables[dmar_index].contents;
 }
+
+/**
+ * @brief The array that stores the context tables allocated to all DRHD structures.
+ *
+ * The number of elements in this array is DRHD_COUNT and this array has an
+ * alignment of 4096 bytes. It's initialized as all 0s.
+ */
+static struct context_table ctx_tables[DRHD_COUNT] __aligned(PAGE_SIZE);
 
 /**
  * @brief Get the 4-KByte aligned context table according to the given DRHD index and the given bus number.
@@ -603,17 +613,19 @@ static inline uint8_t *get_root_table(uint32_t dmar_index)
  */
 static inline uint8_t *get_ctx_table(uint32_t dmar_index, uint8_t bus_no)
 {
-	/** Declare the following static array of type 'struct context_table'.
-	 *  - ctx_tables representing an array that stores the context tables allocated to all DRHD structures
-	 *  (the number of elements in this array is DRHD_COUNT and this array has an alignment of 4096 Bytes),
-	 *  initialized as all 0s.
-	 */
-	static struct context_table ctx_tables[DRHD_COUNT] __aligned(PAGE_SIZE);
 	/** Return ctx_tables[dmar_index].buses[bus_no].contents, which points to the context table whose
 	 *  corresponding bus number is \a bus_no and it belongs to the DRHD structure whose DRHD index is
 	 *  \a dmar_index */
 	return ctx_tables[dmar_index].buses[bus_no].contents;
 }
+
+/**
+ * @brief The array that stores the invalidation queues allocated to all DRHD structures
+ *
+ * The number of elements in this array is DRHD_COUNT and this array has an
+ * alignment of 4096 bytes. It's initialized as all 0s.
+ */
+static struct page qi_queues[DRHD_COUNT] __aligned(PAGE_SIZE);
 
 /**
  * @brief Get the 4-KByte aligned invalidation queue for the specified DRHD structure.
@@ -642,16 +654,18 @@ static inline uint8_t *get_ctx_table(uint32_t dmar_index, uint8_t bus_no)
  */
 static inline uint8_t *get_qi_queue(uint32_t dmar_index)
 {
-	/** Declare the following static array of type 'struct page'.
-	 *  - qi_queues representing an array that stores the invalidation queues allocated to all DRHD structures
-	 *  (the number of elements in this array is DRHD_COUNT and this array has an alignment of 4096 Bytes),
-	 *  initialized as all 0s.
-	 */
-	static struct page qi_queues[DRHD_COUNT] __aligned(PAGE_SIZE);
 	/** Return qi_queues[dmar_index].contents, which points to the invalidation queue whose corresponding
 	 *  DRHD index is \a dmar_index */
 	return qi_queues[dmar_index].contents;
 }
+
+/**
+ * @brief The array that stores the interrupt remapping tables allocated to all DRHD
+ *
+ * The number of elements in this array is DRHD_COUNT and this array has an
+ * alignment of 4096 bytes. It's initialized as all 0s.
+ */
+static struct intr_remap_table ir_tables[DRHD_COUNT] __aligned(PAGE_SIZE);
 
 /**
  * @brief Get the 4-KByte aligned interrupt remapping table for the specified DRHD structure.
@@ -681,12 +695,6 @@ static inline uint8_t *get_qi_queue(uint32_t dmar_index)
  */
 static inline uint8_t *get_ir_table(uint32_t dmar_index)
 {
-	/** Declare the following static array of type 'struct intr_remap_table'.
-	 *  - ir_tables representing an array that stores the interrupt remapping tables allocated to all DRHD
-	 *  structures (the number of elements in this array is DRHD_COUNT and this array has an alignment of
-	 *  4096 Bytes), initialized as all 0s.
-	 */
-	static struct intr_remap_table ir_tables[DRHD_COUNT] __aligned(PAGE_SIZE);
 	/** Return ir_tables[dmar_index].tables[0].contents, which points to the interrupt remapping table
 	 *  whose corresponding DRHD index is \a dmar_index */
 	return ir_tables[dmar_index].tables[0].contents;
@@ -2585,6 +2593,15 @@ static void do_action_for_iommus(void (*action)(struct dmar_drhd_rt *))
 }
 
 /**
+ * @brief The array that represents all the IOMMU domains
+ *
+ * The number of elements in this array is MAX_DOMAIN_NUM. It is initialized as
+ * all 0s.
+ */
+static struct iommu_domain iommu_domains[MAX_DOMAIN_NUM];
+
+
+/**
  * @brief Create an IOMMU domain based on the given information.
  *
  * It is supposed to be called only by 'vpci_init' from 'vp-dm.vperipheral' module.
@@ -2608,11 +2625,6 @@ static void do_action_for_iommus(void (*action)(struct dmar_drhd_rt *))
  */
 struct iommu_domain *create_iommu_domain(uint16_t vm_id, uint64_t translation_table, uint32_t addr_width)
 {
-	/** Declare the following static array of type 'struct iommu_domain'.
-	 *  - iommu_domains representing an array that contains all the IOMMU domains
-	 *  (the number of elements in this array is MAX_DOMAIN_NUM), initialized as all 0s.
-	 */
-	static struct iommu_domain iommu_domains[MAX_DOMAIN_NUM];
 	/** Declare the following local variables of type 'struct iommu_domain *'.
 	 *  - domain representing a pointer to an IOMMU domain to be created, not initialized. */
 	struct iommu_domain *domain;
