@@ -214,7 +214,7 @@ static void pci_cfgaddr_io_write(struct acrn_vcpu *vcpu, uint16_t addr, size_t b
  *
  * @return A boolean to indicate whether the offset is valid: true if valid, false if invalid.
  *
- * @pre N/A
+ * @pre (bytes == 1) || (bytes == 2) || (bytes == 4)
  *
  * @post N/A
  *
@@ -988,6 +988,7 @@ static void vpci_deinit_pt_dev(struct pci_vdev *vdev)
  * @return The index of a BAR
  *
  * @pre offset >= 10H && offset < 28H
+ * @pre (offset & 3H) == 0
  *
  * @post N/A
  *
