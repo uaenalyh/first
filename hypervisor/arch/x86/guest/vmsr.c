@@ -682,29 +682,6 @@ void init_msr_emulation(struct acrn_vcpu *vcpu)
 	 *  - INTERCEPT_WRITE
 	 */
 	enable_msr_interception(msr_bitmap, MSR_IA32_EFER, INTERCEPT_WRITE);
-	/** Call enable_msr_interception with the following parameters, in order to update 'msr_bitmap'
-	 *  according to the specified MSR IA32_MCG_STATUS and the specified mode INTERCEPT_WRITE.
-	 *  - msr_bitmap
-	 *  - MSR_IA32_MCG_STATUS
-	 *  - INTERCEPT_WRITE
-	 */
-	enable_msr_interception(msr_bitmap, MSR_IA32_MCG_STATUS, INTERCEPT_WRITE);
-
-	/** Call enable_msr_interception with the following parameters, in order to update 'msr_bitmap'
-	 *  according to the specified MSR IA32_P5_MC_ADDR and the specified mode INTERCEPT_WRITE.
-	 *  - msr_bitmap
-	 *  - MSR_IA32_P5_MC_ADDR
-	 *  - INTERCEPT_WRITE
-	 */
-	enable_msr_interception(msr_bitmap, MSR_IA32_P5_MC_ADDR, INTERCEPT_WRITE);
-
-	/** Call enable_msr_interception with the following parameters, in order to update 'msr_bitmap'
-	 *  according to the specified MSR IA32_P5_MC_TYPE and the specified mode INTERCEPT_WRITE.
-	 *  - msr_bitmap
-	 *  - MSR_IA32_P5_MC_TYPE
-	 *  - INTERCEPT_WRITE
-	 */
-	enable_msr_interception(msr_bitmap, MSR_IA32_P5_MC_TYPE, INTERCEPT_WRITE);
 	/* handle cases different between safety VM and non-safety VM */
 	/* Machine Check */
 	/** If 'vcpu->vm' is a safety VM */
@@ -1061,6 +1038,16 @@ int32_t rdmsr_vmexit_handler(struct acrn_vcpu *vcpu)
 
 	/** Depending on 'msr' */
 	switch (msr) {
+	/** 'msr' is MSR_IA32_P5_MC_ADDR */
+	case MSR_IA32_P5_MC_ADDR:
+	/** 'msr' is MSR_IA32_P5_MC_TYPE */
+	case MSR_IA32_P5_MC_TYPE:
+	/** 'msr' is MSR_IA32_MCG_STATUS */
+	case MSR_IA32_MCG_STATUS:
+		/** Set 'v' to 0H */
+		v = 0UL;
+		/** End of case */
+		break;
 	/** 'msr' is MSR_IA32_TSC_DEADLINE */
 	case MSR_IA32_TSC_DEADLINE: {
 		/** Set 'v' to the return value of 'vlapic_get_tsc_deadline_msr(vcpu_vlapic(vcpu))',
