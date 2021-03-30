@@ -530,13 +530,10 @@ void init_vdev_pt(struct pci_vdev *vdev)
 			} else {
 				/** Set vbar->size to (vbar->size & ~(vbar->size - 1)) to get the BAR size. */
 				vbar->size = vbar->size & ~(vbar->size - 1UL);
-				/** If the BAR is 32bits BAR */
-				if (type == PCIBAR_MEM32) {
-					/** Set vbar->size to the value returned by round_page_up with vbar->size
-					 *  being the parameter, to make the size 4K aligned.
-					 */
-					vbar->size = round_page_up(vbar->size);
-				}
+				/** Set vbar->size to the value returned by round_page_up with vbar->size
+				 *  being the parameter, to make the size 4K aligned.
+				 */
+				vbar->size = round_page_up(vbar->size);
 				/** Call pci_vdev_write_bar with the following parameters, in order to update the
 				 *  vbar of the given vPCI device.
 				 *  - vdev

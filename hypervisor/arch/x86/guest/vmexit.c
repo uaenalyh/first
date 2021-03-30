@@ -1028,9 +1028,6 @@ static int32_t movdr_vmexit_handler(struct acrn_vcpu *vcpu)
 	 *  number of general purpose register when VM exit happened and set idx to its return value. */
 	idx = (uint32_t)vm_exit_cr_access_reg_idx(exit_qual);
 
-	/** Assert the idx is less than or equals to 7. */
-	ASSERT((idx <= 7U), "index out of range");
-
 	/** if return value of vm_exit_dr_access_direction() with exit_qual being parameter is 1. */
 	if (vm_exit_dr_access_direction(exit_qual) == 1UL) {
 		/** Switch based on the return value of vm_exit_qualification_bit_mask(exit_qual, 2U, 0U). */

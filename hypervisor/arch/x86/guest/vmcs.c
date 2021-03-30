@@ -459,11 +459,6 @@ static void init_host_state(void)
 	/** Set gdt_base to the return value of sgdt() */
 	gdt_base = sgdt();
 
-	/** If bit 47 of 'gdt_base' is set. */
-	if (((gdt_base >> 47U) & 0x1UL) != 0UL) {
-		/** Bitwise OR gdt_base by ffff000000000000H */
-		gdt_base |= 0xffff000000000000UL;
-	}
 	/** Call exec_vmwrite() with the following parameters, in order to write gdt_base to the field
 	 *  'Host GDTR base' in current VMCS.
 	 *  - VMX_HOST_GDTR_BASE
@@ -488,11 +483,6 @@ static void init_host_state(void)
 	/* Obtain the current interrupt descriptor table base */
 	/** Set idt_base to return value of sidt() */
 	idt_base = sidt();
-	/** If bit 47 of idt_base is 1H */
-	if (((idt_base >> 47U) & 0x1UL) != 0UL) {
-		/** Bitwise OR idt_base by 0xffff000000000000UL */
-		idt_base |= 0xffff000000000000UL;
-	}
 	/** Call exec_vmwrite() with the following parameters, in order to write idt_base to the field
 	 *  'Host IDTR base' in current VMCS.
 	 *  - VMX_HOST_IDTR_BASE

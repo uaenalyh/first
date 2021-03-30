@@ -1053,8 +1053,6 @@ int32_t cr_access_vmexit_handler(struct acrn_vcpu *vcpu)
 	 *  and assign the result to idx */
 	idx = (uint32_t)vm_exit_cr_access_reg_idx(exit_qual);
 
-	/** The idx should never be bigger than 15 as there are only 16 general purpose registers */
-	ASSERT((idx <= 15U), "index out of range");
 	/** For MOV CR, set reg to the value from the general-purpose register indicated by idx */
 	reg = vcpu_get_gpreg(vcpu, idx);
 

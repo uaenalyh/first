@@ -1351,8 +1351,6 @@ static void vpci_init_vdev(struct acrn_vpci *vpci, struct acrn_vm_pci_dev_config
 		/** Assert that dev_config->emu_type is PCI_DEV_TYPE_PTDEV */
 		ASSERT(dev_config->emu_type == PCI_DEV_TYPE_PTDEV,
 			"Only PCI_DEV_TYPE_PTDEV could not configuration vdev_ops");
-		/** Assert that dev_config->pdev is not NULL */
-		ASSERT(dev_config->pdev != NULL, "PCI PTDev is not present on platform!");
 	}
 
 	/** Call vdev->vdev_ops->init_vdev with the following parameters, in order to initialzie the vPCI device.
