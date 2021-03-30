@@ -1208,7 +1208,7 @@ void init_vmcs(struct acrn_vcpu *vcpu)
  *
  * @return None
  *
- * @pre vcpu->launched==true
+ * @pre N/A
  *
  * @post N/A
  *
@@ -1230,8 +1230,8 @@ void load_vmcs(const struct acrn_vcpu *vcpu)
 	 *  associated with the current physical CPU, initialized as &get_cpu_var(vmcs_run). */
 	void **vmcs_ptr = &get_cpu_var(vmcs_run);
 
-	/** If *vmcs_ptr is different from vcpu->arch.vmcs */
-	if (*vmcs_ptr != (void *)vcpu->arch.vmcs) {
+	/** If vcpu->launched is true and *vmcs_ptr is different from vcpu->arch.vmcs */
+	if (vcpu->launched && (*vmcs_ptr != (void *)vcpu->arch.vmcs)) {
 		/** Set vmcs_pa to return value of hva2hpa(vcpu->arch.vmcs) */
 		vmcs_pa = hva2hpa(vcpu->arch.vmcs);
 		/** Call exec_vmptrld() with the following parameters, in order to load VMCS pointer from
