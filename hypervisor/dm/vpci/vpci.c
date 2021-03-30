@@ -877,17 +877,20 @@ static void init_default_cfg(struct pci_vdev *vdev)
 
 	/** Set offset to the value returned by pci_vdev_read_cfg with vdev, PCIR_CAP_PTR and 1 being the parameters,
 	 *  which should be the MSI capability offset and its next capability link is set to 00H.
-	 *  */
-	offset = pci_vdev_read_cfg(vdev, PCIR_CAP_PTR, 1U);
-	/** Call pci_vdev_write_cfg with the following parameters, in order to write 0 to MSI_CAP->next CAP offset,
-	 *  for other capabilities are hidden.
-	 * - vdev
-	 * - offset + PCICAP_NEXTPTR
-	 * - 1
-	 * - 0
 	 */
-	pci_vdev_write_cfg(vdev, offset + PCICAP_NEXTPTR, 1U, 0U);
-
+	offset = pci_vdev_read_cfg(vdev, PCIR_CAP_PTR, 1U);
+	/* If offset is less than 0xFF, which means the CAP_PTR register points to a capability structure (which should
+	 * be MSI in normal cases) */
+	if (offset < 0xFFU) {
+		/** Call pci_vdev_write_cfg with the following parameters, in order to write 0 to MSI_CAP->next CAP
+		 *  offset, for other capabilities are hidden.
+		 *  - vdev
+		 *  - offset + PCICAP_NEXTPTR
+		 *  - 1
+		 *  - 0
+		 */
+		pci_vdev_write_cfg(vdev, offset + PCICAP_NEXTPTR, 1U, 0U);
+	}
 }
 
 
