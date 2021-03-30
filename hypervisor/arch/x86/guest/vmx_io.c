@@ -192,10 +192,10 @@ int32_t ept_violation_vmexit_handler(struct acrn_vcpu *vcpu)
 		/** Call vcpu_inject_pf() with the following parameters,
 		 *  in order to inject page fault exeception to guest VM.
 		 *  - vcpu
-		 *  - exec_vmread64(VMX_GUEST_PHYSICAL_ADDR_FULL)
+		 *  - 0UL
 		 *  - 0U
 		 */
-		vcpu_inject_pf(vcpu, exec_vmread64(VMX_GUEST_PHYSICAL_ADDR_FULL), 0U);
+		vcpu_inject_pf(vcpu, 0UL, 0U);
 	}
 
 	/** Return 0 which means EPT violation has been handled successfully. */
