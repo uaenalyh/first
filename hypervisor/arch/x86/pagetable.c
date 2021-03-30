@@ -858,9 +858,9 @@ void mmu_modify_or_del(uint64_t *pml4_page, uint64_t vaddr_base, uint64_t size, 
 			 *  - type
 			 */
 			modify_or_del_pdpte(pml4e, vaddr, vaddr_end_each_iter, prot_set, prot_clr, mem_ops, type);
-			/** Set 'vaddr' to 'vaddr_next' */
-			vaddr = vaddr_next;
 		}
+		/** Set 'vaddr' to 'vaddr_next' */
+		vaddr = vaddr_next;
 	}
 }
 

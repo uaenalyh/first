@@ -151,13 +151,29 @@ int32_t ept_violation_vmexit_handler(struct acrn_vcpu *vcpu)
 	/**
 	 * Declare the following local variables of type uint64_t.
 	 *  - gpa representing guest physical address, not initialized.
+	 *  - pg_size representing the page size of the faulting address in the EPT, not initialized.
 	 */
-	uint64_t gpa;
+	uint64_t gpa, pg_size;
+	/**
+	 * Declare the following local variables of type const uint64_t *.
+	 *  - pgentry representing the paging entry of the faulting address in the EPT.
+	 */
+	const uint64_t *pgentry;
 
 	/** Set exit_qual to vcpu->arch.exit_qualification */
 	exit_qual = vcpu->arch.exit_qualification;
 	/** Set gpa to the value of VMX_GUEST_PHYSICAL_ADDR_FULL (VMCS field)*/
 	gpa = exec_vmread64(VMX_GUEST_PHYSICAL_ADDR_FULL);
+
+	/**
+	 * Call lookup_address with the following parameters and set pgentry to its return value, in order to get the
+	 * paging entry of gpa in the EPT of the vCPU.
+	 *  - vcpu->vm->arch_vm.nworld_eptp
+	 *  - gpa
+	 *  - &pg_size
+	 *  - vcpu->vm->arch_vm.ept_mem_ops
+	 */
+	pgentry = lookup_address(vcpu->vm->arch_vm.nworld_eptp, gpa, &pg_size, &vcpu->vm->arch_vm.ept_mem_ops);
 
 	/**
 	 * Call TRACE_2L with the following parameters, in order to log
@@ -167,8 +183,9 @@ int32_t ept_violation_vmexit_handler(struct acrn_vcpu *vcpu)
 	 */
 	TRACE_2L(TRACE_VMEXIT_EPT_VIOLATION, exit_qual, gpa);
 
-	/** If EPT violation is caused by instruction fetch access. */
-	if ((exit_qual & 0x4UL) != 0UL) {
+	/** If EPT violation is caused by instruction fetch access, pgentry is not NULL and bit 5:3 in *pgentry equals
+	 *  to EPT_WB. */
+	if (((exit_qual & 0x4UL) != 0UL) && (pgentry != NULL) && ((*pgentry & EPT_MT_MASK) == EPT_WB)) {
 		/**
 		 * Call ept_modify_mr() with the following parameters,
 		 * in order to set EPT memory access right to be executable.
