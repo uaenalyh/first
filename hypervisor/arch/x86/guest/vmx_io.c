@@ -39,7 +39,10 @@
  * @param [in] vcpu Pointer to the instance of struct acrn_vcpu, which triggers
  *		    the VM exit on I/O instruction.
  *
- * @return 0, Emulation for I/O instruction shall be always handled successfully.
+ * @return Whether the emulation succeeds or not
+ *
+ * @retval 0 Emulation for the I/O instruction is handled successfully.
+ * @retval -ERANGE Emulation for the I/O instruction fails due to errors of range checks on the VM exit qualification
  *
  * @pre vcpu != NULL
  *
@@ -78,6 +81,9 @@ int32_t pio_instr_vmexit_handler(struct acrn_vcpu *vcpu)
 	 *    initialized as &io_req->reqs.pio.
 	 */
 	struct pio_request *pio_req = &io_req->reqs.pio;
+	/** Declare the following local variable of type int32_t
+	 *  - ret representing the return value of this function, initialized as 0 */
+	int32_t ret = 0;
 
 	/** Set exit_qual to vcpu->arch.exit_qualification. */
 	exit_qual = vcpu->arch.exit_qualification;
@@ -86,8 +92,12 @@ int32_t pio_instr_vmexit_handler(struct acrn_vcpu *vcpu)
 	pio_req->size = vm_exit_io_instruction_size(exit_qual) + 1UL;
 	/** Set pio_req->address to port number of access parsed from exit_qual */
 	pio_req->address = vm_exit_io_instruction_port_number(exit_qual);
+	/** If pio_req->size equals to 3 or is greater than 4, which means the size is invalid */
+	if ((pio_req->size == 3UL) || (pio_req->size >= 5UL)) {
+		/** Set ret to -ERANGE, which means a range check has failed */
+		ret = -ERANGE;
 	/** If direction of attempted access is 0 (OUT). */
-	if (vm_exit_io_instruction_access_direction(exit_qual) == 0UL) {
+	} else if (vm_exit_io_instruction_access_direction(exit_qual) == 0UL) {
 		/** Set mask to 0xFFFFFFFFU >> (32U - (8U * pio_req->size)) */
 		mask = 0xFFFFFFFFU >> (32U - (8U * pio_req->size));
 		/** Set pio_req->direction to REQUEST_WRITE */
@@ -99,25 +109,28 @@ int32_t pio_instr_vmexit_handler(struct acrn_vcpu *vcpu)
 		pio_req->direction = REQUEST_READ;
 	}
 
-	/**
-	 * Call TRACE_4I() with the following parameters,
-	 * in order to log current I/O access infomation.
-	 *  - pio_req->address
-	 *  - pio_req->direction
-	 *  - pio_req->size
-	 */
-	TRACE_4I(TRACE_VMEXIT_IO_INSTRUCTION, (uint32_t)pio_req->address, (uint32_t)pio_req->direction,
-		(uint32_t)pio_req->size, 0U);
+	/** If ret is 0, meaning no error occurs */
+	if (ret == 0) {
+		/**
+		 * Call TRACE_4I() with the following parameters,
+		 * in order to log current I/O access information.
+		 *  - pio_req->address
+		 *  - pio_req->direction
+		 *  - pio_req->size
+		 */
+		TRACE_4I(TRACE_VMEXIT_IO_INSTRUCTION, (uint32_t)pio_req->address, (uint32_t)pio_req->direction,
+			 (uint32_t)pio_req->size, 0U);
 
-	/**
-	 * Call emulate_io() with the following parameters, in order to emulate current I/O access.
-	 *  - vcpu
-	 *  - io_req
-	 */
-	emulate_io(vcpu, io_req);
+		/**
+		 * Call emulate_io() with the following parameters, in order to emulate current I/O access.
+		 *  - vcpu
+		 *  - io_req
+		 */
+		emulate_io(vcpu, io_req);
+	}
 
-	/** Return 0 which means I/O access has been emulated successfully. */
-	return 0;
+	/** Return ret */
+	return ret;
 }
 
 /**
@@ -177,7 +190,7 @@ int32_t ept_violation_vmexit_handler(struct acrn_vcpu *vcpu)
 
 	/**
 	 * Call TRACE_2L with the following parameters, in order to log
-	 * exit_qual and gpa infomation.
+	 * exit_qual and gpa information.
 	 *  - exit_qual
 	 *  - gpa
 	 */

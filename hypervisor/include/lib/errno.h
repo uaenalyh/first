@@ -37,6 +37,10 @@
  */
 #define EINVAL 22
 /**
+ * @brief Indicate that a range check error occurs.
+ */
+#define	ERANGE 34
+/**
  * @brief Indicate that timeout occurs.
  */
 #define ETIMEDOUT 110

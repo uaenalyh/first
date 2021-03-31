@@ -14,6 +14,7 @@
 #include <trace.h>
 #include <logmsg.h>
 #include <console.h>
+#include <errno.h>
 
 /**
  * @defgroup vp-base_hv-main vp-base.hv-main
@@ -214,11 +215,29 @@ void vcpu_thread(struct thread_object *obj)
 			pr_fatal("dispatch VM exit handler failed for reason"
 				 " %d, ret = %d!",
 				basic_exit_reason, ret);
-			/** Call vcpu_inject_gp() with the following parameters, in order to inject
-			 *  gp to the vcpu with error code 0.
-			 *  - vcpu
-			 *  - O */
-			vcpu_inject_gp(vcpu, 0U);
+			/** If ret equals to -ERANGE, indicating that an unexpected range check error occurs */
+			if (ret == -ERANGE) {
+				/** If the VM associated with the given \a vcpu is safety vm */
+				if (is_safety_vm(vcpu->vm)) {
+					/** Call panic with the following parameters, in order to print error
+					 *  information and panic the corresponding pcpu.
+					 *  - Error: Unexpected range check error */
+					panic("Error: Unexpected range check error!");
+				} else {
+					/** Call fatal_error_shutdown_vm() with the following parameters, in order to
+					 *  shutdown the corresponding vm.
+					 *  - vcpu
+					 */
+					fatal_error_shutdown_vm(vcpu);
+				}
+			} else {
+				/** Call vcpu_inject_gp() with the following parameters, in order to inject
+				 *  gp to the vcpu with error code 0.
+				 *  - vcpu
+				 *  - 0
+				 */
+				vcpu_inject_gp(vcpu, 0U);
+			}
 			/** Continue to next iteration */
 			continue;
 		}
