@@ -800,14 +800,12 @@ void mmu_modify_or_del(uint64_t *pml4_page, uint64_t vaddr_base, uint64_t size, 
 {
 	/** Declare the following local variables of type uint64_t.
 	 *  - vaddr representing the address determining the start of the input address space to be handled in
-	 *  each iteration, initialized as the return value of 'round_page_up(vaddr_base)'. */
-	uint64_t vaddr = round_page_up(vaddr_base);
-	/** Declare the following local variables of type uint64_t.
-	 *  - vaddr_next representing the next input address (aligned with PML4E_SIZE) to be handled, not initialized.
+	 *  each iteration, not initialized.
+	 *  - vaddr_next representing the next input address (aligned with PML4E_SIZE) to be mapped, not initialized.
 	 *  - vaddr_end representing the input address determining the end of the input address space whose mapping
-	 *  information is to be updated, not initialized.
+	 *  information is to be established, not initialized.
 	 */
-	uint64_t vaddr_next, vaddr_end;
+	uint64_t vaddr, vaddr_next, vaddr_end;
 	/** Declare the following local variables of type 'uint64_t *'.
 	 *  - pml4e representing the pointer to a PML4E, not initialized. */
 	uint64_t *pml4e;
@@ -816,9 +814,13 @@ void mmu_modify_or_del(uint64_t *pml4_page, uint64_t vaddr_base, uint64_t size, 
 	 *  in each iteration, not initialized. */
 	uint64_t vaddr_end_each_iter;
 
-	/** Set 'vaddr_end' to 'vaddr + round_page_down(size)', where 'round_page_down(size)' is the
-	 *  round-down 4-KByte aligned value corresponding to \a size */
-	vaddr_end = vaddr + round_page_down(size);
+	/** Set 'vaddr' to the return value of 'round_page_down(vaddr_base)', which is the
+	 *  round-down 4-KByte aligned value corresponding to \a vaddr_base */
+	vaddr = round_page_down(vaddr_base);
+	/** Set 'vaddr_end' to 'round_page_up(vaddr_base + size)', which is the round-up 4-KByte aligned
+	 *  value corresponding to the end of the region */
+	vaddr_end = round_page_up(vaddr_base + size);
+
 	/** Logging the following information with a log level of ACRN_DBG_MMU.
 	 *  - __func__
 	 *  - vaddr
@@ -1404,16 +1406,15 @@ void mmu_add(uint64_t *pml4_page, uint64_t paddr_base, uint64_t vaddr_base, uint
 	 */
 	dev_dbg(ACRN_DBG_MMU, "%s, paddr 0x%lx, vaddr 0x%lx, size 0x%lx\n", __func__, paddr_base, vaddr_base, size);
 
-	/* align address to page size*/
-	/** Set 'vaddr' to the return value of 'round_page_up(vaddr_base)', which is the
-	 *  round-up 4-KByte aligned value corresponding to \a vaddr_base */
-	vaddr = round_page_up(vaddr_base);
-	/** Set 'paddr' to the return value of 'round_page_up(paddr_base)', which is the
-	 *  round-up 4-KByte aligned value corresponding to \a paddr_base */
-	paddr = round_page_up(paddr_base);
-	/** Set 'vaddr_end' to 'vaddr + round_page_down(size)', where 'round_page_down(size)' is the
-	 *  round-down 4-KByte aligned value corresponding to \a size */
-	vaddr_end = vaddr + round_page_down(size);
+	/** Set 'vaddr' to the return value of 'round_page_down(vaddr_base)', which is the
+	 *  round-down 4-KByte aligned value corresponding to \a vaddr_base */
+	vaddr = round_page_down(vaddr_base);
+	/** Set 'paddr' to the return value of 'round_page_down(paddr_base)', which is the
+	 *  round-down 4-KByte aligned value corresponding to \a paddr_base */
+	paddr = round_page_down(paddr_base);
+	/** Set 'vaddr_end' to 'round_page_up(vaddr_base + size)', which is the round-up 4-KByte aligned
+	 *  value corresponding to the end of the region */
+	vaddr_end = round_page_up(vaddr_base + size);
 
 	/** Until 'vaddr' is equal to or larger than 'vaddr_end' */
 	while (vaddr < vaddr_end) {
