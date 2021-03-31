@@ -209,6 +209,11 @@
 #define XSAVE_STARTUP_FPU_TAG_WORD		0xFFU
 
 /**
+ * @brief The initial value of MXCSR field in the legacy region of an XSAVE area following STARTUP.
+ */
+#define XSAVE_STARTUP_MXCSR		0x1F80U
+
+/**
  * @brief Structure to define stack frame
  *
  * The stack_frame is linked with the sequence of stack operation.
@@ -699,6 +704,8 @@ static void init_xsave(struct acrn_vcpu *vcpu)
 	ectx->xs_area.legacy_region.fcw = XSAVE_STARTUP_FPU_CONTROL_WORD;
 	/** Set ectx->xs_area.legacy_region.ftw to XSAVE_STARTUP_FPU_TAG_WORD. */
 	ectx->xs_area.legacy_region.ftw = XSAVE_STARTUP_FPU_TAG_WORD;
+	/** Set ectx->xs_area.legacy_region.mxcsr to XSAVE_STARTUP_MXCSR. */
+	ectx->xs_area.legacy_region.mxcsr = XSAVE_STARTUP_MXCSR;
 }
 
 /**
