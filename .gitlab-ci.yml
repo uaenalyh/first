@@ -621,6 +621,19 @@ deploy_sample_case_job:
     - merge_requests
 
 
+deploy_bugfix_job:
+  stage: deploy
+  script:
+    - echo "start bugfix test ..."
+    - pwd
+    - /opt/fusa_ci.sh bugfix_test
+  dependencies:
+    - build_job
+    - test_srs_job
+  only:
+    - merge_requests
+    
+
 deploy_build_job:
   stage: deploy
   script:
