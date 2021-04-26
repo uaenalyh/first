@@ -347,11 +347,6 @@ test_build_job:
     - cp ../build/acrn-unit-test/host/bin/hw.32.out ../../acrn-sliced-mainline/image/hw_cpu_group.32.out
     - make clean
     - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
-    - /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0  "make RELEASE=1 vp-base MODULE_GROUP_OBJ=VP_BASE_CPU_GROUP_PENDING_REQUEST"
-    - if [ $? -ne 0 ]; then exit 1; fi
-    - cp ../build/acrn-unit-test/host/bin/vp-base.32.out ../../acrn-sliced-mainline/image/vp_base_cpu_group_pending_request.32.out
-    - make clean
-    - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
     - /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0  "make RELEASE=1 hw MODULE_GROUP_OBJ=HW_CPU_GROUP_TEST_AFRAMEWORK"
     - if [ $? -ne 0 ]; then exit 1; fi
     - cp ../build/acrn-unit-test/host/bin/hw.32.out ../../acrn-sliced-mainline/image/hw_cpu_group_test_aframework.32.out
@@ -497,6 +492,11 @@ test_build_job:
     - cp ../build/acrn-unit-test/host/bin/vp-base.32.out ../../acrn-sliced-mainline/image/vp_base_virq_general_group.32.out
     - make clean
     - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
+    - /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0  "make RELEASE=1 vp-base MODULE_GROUP_OBJ=VP_BASE_VM_CONFIG_GENERAL_GROUP"
+    - if [ $? -ne 0 ]; then exit 1; fi
+    - cp ../build/acrn-unit-test/host/bin/vp-base.32.out ../../acrn-sliced-mainline/image/vp_base_vm_config_general_group.32.out
+    - make clean
+    - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
     - /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0  "make RELEASE=1 vp-base MODULE_GROUP_OBJ=VP_BASE_VM_GROUP"
     - if [ $? -ne 0 ]; then exit 1; fi
     - cp ../build/acrn-unit-test/host/bin/vp-base.32.out ../../acrn-sliced-mainline/image/vp_base_vm_group.32.out
@@ -577,9 +577,9 @@ test_build_job:
     - cp ../build/acrn-unit-test/host/bin/lib.32.out ../../acrn-sliced-mainline/image/lib_lock_group.32.out
     - make clean
     - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
-    - /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0  "make RELEASE=1 lib MODULE_GROUP_OBJ=DEBUG_GROUP"
+    - /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0  "make RELEASE=1 debug MODULE_GROUP_OBJ=DEBUG_GROUP"
     - if [ $? -ne 0 ]; then exit 1; fi
-    - cp ../build/acrn-unit-test/host/bin/lib.32.out ../../acrn-sliced-mainline/image/debug_group.32.out
+    - cp ../build/acrn-unit-test/host/bin/debug.32.out ../../acrn-sliced-mainline/image/debug_group.32.out
     - make clean
     - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
     - /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0  "make RELEASE=1 vp-base MODULE_GROUP_OBJ=VCPU_RUN_VCPU_GROUP"
@@ -590,6 +590,11 @@ test_build_job:
     - /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0  "make RELEASE=1 hw MODULE_GROUP_OBJ=HWMGT_ACPI_GROUP"
     - if [ $? -ne 0 ]; then exit 1; fi
     - cp ../build/acrn-unit-test/host/bin/hw.32.out ../../acrn-sliced-mainline/image/hwmgt_acpi_group.32.out
+    - make clean
+    - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
+    - /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0  "make RELEASE=1 vp-base MODULE_GROUP_OBJ=VP_MMU_GROUP"
+    - if [ $? -ne 0 ]; then exit 1; fi
+    - cp ../build/acrn-unit-test/host/bin/vp-base.32.out ../../acrn-sliced-mainline/image/vp_mmu_group.32.out
     - make clean
     - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
     - /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0  "make RELEASE=1 hw MODULE_GROUP_OBJ=HW_SCHEDULE_GENERAL_GROUP"
