@@ -130,6 +130,10 @@
 #define APIC_ICR_MASK    0x000C0FFFUL /**< mask of APIC ICR bits which can be changed */
 
 #define ACRN_DBG_LAPIC 6U	      /**< This macro is used for virtual local APIC debug */
+#define APIC_DELMODE_LOWPR   0x00000100U /**< Delivery mode of Lowest Priority in local APIC ICR register */
+#define APIC_DELMODE_SMI     0x00000200U /**< Delivery mode of SMI in local APIC ICR register */
+#define APIC_DELMODE_RESERVED1 0x00000300U /**< Delivery mode of Reserved(3)in local APIC ICR register */
+#define APIC_DELMODE_RESERVED2 0x00000700U /**< Delivery mode of Reserved(7) in local APIC ICR register */
 
 /**
  * @brief This function is for getting the acrn_vlapic structure based on the vcpu_id.
@@ -1110,6 +1114,16 @@ static int32_t vlapic_x2apic_pt_icr_access(struct acrn_vm *vm, uint64_t val)
 					 *  - icr_low
 					 */
 					vlapic_process_init_sipi(target_vcpu, mode, icr_low);
+					/** End of case */
+					break;
+				/** If Delivery Mode is APIC_DELMODE_LOWPR */
+				case APIC_DELMODE_LOWPR:
+				/** If Delivery Mode is APIC_DELMODE_SMI */
+				case APIC_DELMODE_SMI:
+				/** If Delivery Mode is APIC_DELMODE_RESERVED1 */
+				case APIC_DELMODE_RESERVED1:
+				/** If Delivery Mode is APIC_DELMODE_RESERVED2 */
+				case APIC_DELMODE_RESERVED2:
 					/** End of case */
 					break;
 				/** Otherwise */

@@ -339,13 +339,6 @@ void vmsi_write_cfg(struct pci_vdev *vdev, uint32_t offset, uint32_t bytes, uint
 
 	/* If there is any bit that is not set in ro_mask. */
 	if (ro_mask != ~0U) {
-		/** Call enable_disable_msi with the following parameters, in order to disable the physical MSI of
-		 *  the physical PCI device associated with the given vPCI device. It is required to disable MSI
-		 *  before remapping the virtual MSI data/address to the phyiscal MSI data/address.
-		 *  - vdev
-		 *  - false
-		 */
-		enable_disable_msi(vdev, false);
 		/** Set old to the value returned by pci_vdev_read_cfg with vdev, offset and bytes being the
 		 *  parameters, which reads a bytes value from the configuration space of the given vPCI device.
 		 */
@@ -359,6 +352,14 @@ void vmsi_write_cfg(struct pci_vdev *vdev, uint32_t offset, uint32_t bytes, uint
 		 * - (old & ro_mask) | (val & ~ro_mask)
 		 */
 		pci_vdev_write_cfg(vdev, offset, bytes, (old & ro_mask) | (val & ~ro_mask));
+
+		/** Call enable_disable_msi with the following parameters, in order to disable the physical MSI of
+		 *  the physical PCI device associated with the given vPCI device. It is required to disable MSI
+		 *  before remapping the virtual MSI data/address to the phyiscal MSI data/address.
+		 *  - vdev
+		 *  - false
+		 */
+		enable_disable_msi(vdev, false);
 
 		/** Set msgctrl to the value returned by pci_vdev_read_cfg with vdev, vdev->msi.capoff + PCIR_MSI_CTRL
 		 *  and 2 being the parameters to get the MSI control register status, which includes the bit of

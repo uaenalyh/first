@@ -397,15 +397,14 @@ void copy_to_gpa(struct acrn_vm *vm, void *h_ptr, uint64_t gpa, uint32_t size)
  */
 void *gpa2hva(struct acrn_vm *vm, uint64_t x)
 {
-	/** Call gpa2hpa with the following parameters, in order to
-	 *  get corresponding host physical memory address.
-	 *  - \a vm
-	 *  - \a x
-	 *  Then call hpa2hva with the following parameters, in order to
-	 *  get corresponding host virtual memory address and return its return value.
-	 *  - The return value of the previous function
-	 */
-	return hpa2hva(gpa2hpa(vm, x));
+
+	/** Declare the following local variables of type uint64_t.
+	 *  - hpa representing the returned host physical address,
+	 *  initialized as return value of gpa2hpa with vm and x as parameter. */
+	uint64_t hpa = gpa2hpa(vm, x);
+	/** Return NULL if hpa is INVALID_HPA,
+	 *  else return the return value of hpa2hva with hpa as parameter. */
+	return (hpa == INVALID_HPA) ? NULL : hpa2hva(hpa);
 }
 
 /**
