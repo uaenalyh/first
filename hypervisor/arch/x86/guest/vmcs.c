@@ -1167,13 +1167,13 @@ void init_vmcs(struct acrn_vcpu *vcpu)
 	/** Set vmcs_pa to return value of hva2hpa(vcpu->arch.vmcs) */
 	vmcs_pa = hva2hpa(vcpu->arch.vmcs);
 	/** Call exec_vmclear with the following parameters, in order to clear VMCS field of the vCPU.
-	 *  - &vmcs_pa */
-	exec_vmclear((void *)&vmcs_pa);
+	 *  - vmcs_pa */
+	exec_vmclear(vmcs_pa);
 	/** Call exec_vmptrld() with the following parameters, in order to load VMCS pointer from
 	 *  memory pointed by '&vmcs_pa'.
-	 *  - &vmcs_pa
+	 *  - vmcs_pa
 	 */
-	exec_vmptrld((void *)&vmcs_pa);
+	exec_vmptrld(vmcs_pa);
 	/** Set *vmcs_ptr to vcpu->arch.vmcs */
 	*vmcs_ptr = (void *)vcpu->arch.vmcs;
 
@@ -1236,9 +1236,9 @@ void load_vmcs(const struct acrn_vcpu *vcpu)
 		vmcs_pa = hva2hpa(vcpu->arch.vmcs);
 		/** Call exec_vmptrld() with the following parameters, in order to load VMCS pointer from
 		 *  memory pointed by '&vmcs_pa'.
-		 *  - &vmcs_pa
+		 *  - vmcs_pa
 		 */
-		exec_vmptrld((void *)&vmcs_pa);
+		exec_vmptrld(vmcs_pa);
 		/** Set *vmcs_ptr to vcpu->arch.vmcs */
 		*vmcs_ptr = (void *)vcpu->arch.vmcs;
 	}

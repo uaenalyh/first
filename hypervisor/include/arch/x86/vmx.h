@@ -1013,8 +1013,8 @@ void exec_vmwrite64(uint32_t field_full, uint64_t value);
  */
 #define exec_vmwrite exec_vmwrite64
 
-void exec_vmclear(void *addr);
-void exec_vmptrld(void *addr);
+void exec_vmclear(uint64_t addr);
+void exec_vmptrld(uint64_t addr);
 
 /**
  * @}

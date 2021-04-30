@@ -97,16 +97,16 @@
  * @reentrancy Unspecified
  * @threadsafety Unspecified
  */
-static inline void exec_vmxon(void *addr)
+static inline void exec_vmxon(uint64_t addr)
 {
 	/** Execute 'vmxon' instruction in order to put the logical processor in VMX
 	 *  operation with no current VMCS, blocks INIT signals, disables A20M, and clears
 	 *  any address-range monitoring established by the MONITOR instruction.
-	 *  - Input operands: \a addr which is the operand.
+	 *  - Input operands: a memory operand holds the value specified by \a addr.
 	 *  - Output operands: none.
 	 *  - Clobbers: memory and flags register.
 	 */
-	asm volatile("vmxon (%%rax)\n" : : "a"(addr) : "cc", "memory");
+	asm volatile("vmxon %0" : : "m"(addr) : "cc", "memory");
 }
 
 /**
@@ -198,9 +198,9 @@ void vmx_on(void)
 	vmxon_region_pa = hva2hpa(vmxon_region_va);
 	/** Call exec_vmxon with the following parameters, in order to
 	 *  put current logical processor in VMX operation.
-	 *  - &vmxon_region_pa
+	 *  - vmxon_region_pa
 	 */
-	exec_vmxon(&vmxon_region_pa);
+	exec_vmxon(vmxon_region_pa);
 }
 
 /**
@@ -235,13 +235,12 @@ static inline void exec_vmxoff(void)
  * @brief This function copies VMCS data to VMCS region in memory and makes it invalid
  * only if it is the current-VMCS pointer.
  *
- * @param[inout] addr Pointed to the host physical start address of the specified VMCS memory region.
+ * @param[in] addr The host physical start address of the specified VMCS memory region.
 
  * @return None
  *
  * @pre addr is 4KB align
  * @pre addr[63:39] is 0H
- * @pre addr != NULL
  * @pre addr is a physical address different from the VMXON pointer of any physical processor.
  *
  * @post N/A
@@ -253,28 +252,27 @@ static inline void exec_vmxoff(void)
  * @reentrancy Unspecified
  * @threadsafety When \a addr is different among parallel invocation.
  */
-void exec_vmclear(void *addr)
+void exec_vmclear(uint64_t addr)
 {
 	/** Execute 'vmclear' instruction in order to copy VMCS data to VMCS region specified by \a addr
-	 *  - Input operands: \a addr which is the operand.
+	 *  - Input operands: a memory operand holds the value specified by \a addr.
 	 *  - Output operands: none.
 	 *  - Clobbers: memory and flags register.
 	 */
-	asm volatile("vmclear (%%rax)\n" : : "a"(addr) : "cc", "memory");
+	asm volatile("vmclear %0" : : "m"(addr) : "cc", "memory");
 }
 
 /**
  * @brief This function loads the current VMCS pointer from memory.
  *
- * @param[in] addr Pointed to the host physical start address of the specified VMCS memory region.
+ * @param[in] addr The host physical start address of the specified VMCS memory region.
 
  * @return None
  *
  * @pre addr is 4KB align
  * @pre addr[63:39] is 0H
- * @pre addr != NULL
  * @pre addr is a physical address different from the VMXON pointer of any physical processor.
- * @pre addr (*(uint32_t)addr & 7FFFFFFFH) == msr_read(MSR_IA32_VMX_BASIC) & 7FFFFFFFH
+ * @pre (*(uint32_t *)(hpa2hva(addr)) & 7FFFFFFFH) == msr_read(MSR_IA32_VMX_BASIC) & 7FFFFFFFH
  *
  * @post N/A
  *
@@ -285,14 +283,14 @@ void exec_vmclear(void *addr)
  * @reentrancy Unspecified
  * @threadsafety Unspecified
  */
-void exec_vmptrld(void *addr)
+void exec_vmptrld(uint64_t addr)
 {
 	/** Execute 'vmptrld' instruction in order to load the VMCS pointer from memory specified by \a addr.
-	 *  - Input operands: \a addr which is the operand.
+	 *  - Input operands: a memory operand holds the value specified by \a addr.
 	 *  - Output operands: none.
 	 *  - Clobbers: memory and flags register.
 	 */
-	asm volatile("vmptrld (%%rax)\n" : : "a"(addr) : "cc", "memory");
+	asm volatile("vmptrld %0" : : "m"(addr) : "cc", "memory");
 }
 
 /**
@@ -337,9 +335,9 @@ void vmx_off(void)
 		vmcs_pa = hva2hpa(*vmcs_ptr);
 		/** Call exec_vmclear with the following parameters, in order to
 		 *  make processor's vmcs pointer invalid.
-		 *  - &vmcs_pa
+		 *  - vmcs_pa
 		 */
-		exec_vmclear((void *)&vmcs_pa);
+		exec_vmclear(vmcs_pa);
 		/** Set the value located at vmcs_ptr to NULL */
 		*vmcs_ptr = NULL;
 	}
