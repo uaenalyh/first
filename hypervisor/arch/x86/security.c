@@ -168,12 +168,6 @@ bool check_cpu_security_cap(void)
 		ret = false;
 	}
 
-	/** If IBRS and IBPB are not supported by physical platform. */
-	if (!pcpu_has_cap(X86_FEATURE_IBRS_IBPB)) {
-		/** Set the qualification of CPU ucode to false */
-		ret = false;
-	}
-
 	/** If mds_no is false*/
 	if (!mds_no) {
 		/** If MD_CLEAR is supported by physical platform. */
@@ -211,8 +205,7 @@ bool check_cpu_security_cap(void)
   * @brief Flush L1 data cache if it is required on VM entry.
   *
   * This function flushes L1 data cache if such flush is required on VM entry(current processor is
-  * potentially affected by L1TF CPU vulnerability),and flushing L1 data cache also clears CPU
-  * internal buffers if this processor is affected by MDS vulnerability.
+  * potentially affected by L1TF CPU vulnerability).
   *
   *
   * @return None
@@ -296,8 +289,8 @@ static inline void verw_buffer_overwriting(void)
 /**
  * @brief Clear CPU internal buffers.
  *
- *  This function clears CPU internal buffers if it is required, by calling
- *  verw_buffer_overwriting().
+ *  This function clears CPU internal buffers if it is required(current processor is
+  * potentially affected by MDS CPU vulnerability), by calling verw_buffer_overwriting().
  *
  * @return None
  *
