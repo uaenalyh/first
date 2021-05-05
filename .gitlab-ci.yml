@@ -107,7 +107,7 @@ test_srs_build_job:
     - /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0 "make RELEASE=0"
     - mv build/acrn.32.out /var/lib/tftpboot/acrn_srs/srs/acrn_pci_vm0.32.out
     - git reset --hard && git checkout master && git pull
-    - python3 compile_case_hv_ram_start.py
+    - python3 /opt/compile_case_hv_ram_start.py
     - make clean
     - /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0 "make RELEASE=0"
     - mv build/acrn.32.out /var/lib/tftpboot/acrn_srs/srs/acrn_hv_ram.32.out
