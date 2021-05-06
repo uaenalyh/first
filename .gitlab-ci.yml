@@ -738,10 +738,86 @@ test_build_job:
     - if [ $? -ne 0 ]; then exit 1; fi
     - cp ../build/acrn-unit-test/host/bin/hw.32.out ../../acrn-sliced-mainline/image/hw_schedule_sched_group.32.out
     - make clean
-    - cd ../../acrn-hypervisor && git reset --hard && cd ../acrn-sas-test-code/host
-    - /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0 "make vp-dm RELEASE=0 MODULE_GROUP_OBJ=VPDM_MMU_INV_GROUP"
+    - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
+    - /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0  "make RELEASE=0 vp-dm MODULE_GROUP_OBJ=FIT_BROKEN_BOOT_PROTO_GROUP"
     - if [ $? -ne 0 ]; then exit 1; fi
-    - cp ../build/acrn-unit-test/host/bin/vp-dm.32.out ../../acrn-sliced-mainline/image/vp-dm-mmu.32.out
+    - cp ../build/acrn-unit-test/host/bin/vp-dm.32.out ../../acrn-sliced-mainline/image/FIT_BROKEN_BOOT_PROTO_GROUP.32.out
+    - make clean
+    - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
+    - /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0  "make RELEASE=0 vp-dm MODULE_GROUP_OBJ=FIT_TRAMPOLINE_ADDR_GROUP_1"
+    - if [ $? -ne 0 ]; then exit 1; fi
+    - cp ../build/acrn-unit-test/host/bin/vp-dm.32.out ../../acrn-sliced-mainline/image/FIT_TRAMPOLINE_ADDR_GROUP_1.32.out
+    - make clean
+    - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
+    - /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0  "make RELEASE=0 vp-dm MODULE_GROUP_OBJ=FIT_TRAMPOLINE_ADDR_GROUP_2"
+    - if [ $? -ne 0 ]; then exit 1; fi
+    - cp ../build/acrn-unit-test/host/bin/vp-dm.32.out ../../acrn-sliced-mainline/image/FIT_TRAMPOLINE_ADDR_GROUP_2.32.out
+    - make clean
+    - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
+    - /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0  "make RELEASE=0 vp-dm MODULE_GROUP_OBJ=FIT_TRAMPOLINE_ADDR_GROUP_3"
+    - if [ $? -ne 0 ]; then exit 1; fi
+    - cp ../build/acrn-unit-test/host/bin/vp-dm.32.out ../../acrn-sliced-mainline/image/FIT_TRAMPOLINE_ADDR_GROUP_3.32.out
+    - make clean
+    - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
+    - /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0  "make RELEASE=0 vp-dm MODULE_GROUP_OBJ=FIT_TRAMPOLINE_ADDR_GROUP_4"
+    - if [ $? -ne 0 ]; then exit 1; fi
+    - cp ../build/acrn-unit-test/host/bin/vp-dm.32.out ../../acrn-sliced-mainline/image/FIT_TRAMPOLINE_ADDR_GROUP_4.32.out
+    - make clean
+    - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
+    - /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0  "make RELEASE=0 vp-dm MODULE_GROUP_OBJ=FIT_STARTING_AP_FAILURE_GROUP_1"
+    - if [ $? -ne 0 ]; then exit 1; fi
+    - cp ../build/acrn-unit-test/host/bin/vp-dm.32.out ../../acrn-sliced-mainline/image/FIT_STARTING_AP_FAILURE_GROUP_1.32.out
+    - make clean
+    - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
+    - /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0  "make RELEASE=0 vp-dm MODULE_GROUP_OBJ=FIT_STARTING_AP_FAILURE_GROUP_2"
+    - if [ $? -ne 0 ]; then exit 1; fi
+    - cp ../build/acrn-unit-test/host/bin/vp-dm.32.out ../../acrn-sliced-mainline/image/FIT_STARTING_AP_FAILURE_GROUP_2.32.out
+    - make clean
+    - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
+    - /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0  "make RELEASE=0 vp-dm MODULE_GROUP_OBJ=FIT_XSAVE_AREA_SIZE_GROUP"
+    - if [ $? -ne 0 ]; then exit 1; fi
+    - cp ../build/acrn-unit-test/host/bin/vp-dm.32.out ../../acrn-sliced-mainline/image/FIT_XSAVE_AREA_SIZE_GROUP.32.out
+    - make clean
+    - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
+    - /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0  "make RELEASE=0 vp-dm MODULE_GROUP_OBJ=FIT_INV_IOMMU_GROUP"
+    - if [ $? -ne 0 ]; then exit 1; fi
+    - cp ../build/acrn-unit-test/host/bin/vp-dm.32.out ../../acrn-sliced-mainline/image/FIT_INV_IOMMU_GROUP.32.out
+    - make clean
+    - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
+    - /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0  "make RELEASE=0 vp-dm MODULE_GROUP_OBJ=FIT_HW_GENERAL_GROUP"
+    - if [ $? -ne 0 ]; then exit 1; fi
+    - cp ../build/acrn-unit-test/host/bin/vp-dm.32.out ../../acrn-sliced-mainline/image/FIT_HW_GENERAL_GROUP.32.out
+    - make clean
+    - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
+    - /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0  "make RELEASE=0 vp-dm MODULE_GROUP_OBJ=FIT_VP_DM_SAFETY_GROUP VM=safety"
+    - if [ $? -ne 0 ]; then exit 1; fi
+    - cp ../build/acrn-unit-test/host/bin/vp-dm.32.out ../../acrn-sliced-mainline/image/FIT_VP_DM_SAFETY_GROUP.32.out
+    - cp ../host/guest/x86/stitched.raw ../../acrn-sliced-mainline/image/
+    - make clean
+    - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
+    - /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0  "make RELEASE=0 vp-dm MODULE_GROUP_OBJ=FIT_VP_DM_NON_SAFETY_RTC_GROUP VM=non-safety"
+    - if [ $? -ne 0 ]; then exit 1; fi
+    - cp ../build/acrn-unit-test/host/bin/vp-dm.32.out ../../acrn-sliced-mainline/image/FIT_VP_DM_NON_SAFETY_RTC_GROUP.32.out
+    - make clean
+    - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
+    - /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0  "make RELEASE=0 vp-dm MODULE_GROUP_OBJ=FIT_VP_DM_NON_SAFETY_VMEXIT_QUALIFICATION2_GROUP VM=non-safety"
+    - if [ $? -ne 0 ]; then exit 1; fi
+    - cp ../build/acrn-unit-test/host/bin/vp-dm.32.out ../../acrn-sliced-mainline/image/FIT_VP_DM_NON_SAFETY_VMEXIT_QUALIFICATION2_GROUP.32.out
+    - make clean
+    - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
+    - /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0  "make RELEASE=0 vp-dm MODULE_GROUP_OBJ=FIT_VP_DM_NON_SAFETY_VMEXIT_QUALIFICATION1_GROUP VM=non-safety"
+    - if [ $? -ne 0 ]; then exit 1; fi
+    - cp ../build/acrn-unit-test/host/bin/vp-dm.32.out ../../acrn-sliced-mainline/image/FIT_VP_DM_NON_SAFETY_VMEXIT_QUALIFICATION1_GROUP.32.out
+    - make clean
+    - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
+    - /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0  "make RELEASE=0 vp-dm MODULE_GROUP_OBJ=FIT_VP_DM_NON_SAFETY_VMEXIT_REASON2_GROUP VM=non-safety"
+    - if [ $? -ne 0 ]; then exit 1; fi
+    - cp ../build/acrn-unit-test/host/bin/vp-dm.32.out ../../acrn-sliced-mainline/image/FIT_VP_DM_NON_SAFETY_VMEXIT_REASON2_GROUP.32.out
+    - make clean
+    - cd ../../acrn-sliced-mainline && git reset --hard && cd ../acrn-sas-test-code/host
+    - /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0  "make RELEASE=0 vp-dm MODULE_GROUP_OBJ=FIT_VP_DM_NON_SAFETY_VMEXIT_REASON1_GROUP VM=non-safety"
+    - if [ $? -ne 0 ]; then exit 1; fi
+    - cp ../build/acrn-unit-test/host/bin/vp-dm.32.out ../../acrn-sliced-mainline/image/FIT_VP_DM_NON_SAFETY_VMEXIT_REASON1_GROUP.32.out
     - cp ../host/guest/x86/stitched.bzimage ../../acrn-sliced-mainline/image/
     - /opt/fusa_ci.sh sas
   dependencies:
