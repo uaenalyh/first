@@ -1604,6 +1604,12 @@ void reset_vcpu(struct acrn_vcpu *vcpu)
 	/** Set nr_sipi state of vcpu->arch to false */
 	vcpu->arch.nr_sipi = 0U;
 
+	/** Call msr_write() with the following parameters, in order to reset IA32_KERNEL_GS_BASE MSR.
+	 *  - MSR_IA32_KERNEL_GS_BASE
+	 *  - 0H
+	 */
+	msr_write(MSR_IA32_KERNEL_GS_BASE, 0x00000000U);
+
 	/** Set exception information of vcpu->arch to VECTOR_INVALID */
 	vcpu->arch.exception_info.exception = VECTOR_INVALID;
 

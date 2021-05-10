@@ -114,7 +114,7 @@
 
 #define REAL_MODE_BSP_INIT_CODE_SEL (0xf000U)    /**< code segment selector of real mode operation */
 #define REAL_MODE_DATA_SEG_AR       (0x0093U)    /**< data segment attributes of real mode operation */
-#define REAL_MODE_CODE_SEG_AR       (0x009fU)    /**< code segment attributes of real mode operation */
+#define REAL_MODE_CODE_SEG_AR       (0x009bU)    /**< code segment attributes of real mode operation */
 #define PROTECTED_MODE_DATA_SEG_AR  (0xc093U)    /**< data segment attributes of protected mode operation */
 #define PROTECTED_MODE_CODE_SEG_AR  (0xc09bU)    /**< code segment attributes of protected mode operation */
 #define REAL_MODE_SEG_LIMIT         (0xffffU)    /**< segment limit of real mode operation */

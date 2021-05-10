@@ -334,6 +334,18 @@ void init_lapic(uint16_t pcpu_id)
 	 */
 	msr_write(MSR_IA32_EXT_APIC_ICR, 0x0000000000000000U);
 
+	/** Call msr_write() with the following parameters, in order to reset Task Priority Register.
+	 *  - MSR_IA32_EXT_APIC_TPR
+	 *  - 0H
+	 */
+	msr_write(MSR_IA32_EXT_APIC_TPR, 0x00000000U);
+
+	/** Call msr_write() with the following parameters, in order to reset Initial Count Register(for Timer).
+	 *  - MSR_IA32_EXT_APIC_INIT_COUNT
+	 *  - 0H
+	 */
+	msr_write(MSR_IA32_EXT_APIC_INIT_COUNT, 0x00000000U);
+
 	/** Call clear_lapic_isr() with the following parameters,
 	 *  in order to ensure there are no ISR bits set.
 	 *  - N/A
