@@ -130,6 +130,7 @@ test_srs_build_job:
     - /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0 "./make_all.sh"
     - if [ $? -ne 0 ]; then exit 1; fi
     - cp -r x86/obj/* /var/lib/tftpboot/acrn_srs/acrn/
+    - cp x86/memory_order_single_case.bzimage /var/lib/tftpboot/acrn_srs/acrn/
     - cd ../../../../acrn-sliced-mainline
     - /opt/fusa_ci.sh launch_acrn_unit_test
   dependencies:
