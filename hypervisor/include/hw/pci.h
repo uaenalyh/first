@@ -55,6 +55,7 @@
 
 #define PCI_BAR_COUNT 0x6U /**< Pre-defined PCI devices BAR count. */
 #define PCI_REGMAX    0xFFU /**< Pre-defined the MAX offset of the PCI configuration space registers. */
+#define PCI_HDRMAX    0x3FU /**< Pre-defined the MAX offset of the PCI configuration space header. */
 
 #define PCI_CONFIG_ADDR 0xCF8U /**< Pre-defined the I/O port of PCI configuration address. */
 #define PCI_CONFIG_DATA 0xCFCU /**< Pre-defined the I/O port of PCI configuration data. */

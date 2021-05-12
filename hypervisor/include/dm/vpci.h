@@ -49,6 +49,11 @@
 #include <pci.h>
 
 /**
+ * @brief Pre-defined the mask of "next pointer" fields in MSI capability.
+ */
+#define PCIM_NEXTPTR	0xFFU
+
+/**
  * @brief Data structure to present PCI BAR information
  *
  * For a PCI BAR, this structure includes its type (MMIO BAR and 32bits or 64bits), BAR size,

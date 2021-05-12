@@ -437,45 +437,65 @@ void deinit_vmsi(const struct pci_vdev *vdev)
 void init_vmsi(struct pci_vdev *vdev)
 {
 	/** Declare the following local variables of type uint32_t.
-	 *  - val representing a register value in the configuration space of the given vPCI, not initialized. */
+	 *  - val representing a register value in the configuration space of the given vPCI, not initialized.
+	 */
 	uint32_t val;
 	/** Declare the following local variables of type uint32_t.
 	 *  - msi_data_addr representing the MSI data register address in the configuration space of the given
-	 *  vPCI, not initialized. */
+	 *  vPCI, not initialized.
+	 */
 	uint32_t msi_data_addr;
-	/** Set val to the value returned by pci_vdev_read_cfg with vdev, PCIR_CAP_PTR and 1 being the parameters,
+	/** Set val to the value returned by pci_pdev_read_cfg with vdev->pbdf, PCIR_CAP_PTR and 1 being the parameters,
 	 *  which reads the register of PCIR_CAP_PTR to get the offset of the first capability structure.
 	 */
-	val = pci_vdev_read_cfg(vdev, PCIR_CAP_PTR, 1U);
-	/** If 'val' (the offset) is valid, i.e. not equals 0 or FFH */
-	if ((val != 0U) && (val != 0xFFU)) {
+	val = pci_pdev_read_cfg(vdev->pbdf, PCIR_CAP_PTR, 1U);
+	/** Until 'val' (the offset) is equal to 0 or FFH */
+	while ((val != 0U) && (val != 0xFFU)) {
 		/** Declare the following local variables of type uint8_t.
-		 *  - cap representing a capability ID, initialized as the value returned by pci_vdev_read_cfg with
-		 *  vdev, val + PCICAP_ID and 1 being the parameters, which reads the capability ID from its first
+		 *  - cap representing a capability ID, initialized as the value returned by pci_pdev_read_cfg with
+		 *  vdev->pbdf, (val + PCICAP_ID) and 1 being the parameters, which reads the capability ID from the
 		 *  capability.
 		 */
-		uint8_t cap = pci_vdev_read_cfg(vdev, val + PCICAP_ID, 1U);
+		uint8_t cap = pci_pdev_read_cfg(vdev->pbdf, val + PCICAP_ID, 1U);
 		/** If the capability ID is PCIY_MSI */
 		if (cap == PCIY_MSI) {
 			/** Set vdev->msi.capoff to 'val', the offset of the MSI capability structure. */
 			vdev->msi.capoff = val;
+			/** Terminate the loop */
+			break;
 		}
+		/** Set val to the value returned by pci_pdev_read_cfg with vdev->pbdf, (val + PCICAP_NEXTPTR) and 1
+		 *  being the parameters, which reads the next pointer register of the specific capability structure.
+		 */
+		val = pci_pdev_read_cfg(vdev->pbdf, val + PCICAP_NEXTPTR, 1U);
 	}
 
+	/** Call pci_vdev_write_cfg with the following parameters, in order to write vdev->msi.capoff into the
+	 *  given vPCI configuration space to update the virtual capabilities pointer register.
+	 * - vdev
+	 * - PCIR_CAP_PTR
+	 * - 1
+	 * - vdev->msi.capoff
+	 */
+	pci_vdev_write_cfg(vdev, PCIR_CAP_PTR, 1U, vdev->msi.capoff);
 	/** If the given vPCI device has the MSI capability (determined by calling has_msi_cap with the device) */
 	if (has_msi_cap(vdev)) {
-		/** Set val to the value returned by pci_vdev_read_cfg with vdev, vdev->msi.capoff and 4 being the
-		 *  parameters,, which reads a 32bits value (including the MSI control register value) from the
-		 *  configuration space of the given vPCI device.
+		/** Set val to the value returned by pci_pdev_read_cfg with vdev->pbdf, vdev->msi.capoff and 4
+		 *  being the parameters, which reads a 32-bit value (including the MSI control register value)
+		 *  from the configuration space of the physical PCI device.
 		 */
-		val = pci_vdev_read_cfg(vdev, vdev->msi.capoff, 4U);
-		/** Set vdev->msi.is_64bit to true, if the MSI control register indicates it uses a 64bits message
+		val = pci_pdev_read_cfg(vdev->pbdf, vdev->msi.capoff, 4U);
+		/** Set vdev->msi.is_64bit to true, if the MSI control register indicates it uses a 64-bit message
 		 *  address. Otherwise set the field to false.
 		 */
 		vdev->msi.is_64bit = ((val & (PCIM_MSICTRL_64BIT << 16U)) != 0U);
-		/** Set vdev->msi.caplen to 14 if its message address is 64bits, or to 10. */
+		/** Set vdev->msi.caplen to 14 if its message address is 64-bit, or to 10. */
 		vdev->msi.caplen = vdev->msi.is_64bit ? 14U : 10U;
-
+		/** Bitwise AND val by ~((uint32_t)PCIM_NEXTPTR << 8U), to set
+		 *  "Next Pointer" field to 0, which indicates the MSI capability is the final item
+		 *  in the capabilities list.
+		 */
+		val &= ~((uint32_t)PCIM_NEXTPTR << 8U);
 		/** Bitwise AND val by ~((uint32_t)PCIM_MSICTRL_MMC_MASK << 16U), to set
 		 *  "Multiple Message Capable" field to 0, which indicates this PCI device just supports 1 vector.
 		 */
@@ -502,25 +522,29 @@ void init_vmsi(struct pci_vdev *vdev)
 		 */
 		pci_vdev_write_cfg(vdev, vdev->msi.capoff + PCIR_MSI_ADDR, 4U, MSG_INITIAL_VALUE);
 
-		/** If MSI is 64bit */
+		/** If MSI is 64-bit */
 		if (vdev->msi.is_64bit) {
 			/** Set msi_data_addr to the value, where the value is calculated by plusing
-			 *  PCIR_MSI_DATA_64BIT and msi.capoff */
+			 *  PCIR_MSI_DATA_64BIT and msi.capoff.
+			 */
 			msi_data_addr = vdev->msi.capoff + PCIR_MSI_DATA_64BIT;
 		} else {
 			/** Set msi_data_addr to the value, where the value is calculated by plusing
-			 *  PCIR_MSI_DATA and msi.capoff */
+			 *  PCIR_MSI_DATA and msi.capoff.
+			 */
 			msi_data_addr = vdev->msi.capoff + PCIR_MSI_DATA;
 		}
 
-		/** Set val to the value returned by pci_vdev_read_cfg with vdev, msi_data_addr, and 4 being the
-		 *  parameters, in order to read the register of the msi_data_addr to get the value of MSI data
-		 *  register. */
-		val = pci_vdev_read_cfg(vdev, msi_data_addr, 4U);
-		/* Clear the bit MSI_DATA_TRIGGER_MODE and MSI_DATA_LEVEL_TRIGGER_MODE. Clear all of the bits in
-		 * MSI_DATA_DELIVER_MODE_MASK. */
+		/** Set val to the value returned by pci_pdev_read_cfg with vdev->pbdf, msi_data_addr, and 4 being
+		 *  the parameters, in order to read the register of the msi_data_addr to get the value of
+		 *  the physical MSI data register.
+		 */
+		val = pci_pdev_read_cfg(vdev->pbdf, msi_data_addr, 4U);
+		/** Clear the bit MSI_DATA_TRIGGER_MODE and MSI_DATA_LEVEL_TRIGGER_MODE. Clear all of the bits in
+		 *  MSI_DATA_DELIVER_MODE_MASK.
+		 */
 		val &= (~(MSI_DATA_TRIGGER_MODE | MSI_DATA_LEVEL_TRIGGER_MODE | MSI_DATA_DELIVER_MODE_MASK));
-		/* Set the bit MSI_DATA_LEVEL_TRIGGER_MODE of val */
+		/** Set the bit MSI_DATA_LEVEL_TRIGGER_MODE of val */
 		val |= MSI_DATA_LEVEL_TRIGGER_MODE;
 		/** Call pci_vdev_write_cfg with the following parameters, in order to write val into the
 		 *  given vPCI configuration space to update the virtual MSI capability structure.

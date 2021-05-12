@@ -62,8 +62,8 @@
  * Note: for FuSa scope, the passthrough PCI devices just includes: USB controller and Ethernet card.
  */
 
-#define PCI_USB_CONTROLLER 0x0CU /**< Pre-defined class number of USB PCI device. */
-#define PCI_ETH_CONTROLLER 0x02U /**< Pre-defined class number of Ethernet PCI device. */
+#define PCI_USB_CONTROLLER 0xA0U /**< Pre-defined physical BDF value of the USB PCI device. */
+#define PCI_ETH_CONTROLLER 0xFEU /**< Pre-defined physical BDF value of Ethernet PCI device. */
 
 #define PCI_DISABLED_CONFIG_ADDR 0x00FFFF00U /**< A value indicating the PCI config address port is disabled. */
 
@@ -94,9 +94,9 @@ struct cap_info {
  *
  * @remark N/A
  */
-struct unused_fields {
-	uint8_t offset;  /**< The offset of the unused field in PCI configuration space. */
-	uint8_t length;  /**< The length of this unused field. */
+struct pci_dev_fields {
+	uint8_t offset;  /**< The offset of the device specific field in PCI configuration space. */
+	uint8_t length;  /**< The length of this device specific field. */
 };
 
 static void vpci_init_vdevs(struct acrn_vm *vm);
@@ -685,10 +685,11 @@ static void remove_vdev_pt_iommu_domain(const struct pci_vdev *vdev)
 /**
  * @brief Initialize the given vPCI device's virtual configuration space registers
  *
- * This function is called to initialize the given vPCI virtual configuration space registers. First it reads all the
- * configuration space registers from the physical PCI device associated with the given vPCI, then it handles
- * some specific fields according to the physical PCI device class info. For example, it will hide other capabilities
- * except MSI and clean some unused fields to 00H. Now it just handles two PCI devices: USB/network controller.
+ * This function is called to initialize the given vPCI configuration space registers. First it reads the
+ * configuration space header registers from the physical PCI device associated with the given vPCI device, then it
+ * initializes some devices specific fields according to the physical PCI device BDF and the virtual MSI capabilities
+ * through parsing the physical MSI capabilities.
+ * It just handles two PCI devices (USB and network controller) according to design.
  *
  * @param[in] vdev A vPCI device which is associated with a physical PCI device
  *
@@ -710,23 +711,27 @@ static void remove_vdev_pt_iommu_domain(const struct pci_vdev *vdev)
 static void init_default_cfg(struct pci_vdev *vdev)
 {
 	/** Declare the following local variables of type uint16_t.
-	 *  - pci_command representing the value of the PCI command register, not initialized. */
+	 *  - pci_command representing the value of the PCI command register, not initialized.
+	 */
 	uint16_t pci_command;
-	/** Declare the following local variables of type 'const struct cap_info [2]'.
-	 *  - caps representing two capabilities (PM and Advanced Features which will be hidden) ID and length,
-	 *  initialized as {0x01U, 8U}, {0x13U, 4U}.
+	/** Declare the following local variables of type 'const struct pci_dev_fields'.
+	 *  - eth_fields representing the device specific fields information of the Ethernet controller, initialized
+	 *  as {a4H, 4H}, {a8H, 4H}.
 	 */
-	const struct cap_info caps[2] = { {0x01U, 8U}, {0x13U, 4U} };
-	/** Declare the following local variables of type 'const struct unused_fields'.
-	 *  - eth_unused representing the device specific unused fields info of the ethernet controller, initialized
-	 *  as {0x80U, 4U}, {0x84U, 4U}, {0x90U, 16U}.
+	const struct pci_dev_fields eth_fields[2] = { {0xa4U, 4U}, {0xa8U, 4U} };
+	/** Declare the following local variables of type 'const struct pci_dev_fields'.
+	 *  - usb_fields representing the device specific fields information of the USB controller, initialized
+	 *  as {40H, 4H}, {44H, 4H}, {50H, 4H},
+	 *  {60H, 2H}, {94H, 4H}, {a4H, 2H}, {b0H, 4H}, {b4H, 4H},
+	 *  {b8H, 4H}, {bcH, 4H}, {d0H, 4H}, {d4H, 4H}, {d8H, 1H}.
 	 */
-	const struct unused_fields eth_unused[] = { {0x80U, 4U}, {0x84U, 4U}, {0x90U, 16U} };
-	/** Declare the following local variables of type 'const struct unused_fields'.
-	 *  - usb_unused representing the device specific unused fields info of the USB controller, initialized
-	 *  as {0x90U, 4U}, {0x9CU, 4U}, {0xA0U, 2U}, {0xA8U, 8U}, {0xf8U, 4U}.
-	 */
-	const struct unused_fields usb_unused[] = { {0x90U, 4U}, {0x9CU, 4U}, {0xA0U, 2U}, {0xA8U, 8U}, {0xf8U, 4U} };
+	const struct pci_dev_fields usb_fields[13] = { {0x40U, 4U}, {0x44U, 4U},
+							{0x50U, 4U}, {0x60U, 2U},
+							{0x94U, 4U}, {0xa4U, 2U},
+							{0xb0U, 4U}, {0xb4U, 4U},
+							{0xb8U, 4U}, {0xbcU, 4U},
+							{0xd0U, 4U}, {0xd4U, 4U},
+							{0xd8U, 1U} };
 
 	/** Declare the following local variables of type uint8_t.
 	 *  - offset representing the address of the PCI configuration register, not initialized.
@@ -734,12 +739,13 @@ static void init_default_cfg(struct pci_vdev *vdev)
 	 */
 	uint8_t offset, index;
 	/** Declare the following local variables of type uint8_t.
-	 *  - max_index representing MAX index of PCI configuration space as 4bytes counting, initialized as
-	 *  '(PCI_REGMAX + 1U) >> 2U'.
+	 *  - max_index representing MAX index of PCI configuration space as 4 bytes counting, initialized as
+	 *  '(PCI_HDRMAX + 1U) >> 2U'.
 	 */
-	uint8_t max_index = (PCI_REGMAX + 1U) >> 2U;
+	uint8_t max_index = (PCI_HDRMAX + 1U) >> 2U;
 	/** Declare the following local variables of type uint32_t.
-	 *  - val representing the value as 4bytes reading from the PCI configuration space, not initialized. */
+	 *  - val representing the value as 4 bytes reading from the PCI configuration space, not initialized.
+	 */
 	uint32_t val;
 
 	/** Set pci_command to the value returned by pci_pdev_read_cfg with vdev->pbdf, PCIR_COMMAND and 2H being the
@@ -751,14 +757,14 @@ static void init_default_cfg(struct pci_vdev *vdev)
 	pci_command |= PCIM_CMD_INTXDIS;
 	/** Call pci_pdev_write_cfg with the following parameters, in order to update the command register
 	 *  to the physical PCI device to disable the legacy interrupt.
-	 *  - pbdf
-	 *  - offset
+	 *  - vdev->pbdf
+	 *  - PCIR_COMMAND
 	 *  - 2
 	 *  - pci_command
 	 */
 	pci_pdev_write_cfg(vdev->pbdf, PCIR_COMMAND, 2U, pci_command);
 
-	/** For each index ranging from 0 to max_index (63) [with a step of 1] */
+	/** For each index ranging from 0 to max_index (16) [with a step of 1] */
 	for (index = 0U; index < max_index; index++) {
 		/** If index is not in the range of PCI BAR, then read the value from physical configuration space
 		 *  and write it into its virtual configuration space.
@@ -789,108 +795,48 @@ static void init_default_cfg(struct pci_vdev *vdev)
 	 *  - 0
 	 */
 	pci_vdev_write_cfg(vdev, PCIR_INTERRUPT_PIN, 1U, 0U);
-	/** Set val to the value returned by pci_vdev_read_cfg with vdev, PCIR_CAP_PTR and 1 being the parameters,
-	 *  to get the PCI device's class number. */
-	val = pci_vdev_read_cfg(vdev, PCIR_CLASS, 1U);
-	/** If val is PCI_USB_CONTROLLER, which indicates the given vPCI device is a USB controller. */
-	if (val == PCI_USB_CONTROLLER) {
+	/** If vdev->pbdf.value is PCI_USB_CONTROLLER, which indicates the given vPCI device is a USB controller. */
+	if (vdev->pbdf.value == PCI_USB_CONTROLLER) {
 		/** For each index ranging from 0 to ARRAY_SIZE(usb_unused) - 1 [with a step of 1] */
-		for (index = 0U; index < ARRAY_SIZE(usb_unused); index++) {
-			/** Call memset with the following parameters, in order to clean the unused fields to 00H.
-			 *  - vdev->cfgdata.data_8 + usb_unused[index].offset
-			 *  - 0
-			 *  - usb_unused[index].length
+		for (index = 0U; index < ARRAY_SIZE(usb_fields); index++) {
+			/** Set val to the value returned by pci_pdev_read_cfg with vdev->pbdf,
+			 *  usb_fields[index].offset and usb_fields[index].length being the
+			 *  parameters, which reads from the physical PCI configuration space.
 			 */
-			memset(vdev->cfgdata.data_8 + usb_unused[index].offset, 0U, usb_unused[index].length);
-		}
-		/** If val is PCI_ETH_CONTROLLER, which indicates the given vPCI device is a ethernet controller. */
-	} else if (val == PCI_ETH_CONTROLLER) {
-		/** For each index ranging from 0 to ARRAY_SIZE(eth_unused) - 1 [with a step of 1] */
-		for (index = 0U; index < ARRAY_SIZE(eth_unused); index++) {
-			/** Call memset with the following parameters, in order to clean the unused fields to 00H.
-			 *  - vdev->cfgdata.data_8 + eth_unused[index].offset
-			 *  - 0
-			 *  - eth_unused[index].length
-			 */
-			memset(vdev->cfgdata.data_8 + eth_unused[index].offset, 0U, eth_unused[index].length);
-		}
-	}
-
-	/** Set offset to the value returned by pci_vdev_read_cfg with vdev, PCIR_CAP_PTR and 1 being the
-	 *  parameters, to get the first capability offset */
-	offset = pci_vdev_read_cfg(vdev, PCIR_CAP_PTR, 1U);
-	/** Until offset is 0 or FFH, which means looping until no capability found. */
-	while ((offset != 0U) && (offset != 0xFFU)) {
-		/** Declare the following local variables of type uint8_t.
-		 *  - cap representing the ID of one capability, initialized as the value returned by pci_vdev_read_cfg
-		 *  with vdev, offset + PCICAP_ID and 1 being the parameters, which reads the capability's ID from the
-		 *  configuration space.
-		 */
-		uint8_t cap = pci_vdev_read_cfg(vdev, offset + PCICAP_ID, 1U);
-		/** Declare the following local variables of type uint8_t.
-		 *  - next representing the offset for next capability, initialized as the value returned by
-		 *  pci_vdev_read_cfg with vdev, offset + PCICAP_NEXTPTR and 1 being the parameters,
-		 *  which reads the offset of next capability from the configuration space.
-		 */
-		uint8_t next = pci_vdev_read_cfg(vdev, offset + PCICAP_NEXTPTR, 1U);
-
-		/** If cap is PCIY_MSI, it exposes MSI capability and hides others. */
-		if (cap == PCIY_MSI) {
-			/** Call pci_vdev_write_cfg with the following parameters, in order to write the MSI
-			 *  capability's offset to the register of PCIR_CAP_PTR, which links the first capability
-			 *  to the MSI capability.
+			val = pci_pdev_read_cfg(vdev->pbdf, usb_fields[index].offset, usb_fields[index].length);
+			/** Call pci_vdev_write_cfg with the following parameters, in order to write the
+			 *  device specific registers in the virtual configuration space of the given vPCI device.
 			 *  - vdev
-			 *  - PCIR_CAP_PTR
-			 *  - 1
-			 *  - offset
+			 *  - usb_fields[index].offset
+			 *  - usb_fields[index].length
+			 *  - val
 			 */
-			pci_vdev_write_cfg(vdev, PCIR_CAP_PTR, 1U, offset);
-		} else {
-			/** If cap equals caps[0].id */
-			if (cap == caps[0].id) {
-				/** Set index to 0 */
-				index = 0U;
-				/** If cap equals caps[1].id */
-			} else if (cap == caps[1].id) {
-				/** Set index to 1 */
-				index = 1U;
-			} else {
-				/** Logging the following information with a log level of LOG_FATAL.
-				 *  - "CAP: %d, not handled, please check!\n"
-				 *  - cap
-				 */
-				pr_fatal("CAP: %d, not handled, please check!\n", cap);
-			}
-
-			/** Call memset with the following parameters, in order to clean the hidden capability structure
-			 *  fields to 00H.
-			 *  - vdev->cfgdata.data_8 + offset
-			 *  - 0
-			 *  - caps[index].length
-			 */
-			memset(vdev->cfgdata.data_8 + offset, 0U, caps[index].length);
+			pci_vdev_write_cfg(vdev, usb_fields[index].offset, usb_fields[index].length, val);
 		}
-
-		/** Set offset to next, to probe next capability */
-		offset = next;
-	}
-
-	/** Set offset to the value returned by pci_vdev_read_cfg with vdev, PCIR_CAP_PTR and 1 being the parameters,
-	 *  which should be the MSI capability offset and its next capability link is set to 00H.
+	/** If vdev->pbdf.value is PCI_ETH_CONTROLLER, which indicates the given vPCI device
+	 *  is an Ethernet controller.
 	 */
-	offset = pci_vdev_read_cfg(vdev, PCIR_CAP_PTR, 1U);
-	/* If offset is less than 0xFF, which means the CAP_PTR register points to a capability structure (which should
-	 * be MSI in normal cases) */
-	if (offset < 0xFFU) {
-		/** Call pci_vdev_write_cfg with the following parameters, in order to write 0 to MSI_CAP->next CAP
-		 *  offset, for other capabilities are hidden.
-		 *  - vdev
-		 *  - offset + PCICAP_NEXTPTR
-		 *  - 1
-		 *  - 0
-		 */
-		pci_vdev_write_cfg(vdev, offset + PCICAP_NEXTPTR, 1U, 0U);
+	} else if (vdev->pbdf.value == PCI_ETH_CONTROLLER) {
+		/** For each index ranging from 0 to ARRAY_SIZE(eth_unused) - 1 [with a step of 1] */
+		for (index = 0U; index < ARRAY_SIZE(eth_fields); index++) {
+			/** Set val to the value returned by pci_pdev_read_cfg with vdev->pbdf,
+			 *  eth_fields[index].offset and eth_fields[index].length being the
+			 *  parameters, which reads from the physical PCI configuration space.
+			 */
+			val = pci_pdev_read_cfg(vdev->pbdf, eth_fields[index].offset, eth_fields[index].length);
+			/** Call pci_vdev_write_cfg with the following parameters, in order to write the
+			 *  device specific registers in the virtual configuration space of the given vPCI device.
+			 *  - vdev
+			 *  - eth_fields[index].offset
+			 *  - eth_fields[index].length
+			 *  - val
+			 */
+			pci_vdev_write_cfg(vdev, eth_fields[index].offset, eth_fields[index].length, val);
+		}
+	} else {
+		/** No need to initialize other devices according to design, do nothing */
 	}
+
 }
 
 
