@@ -630,16 +630,6 @@ int32_t acrn_handle_pending_request(struct acrn_vcpu *vcpu)
 				 */
 				exec_vmwrite32(VMX_ENTRY_INT_INFO_FIELD,
 					VMX_INT_INFO_VALID | (VMX_INT_TYPE_NMI << 8U) | IDT_NMI);
-				/** Set 'injected' to 'true' */
-				injected = true;
-				/** If return value of bitmap_test(ACRN_REQUEST_EXCP, pending_req_bits) is true */
-				if (bitmap_test(ACRN_REQUEST_EXCP, pending_req_bits)) {
-					/** Call vcpu_retain_rip() with the following parameters, in order
-					 *  to retain guest RIP of the target vCPU.
-					 *  - vcpu
-					 */
-					vcpu_retain_rip(vcpu);
-				}
 			} else {
 				/* handling pending vector injection:
 				* there are many reason inject failed, we need re-inject again
@@ -659,8 +649,6 @@ int32_t acrn_handle_pending_request(struct acrn_vcpu *vcpu)
 					exec_vmwrite32(VMX_ENTRY_INT_INFO_FIELD, arch->idt_vectoring_info);
 					/** Set 'arch->idt_vectoring_info' to '0' */
 					arch->idt_vectoring_info = 0U;
-					/** Set 'injected' to 'true' */
-					injected = true;
 				}
 			}
 		}
