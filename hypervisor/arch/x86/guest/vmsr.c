@@ -574,18 +574,18 @@ static void intercept_x2apic_msrs(uint8_t *msr_bitmap, uint32_t mode)
  */
 static void init_msr_area(struct acrn_vcpu *vcpu)
 {
-	/** Set vcpu->arch.msr_area.guest[MSR_AREA_TSC_AUX].msr_index to MSR_IA32_TSC_AUX, which is the MSR index
-	 *  in the MSR Entry to be loaded on VM entry */
+	/** Set vcpu->arch.msr_area.guest[MSR_AREA_TSC_AUX].msr_index to MSR_IA32_TSC_AUX,
+	 *  which is the MSR index in the MSR Entry to be loaded on VM entry */
 	vcpu->arch.msr_area.guest[MSR_AREA_TSC_AUX].msr_index = MSR_IA32_TSC_AUX;
-	/** Set vcpu->arch.msr_area.guest[MSR_AREA_TSC_AUX].value to vcpu->vcpu_id, which is the virtual CPU ID
-	 *  associated with \a vcpu and the MSR data in the MSR Entry to be loaded on VM entry */
-	vcpu->arch.msr_area.guest[MSR_AREA_TSC_AUX].value = vcpu->vcpu_id;
-	/** Set vcpu->arch.msr_area.host[MSR_AREA_TSC_AUX].msr_index to MSR_IA32_TSC_AUX, which is the MSR index
-	 *  in the MSR Entry to be loaded on VM exit */
+	/** Set vcpu->arch.msr_area.guest[MSR_AREA_TSC_AUX].value to 0 and the MSR data in
+	 *  the MSR Entry to be loaded on VM entry */
+	vcpu->arch.msr_area.guest[MSR_AREA_TSC_AUX].value = 0U;
+	/** Set vcpu->arch.msr_area.host[MSR_AREA_TSC_AUX].msr_index to MSR_IA32_TSC_AUX,
+	 *  which is the MSR index in the MSR Entry to be loaded on VM exit */
 	vcpu->arch.msr_area.host[MSR_AREA_TSC_AUX].msr_index = MSR_IA32_TSC_AUX;
-	/** Set vcpu->arch.msr_area.host[MSR_AREA_TSC_AUX].value to the return value of 'pcpuid_from_vcpu(vcpu)',
-	 *  which is the physical CPU ID associated with \a vcpu and the MSR data in the MSR Entry to be loaded
-	 *  on VM exit */
+	/** Set vcpu->arch.msr_area.host[MSR_AREA_TSC_AUX].value to the return value of
+	 *  'pcpuid_from_vcpu(vcpu)', which is the physical CPU ID associated with \a vcpu
+	 *  and the MSR data in the MSR Entry to be loaded on VM exit */
 	vcpu->arch.msr_area.host[MSR_AREA_TSC_AUX].value = pcpuid_from_vcpu(vcpu);
 }
 
@@ -742,11 +742,14 @@ void init_msr_emulation(struct acrn_vcpu *vcpu)
 	 */
 	pr_dbg("VMX_MSR_BITMAP: 0x%016lx ", value64);
 
-	/* Initialize the MSR save/store area */
-	/** Call init_msr_area with the following parameters, in order to initialize the VMX-transition MSR areas for
-	 *  the specified \a vcpu.
-	 *  - vcpu */
-	init_msr_area(vcpu);
+	/** If vcpu->arch.vcpu_powerup is false. */
+	if (vcpu->arch.vcpu_powerup == false) {
+		/* Initialize the MSR save/store area */
+		/** Call init_msr_area with the following parameters, in order to initialize the
+		 *  VMX-transition MSR areas for the specified \a vcpu.
+		 *  - vcpu */
+		init_msr_area(vcpu);
+	}
 }
 
 /**
