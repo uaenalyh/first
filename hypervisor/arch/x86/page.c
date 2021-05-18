@@ -169,7 +169,7 @@ static inline uint64_t ppt_get_default_access_right(void)
  * @reentrancy Unspecified
  * @threadsafety Yes
  */
-static inline void ppt_clflush_pagewalk(const void *entry __attribute__((unused)))
+static inline void ppt_clflush_pagewalk(__unused const void *entry)
 {
 }
 
@@ -357,7 +357,7 @@ static inline struct page *ppt_get_pd_page(const union pgtable_pages_info *info,
  * @reentrancy Unspecified
  * @threadsafety Yes
  */
-static inline void nop_tweak_exe_right(uint64_t *prot __attribute__((unused)))
+static inline void nop_tweak_exe_right(__unused uint64_t *prot)
 {
 }
 
@@ -388,7 +388,7 @@ static inline void nop_tweak_exe_right(uint64_t *prot __attribute__((unused)))
  * @reentrancy Unspecified
  * @threadsafety Yes
  */
-static inline void nop_recover_exe_right(uint64_t *prot __attribute__((unused)))
+static inline void nop_recover_exe_right(__unused uint64_t *prot)
 {
 }
 
