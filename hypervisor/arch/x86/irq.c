@@ -68,10 +68,7 @@
  * @brief This structure exception_spinlock is used to protect the operations on the
  * context of the exception.
  */
-static spinlock_t exception_spinlock = {
-	.head = 0U,   /**< head of the LinkedList */
-	.tail = 0U,   /**< tail of the LinkedList */
-};
+static spinlock_t exception_spinlock;
 
 /**
  * @brief This function is used to handle the interrupt in root mode.
@@ -365,6 +362,11 @@ void init_interrupt(uint16_t pcpu_id)
 		 *  - idtd
 		 */
 		fixup_idt(idtd);
+		/** Call spinlock_init with the following parameter, in order to initialize the spinlock for protecting
+		 *  the operations on exception.
+		 *  - &exception_spinlock
+		 */
+		spinlock_init(&exception_spinlock);
 	}
 	/** Call set_idt() with the following parameters, in order to load the IDT information pointed
 	 *  by 'idtd' into the host IDTR.
