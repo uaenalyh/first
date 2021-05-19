@@ -1074,9 +1074,9 @@ static void vpci_write_pt_dev_cfg(struct pci_vdev *vdev, uint32_t offset, uint32
 			 *  - vdev->pbdf
 			 *  - offset
 			 *  - bytes
-			 *  - val | (PCIM_CMD_INTXDIS >> 16U)
+			 *  - val | (PCIM_CMD_INTXDIS >> 8U)
 			 */
-			pci_pdev_write_cfg(vdev->pbdf, offset, bytes, val | (PCIM_CMD_INTXDIS >> 16U));
+			pci_pdev_write_cfg(vdev->pbdf, offset, bytes, val | (PCIM_CMD_INTXDIS >> 8U));
 		/** If offset is 04H and bytes is 2 or 4, which means
 		 *  all the bytes of command register or command and status registers. */
 		} else if ((offset == PCIR_COMMAND) && ((bytes == 2U) || (bytes == 4U))) {

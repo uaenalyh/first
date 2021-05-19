@@ -306,17 +306,17 @@ void vmsi_write_cfg(struct pci_vdev *vdev, uint32_t offset, uint32_t bytes, uint
 	 *  - ro_mask representing the MSI read-only bit, initialized as ~0. */
 	uint32_t ro_mask = ~0U;
 
-	/** Declare the following local variables of type const uint8_t [10U].
+	/** Declare the following local variables of type const uint8_t [12].
 	 *  - msi_32_ro_mask representing the 32-bit MSI read-only bit. */
-	static const uint8_t msi_32_ro_mask[10U] = {0xffU, 0xffU, 0xfeU, 0xffU,
+	static const uint8_t msi_32_ro_mask[12U] = {0xffU, 0xffU, 0xfeU, 0xffU,
 						    0xffU, 0x0fU, 0xf0U, 0xffU,
-						    0x00U, 0xffU};
-	/** Declare the following local variables of type const uint8_t [14U].
+						    0x00U, 0xffU, 0xffU, 0xffU};
+	/** Declare the following local variables of type const uint8_t [16].
 	 *  - msi_64_ro_mask representing the 64-bit MSI read-only bit. */
-	static const uint8_t msi_64_ro_mask[14U] = {0xffU, 0xffU, 0xfeU, 0xffU,
+	static const uint8_t msi_64_ro_mask[16U] = {0xffU, 0xffU, 0xfeU, 0xffU,
 						    0xffU, 0x0fU, 0xf0U, 0xffU,
 						    0xffU, 0xffU, 0xffU, 0xffU,
-						    0x00U, 0xffU};
+						    0x00U, 0xffU, 0xffU, 0xffU};
 
 	/** If MSI is 64bit */
 	if (vdev->msi.is_64bit) {
