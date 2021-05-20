@@ -551,17 +551,8 @@ int32_t vmexit_handler(struct acrn_vcpu *vcpu)
 				vcpu_queue_exception(vcpu, vector, err_code);
 				/** Set vcpu->arch.idt_vectoring_info to 0 */
 				vcpu->arch.idt_vectoring_info = 0U;
-			/** If type is VMX_INT_TYPE_NMI */
-			} else if (type == VMX_INT_TYPE_NMI) {
-				/** Call vcpu_make_request() with the following parameters, in order to
-				 *  submit a NMI request to \a vcpu.
-				 *  - vcpu
-				 *  - ACRN_REQUEST_NMI */
-				vcpu_make_request(vcpu, ACRN_REQUEST_NMI);
-				/** Set vcpu->arch.idt_vectoring_info to 0 */
-				vcpu->arch.idt_vectoring_info = 0U;
 			} else {
-				/** No action on EXT_INT or SW exception. */
+				/** No action on NMI, EXT_INT or SW exception. */
 			}
 		}
 

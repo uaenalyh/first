@@ -422,6 +422,9 @@ void send_startup_ipi(__unused enum intr_cpu_startup_shorthand cpu_startup_short
 	/** Declare the following local variables of type uint8_t.
 	 *  - shorthand representing shorthand setting of ICR register, not initialized. */
 	uint8_t shorthand;
+	/** Declare the following local variable of type 'cpuinfo_x86*'
+	 *  - cpu_info representing the physical cpu information, initialized as get_pcpu_info() */
+	struct cpuinfo_x86 *cpu_info = get_pcpu_info();
 
 	/** Set icr.value to 0H */
 	icr.value = 0U;
@@ -442,7 +445,21 @@ void send_startup_ipi(__unused enum intr_cpu_startup_shorthand cpu_startup_short
 	 *  - icr.value
 	 */
 	msr_write(MSR_IA32_EXT_APIC_ICR, icr.value);
-
+	/** If cpu_info->displayfamily is not equal to 6, which indicates the current processor is not
+	 *  the modern processor
+	 */
+	if (cpu_info->displayfamily != 6U) {
+		/** Call udelay with the following parameters, in order to delay 10000 microseconds.
+		 *  - 10000
+		 */
+		udelay(10000U);
+	/** If the current processor is the modern processor */
+	} else {
+		/** Call udelay with the following parameters, in order to delay 10 microseconds.
+		 *  - 10
+		 */
+		udelay(10U);
+	}
 	/** Set icr.value_32.lo_32 to 0H */
 	icr.value_32.lo_32 = 0U;
 	/** Set icr.bits.shorthand to shorthand */
