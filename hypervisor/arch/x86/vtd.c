@@ -286,9 +286,9 @@ static inline uint64_t dmar_set_bitslice(uint64_t var, uint64_t mask, uint32_t p
  */
 #define DMAR_QI_INV_ENTRY_SIZE       16U
 /**
- * @brief The number of interrupt remapping entries contained in one 4-KByte page.
+ * @brief The number of DMA/interrupt remapping entries contained in one 4-KByte page.
  */
-#define DMAR_NUM_IR_ENTRIES_PER_PAGE 256U
+#define DMAR_NUM_ENTRIES_PER_PAGE 256U
 
 /**
  * @brief Starting bit position of Status Write field in Invalidation Wait Descriptor.
@@ -512,6 +512,23 @@ struct context_table {
 };
 
 /**
+ * @brief Data structure to store the root table allocated to one DRHD structure.
+ *
+ * It is supposed to be used when hypervisor accesses the root table.
+ *
+ * @consistency N/A
+ * @alignment 4096
+ *
+ * @remark N/A
+ */
+struct dmar_root_table {
+	/**
+	 * @brief The DMAR entries allocated to one DRHD structure
+	 */
+	struct dmar_entry dmar_entries[DMAR_NUM_ENTRIES_PER_PAGE];
+};
+
+/**
  * @brief Data structure to store the interrupt remapping table allocated to one DRHD structure.
  *
  * It is supposed to be used when hypervisor accesses the interrupt remapping table.
@@ -524,15 +541,8 @@ struct context_table {
 struct intr_remap_table {
 	/**
 	 * @brief The interrupt remapping table allocated to one DRHD structure.
-	 *
-	 * For each DRHD structure, it would support at most CONFIG_MAX_IR_ENTRIES interrupt remapping entries,
-	 * where CONFIG_MAX_IR_ENTRIES is a multiple of DMAR_NUM_IR_ENTRIES_PER_PAGE and it is smaller than or
-	 * equal to 2^16.
-	 * And one 4-KByte page contains DMAR_NUM_IR_ENTRIES_PER_PAGE interrupt remapping entries.
-	 * Consequently, the number of the 4-KByte pages required by one DRHD structure is
-	 * (CONFIG_MAX_IR_ENTRIES / DMAR_NUM_IR_ENTRIES_PER_PAGE).
 	 */
-	struct page tables[CONFIG_MAX_IR_ENTRIES / DMAR_NUM_IR_ENTRIES_PER_PAGE];
+	union dmar_ir_entry ir_entries[CONFIG_MAX_IR_ENTRIES];
 };
 
 /**
@@ -541,7 +551,7 @@ struct intr_remap_table {
  * The number of elements in this array is DRHD_COUNT and this array has an
  * alignment of 4096 bytes. It's initialized as all 0s.
  */
-static struct page root_tables[DRHD_COUNT] __aligned(PAGE_SIZE);
+static struct dmar_root_table root_tables[DRHD_COUNT] __aligned(PAGE_SIZE);
 
 /**
  * @brief Get the 4-KByte aligned root table for the specified DRHD structure.
@@ -568,11 +578,11 @@ static struct page root_tables[DRHD_COUNT] __aligned(PAGE_SIZE);
  * @reentrancy Unspecified
  * @threadsafety Unspecified
  */
-static inline uint8_t *get_root_table(uint32_t dmar_index)
+static inline struct dmar_entry *get_root_table(uint32_t dmar_index)
 {
-	/** Return root_tables[dmar_index].contents, which points to the root table whose corresponding
+	/** Return root_tables[dmar_index].dmar_entries, which points to the root table whose corresponding
 	 *  DRHD index is \a dmar_index */
-	return root_tables[dmar_index].contents;
+	return root_tables[dmar_index].dmar_entries;
 }
 
 /**
@@ -693,11 +703,11 @@ static struct intr_remap_table ir_tables[DRHD_COUNT] __aligned(PAGE_SIZE);
  * @reentrancy Unspecified
  * @threadsafety Unspecified
  */
-static inline uint8_t *get_ir_table(uint32_t dmar_index)
+static inline union dmar_ir_entry *get_ir_table(uint32_t dmar_index)
 {
-	/** Return ir_tables[dmar_index].tables[0].contents, which points to the interrupt remapping table
+	/** Return ir_tables[dmar_index].ir_entries, which points to the interrupt remapping table
 	 *  whose corresponding DRHD index is \a dmar_index */
-	return ir_tables[dmar_index].tables[0].contents;
+	return ir_tables[dmar_index].ir_entries;
 }
 
 /**
@@ -1423,7 +1433,7 @@ static void dmar_issue_qi_request(struct dmar_drhd_rt *dmar_unit, struct dmar_en
 
 	/** Set 'invalidate_desc_ptr' to 'dmar_unit->qi_queue + dmar_unit->qi_tail / DMAR_QI_INV_ENTRY_SIZE', which is
 	 *  the pointer to the invalidation descriptor in the invalidation queue to be written next by software. */
-	invalidate_desc_ptr = dmar_unit->qi_queue + dmar_unit->qi_tail / DMAR_QI_INV_ENTRY_SIZE;
+	invalidate_desc_ptr = dmar_unit->qi_queue + (dmar_unit->qi_tail / DMAR_QI_INV_ENTRY_SIZE);
 
 	/** Set 'invalidate_desc_ptr->hi_64' to 'invalidate_desc.hi_64', which is the high 64-bits of the specified
 	 *  invalidation descriptor */
@@ -1441,7 +1451,7 @@ static void dmar_issue_qi_request(struct dmar_drhd_rt *dmar_unit, struct dmar_en
 	 *  the pointer to the invalidation descriptor in the invalidation queue to be written next by software.
 	 *  It would be an Invalidation Wait Descriptor which is used to check whether hardware completes
 	 *  all invalidation requests or not. */
-	invalidate_desc_ptr = dmar_unit->qi_queue + dmar_unit->qi_tail / DMAR_QI_INV_ENTRY_SIZE;
+	invalidate_desc_ptr = dmar_unit->qi_queue + (dmar_unit->qi_tail / DMAR_QI_INV_ENTRY_SIZE);
 
 	/** Set 'invalidate_desc_ptr->hi_64' to the return value of 'hva2hpa(&qi_status)', which is the
 	 *  host physical address of 'qi_status' and it specifies the Status Address field in the
@@ -1811,7 +1821,7 @@ static void dmar_set_intr_remap_table(struct dmar_drhd_rt *dmar_unit)
 		/** Set 'dmar_unit->ir_table_addr' to the return value of 'get_ir_table(dmar_unit->index)',
 		 *  which is the base address (host virtual address) of the 4-KByte aligned interrupt remapping table
 		 *  allocated to the DRHD structure specified by \a dmar_unit */
-		dmar_unit->ir_table_addr = (union dmar_ir_entry *)get_ir_table(dmar_unit->index);
+		dmar_unit->ir_table_addr = get_ir_table(dmar_unit->index);
 	}
 
 	/** Set 'address' to return value of hva2hpa((void *)dmar_unit->ir_table_addr) bitwise OR DMAR_IR_ENABLE_EIM
@@ -1820,7 +1830,7 @@ static void dmar_set_intr_remap_table(struct dmar_drhd_rt *dmar_unit)
 
 	/* Set number of bits needed to represent the entries minus 1 */
 	/** Set 'size' to the subtraction of 1 from the index of most significant bit set in CONFIG_MAX_IR_ENTRIES,
-	 *  where CONFIG_MAX_IR_ENTRIES is a multiple of DMAR_NUM_IR_ENTRIES_PER_PAGE and it is smaller than or
+	 *  where CONFIG_MAX_IR_ENTRIES is a multiple of DMAR_NUM_ENTRIES_PER_PAGE and it is smaller than or
 	 *  equal to 2^16. */
 	size = (uint8_t)fls32(CONFIG_MAX_IR_ENTRIES) - 1U;
 	/** Set 'address' to 'address | size'
@@ -2016,7 +2026,7 @@ static void dmar_set_root_table(struct dmar_drhd_rt *dmar_unit)
 		/** Set 'dmar_unit->root_table_addr' to the return value of 'get_root_table(dmar_unit->index)',
 		 *  which is the base address (host virtual address) of the 4-KByte aligned root table
 		 *  allocated to the DRHD structure specified by \a dmar_unit */
-		dmar_unit->root_table_addr = (struct dmar_entry *)get_root_table(dmar_unit->index);
+		dmar_unit->root_table_addr = get_root_table(dmar_unit->index);
 	}
 
 	/** Set 'address' to the return value of 'hva2hpa((void *)dmar_unit->root_table_addr)' */

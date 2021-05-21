@@ -418,14 +418,13 @@ uint32_t vmsr_get_guest_msr_index(uint32_t msr)
  *
  * It is supposed to be called when hypervisor attempts to update MSR bitmaps for any vCPU.
  *
- * @param[out] bitmap A pointer which points to the MSR bitmap that is to be updated.
+ * @param[out] bitmap The MSR bitmap (as an array) that is to be updated.
  * @param[in] msr_arg The specified MSR whose corresponding bits in the MSR bitmap need to be updated.
  * @param[in] mode The specified mode which indicates whether RDMSR and WRMSR instructions executed from guest
  *                 associated with the specified MSR would cause VM exit or not.
  *
  * @return None
  *
- * @pre bitmap != NULL
  * @pre (mode & (~INTERCEPT_READ_WRITE)) == 0
  * @pre ((msr_arg >= LOW_MSR_START) && (msr_arg <= LOW_MSR_END)) ||
  *      ((msr_arg >= HIGH_MSR_START) && (msr_arg <= HIGH_MSR_END))
@@ -437,7 +436,7 @@ uint32_t vmsr_get_guest_msr_index(uint32_t msr)
  * @reentrancy Unspecified
  * @threadsafety When \a bitmap is different among parallel invocation.
  */
-static void enable_msr_interception(uint8_t *bitmap, uint32_t msr_arg, uint32_t mode)
+static void enable_msr_interception(uint8_t bitmap[PAGE_SIZE], uint32_t msr_arg, uint32_t mode)
 {
 	/** Declare the following local variables of type uint32_t.
 	 *  - read_offset representing the offset of the read bitmap in the MSR bitmap, initialized as 0H. */
@@ -618,10 +617,10 @@ static void update_msr_bitmap_x2apic_passthru(struct acrn_vcpu *vcpu);
  */
 void init_msr_emulation(struct acrn_vcpu *vcpu)
 {
-	/** Declare the following local variables of type 'uint8_t *'.
-	 *  - msr_bitmap representing a pointer which points to the MSR bitmap associated with the specified \a vcpu,
-	 *  initialized as vcpu->arch.msr_bitmap. */
-	uint8_t *msr_bitmap = vcpu->arch.msr_bitmap;
+	/** Declare the following local variables of type 'pointer to uint8_t[PAGE_SIZE]'.
+	 *  - msr_bitmap representing a pointer to the MSR bitmap associated with \a vcpu,
+	 *  initialized as &vcpu->arch.msr_bitmap. */
+	uint8_t (*msr_bitmap)[PAGE_SIZE] = &vcpu->arch.msr_bitmap;
 	/** Declare the following local variables of type uint32_t.
 	 *  - msr representing a MSR address, not initialized.
 	 *  - i representing the loop counter as array index, not initialized.
@@ -635,90 +634,92 @@ void init_msr_emulation(struct acrn_vcpu *vcpu)
 	/* Trap all MSRs by default */
 	/** For each 'msr' ranging from LOW_MSR_START to LOW_MSR_END [with a step of 1] */
 	for (msr = LOW_MSR_START; msr <= LOW_MSR_END; msr++) {
-		/** Call enable_msr_interception with the following parameters, in order to update 'msr_bitmap'
+		/** Call enable_msr_interception with the following parameters, in order to update '(*msr_bitmap)'
 		 *  according to the specified MSR 'msr' and the specified mode INTERCEPT_READ_WRITE.
-		 *  - msr_bitmap
+		 *  - (*msr_bitmap)
 		 *  - msr
 		 *  - INTERCEPT_READ_WRITE
 		 */
-		enable_msr_interception(msr_bitmap, msr, INTERCEPT_READ_WRITE);
+		enable_msr_interception((*msr_bitmap), msr, INTERCEPT_READ_WRITE);
 	}
 
 	/** For each 'msr' ranging from HIGH_MSR_START to HIGH_MSR_END [with a step of 1] */
 	for (msr = HIGH_MSR_START; msr <= HIGH_MSR_END; msr++) {
-		/** Call enable_msr_interception with the following parameters, in order to update 'msr_bitmap'
+		/** Call enable_msr_interception with the following parameters, in order to update '(*msr_bitmap)'
 		 *  according to the specified MSR 'msr' and the specified mode INTERCEPT_READ_WRITE.
-		 *  - msr_bitmap
+		 *  - (*msr_bitmap)
 		 *  - msr
 		 *  - INTERCEPT_READ_WRITE
 		 */
-		enable_msr_interception(msr_bitmap, msr, INTERCEPT_READ_WRITE);
+		enable_msr_interception((*msr_bitmap), msr, INTERCEPT_READ_WRITE);
 	}
 
 	/* unintercepted_msrs read_write 0_0 */
 	/** For each 'i' ranging from 0H to 'NUM_UNINTERCEPTED_MSRS - 1' [with a step of 1] */
 	for (i = 0U; i < NUM_UNINTERCEPTED_MSRS; i++) {
-		/** Call enable_msr_interception with the following parameters, in order to update 'msr_bitmap'
+		/** Call enable_msr_interception with the following parameters, in order to update '(*msr_bitmap)'
 		 *  according to the specified MSR 'unintercepted_msrs[i]' and the specified mode INTERCEPT_DISABLE.
-		 *  - msr_bitmap
+		 *  - (*msr_bitmap)
 		 *  - unintercepted_msrs[i]
 		 *  - INTERCEPT_DISABLE
 		 */
-		enable_msr_interception(msr_bitmap, unintercepted_msrs[i], INTERCEPT_DISABLE);
+		enable_msr_interception((*msr_bitmap), unintercepted_msrs[i], INTERCEPT_DISABLE);
 	}
 
 	/* only intercept wrmsr for MSR_IA32_TIME_STAMP_COUNTER, MSR_IA32_EFER */
-	/** Call enable_msr_interception with the following parameters, in order to update 'msr_bitmap'
+	/** Call enable_msr_interception with the following parameters, in order to update '(*msr_bitmap)'
 	 *  according to the specified MSR IA32_TIME_STAMP_COUNTER and the specified mode INTERCEPT_WRITE.
-	 *  - msr_bitmap
+	 *  - (*msr_bitmap)
 	 *  - MSR_IA32_TIME_STAMP_COUNTER
 	 *  - INTERCEPT_WRITE
 	 */
-	enable_msr_interception(msr_bitmap, MSR_IA32_TIME_STAMP_COUNTER, INTERCEPT_WRITE);
-	/** Call enable_msr_interception with the following parameters, in order to update 'msr_bitmap'
+	enable_msr_interception((*msr_bitmap), MSR_IA32_TIME_STAMP_COUNTER, INTERCEPT_WRITE);
+	/** Call enable_msr_interception with the following parameters, in order to update '(*msr_bitmap)'
 	 *  according to the specified MSR IA32_EFER and the specified mode INTERCEPT_WRITE.
-	 *  - msr_bitmap
+	 *  - (*msr_bitmap)
 	 *  - MSR_IA32_EFER
 	 *  - INTERCEPT_WRITE
 	 */
-	enable_msr_interception(msr_bitmap, MSR_IA32_EFER, INTERCEPT_WRITE);
+	enable_msr_interception((*msr_bitmap), MSR_IA32_EFER, INTERCEPT_WRITE);
 	/* handle cases different between safety VM and non-safety VM */
 	/* Machine Check */
 	/** If 'vcpu->vm' is a safety VM */
 	if (is_safety_vm(vcpu->vm)) {
 		/** For each 'msr' ranging from MSR_IA32_MC0_CTL2 to 'MSR_IA32_MC4_CTL2 - 1' [with a step of 1] */
 		for (msr = MSR_IA32_MC0_CTL2; msr < MSR_IA32_MC4_CTL2; msr++) {
-			/** Call enable_msr_interception with the following parameters, in order to update 'msr_bitmap'
-			 *  according to the specified MSR 'msr' and the specified mode INTERCEPT_DISABLE.
-			 *  - msr_bitmap
+			/** Call enable_msr_interception with the following parameters, in order to update
+			 *  '(*msr_bitmap)' according to the specified MSR 'msr' and the specified mode
+			 *  INTERCEPT_DISABLE.
+			 *  - (*msr_bitmap)
 			 *  - msr
 			 *  - INTERCEPT_DISABLE
 			 */
-			enable_msr_interception(msr_bitmap, msr, INTERCEPT_DISABLE);
+			enable_msr_interception((*msr_bitmap), msr, INTERCEPT_DISABLE);
 		}
 
-		/** For each 'msr' ranging from MSR_IA32_MC0_CTL to 'MSR_IA32_MC0_CTL + 4U * NUM_MC_BANKS - 4'
+		/** For each 'msr' ranging from MSR_IA32_MC0_CTL to 'MSR_IA32_MC0_CTL + (4U * NUM_MC_BANKS) - 4'
 		 *  [with a step of 4] */
-		for (msr = MSR_IA32_MC0_CTL; msr < (MSR_IA32_MC0_CTL + 4U * NUM_MC_BANKS); msr = msr + 4U) {
-			/** Call enable_msr_interception with the following parameters, in order to update 'msr_bitmap'
-			 *  according to the specified MSR 'msr' and the specified mode INTERCEPT_DISABLE.
-			 *  - msr_bitmap
+		for (msr = MSR_IA32_MC0_CTL; msr < (MSR_IA32_MC0_CTL + (4U * NUM_MC_BANKS)); msr = msr + 4U) {
+			/** Call enable_msr_interception with the following parameters, in order to update
+			 *  '(*msr_bitmap)' according to the specified MSR 'msr' and the specified mode
+			 *  INTERCEPT_DISABLE.
+			 *  - (*msr_bitmap)
 			 *  - msr
 			 *  - INTERCEPT_DISABLE
 			 */
-			enable_msr_interception(msr_bitmap, msr, INTERCEPT_DISABLE);
+			enable_msr_interception((*msr_bitmap), msr, INTERCEPT_DISABLE);
 		}
 
-		/** For each 'msr' ranging from MSR_IA32_MC0_STATUS to 'MSR_IA32_MC0_STATUS + 4U * NUM_MC_BANKS - 4'
+		/** For each 'msr' ranging from MSR_IA32_MC0_STATUS to 'MSR_IA32_MC0_STATUS + (4U * NUM_MC_BANKS) - 4'
 		 *  [with a step of 4] */
-		for (msr = MSR_IA32_MC0_STATUS; msr < (MSR_IA32_MC0_STATUS + 4U * NUM_MC_BANKS); msr = msr + 4U) {
-			/** Call enable_msr_interception with the following parameters, in order to update 'msr_bitmap'
-			 *  according to the specified MSR 'msr' and the specified mode INTERCEPT_READ.
-			 *  - msr_bitmap
+		for (msr = MSR_IA32_MC0_STATUS; msr < (MSR_IA32_MC0_STATUS + (4U * NUM_MC_BANKS)); msr = msr + 4U) {
+			/** Call enable_msr_interception with the following parameters, in order to update
+			 *  '(*msr_bitmap)' according to the specified MSR 'msr' and the specified mode INTERCEPT_READ.
+			 *  - (*msr_bitmap)
 			 *  - msr
 			 *  - INTERCEPT_READ
 			 */
-			enable_msr_interception(msr_bitmap, msr, INTERCEPT_READ);
+			enable_msr_interception((*msr_bitmap), msr, INTERCEPT_READ);
 		}
 	}
 
@@ -730,7 +731,7 @@ void init_msr_emulation(struct acrn_vcpu *vcpu)
 	/* Setup MSR bitmap - Intel SDM Vol3 24.6.9 */
 	/** Set 'value64' to the return value of 'hva2hpa(vcpu->arch.msr_bitmap)', which is the host physical address
 	 *  of the MSR bitmap associated with the specified \a vcpu */
-	value64 = hva2hpa(vcpu->arch.msr_bitmap);
+	value64 = hva2hpa(*msr_bitmap);
 	/** Call exec_vmwrite64 with the following parameters, in order to write 'value64' into
 	 *  the 64-Bit control field 'Address of MSR bitmaps (full)' in current VMCS.
 	 *  - VMX_MSR_BITMAP_FULL
@@ -951,10 +952,10 @@ static inline bool is_mc_ctl2_msr(uint32_t msr)
  */
 static inline bool is_mc_ctl_msr(uint32_t msr)
 {
-	/** Return 'true' if \a msr is in the range MSR_IA32_MC0_CTL to 'MSR_IA32_MC0_CTL + 4U * NUM_MC_BANKS - 4'
+	/** Return 'true' if \a msr is in the range MSR_IA32_MC0_CTL to 'MSR_IA32_MC0_CTL + (4U * NUM_MC_BANKS) - 4'
 	 *  and the remainder after division of \a msr by 4 is equal to 0H.
 	 *  Otherwise, return 'false'. */
-	return ((msr >= MSR_IA32_MC0_CTL) && (msr < (MSR_IA32_MC0_CTL + 4U * NUM_MC_BANKS)) && ((msr % 4U) == 0U));
+	return ((msr >= MSR_IA32_MC0_CTL) && (msr < (MSR_IA32_MC0_CTL + (4U * NUM_MC_BANKS))) && ((msr % 4U) == 0U));
 }
 
 /**
@@ -985,10 +986,10 @@ static inline bool is_mc_ctl_msr(uint32_t msr)
  */
 static inline bool is_mc_status_msr(uint32_t msr)
 {
-	/** Return 'true' if \a msr is in the range MSR_IA32_MC0_STATUS to 'MSR_IA32_MC0_STATUS + 4U * NUM_MC_BANKS - 4'
-	 *  and the remainder after division of \a msr by 4 is equal to 1H.
+	/** Return 'true' if \a msr is in the range MSR_IA32_MC0_STATUS to 'MSR_IA32_MC0_STATUS + (4U * NUM_MC_BANKS) -
+	 *  4' and the remainder after division of \a msr by 4 is equal to 1H.
 	 *  Otherwise, return 'false'. */
-	return ((msr >= MSR_IA32_MC0_STATUS) && (msr < (MSR_IA32_MC0_STATUS + 4U * NUM_MC_BANKS))
+	return ((msr >= MSR_IA32_MC0_STATUS) && (msr < (MSR_IA32_MC0_STATUS + (4U * NUM_MC_BANKS)))
 			&& ((msr % 4U) == 1U));
 }
 
@@ -1163,7 +1164,7 @@ int32_t rdmsr_vmexit_handler(struct acrn_vcpu *vcpu)
 			if (is_safety_vm(vcpu->vm)) {
 				/** Set 'v' to the contents of the native MSR IA32_MCi_STATUS 'msr' with
 				 *  ADDRV bit and MISCV bit being cleared */
-				v = msr_read(msr) & (~MSR_IA32_MC_STATUS_ADDRV) & (~MSR_IA32_MC_STATUS_MISCV);
+				v = msr_read(msr) & ~(MSR_IA32_MC_STATUS_ADDRV | MSR_IA32_MC_STATUS_MISCV);
 			} else {
 				/** Set 'err' to -EACCES, which indicates that an exception needs to be injected
 				 *  to guest software by the caller */
@@ -1267,33 +1268,33 @@ int32_t rdmsr_vmexit_handler(struct acrn_vcpu *vcpu)
  */
 static void set_tsc_msr_interception(struct acrn_vcpu *vcpu, bool interception)
 {
-	/** Declare the following local variables of type 'uint8_t *'.
+	/** Declare the following local variables of type 'pointer to uint8_t[PAGE_SIZE]'.
 	 *  - msr_bitmap representing a pointer to the MSR bitmap associated with \a vcpu,
-	 *  initialized as vcpu->arch.msr_bitmap. */
-	uint8_t *msr_bitmap = vcpu->arch.msr_bitmap;
+	 *  initialized as &vcpu->arch.msr_bitmap. */
+	uint8_t (*msr_bitmap)[PAGE_SIZE] = &vcpu->arch.msr_bitmap;
 	/** Declare the following local variables of type bool.
 	 *  - is_intercepted representing whether the MSR IA32_TSC_DEADLINE is intercepted or not at this moment,
 	 *  initialized as 'true' if the corresponding bit for the MSR IA32_TSC_DEADLINE in current MSR read bitmap is
 	 *  1H, initialized as 'false' if that bit is 0H. */
 	bool is_intercepted =
-		((msr_bitmap[MSR_IA32_TSC_DEADLINE >> 3U] & (1U << (MSR_IA32_TSC_DEADLINE & 0x7U))) != 0U);
+		(((*msr_bitmap)[MSR_IA32_TSC_DEADLINE >> 3U] & (1U << (MSR_IA32_TSC_DEADLINE & 0x7U))) != 0U);
 
 	/** If the MSR IA32_TSC_DEADLINE is intercepted at this moment and it is requested to be not intercepted */
 	if (!interception && is_intercepted) {
-		/** Call enable_msr_interception with the following parameters, in order to update 'msr_bitmap'
+		/** Call enable_msr_interception with the following parameters, in order to update '(*msr_bitmap)'
 		 *  according to the specified MSR 'MSR_IA32_TSC_DEADLINE' and the specified mode INTERCEPT_DISABLE.
-		 *  - msr_bitmap
+		 *  - (*msr_bitmap)
 		 *  - MSR_IA32_TSC_DEADLINE
 		 *  - INTERCEPT_DISABLE
 		 */
-		enable_msr_interception(msr_bitmap, MSR_IA32_TSC_DEADLINE, INTERCEPT_DISABLE);
-		/** Call enable_msr_interception with the following parameters, in order to update 'msr_bitmap'
+		enable_msr_interception((*msr_bitmap), MSR_IA32_TSC_DEADLINE, INTERCEPT_DISABLE);
+		/** Call enable_msr_interception with the following parameters, in order to update '(*msr_bitmap)'
 		 *  according to the specified MSR 'MSR_IA32_TSC_ADJUST' and the specified mode INTERCEPT_WRITE.
-		 *  - msr_bitmap
+		 *  - (*msr_bitmap)
 		 *  - MSR_IA32_TSC_ADJUST
 		 *  - INTERCEPT_WRITE
 		 */
-		enable_msr_interception(msr_bitmap, MSR_IA32_TSC_ADJUST, INTERCEPT_WRITE);
+		enable_msr_interception((*msr_bitmap), MSR_IA32_TSC_ADJUST, INTERCEPT_WRITE);
 		/* If the timer hasn't expired, sync virtual TSC_DEADLINE to physical TSC_DEADLINE, to make the guest
 		 * read the same tsc_deadline as it writes. This may change when the timer actually trigger. If the
 		 * timer has expired, write 0 to the virtual TSC_DEADLINE.
@@ -1317,20 +1318,20 @@ static void set_tsc_msr_interception(struct acrn_vcpu *vcpu, bool interception)
 		}
 	/** If the MSR IA32_TSC_DEADLINE is not intercepted at this moment and it is requested to be intercepted */
 	} else if (interception && !is_intercepted) {
-		/** Call enable_msr_interception with the following parameters, in order to update 'msr_bitmap'
+		/** Call enable_msr_interception with the following parameters, in order to update '(*msr_bitmap)'
 		 *  according to the specified MSR 'MSR_IA32_TSC_DEADLINE' and the specified mode INTERCEPT_READ_WRITE.
-		 *  - msr_bitmap
+		 *  - (*msr_bitmap)
 		 *  - MSR_IA32_TSC_DEADLINE
 		 *  - INTERCEPT_READ_WRITE
 		 */
-		enable_msr_interception(msr_bitmap, MSR_IA32_TSC_DEADLINE, INTERCEPT_READ_WRITE);
-		/** Call enable_msr_interception with the following parameters, in order to update 'msr_bitmap'
+		enable_msr_interception((*msr_bitmap), MSR_IA32_TSC_DEADLINE, INTERCEPT_READ_WRITE);
+		/** Call enable_msr_interception with the following parameters, in order to update '(*msr_bitmap)'
 		 *  according to the specified MSR 'MSR_IA32_TSC_ADJUST' and the specified mode INTERCEPT_READ_WRITE.
-		 *  - msr_bitmap
+		 *  - (*msr_bitmap)
 		 *  - MSR_IA32_TSC_ADJUST
 		 *  - INTERCEPT_READ_WRITE
 		 */
-		enable_msr_interception(msr_bitmap, MSR_IA32_TSC_ADJUST, INTERCEPT_READ_WRITE);
+		enable_msr_interception((*msr_bitmap), MSR_IA32_TSC_ADJUST, INTERCEPT_READ_WRITE);
 		/* sync physical TSC_DEADLINE to virtual TSC_DEADLINE */
 		/** Call vcpu_set_guest_msr with the following parameters, in order to write the contents of the
 		 *  native MSR IA32_TSC_DEADLINE into the MSR IA32_TSC_DEADLINE associated with \a vcpu.
@@ -2017,38 +2018,38 @@ int32_t wrmsr_vmexit_handler(struct acrn_vcpu *vcpu)
  */
 static void update_msr_bitmap_x2apic_passthru(struct acrn_vcpu *vcpu)
 {
-	/** Declare the following local variables of type 'uint8_t *'.
+	/** Declare the following local variables of type 'pointer to uint8_t[PAGE_SIZE]'.
 	 *  - msr_bitmap representing a pointer which points to the MSR bitmap associated with the specified \a vcpu,
-	 *  initialized as vcpu->arch.msr_bitmap. */
-	uint8_t *msr_bitmap = vcpu->arch.msr_bitmap;
+	 *  initialized as &vcpu->arch.msr_bitmap. */
+	uint8_t (*msr_bitmap)[PAGE_SIZE] = &vcpu->arch.msr_bitmap;
 
-	/** Call intercept_x2apic_msrs with the following parameters, in order to update 'msr_bitmap'
+	/** Call intercept_x2apic_msrs with the following parameters, in order to update '(*msr_bitmap)'
 	 *  with regard to x2APIC MSRs, the specified mode for these MSRs is INTERCEPT_DISABLE.
-	 *  - msr_bitmap
+	 *  - (*msr_bitmap)
 	 *  - INTERCEPT_DISABLE
 	 */
-	intercept_x2apic_msrs(msr_bitmap, INTERCEPT_DISABLE);
-	/** Call enable_msr_interception with the following parameters, in order to update 'msr_bitmap'
+	intercept_x2apic_msrs((*msr_bitmap), INTERCEPT_DISABLE);
+	/** Call enable_msr_interception with the following parameters, in order to update '(*msr_bitmap)'
 	 *  according to the specified MSR 'MSR_IA32_EXT_XAPICID' and the specified mode INTERCEPT_READ.
-	 *  - msr_bitmap
+	 *  - (*msr_bitmap)
 	 *  - MSR_IA32_EXT_XAPICID
 	 *  - INTERCEPT_READ
 	 */
-	enable_msr_interception(msr_bitmap, MSR_IA32_EXT_XAPICID, INTERCEPT_READ);
-	/** Call enable_msr_interception with the following parameters, in order to update 'msr_bitmap'
+	enable_msr_interception((*msr_bitmap), MSR_IA32_EXT_XAPICID, INTERCEPT_READ);
+	/** Call enable_msr_interception with the following parameters, in order to update '(*msr_bitmap)'
 	 *  according to the specified MSR 'MSR_IA32_EXT_APIC_LDR' and the specified mode INTERCEPT_READ.
-	 *  - msr_bitmap
+	 *  - (*msr_bitmap)
 	 *  - MSR_IA32_EXT_APIC_LDR
 	 *  - INTERCEPT_READ
 	 */
-	enable_msr_interception(msr_bitmap, MSR_IA32_EXT_APIC_LDR, INTERCEPT_READ);
-	/** Call enable_msr_interception with the following parameters, in order to update 'msr_bitmap'
+	enable_msr_interception((*msr_bitmap), MSR_IA32_EXT_APIC_LDR, INTERCEPT_READ);
+	/** Call enable_msr_interception with the following parameters, in order to update '(*msr_bitmap)'
 	 *  according to the specified MSR 'MSR_IA32_EXT_APIC_ICR' and the specified mode INTERCEPT_READ_WRITE.
-	 *  - msr_bitmap
+	 *  - (*msr_bitmap)
 	 *  - MSR_IA32_EXT_APIC_ICR
 	 *  - INTERCEPT_READ_WRITE
 	 */
-	enable_msr_interception(msr_bitmap, MSR_IA32_EXT_APIC_ICR, INTERCEPT_READ_WRITE);
+	enable_msr_interception((*msr_bitmap), MSR_IA32_EXT_APIC_ICR, INTERCEPT_READ_WRITE);
 	/** Call set_tsc_msr_interception with the following parameters, in order to
 	 *  update system state according to the changes of the interception associated with the MSR IA32_TSC_DEADLINE.
 	 *  MSR IA32_TSC_DEADLINE needs to be intercepted if 'exec_vmread64(VMX_TSC_OFFSET_FULL)' is not equal to 0H.

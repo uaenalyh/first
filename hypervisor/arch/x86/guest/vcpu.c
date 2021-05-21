@@ -1694,6 +1694,36 @@ void pause_vcpu(struct acrn_vcpu *vcpu)
 }
 
 /**
+ * @brief Save XSAVE-managed user and supervisor state components
+ *
+ * This function saves all XSAVE-managed state components (including user and supervisor) that are enabled in the
+ * current XCR0 and IA32_XSS.
+ *
+ * @param[out] xs_area A pointer which points to the target XSAVE area
+ *
+ * @return N/A
+ *
+ * @pre xs_area != NULL
+ *
+ * @post None
+ *
+ * @mode HV_OPERATIONAL
+ *
+ * @reentrancy Unspecified
+ *
+ * @threadsafety When \a xs_area is different among parallel invocation
+ *
+ */
+static void asm_xsaves(struct xsave_area *xs_area)
+{
+	/** Execute xsaves in order to save extend state components to the xsave area located at target memory address.
+	 *  - Input operands: *xs_area, RDX holds UINT32_MAX, RAX holds UINT32_MAX.
+	 *  - Output operands: N/A
+	 *  - Clobbers: memory */
+	asm volatile("xsaves %0" : : "m"(*xs_area), "d"(UINT32_MAX), "a"(UINT32_MAX) : "memory");
+}
+
+/**
  * @brief This function is used to save the physical state-component bitmaps and XSAVE-managed
  * user and supervisor state components to the given extended context.
  *
@@ -1725,11 +1755,40 @@ void save_xsave_area(struct ext_context *ectx)
 	/** Call msr_read() with MSR_IA32_XSS being parameter, in order to read host
 	 *  MSR with index of MSR_IA32_XSS and set ectx->xss to its return value */
 	ectx->xss = msr_read(MSR_IA32_XSS);
-	/** Execute xsaves in order to save extend state components to the xsave area located at target memory address.
-	 *  - Input operands: ectx->xs_area, RDX holds UINT32_MAX, RAX holds UINT32_MAX.
+	/** Call asm_xsaves() with &ectx->xs_area being the parameter, in order to save XSAVE managed state components
+	 *  to ectx->xs_area. */
+	asm_xsaves(&ectx->xs_area);
+}
+
+/**
+ * @brief Restore XSAVE-managed user and supervisor state components
+ *
+ * This function restores all XSAVE-managed state components (including user and supervisor) that are enabled in the
+ * current XCR0 and IA32_XSS.
+ *
+ * @param[in] xs_area A pointer which points to the target XSAVE area
+ *
+ * @return N/A
+ *
+ * @pre xs_area != NULL
+ *
+ * @post None
+ *
+ * @mode HV_OPERATIONAL
+ *
+ * @reentrancy Unspecified
+ *
+ * @threadsafety Yes
+ *
+ */
+static void asm_xrstors(const struct xsave_area *xs_area)
+{
+	/** Execute xrstors in order to restore of processor state components from the XSAVE area located at the
+	 * memory address.
+	 *  - Input operands: *xs_area, RDX holds UINT32_MAX, RAX holds UINT32_MAX.
 	 *  - Output operands: N/A
-	 *  - Clobbers: memory */
-	asm volatile("xsaves %0" : : "m"(ectx->xs_area), "d"(UINT32_MAX), "a"(UINT32_MAX) : "memory");
+	 *  - Clobbers memory */
+	asm volatile("xrstors %0" : : "m"(*xs_area), "d"(UINT32_MAX), "a"(UINT32_MAX) : "memory");
 }
 
 /**
@@ -1761,12 +1820,9 @@ void rstore_xsave_area(const struct ext_context *ectx)
 	 *  - MSR_IA32_XSS: target MSR to write
 	 *  - ectx->xss: value to write to the msr */
 	msr_write(MSR_IA32_XSS, ectx->xss);
-	/** Execute xrstors in order to restore of processor state components from the XSAVE area located at the
-	 * memory address.
-	 *  - Input operands: ectx->xs_area, RDX holds UINT32_MAX, RAX holds UINT32_MAX.
-	 *  - Output operands: N/A
-	 *  - Clobbers memory */
-	asm volatile("xrstors %0" : : "m"(ectx->xs_area), "d"(UINT32_MAX), "a"(UINT32_MAX) : "memory");
+	/** Call asm_xrstors() with &ectx->xs_area being the parameter, in order to restore XSAVE managed state
+	 *  components from ectx->xs_area. */
+	asm_xrstors(&ectx->xs_area);
 	/** Call write_xcr with the following parameters, in order write xcr0 of extend context to target xcr0.
 	 *  - 0: number of xcr
 	 *  - ectx->xcr0: value to write to the xcr0 */

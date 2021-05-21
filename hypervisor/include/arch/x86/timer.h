@@ -29,7 +29,6 @@
 
 void udelay(uint32_t us);
 uint64_t us_to_ticks(uint32_t us);
-uint64_t ticks_to_us(uint64_t ticks);
 uint64_t rdtsc(void);
 void calibrate_tsc(void);
 uint32_t get_tsc_khz(void);

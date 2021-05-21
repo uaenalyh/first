@@ -326,7 +326,8 @@ void vmsi_write_cfg(struct pci_vdev *vdev, uint32_t offset, uint32_t bytes, uint
 		 *  - &msi_64_ro_mask[offset - vdev->msi.capoff]
 		 *  - bytes
 		 */
-		(void)memcpy_s((void *)&ro_mask, bytes, (void *)&msi_64_ro_mask[offset - vdev->msi.capoff], bytes);
+		(void)memcpy_s((void *)&ro_mask, bytes,
+			(const void *)&msi_64_ro_mask[offset - vdev->msi.capoff], bytes);
 	} else {
 		/** Call memcpy_s with the following parameters, in order to set ro_mask to 32bit MSI read-only mask.
 		 *  - &ro_mask
@@ -334,7 +335,8 @@ void vmsi_write_cfg(struct pci_vdev *vdev, uint32_t offset, uint32_t bytes, uint
 		 *  - &msi_32_ro_mask[offset - vdev->msi.capoff]
 		 *  - bytes
 		 */
-		(void)memcpy_s((void *)&ro_mask, bytes, (void *)&msi_32_ro_mask[offset - vdev->msi.capoff], bytes);
+		(void)memcpy_s((void *)&ro_mask, bytes,
+			(const void *)&msi_32_ro_mask[offset - vdev->msi.capoff], bytes);
 	}
 
 	/* If there is any bit that is not set in ro_mask. */
@@ -456,7 +458,7 @@ void init_vmsi(struct pci_vdev *vdev)
 		 *  vdev->pbdf, (val + PCICAP_ID) and 1 being the parameters, which reads the capability ID from the
 		 *  capability.
 		 */
-		uint8_t cap = pci_pdev_read_cfg(vdev->pbdf, val + PCICAP_ID, 1U);
+		uint8_t cap = (uint8_t)pci_pdev_read_cfg(vdev->pbdf, val + PCICAP_ID, 1U);
 		/** If the capability ID is PCIY_MSI */
 		if (cap == PCIY_MSI) {
 			/** Set vdev->msi.capoff to 'val', the offset of the MSI capability structure. */

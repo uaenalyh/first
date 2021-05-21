@@ -149,7 +149,7 @@
 #define foreach_vcpu(idx, vm, vcpu)                                                         \
 	for ((idx) = 0U, (vcpu) = &((vm)->hw.vcpu_array[(idx)]); (idx) < (vm)->hw.created_vcpus; \
 		(idx)++, (vcpu) = &((vm)->hw.vcpu_array[(idx)]))                                     \
-		if (vcpu->state != VCPU_OFFLINE)
+		if ((vcpu)->state != VCPU_OFFLINE)
 
 /**
  * @brief This enum is used to define vcpu state.

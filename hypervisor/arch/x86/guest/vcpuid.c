@@ -126,7 +126,7 @@ static inline const struct vcpuid_entry *local_find_vcpuid_entry(
 		/** Declare the following local variables of type 'const struct vcpuid_entry *'.
 		 *  - tmp representing a pointer to the ith virtual CPUID entry of 'vm', initialized as
 		 *  &vm->vcpuid_entries[i]. */
-		const struct vcpuid_entry *tmp = (const struct vcpuid_entry *)(&vm->vcpuid_entries[i]);
+		const struct vcpuid_entry *tmp = &vm->vcpuid_entries[i];
 
 		/** If the specified \a leaf is larger than 'tmp->leaf' */
 		if (tmp->leaf < leaf) {

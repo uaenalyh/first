@@ -739,6 +739,8 @@ int32_t exception_vmexit_handler(struct acrn_vcpu *vcpu)
 			 */
 			fatal_error_shutdown_vm(vcpu);
 		}
+		/** End of case */
+		break;
 	}
 	/** Return 0 */
 	return 0;

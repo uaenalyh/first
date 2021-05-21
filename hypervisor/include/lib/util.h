@@ -19,32 +19,11 @@
  *
  * This file is decomposed into the following functions and macros:
  *
- * - INT_DIV_ROUNDUP(x, y): Calculate \a x divided by \a y, round up.
  * - max: Get the maximum value from the 2 parameters.
  * - STRINGIFY(x): Expand to a constant string with \a x being its content.
  * - mem_aligned_check: Check if a value is aligned to the required boundary.
  */
 #include <types.h>
-
-/**
- * @brief Calculate \a x divided by \a y, round up.
- *
- * @param[in]    x The dividend.
- * @param[in]    y The divisor.
- *
- * @return The result of calculation.
- *
- * @pre \a x and \a y shall have the same integer type.
- * @pre \a y != 0.
- *
- * @mode HV_INIT, HV_OPERATIONAL, HV_TERMINATION
- *
- * @reentrancy Unspecified
- * @threadsafety Unspecified
- *
- * Expand to a value calculated by dividing z by \a y where z is \a x plus \a y minus 1.
- */
-#define INT_DIV_ROUNDUP(x, y) ((((x) + (y)) - 1U) / (y))
 
 /**
  * @brief Get the maximum value from the 2 parameters.

@@ -53,6 +53,33 @@ struct acrn_logmsg_ctl {
 
 static struct acrn_logmsg_ctl logmsg_ctl;
 
+
+/**
+ * @brief Convert the unit of a time interval from TSC ticks to microseconds.
+ *
+ * @param[in] ticks the to-be-converted time interval in TSC ticks.
+ *
+ * @return The converted microseconds
+ *
+ * @pre n/a
+ *
+ * @post n/a
+ *
+ * @mode HV_INIT, HV_OPERATIONAL, HV_TERMINATION
+ *
+ * @remark calibrate_tsc() has been called once on any processor. The input ticks is a 64bits number, and converted
+ *         value also 64bits, so ticks <= (1UL << 54) to avoid overflow.
+ *
+ * @reentrancy unspecified
+ *
+ * @threadsafety true
+ */
+uint64_t ticks_to_us(uint64_t ticks)
+{
+	/** Return the converted microseconds: ticks * 1000 / get_tsc_khz(). */
+	return (ticks * 1000UL) / (uint64_t)get_tsc_khz();
+}
+
 void init_logmsg(uint32_t flags)
 {
 	logmsg_ctl.flags = flags;

@@ -135,7 +135,7 @@ static uint32_t create_zeropage_e820(struct zero_page *zp, const struct acrn_vm 
 		 *  - vm_e820
 		 *  - entry_num * sizeof(struct e820_entry)
 		 */
-		(void)memcpy_s((void *)zp_e820, entry_num * sizeof(struct e820_entry), (void *)vm_e820,
+		(void)memcpy_s((void *)zp_e820, entry_num * sizeof(struct e820_entry), (const void *)vm_e820,
 			entry_num * sizeof(struct e820_entry));
 	}
 	/** Return number of the copied e820 table entries */

@@ -20,12 +20,12 @@ static uint32_t get_lapic_id(void)
 
 void bsp_init(void)
 {
-	printf("%s: lapic id = %x\n", __func__, get_lapic_id());
+	pr_info("%s: lapic id = %x\n", __func__, get_lapic_id());
 }
 
 void bsp_fatal_error(void)
 {
-	printf("%s: lapic id = %x\n", __func__, get_lapic_id());
+	pr_err("%s: lapic id = %x\n", __func__, get_lapic_id());
 
 	/* Halt the current processor */
 	while(1) {

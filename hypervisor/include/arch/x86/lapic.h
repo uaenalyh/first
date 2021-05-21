@@ -102,7 +102,7 @@ uint32_t get_cur_lapic_id(void);
 
 void init_lapic(uint16_t pcpu_id);
 
-void send_startup_ipi(enum intr_cpu_startup_shorthand cpu_startup_shorthand, uint16_t dest_pcpu_id,
+void send_startup_ipi(__unused enum intr_cpu_startup_shorthand cpu_startup_shorthand, uint16_t dest_pcpu_id,
 	uint64_t cpu_startup_start_address);
 
 void send_single_init(uint16_t pcpu_id);

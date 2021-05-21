@@ -29,6 +29,8 @@
 
 /* DRHD of DMAR */
 
+#include <vtd.h>
+
 /**
  * @addtogroup hwmgmt_vtd
  *
@@ -75,9 +77,9 @@
 /**
  * @brief The type of the Device Scope Entry 0 under DRHD0.
  *
- * 1 indicates that the device identified by the Path field is a PCI endpoint device.
+ * The enum constant indicates that the device identified by the Path field is a PCI endpoint device.
  */
-#define DRHD0_DEVSCOPE0_TYPE 0x1U
+#define DRHD0_DEVSCOPE0_TYPE ACPI_DMAR_SCOPE_TYPE_ENDPOINT
 /**
  * @brief The enumeration ID associated with the Device Scope Entry 0 under DRHD0.
  */
@@ -121,9 +123,9 @@
 /**
  * @brief The type of the Device Scope Entry 0 under DRHD1.
  *
- * 3 indicates that the device identified by the Path field is an I/O APIC (or I/O SAPIC) device.
+ * The enum constant indicates that the device identified by the Path field is an I/O APIC (or I/O SAPIC) device.
  */
-#define DRHD1_DEVSCOPE0_TYPE 0x3U
+#define DRHD1_DEVSCOPE0_TYPE ACPI_DMAR_SCOPE_TYPE_IOAPIC
 /**
  * @brief The enumeration ID associated with the Device Scope Entry 0 under DRHD1.
  */
@@ -139,9 +141,10 @@
 /**
  * @brief The type of the Device Scope Entry 1 under DRHD1.
  *
- * 4 indicates that the device identified by the Path field is an HPET Timer Block capable of generating MSI.
+ * The enum constant indicates that the device identified by the Path field is an HPET Timer Block capable of generating
+ * MSI.
  */
-#define DRHD1_DEVSCOPE1_TYPE 0x4U
+#define DRHD1_DEVSCOPE1_TYPE ACPI_DMAR_SCOPE_TYPE_HPET
 /**
  * @brief The enumeration ID associated with the Device Scope Entry 1 under DRHD1.
  */

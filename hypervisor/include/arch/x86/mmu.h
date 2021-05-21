@@ -57,8 +57,11 @@ struct acrn_vcpu;
  */
 static inline uint64_t round_page_up(uint64_t addr)
 {
+	/** Declare the following local variable of type uint64_t.
+	 *  - page_size representing the PAGE_SIZE converted to a 64-bit unsigned integer, initialized as PAGE_SIZE. */
+	uint64_t page_size = PAGE_SIZE;
 	/** Return the nearest page 4-Kbyte boundary greater than or equal to \a addr. */
-	return (((addr + (uint64_t)PAGE_SIZE) - 1UL) & PAGE_MASK);
+	return (((addr + (uint64_t)page_size) - 1UL) & PAGE_MASK);
 }
 
 /**

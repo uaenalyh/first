@@ -119,7 +119,6 @@
 
 void init_logmsg(uint32_t flags);
 void do_logmsg(uint32_t severity, const char *fmt, ...);
-void printf(const char *fmt, ...);
 
 #ifndef pr_prefix
 /**

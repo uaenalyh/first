@@ -99,7 +99,7 @@ static uint64_t get_ap_trampoline_buf(void)
 	 *  of mbi and the x, where the x is calculated by mi_mods_count field of mbi multiplying the
 	 *  size of structure multiboot_module. */
 	if ((end > mbi->mi_mods_addr) &&
-		(ret < (mbi->mi_mods_addr + mbi->mi_mods_count * sizeof(struct multiboot_module)))) {
+		(ret < (mbi->mi_mods_addr + (mbi->mi_mods_count * sizeof(struct multiboot_module))))) {
 		/** Call panic in order to enter safety state. */
 		panic("overlaped with module address");
 	}

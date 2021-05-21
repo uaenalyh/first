@@ -195,32 +195,6 @@ uint64_t us_to_ticks(uint32_t us)
 }
 
 /**
- * @brief Convert the unit of a time interval from TSC ticks to microseconds.
- *
- * @param[in] ticks the to-be-converted time interval in TSC ticks.
- *
- * @return The converted microseconds
- *
- * @pre n/a
- *
- * @post n/a
- *
- * @mode HV_INIT, HV_OPERATIONAL, HV_TERMINATION
- *
- * @remark calibrate_tsc() has been called once on any processor. The input ticks is a 64bits number, and converted
- *         value also 64bits, so ticks <= (1UL << 54) to avoid overflow.
- *
- * @reentrancy unspecified
- *
- * @threadsafety true
- */
-uint64_t ticks_to_us(uint64_t ticks)
-{
-	/** Return the converted microseconds: ticks * 1000 / tsc_khz. */
-	return (ticks * 1000UL) / (uint64_t)tsc_khz;
-}
-
-/**
  * @brief Delay \a us microseconds before return.
  *
  * @param[in] us: Number of microseconds to delay before returning.

@@ -47,7 +47,6 @@
  * - init_logmsg(flags)            Initialize the logging service used internally by the hypervisor. No operation in
  *                                 release version.
  * - do_logmsg(severity, fmt, ...) Log a string with the given severity. No operation in release version.
- * - printf(fmt, ...)              Format a string and print it to the serial console. No operation in release version.
  */
 
 /**
@@ -91,28 +90,6 @@ void init_logmsg(__unused uint32_t flags)
  * @threadsafety Unspecified
  */
 void do_logmsg(__unused uint32_t severity, __unused const char *fmt, ...)
-{
-}
-/**
- * @brief Format a string and print it to the serial console. No operation in release version.
- *
- * @param[in]    fmt      A format string. Not used in release version.
- * @param[in]    ...      Variadic argument used to be introduced after meet '%' in the \a fmt immediately followed
- *                        conversion specifier, where conversion specifier is a character that specifies the type of
- *                        conversion to be applied. Not used in release version.
- *
- * @return None
- *
- * @pre N/A
- *
- * @post N/A
- *
- * @mode HV_INIT, HV_OPERATIONAL, HV_TERMINATION
- *
- * @reentrancy Unspecified
- * @threadsafety Unspecified
- */
-void printf(__unused const char *fmt, ...)
 {
 }
 

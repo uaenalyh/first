@@ -249,7 +249,6 @@
  *       + pr_fatal
  *       + ASSERT
  *       + pr_err
- *       + printf
  *
  * This module is decomposed into the following files:
  *

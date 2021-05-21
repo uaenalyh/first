@@ -338,7 +338,7 @@ static void pci_cfgdata_io_read(struct acrn_vcpu *vcpu, uint16_t addr, size_t by
 	 *  - offset representing the value offset to the base of PCI configuration data IO port: 0CFCH, initialized as
 	 *  'addr - PCI_CONFIG_DATA'.
 	 */
-	uint32_t offset = addr - PCI_CONFIG_DATA;
+	uint32_t offset = (uint32_t)addr - PCI_CONFIG_DATA;
 	/** Declare the following local variables of type uint32_t.
 	 *  - val representing the default value to read from PCI configuration space, initialized as 0FFFFFFFFH. */
 	uint32_t val = ~0U;
@@ -425,7 +425,7 @@ static void pci_cfgdata_io_write(struct acrn_vcpu *vcpu, uint16_t addr, size_t b
 	 *  - offset representing the value offset to the base of PCI configuration data IO port: 0CFCH, initialized as
 	 *  'addr - PCI_CONFIG_DATA'.
 	 */
-	uint32_t offset = addr - PCI_CONFIG_DATA;
+	uint32_t offset = (uint32_t)addr - PCI_CONFIG_DATA;
 
 	/** Set cfg_addr.value to the value returned by function atomic_swap32, which returns vpci->addr.value and
 	 *  set vpci->addr.value to PCI_DISABLED_CONFIG_ADDR.
@@ -769,7 +769,7 @@ static void init_default_cfg(struct pci_vdev *vdev)
 		/** If index is not in the range of PCI BAR, then read the value from physical configuration space
 		 *  and write it into its virtual configuration space.
 		 */
-		if ((index < (PCIR_BARS/4U)) || (index > (PCIR_BARS/4U + PCI_BAR_COUNT - 1U))) {
+		if ((index < (PCIR_BARS / 4U)) || (index > ((PCIR_BARS / 4U) + PCI_BAR_COUNT - 1U))) {
 			/** Set offset to index << 2, to get the register's address in configuration space. */
 			offset = (uint8_t)(index << 2U);
 			/** Set val to the value returned by pci_pdev_read_cfg with vdev->pbdf, offset and 4 being the

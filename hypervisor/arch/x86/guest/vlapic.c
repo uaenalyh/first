@@ -1265,6 +1265,9 @@ int32_t vlapic_x2apic_write(struct acrn_vcpu *vcpu, uint32_t msr, uint64_t val)
 	/** Declare the following local variable of type int32_t
 	 *  - error representing the error code of this function, initialized as -1 */
 	int32_t error = -1;
+	/** Declare the following local variable of type uint32_t
+	 *  - icr_lo representing lower 32-bit of the value to be written, not initialized */
+	uint32_t icr_lo;
 
 	/** call vcpu_vlapic with the following parameters, in order to
 	 *  get the virtual LAPIC structure pointer from vCPU structure
@@ -1280,8 +1283,10 @@ int32_t vlapic_x2apic_write(struct acrn_vcpu *vcpu, uint32_t msr, uint64_t val)
 	case MSR_IA32_EXT_APIC_ICR:
 		/** Set lapic->icr_hi.v to be (uint32_t)(val >> 32UL) */
 		lapic->icr_hi.v = (uint32_t)(val >> 32UL);
-		/** Set lapic->icr_lo.v to be (uint32_t)((val & APIC_ICR_MASK) | APIC_LEVEL_MASK) */
-		lapic->icr_lo.v = (uint32_t)((val & APIC_ICR_MASK) | APIC_LEVEL_MASK);
+		/** Set icr_lo to be (uint32_t)(val & APIC_ICR_MASK) */
+		icr_lo = (uint32_t)(val & APIC_ICR_MASK);
+		/** Set lapic->icr_lo.v to be (icr_lo | APIC_LEVEL_MASK) */
+		lapic->icr_lo.v = icr_lo | APIC_LEVEL_MASK;
 		/** Call vlapic_x2apic_pt_icr_access with the following parameters, in order to
 		 *  handle writing to virtual LAPIC ICR and assign the return value of
 		 *  vlapic_x2apic_pt_icr_access to error

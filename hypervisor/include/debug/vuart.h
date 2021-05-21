@@ -49,8 +49,8 @@
 #include <vm_config.h>
 #include <vm.h>
 
-void init_vuart(struct acrn_vm *vm, const struct vuart_config *vu_config);
-void deinit_vuart(struct acrn_vm *vm);
+void init_vuart(__unused struct acrn_vm *vm, __unused const struct vuart_config *vu_config);
+void deinit_vuart(__unused struct acrn_vm *vm);
 
 /**
  * @}

@@ -174,10 +174,10 @@ void handle_nmi(struct intr_excp_ctx *ctx)
 	/** Call vcpu_queue_exception() with the following parameters, in order to
 	 *  inject the exception to the guest vcpu.
 	 *  - get_cpu_var(ever_run_vcpu)
-	 *  - ctx->vector
-	 *  - ctx->error_code
+	 *  - (uint32_t)ctx->vector
+	 *  - (uint32_t)ctx->error_code
 	 */
-	vcpu_queue_exception(get_cpu_var(ever_run_vcpu), ctx->vector, ctx->error_code);
+	vcpu_queue_exception(get_cpu_var(ever_run_vcpu), (uint32_t)ctx->vector, (uint32_t)ctx->error_code);
 }
 
 /**
