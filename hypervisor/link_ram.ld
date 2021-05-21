@@ -5,8 +5,8 @@ MEMORY
     /* Low 1MB of memory for secondary processor start-up */
     lowram  :   ORIGIN = 0, LENGTH = 0x00010000
 
-    /* 32 MBytes of RAM for HV */
-    ram     :   ORIGIN = 0x00400000, LENGTH = 0x0b800000
+    /* 232 MBytes of RAM for HV */
+    ram     :   ORIGIN = 0x00400000, LENGTH = 0x0e800000
 }
 
 SECTIONS

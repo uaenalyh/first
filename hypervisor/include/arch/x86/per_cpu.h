@@ -38,12 +38,41 @@
 #include <vm_config.h>
 
 /**
+ * @brief Size of the 2-MByte page.
+ */
+#define GUARD_PAGE_SIZE  0x200000U
+/**
+ * @brief The physical CPU normal stack size in Byte
+ */
+#define PCPU_STACK_SIZE  0x200000U
+/**
  * @brief The structure to hold all per CPU information.
  *
  * @consistency For struct per_cpu_region p, p.lapic_id == 2 * pcpuid_from_vcpu(p.ever_run_vcpu)
  * @alignment PAGE_SIZE
  */
 struct per_cpu_region {
+	/**
+	 * @brief The guard page.
+	 *
+	 * This guard page is to mitigate stack overflow. This page is 2M-byte
+	 * alignment and will be unmapped during page initialization.
+	 */
+	uint8_t before_guard_page[GUARD_PAGE_SIZE] __aligned(GUARD_PAGE_SIZE);
+	/**
+	 * @brief The physical CPU stack.
+	 *
+	 * This stack is the physical CPU stack on the logical processor. This stack is 2M-byte
+	 * alignment.
+	 */
+	uint8_t stack[PCPU_STACK_SIZE] __aligned(PCPU_STACK_SIZE);
+	/**
+	 * @brief The guard page.
+	 *
+	 * This guard page is to mitigate stack underflow. This page is 2M-byte
+	 * alignment and will be unmapped during page initialization.
+	 */
+	uint8_t after_guard_page[GUARD_PAGE_SIZE] __aligned(GUARD_PAGE_SIZE);
 	/* vmxon_region MUST be 4KB-aligned */
 	uint8_t vmxon_region[PAGE_SIZE]; /**< Array that the logical processor uses to support VMX operation. */
 	void *vmcs_run; /**< VMCS region used for vCPU run on the logical processor. */
@@ -70,12 +99,10 @@ struct per_cpu_region {
 							    *   processor. This stack is 16-byte aligned. */
 	uint8_t sf_stack[CONFIG_STACK_SIZE] __aligned(16); /**< stack used to handle stack segment fault on the logical
 							    *   processor.This stack is 16-byte aligned. */
-	uint8_t stack[CONFIG_STACK_SIZE] __aligned(16); /**< stack used to handle pcpu's stack on the logical
-							 *   processor. This stack is 16-byte aligned. */
 	uint32_t lapic_id; /**< lapic id. */
 	uint32_t lapic_ldr; /**< lapic local destination register. */
 	uint16_t shutdown_vm_id; /**< ID representing the VM that requests to be shutdown. */
-} __aligned(PAGE_SIZE); /* per_cpu_region size aligned with PAGE_SIZE */
+} __aligned(GUARD_PAGE_SIZE); /* per_cpu_region size aligned with GUARD_PAGE_SIZE */
 
 extern struct per_cpu_region per_cpu_data[MAX_PCPU_NUM];
 /**

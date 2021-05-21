@@ -255,7 +255,7 @@ void init_primary_pcpu(void)
 	/** Use get_cpu_var with 'stack' parameter to get current physical CPU's stack
 	 *  array and set 'rsp' to the address of the last element in that stack array.
 	 */
-	rsp = (uint64_t)(&get_cpu_var(stack)[CONFIG_STACK_SIZE - 1U]);
+	rsp = (uint64_t)(&get_cpu_var(stack)[PCPU_STACK_SIZE - 1U]);
 	/** Align the rsp with CPU_STACK_ALIGN */
 	rsp &= ~(CPU_STACK_ALIGN - 1UL);
 	/** Call SWITCH_TO with the following parameters, in order to

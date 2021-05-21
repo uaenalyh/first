@@ -170,8 +170,8 @@ void write_trampoline_stack_sym(uint16_t pcpu_id)
 	hva = (uint64_t *)(hpa2hva(trampoline_start16_paddr + trampoline_relo_addr(secondary_cpu_stack)));
 
 	/** Set stack_sym_addr to the address of the stack field of the pcpu_id-th element in the per-CPU region, where
-	 *  pcpu_id is calculated by subtracting 1 from CONFIG_STACK_SIZE, where the CPU's id is pcpu_id.  */
-	stack_sym_addr = (uint64_t)&per_cpu(stack, pcpu_id)[CONFIG_STACK_SIZE - 1U];
+	 *  pcpu_id is calculated by subtracting 1 from PCPU_STACK_SIZE, where the CPU's id is pcpu_id.  */
+	stack_sym_addr = (uint64_t)&per_cpu(stack, pcpu_id)[PCPU_STACK_SIZE - 1U];
 	/** Bitwise AND the complement value by stack_sym_addr, where the value is calculated by subtracting 1 from
 	 *  CPU_STACK_ALIGN.
 	 *  Clear the lower bits of stack_sym_addr to make it align with CPU_STACK_ALIGN.

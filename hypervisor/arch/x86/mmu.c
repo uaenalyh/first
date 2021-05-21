@@ -39,6 +39,7 @@
 #include <vm.h>
 #include <ld_sym.h>
 #include <logmsg.h>
+#include <per_cpu.h>
 
 /**
  * @defgroup hwmgmt_mmu hwmgmt.mmu
@@ -940,6 +941,36 @@ void init_paging(void)
 	 */
 	mmu_modify_or_del((uint64_t *)ppt_mmu_pml4_addr, round_pde_down(hv_hpa),
 		round_pde_up(text_end) - round_pde_down(hv_hpa), 0UL, PAGE_NX, &ppt_mem_ops, MR_MODIFY);
+
+	/** For each 'i' ranging from 0H to MAX_PCPU_NUM [with a step of 1] */
+	for (i = 0U; i < MAX_PCPU_NUM; i++) {
+		/**
+		 * Call mmu_modify_or_del with following parameters, in order to
+		 * unmap the guard page which is before the physical CPU stack.
+		 * - (uint64_t *)ppt_mmu_pml4_addr
+		 * - per_cpu(before_guard_page, i)
+		 * - GUARD_PAGE_SIZE
+		 * - 0UL
+		 * - 0UL
+		 * - &ppt_mem_ops
+		 * - MR_DEL
+		 */
+		mmu_modify_or_del((uint64_t *)ppt_mmu_pml4_addr, (uint64_t)per_cpu(before_guard_page, i),
+			GUARD_PAGE_SIZE, 0UL, 0UL, &ppt_mem_ops, MR_DEL);
+		/**
+		 * Call mmu_modify_or_del with following parameters, in order to
+		 * unmap the guard page which is after the physical CPU stack.
+		 * - (uint64_t *)ppt_mmu_pml4_addr
+		 * - per_cpu(after_guard_page, i)
+		 * - GUARD_PAGE_SIZE
+		 * - 0UL
+		 * - 0UL
+		 * - &ppt_mem_ops
+		 * - MR_DEL
+		 */
+		mmu_modify_or_del((uint64_t *)ppt_mmu_pml4_addr, (uint64_t)per_cpu(after_guard_page, i),
+			GUARD_PAGE_SIZE, 0UL, 0UL, &ppt_mem_ops, MR_DEL);
+	}
 
 	/** Call enable_paging in order to enable paging */
 	enable_paging();

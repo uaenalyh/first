@@ -26,7 +26,7 @@
 #define CONFIG_LOG_DESTINATION           7U /**< Bitmap setting for destination of log messages */
 #define CONFIG_LOW_RAM_SIZE              0x00010000U /**< Memory size of low memory */
 #define CONFIG_HV_RAM_START              0x00400000UL /**< Start memory address of hypervisor */
-#define CONFIG_HV_RAM_SIZE               0x0b800000UL /**< Size of the memory allocated to hypervisor */
+#define CONFIG_HV_RAM_SIZE               0x0e800000UL /**< Size of the memory allocated to hypervisor */
 #define CONFIG_PLATFORM_RAM_SIZE         0x400000000UL /**< Memory size of platform */
 #define CONFIG_UOS_RAM_SIZE              0x200000000UL /**< Size of the memory allocated to a User VM */
 #define CONFIG_MAX_IOAPIC_NUM            1U /**< Number of physical IOAPICs on current platform */
