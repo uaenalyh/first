@@ -467,6 +467,7 @@ test_build_job:
   script:
     - echo "start to test build job ..."
     - pwd
+    - exit 0
     - mkdir -p ./image
     - cd ../acrn-hypervisor/
     - git reset --hard && git checkout master && git pull
