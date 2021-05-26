@@ -756,6 +756,9 @@ void set_vcpu_regs(struct acrn_vcpu *vcpu, struct acrn_vcpu_regs *vcpu_regs)
 	/** Set ctx to &(vcpu->arch.context.run_ctx) */
 	ctx = &(vcpu->arch.context.run_ctx);
 
+	/** Set ia32_kernel_gs_base of the extend context to 0x00000000U */
+	ectx->ia32_kernel_gs_base = 0x00000000U;
+
 	/** If vcpu is in protected mode */
 	if ((vcpu_regs->cr0 & CR0_PE) != 0UL) {
 		/** Set attr to PROTECTED_MODE_DATA_SEG_AR */
@@ -1603,12 +1606,6 @@ void reset_vcpu(struct acrn_vcpu *vcpu)
 	vcpu->running = false;
 	/** Set nr_sipi state of vcpu->arch to false */
 	vcpu->arch.nr_sipi = 0U;
-
-	/** Call msr_write() with the following parameters, in order to reset IA32_KERNEL_GS_BASE MSR.
-	 *  - MSR_IA32_KERNEL_GS_BASE
-	 *  - 0H
-	 */
-	msr_write(MSR_IA32_KERNEL_GS_BASE, 0x00000000U);
 
 	/** Set exception information of vcpu->arch to VECTOR_INVALID */
 	vcpu->arch.exception_info.exception = VECTOR_INVALID;
