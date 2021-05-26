@@ -809,24 +809,11 @@ static int32_t xsetbv_vmexit_handler(struct acrn_vcpu *vcpu)
 				 *  - 0 */
 				vcpu_inject_gp(vcpu, 0U);
 			} else {
-				/*
-					* SDM Vol.1 13-4, XCR0[4:3] are associated with MPX state,
-					* Guest should not set these two bits without MPX support.
-					*/
-				/** If bits 4:3 of val64 is not 0 */
-				if ((val64 & (XCR0_BNDREGS | XCR0_BNDCSR)) != 0UL) {
-					/** Call vcpu_inject_gp() with the following parameters,
-					 *  in order to inject GP to the vcpu with error code 0.
-					 *  - vcpu
-					 *  - 0 */
-					vcpu_inject_gp(vcpu, 0U);
-				} else {
-					/** Call write_xcr() with the following parameters, in order to
-					 *  write val64 into the XCR0.
-					 *  - 0
-					 *  - val64 */
-					write_xcr(0, val64);
-				}
+				/** Call write_xcr() with the following parameters, in order to
+				 *  write val64 into the XCR0.
+				 *  - 0
+				 *  - val64 */
+				write_xcr(0, val64);
 			}
 		}
 	}
