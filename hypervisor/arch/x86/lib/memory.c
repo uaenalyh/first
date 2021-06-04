@@ -52,8 +52,8 @@
  * @pre s != NULL
  * @pre The host logical address range [\a d ,\a d + \a dmax ) maps to memory with write privilege.
  * @pre The host logical address range [\a s ,\a s + \a slen ) maps to memory with read privilege.
- * @pre The intersection of host physical address range [hva2hpa(\a s ), hva2hpa(\a s + \a slen )) and
- * [hva2hpa(\a d ),hva2hpa(\a d + \a dmax )) shall be empty.
+ * @pre The host physical address ranges [hva2hpa(\a s ), hva2hpa(\a s + \a slen )) and
+ * [hva2hpa(\a d ),hva2hpa(\a d + \a slen )) do not overlap.
  *
  * @mode HV_INIT, HV_OPERATIONAL, HV_TERMINATION
  *

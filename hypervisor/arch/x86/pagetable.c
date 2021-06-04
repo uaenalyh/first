@@ -1355,9 +1355,9 @@ static void add_pdpte(const uint64_t *pml4e, uint64_t paddr_start, uint64_t vadd
  *
  * @return None
  *
- * @pre pml4e != NULL
+ * @pre pml4_page != NULL
  * @pre mem_ops != NULL
- * @pre 0 < vaddr_size < get_mem_range_info()->mem_top
+ * @pre 0 < size < get_mem_range_info()->mem_top
  * @pre Any subrange within [vaddr_base, vaddr_base + size) shall be unmapped before calling mmu_add.
  * @pre For x86 hypervisor mapping, the following condition shall be met.
  *      - prot & ~(PAGE_PRESENT| PAGE_RW | PAGE_USER | PAGE_PWT | PAGE_PCD | PAGE_ACCESSED | PAGE_DIRTY | PAGE_PS |

@@ -84,7 +84,7 @@ void fatal_error_shutdown_vm(struct acrn_vcpu *vcpu)
  *
  * @return None
  *
- * @pre pcpu_id < CONFIG_MAX_PCPU_NUM
+ * @pre pcpu_id < MAX_PCPU_NUM
  *
  * @mode HV_OPERATIONAL
  *

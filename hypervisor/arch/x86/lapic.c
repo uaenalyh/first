@@ -403,7 +403,7 @@ uint32_t get_cur_lapic_id(void)
  *
  * @pre cpu_startup_shorthand == INTR_CPU_STARTUP_USE_DEST
  * @pre cpu_startup_start_address < 0x100000 && (cpu_startup_start_address & 0FFFH == 0)
- * @pre dest_pcpu_id < CONFIG_MAX_PCPU_NUM
+ * @pre dest_pcpu_id < MAX_PCPU_NUM
  *
  * @post N/A
  *

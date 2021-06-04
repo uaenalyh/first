@@ -316,7 +316,7 @@ static inline int32_t copy_gpa(
  * @return 0 if no error happens otherwise return -EINVAL.
  *
  * @pre vm != NULL
- * @pre hptr != NULL
+ * @pre h_ptr != NULL
  * @pre size != 0
 
  * @post N/A
@@ -351,7 +351,7 @@ int32_t copy_from_gpa(struct acrn_vm *vm, void *h_ptr, uint64_t gpa, uint32_t si
  * @return None
  *
  * @pre vm != NULL
- * @pre hptr != NULL
+ * @pre h_ptr != NULL
  * @pre size != 0
 
  * @post N/A

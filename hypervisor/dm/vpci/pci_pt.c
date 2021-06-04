@@ -330,7 +330,7 @@ void vdev_pt_write_vbar(struct pci_vdev *vdev, uint32_t idx, uint32_t val)
  * @pre vdev != NULL
  * @pre vdev->vpci != NULL
  * @pre vdev->vpci->vm != NULL
- * @pre vdev->pdev != NULL
+ * @pre vdev->pbdf.value != 0
  *
  * @post N/A
  *

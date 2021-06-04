@@ -85,7 +85,7 @@
  *
  * @return None
  *
- * @pre addr != NULL
+ * @pre addr != 0
  * @pre addr is 4KB-aligned
  *
  * @post N/A

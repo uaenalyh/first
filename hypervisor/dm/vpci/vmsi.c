@@ -85,7 +85,7 @@
  * @return None
  *
  * @pre vdev != NULL
- * @pre vdev->pbdf != 0
+ * @pre vdev->pbdf.value != 0
  *
  * @post N/A
  *
@@ -146,7 +146,7 @@ static inline void enable_disable_msi(const struct pci_vdev *vdev, bool enable)
  * @pre vdev != NULL
  * @pre vdev->vpci != NULL
  * @pre vdev->vpci->vm != NULL
- * @pre vdev->pbdf != 0
+ * @pre vdev->pbdf.value != 0
  *
  * @post N/A
  *

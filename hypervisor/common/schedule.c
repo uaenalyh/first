@@ -202,7 +202,7 @@ static inline void set_thread_status(struct thread_object *obj, enum thread_obje
  *
  * @return None
  *
- * @pre pcpu_id < CONFIG_MAX_PCPU_NUM
+ * @pre pcpu_id < MAX_PCPU_NUM
  *
  * @post N/A
  *
@@ -240,7 +240,7 @@ void obtain_schedule_lock(uint16_t pcpu_id, uint64_t *rflag)
  *
  * @return None
  *
- * @pre pcpu_id < CONFIG_MAX_PCPU_NUM
+ * @pre pcpu_id < MAX_PCPU_NUM
  *
  * @post N/A
  *
@@ -273,7 +273,7 @@ void release_schedule_lock(uint16_t pcpu_id, uint64_t rflag)
  *
  * @return A pointer which points to the obtained scheduler.
  *
- * @pre pcpu_id < CONFIG_MAX_PCPU_NUM
+ * @pre pcpu_id < MAX_PCPU_NUM
  *
  * @post N/A
  *
@@ -327,7 +327,7 @@ uint16_t sched_get_pcpuid(const struct thread_object *obj)
  *
  * @return None
  *
- * @pre pcpu_id < CONFIG_MAX_PCPU_NUM
+ * @pre pcpu_id < MAX_PCPU_NUM
  * @pre per_cpu(sched_ctl, pcpu_id).scheduler->init != NULL
  *
  * @post N/A
@@ -380,7 +380,7 @@ void init_sched(uint16_t pcpu_id)
  *
  * @return None
  *
- * @pre pcpu_id < CONFIG_MAX_PCPU_NUM
+ * @pre pcpu_id < MAX_PCPU_NUM
  * @pre per_cpu(sched_ctl, pcpu_id).scheduler->deinit == NULL
  *
  * @post N/A
@@ -478,7 +478,7 @@ void init_thread_data(struct thread_object *obj)
  *
  * @return None
  *
- * @pre pcpu_id < CONFIG_MAX_PCPU_NUM
+ * @pre pcpu_id < MAX_PCPU_NUM
  * @pre delmode == DEL_MODE_INIT
  *
  * @post N/A
@@ -538,7 +538,7 @@ void make_reschedule_request(uint16_t pcpu_id, uint16_t delmode)
  * @retval true The specified physical CPU need reschedule.
  * @retval false The specified physical needn't reschedule.
  *
- * @pre pcpu_id < CONFIG_MAX_PCPU_NUM
+ * @pre pcpu_id < MAX_PCPU_NUM
  *
  * @post N/A
  *

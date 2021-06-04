@@ -1881,7 +1881,7 @@ static void context_switch_out(struct thread_object *prev)
  *
  * @return N/A
  *
- * @pre vcpu != NULL
+ * @pre next != NULL
  *
  * @post None
  *
@@ -2061,7 +2061,7 @@ uint16_t pcpuid_from_vcpu(const struct acrn_vcpu *vcpu)
  *
  * @return N/A
  *
- * @pre vcpu != NULL
+ * @pre vm != NULL
  *
  * @post None
  *

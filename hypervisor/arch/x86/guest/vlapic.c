@@ -686,7 +686,7 @@ void vlapic_calc_dest(struct acrn_vm *vm, uint64_t *dmask, bool is_broadcast, ui
  * @return None
  *
  * @pre target_vcpu != NULL
- * @pre mode == APIC_DELMODE_INIT || mode == APIC_DELMODE_SIPI
+ * @pre mode == APIC_DELMODE_INIT || mode == APIC_DELMODE_STARTUP
  *
  * @post N/A
  *

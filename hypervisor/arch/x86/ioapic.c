@@ -220,7 +220,7 @@ static inline void ioapic_write_reg32(void *ioapic_base, const uint32_t offset, 
  *
  * @return None
  *
- * @pre ioapic_base != NULL
+ * @pre ioapic_addr != NULL
  *
  * @post N/A
  *
