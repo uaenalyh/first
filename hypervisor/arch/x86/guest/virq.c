@@ -260,7 +260,6 @@ static int32_t get_excep_class(uint32_t vector)
  * @return None
  *
  * @pre vcpu != NULL
- * @pre vector_arg == IDT_PF ||  vector_arg == IDT_GP || vector_arg == IDT_UD || vector_arg == IDT_NMI
  *
  * @post None
  *
@@ -541,9 +540,6 @@ void vcpu_inject_ud(struct acrn_vcpu *vcpu)
  *
  * @pre vcpu != NULL
  * @pre pcpuid_from_vcpu(vcpu) == get_pcpu_id()
- * @pre vcpu->arch.exception_info.exception == IDT_PF ||  vcpu->arch.exception_info.exception
- * == IDT_GP || vcpu->arch.exception_info.exception == IDT_UD || vcpu->arch.exception_info.exception
- * == IDT_NMI || vcpu->arch.exception_info.exception == IDT_DF
  *
  * @post None
  *

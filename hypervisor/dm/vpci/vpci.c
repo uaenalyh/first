@@ -290,7 +290,7 @@ static inline bool vpci_is_valid_access(uint32_t offset, uint32_t bytes)
  *
  * @pre vcpu != NULL
  * @pre vcpu->vm != NULL
- * @pre addr == 0CF8H
+ * @pre (addr >= 0CFCH) && (addr <= 0CFFH)
  * @pre bytes == 1 || bytes == 2 || bytes == 4
  *
  * @post The register value got from the PCI device configuration space will be set to the give vCPU's port IO request
@@ -378,7 +378,7 @@ static void pci_cfgdata_io_read(struct acrn_vcpu *vcpu, uint16_t addr, size_t by
  *
  * @pre vcpu != NULL
  * @pre vcpu->vm != NULL
- * @pre addr == 0CF8H
+ * @pre (addr >= 0CFCH) && (addr <= 0CFFH)
  * @pre bytes == 1 || bytes == 2 || bytes == 4
  *
  * @post N/A

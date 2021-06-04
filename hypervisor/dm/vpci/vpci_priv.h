@@ -57,7 +57,7 @@
  *
  * @return the offset of the BAR register corresponding with the given 'idx'
  *
- * @pre idx < PCI_BAR_COUNT
+ * @pre idx <= PCI_BAR_COUNT
  *
  * @post N/A
  *
