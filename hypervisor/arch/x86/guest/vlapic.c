@@ -1242,7 +1242,6 @@ int32_t vlapic_x2apic_read(struct acrn_vcpu *vcpu, uint32_t msr, uint64_t *val)
  * @return 0 if no error happens otherwise return -1.
  *
  * @pre vcpu != NULL
- * @pre val != NULL
  * @pre msr == 830H
  *
  * @post N/A

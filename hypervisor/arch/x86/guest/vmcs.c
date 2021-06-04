@@ -629,7 +629,7 @@ static void init_host_state(void)
  *
  * @return the checked value which will be finally set to the control fields
  *
- * @pre vcpu != NULL
+ * @pre N/A
  *
  * @post N/A
  *

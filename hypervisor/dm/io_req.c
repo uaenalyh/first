@@ -172,7 +172,6 @@ static void pio_default_write(
  *
  * @pre vcpu != NULL
  * @pre io_req != NULL
- * @pre io_req->io_type == REQ_PORTIO
  *
  * @post None
  *
@@ -289,7 +288,6 @@ static void hv_emulate_pio(struct acrn_vcpu *vcpu, struct io_request *io_req)
  *
  * @pre vcpu != NULL
  * @pre io_req != NULL
- * @pre io_req->io_type == REQ_PORTIO
  *
  * @post None
  *
