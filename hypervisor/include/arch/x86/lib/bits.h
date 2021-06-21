@@ -235,7 +235,7 @@ build_bitmap_set(bitmap_set_nolock, "q", uint64_t, "")
  *
  * @mode HV_INIT, HV_OPERATIONAL, HV_TERMINATION
  *
- * @reentrancy Unspecified
+ * @reentrancy Yes
  * @threadsafety Yes
  *
  * This function does the following actions in sequence:
@@ -319,7 +319,7 @@ build_bitmap_clear(bitmap_clear_nolock, "q", uint64_t, "")
  *
  * @mode HV_INIT, HV_OPERATIONAL, HV_TERMINATION
  *
- * @reentrancy Yes
+ * @reentrancy Unspecified
  * @threadsafety Yes
  *
  * This function does the following actions in sequence:
@@ -358,7 +358,7 @@ build_bitmap_clear(bitmap_clear_lock, "q", uint64_t, BUS_LOCK)
  *
  * @mode HV_INIT, HV_OPERATIONAL, HV_TERMINATION
  *
- * @reentrancy Yes
+ * @reentrancy Unspecified
  * @threadsafety Yes
  *
  * This function does the following actions in sequence:

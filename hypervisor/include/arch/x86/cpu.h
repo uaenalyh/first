@@ -856,7 +856,7 @@ static inline void cpu_write_memory_barrier(void)
  *
  * @mode HV_SUBMODE_INIT_ROOT, HV_OPERATIONAL, HV_SUBMODE_INIT_PRE_SMP, HV_SUBMODE_INIT_POST_SMP
  *
- * @reentrancy Unspecified
+ * @reentrancy Yes
  * @threadsafety Yes
  */
 static inline uint16_t get_pcpu_id(void)

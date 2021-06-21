@@ -169,15 +169,22 @@ void dispatch_exception(struct intr_excp_ctx *ctx)
  *
  * @threadsafety when \a ctx is different among parallel invocation.
  */
-void handle_nmi(struct intr_excp_ctx *ctx)
+void handle_nmi(__unused struct intr_excp_ctx *ctx)
 {
-	/** Call vcpu_queue_exception() with the following parameters, in order to
-	 *  inject the exception to the guest vcpu.
-	 *  - get_cpu_var(ever_run_vcpu)
-	 *  - (uint32_t)ctx->vector
-	 *  - (uint32_t)ctx->error_code
+	/** Declare the following local variables of type 'struct acrn_vcpu *'.
+	 *  - vcpu representing a pointer to the vCPU running on the current physical processor, initialized as
+	 *  get_cpu_var(ever_run_vcpu).
 	 */
-	vcpu_queue_exception(get_cpu_var(ever_run_vcpu), (uint32_t)ctx->vector, (uint32_t)ctx->error_code);
+	struct acrn_vcpu *vcpu = get_cpu_var(ever_run_vcpu);
+
+	/** If 'vcpu' is not NULL */
+	if (vcpu != NULL) {
+		/** Call bitmap_set_lock with the following parameters, in order to set the bit ACRN_REQUEST_NMI to 1.
+		 *  - ACRN_REQUEST_NMI
+		 *  - &vcpu->arch.pending_req
+		 */
+		bitmap_set_lock(ACRN_REQUEST_NMI, &vcpu->arch.pending_req);
+	}
 }
 
 /**
