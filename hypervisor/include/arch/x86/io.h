@@ -47,7 +47,10 @@
  * @mode HV_SUBMODE_INIT_PRE_SMP, HV_OPERATIONAL
  *
  * @reentrancy Unspecified
- * @threadsafety Yes
+ * @threadsafety When port is in different sub-range among parallel invocation:
+ *               Sub-range 1: port == 0A1H || port == 21H.
+ *               Sub-range 2: port == 70H.
+ *               Sub-range 3: 0CFCH <= port <= 0CFFH.
  */
 static inline void pio_write8(uint8_t value, uint16_t port)
 {
@@ -106,7 +109,7 @@ static inline uint8_t pio_read8(uint16_t port)
  * @mode HV_SUBMODE_INIT_PRE_SMP, HV_OPERATIONAL
  *
  * @reentrancy Unspecified
- * @threadsafety Yes
+ * @threadsafety Unspecified
  */
 static inline void pio_write16(uint16_t value, uint16_t port)
 {
@@ -172,7 +175,7 @@ static inline uint16_t pio_read16(uint16_t port)
  * @mode HV_SUBMODE_INIT_PRE_SMP, HV_OPERATIONAL
  *
  * @reentrancy Unspecified
- * @threadsafety Yes
+ * @threadsafety Unspecified
  */
 static inline void pio_write32(uint32_t value, uint16_t port)
 {
@@ -225,14 +228,17 @@ static inline uint32_t pio_read32(uint16_t port)
 
  * @return None
  *
- * @pre (0FEC00000H <= addr && addr <= 0FEC003FFH) || (0FED90000H <= addr && addr < 0FED92000H)
+ * @pre (0FEC00000H <= hva2hpa(addr) <= 0FEC003FFH) || (0FED90000H <= hva2hpa(addr) < 0FED92000H)
 
  * @post N/A
  *
  * @mode HV_SUBMODE_INIT_PRE_SMP, HV_OPERATIONAL
  *
  * @reentrancy Unspecified
- * @threadsafety Yes
+ * @threadsafety When hva2hpa(addr) is in different sub-range among parallel invocation:
+ *               Sub-range 1: 0FEC00000H <= hva2hpa(addr) <= 0FEC003FFH.
+ *               Sub-range 2: 0FED90000H <= hva2hpa(addr) <= 0FED90FFFH.
+ *               Sub-range 3: 0FED91000H <= hva2hpa(addr) <= 0FED91FFFH.
  */
 static inline void mmio_write32(uint32_t value, void *addr)
 {
@@ -251,7 +257,7 @@ static inline void mmio_write32(uint32_t value, void *addr)
  *
  * @return A 32-bits value read from the given address.
 
- * @pre (0FEC00000H <= addr && addr <= 0FEC003FFH) || (0FED90000H <= addr && addr < 0FED92000H)
+ * @pre (0FEC00000H <= hva2hpa(addr) <= 0FEC003FFH) || (0FED90000H <= hva2hpa(addr) < 0FED92000H)
 
  * @post N/A
  *
