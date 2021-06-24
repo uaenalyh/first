@@ -36,6 +36,8 @@
  * - trace.c         Implement trace APIs that shall be provided by the debug module.
  * - uart16550.c     Implement an 16550 UART initialization API that shall be provided by the debug module.
  * - vuart.c         Implement virtual UART APIs that shall be provided by the debug module.
+ *
+ * @{
  */
 
 /**

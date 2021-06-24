@@ -37,9 +37,9 @@
  * @brief This file implements get_vm_config() function that shall be provided by the vp-base.vm-config module.
  *
  * External APIs:
- *  - get_vm_config()     This function gets the static configurations for specific VM.
- *				   Depends on:
- *					- N/A.
+ *  - get_vm_config()	This function gets the static configurations for specific VM.
+ *			Depends on:
+ *			 - N/A.
  */
 
  /**

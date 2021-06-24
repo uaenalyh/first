@@ -81,7 +81,7 @@ cpu_primary_start_32:
 	/** Enable paging, protection, numeric error and co-processor
 	 *  monitoring in CR0 to enter long mode,
 	 * 0x80000033 = (CR0_PG | CR0_PE | CR0_MP | CR0_NE | CR0_ET) */
-	movl    $0x80000033, %ebx
+	movl	$0x80000033, %ebx
 	mov	%ebx, %cr0
 
 	/* Load temportary GDT pointer value */

@@ -211,8 +211,8 @@ static void remap_vmsi(const struct pci_vdev *vdev)
 	/** Set info.vmsi_data.full to vmsi_msgdata */
 	info.vmsi_data.full = vmsi_msgdata;
 
-	/** If the remmaping vector number is in the range [0x10,0xfe]
-	 */
+	/** If the remmaping vector number is in the range [0x10,0xfe], where 0x10 and 0xfe are the smallest and largest
+	 *  valid vector for MSIs */
 	if ((info.vmsi_data.bits.vector >= 0x10U) && (info.vmsi_data.bits.vector <= 0xfeU)) {
 		/** Call ptirq_msix_remap with the following parameters, in order to calculate the physical MSI message
 		 * data and message address according to its virtual MSI data and address.

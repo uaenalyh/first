@@ -68,22 +68,6 @@
 #define PCI_DISABLED_CONFIG_ADDR 0x00FFFF00U /**< A value indicating the PCI config address port is disabled. */
 
 /**
- * @brief Data structure to represent a PCI capability's ID and its length.
- *
- * Data structure to represent a PCI capability's ID and its length, because hypervisor just exposes MSI capability to
- * the guest VM, this structure is used to clean up some hidden capabilities in the virtual configuration space.
- *
- * @consistency N/A
- * @alignment N/A
- *
- * @remark N/A
- */
-struct cap_info {
-	uint8_t id;     /**< The ID of one capability. */
-	uint8_t length; /**< The length of one capability. */
-};
-
-/**
  * @brief Data structure to represent some unused fields in the virtual PCI configuration space
  *
  * Data structure to represent some unused fields to be hidden from guest VM. Because some fields in the passthrough

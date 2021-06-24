@@ -701,7 +701,7 @@ static void vlapic_process_init_sipi(struct acrn_vcpu *target_vcpu, uint32_t mod
 {
 	/** If the target_vcpu->vcpu_id is not equals to BOOT_CPU_ID. */
 	if (target_vcpu->vcpu_id != BOOT_CPU_ID) {
-	/** If the Delivery Mode is INIT */
+		/** If the Delivery Mode is INIT */
 		if (mode == APIC_DELMODE_INIT) {
 			/** Print a debug message to show which vCPU the INIT IPI is sent to */
 			dev_dbg(ACRN_DBG_LAPIC, "Sending INIT to %hu", target_vcpu->vcpu_id);

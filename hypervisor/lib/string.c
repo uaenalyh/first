@@ -12,6 +12,7 @@
  *
  * This module is decomposed into the following sub-component:
  *
+ * - lib.public: Definition of public values of data structures.
  * - lib.bits: Implementation of bit APIs to do bitmap operating.
  * - lib.lock: Implementation of lock APIs to do lock operating.
  * - lib.util: Implementation of utility APIs to do string operating and memory operation.
