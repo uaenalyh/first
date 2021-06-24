@@ -174,56 +174,6 @@ struct acrn_vm {
 } __aligned(PAGE_SIZE);
 
 /**
- * @brief Get all the online vCPU IDs of the given VM
- *
- * This interface is used to get all the online vCPU IDs of the given VM, and fill them into a bitmap.
- *
- * @param[in] vm Pointer to the data structure representing the VM whose online vCPU IDs will be reported.
- *
- * @return A bitmap containing the online vCPU IDs info.
- *
- * @pre vm != NULL
- *
- * @post N/A
- *
- * @mode HV_OPERATIONAL
- *
- * @remark It is a public API called by other modules.
- *
- * @reentrancy Unspecified
- *
- * @threadsafety Yes
- */
-static inline uint64_t vm_active_cpus(const struct acrn_vm *vm)
-{
-	/** Declare the following local variables of type uint64_t.
-	 *  - dmask representing a bitmap to be filled the vCPU ID info, initialized as 0.
-	 */
-	uint64_t dmask = 0UL;
-	/** Declare the following local variables of type uint16_t.
-	 *  - i representing a loop counter, not initialized.
-	 */
-	uint16_t i;
-	/** Declare the following local variables of type 'const struct acrn_vcpu *'.
-	 *  - vcpu representing a pointer to a vCPU data structure, not initialized.
-	 */
-	const struct acrn_vcpu *vcpu;
-
-	/** For each vcpu in the online vCPUs of vm, using i as the loop counter */
-	foreach_vcpu(i, vm, vcpu) {
-		/** Call bitmap_set_nolock with the following parameters, in order to set the corresponding bit
-		 *  of the vcpu->vcpu_id in 'dmask'.
-		 *  - vcpu->vcpu_id
-		 *  - &dmask
-		 */
-		bitmap_set_nolock(vcpu->vcpu_id, &dmask);
-	}
-
-	/** Return dmask, the bitmap of the vCPUs ID */
-	return dmask;
-}
-
-/**
  * @brief Get a pointer to the vCPU data according to its ID and the given VM.
  *
  * This interface is used to get a pointer to the vCPU data according to its vCPU ID and the VM this vCPU

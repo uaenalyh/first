@@ -109,12 +109,10 @@
  * This file also implements following helper functions to help realizing the features of
  * the external
  * APIs.
- * - vm_lapic_from_vcpu_id
  * - vm_apicid2vcpu_id
  * - vlapic_build_id
  * - vlapic_build_x2apic_id
  * - set_dest_mask_phys
- * - is_dest_field_matched
  * - vlapic_process_init_sipi
  * - vlapic_read
  * - vlapic_init
@@ -134,47 +132,6 @@
 #define APIC_DELMODE_SMI     0x00000200U /**< Delivery mode of SMI in local APIC ICR register */
 #define APIC_DELMODE_RESERVED1 0x00000300U /**< Delivery mode of Reserved(3)in local APIC ICR register */
 #define APIC_DELMODE_RESERVED2 0x00000700U /**< Delivery mode of Reserved(7) in local APIC ICR register */
-
-/**
- * @brief This function is for getting the acrn_vlapic structure based on the vcpu_id.
- *
- * @param[in] vm pointer to the virtual machine structure which the virtual local APIC belongs to.
- * @param[in] vcpu_id The ID marks the vCPU.
- *
- * @return the acrn_vlapic structure associated with the vcpu_id.
- *
- * @pre vm != NULL
- * @pre vcpu_id < MAX_VCPUS_PER_VM
- * @pre vm->hw.vcpu_array[vcpu_id].state != VCPU_OFFLINE
- *
- * @post N/A
- *
- * @mode HV_OPERATIONAL
- *
- * @remark N/A
- *
- * @reentrancy unspecified
- * @threadsafety yes
- */
-static struct acrn_vlapic *vm_lapic_from_vcpu_id(struct acrn_vm *vm, uint16_t vcpu_id)
-{
-	/** Declare the following local variable of type 'struct acrn_vcpu *'
-	 *  - vcpu representing the vCPU structure associated with the vcpu_id, not initialized */
-	struct acrn_vcpu *vcpu;
-
-	/** Call vcpu_from_vid with the following parameters, in order to get the vCPU
-	 *  structure associated with the vcpu_id and assign it to vcpu
-	 *  - vm
-	 *  - vcpu_id
-	 */
-	vcpu = vcpu_from_vid(vm, vcpu_id);
-
-	/** Call vcpu_vlapic with the following parameters and return its return value,
-	 *  in order to return the acrn_vlapic structure associated with the vcpu_id.
-	 *  - vcpu
-	 */
-	return vcpu_vlapic(vcpu);
-}
 
 /**
  * @brief This function is for converting the Local APIC ID to its vCPU ID .
@@ -500,64 +457,13 @@ static inline void set_dest_mask_phys(struct acrn_vm *vm, uint64_t *dmask, uint3
 	}
 }
 
- /**
-  * @brief This function tells if a vlapic belongs to the destination.
-  *
-  * @param[in] vlapic is pointer to the virtual machine structure which is going to be matched.
-  * @param[in] dest The desniation of \a vlapic to be matched. It equals to local
-  *            APIC ID in Physical Destination mode or APICs mask bits in Logical Destination
-  *            Mode.
-  *
-  * @return If yes, return true, otherwise reture false.
-  *
-  * @pre vlapic != NULL
-  *
-  * @post N/A
-  *
-  * @mode HV_OPERATIONAL
-  *
-  * @remark N/A
-  *
-  * @reentrancy unspecified
-  * @threadsafety when \a vlapic is different among parallel invocation
-  */
-static inline bool is_dest_field_matched(const struct acrn_vlapic *vlapic, uint32_t dest)
-{
-	/** Declare the following local variable of type uint32_t
-	 *  - logical_id representing the Logical ID of \a vlapic, not initialized
-	 *  - cluster_id representing the Cluster ID of \a vlapic, not initialized
-	 *  - dest_logical_id representing the Logical ID of \a dest, not initialized
-	 *  - dest_cluster_id representing the Cluster ID of \a dest, not initialized*/
-	uint32_t logical_id, cluster_id, dest_logical_id, dest_cluster_id;
-	/** Declare the following local variable of type uint32_t
-	 *  - ldr representing the temp value of virtual Local destination register,
-	 *    initialized as vlapic->apic_page.ldr.v */
-	uint32_t ldr = vlapic->apic_page.ldr.v;
-	/** Declare the following local variable of type bool
-	 *  - ret representing the function return value, initialized as false */
-	bool ret = false;
-
-	/** Set the logical_id to be ldr & 0xFFFFU */
-	logical_id = ldr & 0xFFFFU;
-	/** Set the cluster_id to be (ldr >> 16U) & 0xFFFFU */
-	cluster_id = (ldr >> 16U) & 0xFFFFU;
-	/** Set dest_logical_id to be dest & 0xFFFFU */
-	dest_logical_id = dest & 0xFFFFU;
-	/** Set dest_cluster_id to be (dest >> 16U) & 0xFFFFU */
-	dest_cluster_id = (dest >> 16U) & 0xFFFFU;
-	/** If cluster_id equals to dest_cluster_id and (logical_id & dest_logical_id) != 0U */
-	if ((cluster_id == dest_cluster_id) && ((logical_id & dest_logical_id) != 0U)) {
-		/** Set the ret to be true */
-		ret = true;
-	}
-
-	/** Return ret */
-	return ret;
-}
-
 /**
  * @brief The public API that populates \a dmask with the set of vcpus that match the addressing specified
  *        by the (dest, phys, lowprio) tuple.
+ *
+ * The parameters is_broadcast, lowprio and phys are not used in the body of the function because they are constrained
+ * to have fixed values according to the pre-conditions. These parameters are preserved for scalability when other
+ * destination mode, broadcasting and deliver mode are to be supported.
  *
  * @param[in] vm pointer to the virtual machine structure which the virtual local APIC belongs to.
  * @param[out] dmask The mask of the target vcpu, which is calculated from (dest, phys, lowprio) tuple.
@@ -583,96 +489,18 @@ static inline bool is_dest_field_matched(const struct acrn_vlapic *vlapic, uint3
  * @reentrancy unspecified
  * @threadsafety when \a vcpu is different among parallel invocation
  */
-void vlapic_calc_dest(struct acrn_vm *vm, uint64_t *dmask, bool is_broadcast, uint32_t dest, bool phys, bool lowprio)
+void vlapic_calc_dest(struct acrn_vm *vm, uint64_t *dmask,
+	__unused bool is_broadcast, uint32_t dest, __unused bool phys, __unused bool lowprio)
 {
-	/** Declare the following local variable of type 'struct acrn_vlapic *'
-	 *  - vlapic representing the virtual LAPIC of the destination, not initialized
-	 *  - lowprio_dest representing the virtual LAPIC of the destination in
-	 *    Lowest Priority Delivery mode initialized as NULL */
-	struct acrn_vlapic *vlapic, *lowprio_dest = NULL;
-	/** Declare the following local variable of type 'struct acrn_vcpu *'
-	 *  - vcpu representing vcpu structure for destination calculation, not initialized */
-	struct acrn_vcpu *vcpu;
-	/** Declare the following local variable of type uint16_t
-	 *  - vcpu_id representing the virtual CPU ID, not initialized */
-	uint16_t vcpu_id;
-
 	/** Set the *dmask to be 0UL */
 	*dmask = 0UL;
-	/** If this is broadcast mode */
-	if (is_broadcast) {
-		/** Call vm_active_cpus with the following parameters, in order to
-		 *  set *dmask to be its return value, meaning Broadcast in both
-		 *  logical and physical modes.
-		 *  - vm
-		 */
-		*dmask = vm_active_cpus(vm);
-	/** If this is physical Destination mode */
-	} else if (phys) {
-		/** Call set_dest_mask_phys with the following parameters, in order to
-		 *  set dmask in physical mode ("dest" is local APIC ID).
-		 *  - vm
-		 *  - dmask
-		 *  - dest
-		 */
-		set_dest_mask_phys(vm, dmask, dest);
-	/** If it is in Logical Destination mode */
-	} else {
-		/** Go through all vCPU in the VM to find the destination vCPU.
-		 *  In Logical mode: "dest" is message destination addr
-		 *  to be compared with the logical APIC ID in LDR. */
-		foreach_vcpu(vcpu_id, vm, vcpu) {
-			/** Call vm_lapic_from_vcpu_id with the following parameters, in order to
-			 *  get the vlapic structure and assign it to vlapic
-			 *  - vm
-			 *  - vcpu_id
-			 */
-			vlapic = vm_lapic_from_vcpu_id(vm, vcpu_id);
-			/** If this is not the destination virtual LAPIC */
-			if (!is_dest_field_matched(vlapic, dest)) {
-				/** Continue to next iteration */
-				continue;
-			}
-
-			/** If this is the Lowest Priority Delivery Mode */
-			if (lowprio) {
-				/** If lowprio_dest equals to NULL */
-				if (lowprio_dest == NULL) {
-					/** Set lowprio_dest to be vlapic */
-					lowprio_dest = vlapic;
-				/** If the lowprio_dest->apic_page.ppr.v is bigger than
-				 *  vlapic->apic_page.ppr.v */
-				} else if (lowprio_dest->apic_page.ppr.v > vlapic->apic_page.ppr.v) {
-					/** Set lowprio_dest to be vlapic, for lowprio delivery mode,
-					 *  the lowest-priority one among all "dest" matched processors
-					 *  accepts the intr. */
-					lowprio_dest = vlapic;
-				/** If it is not in above cases */
-				} else {
-					/** No other state currently, do nothing */
-				}
-			/** If this is not Lowest Priority Delivery Mode */
-			} else {
-				/** Call bitmap_set_nolock with the following parameters, in order to
-				 *  mask the target vCPU in dmask
-				 *  - vcpu_id
-				 *  - dmask
-				 */
-				bitmap_set_nolock(vcpu_id, dmask);
-			}
-		}
-
-		/** If this is the Lowest Priority Delivery Mode and lowprio_dest does not
-		 *  equals to NULL */
-		if (lowprio && (lowprio_dest != NULL)) {
-			/** Call bitmap_set_nolock with the following parameters, in order to
-			 *  mask the target vCPU in dmask
-			 *  - lowprio_dest->vcpu->vcpu_id
-			 *  - dmask
-			 */
-			bitmap_set_nolock(lowprio_dest->vcpu->vcpu_id, dmask);
-		}
-	}
+	/** Call set_dest_mask_phys with the following parameters, in order to
+	 *  set dmask in physical mode ("dest" is local APIC ID).
+	 *  - vm
+	 *  - dmask
+	 *  - dest
+	 */
+	set_dest_mask_phys(vm, dmask, dest);
 }
 
 /**

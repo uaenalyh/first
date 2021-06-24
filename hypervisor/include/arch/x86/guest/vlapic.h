@@ -254,6 +254,10 @@ void vlapic_reset(struct acrn_vlapic *vlapic);
  * @brief The public API that populates \a dmask with the set of vcpus that match the addressing specified
  *        by the (dest, phys, lowprio) tuple.
  *
+ * The parameters is_broadcast, lowprio and phys are not used in the body of the function because they are constrained
+ * to have fixed values according to the pre-conditions. These parameters are preserved for scalability when other
+ * destination mode, broadcasting and deliver mode are to be supported.
+ *
  * @param[in] vm pointer to the virtual machine structure which the virtual local APIC belongs to.
  * @param[out] dmask The mask of the target vcpu, which is calculated from (dest, phys, lowprio) tuple.
  * @param[in] is_broadcast whether broadcast the interrupt to all vcpu. Yes for true, otherwise false.
@@ -278,7 +282,8 @@ void vlapic_reset(struct acrn_vlapic *vlapic);
  * @reentrancy unspecified
  * @threadsafety when \a vcpu is different among parallel invocation
  */
-void vlapic_calc_dest(struct acrn_vm *vm, uint64_t *dmask, bool is_broadcast, uint32_t dest, bool phys, bool lowprio);
+void vlapic_calc_dest(struct acrn_vm *vm, uint64_t *dmask,
+	__unused bool is_broadcast, uint32_t dest, __unused bool phys, __unused bool lowprio);
 
 /**
  * @}
