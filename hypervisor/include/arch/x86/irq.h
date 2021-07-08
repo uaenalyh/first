@@ -65,7 +65,7 @@ void dispatch_exception(struct intr_excp_ctx *ctx);
 
 void dispatch_interrupt(__unused const struct intr_excp_ctx *ctx);
 
-void handle_nmi(struct intr_excp_ctx *ctx);
+void handle_nmi(__unused struct intr_excp_ctx *ctx);
 
 void init_interrupt(uint16_t pcpu_id);
 
