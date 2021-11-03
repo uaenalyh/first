@@ -28,6 +28,7 @@ jobs:
       - name: Run scan
         run: 
            pwd
+        run:
            ls -lh
 
       # Runs a set of commands using the runners shell
