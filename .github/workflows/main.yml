@@ -29,7 +29,5 @@ jobs:
         run: 
             echo "start to check coding guideline violations ..."
             pwd
-            cd hypervisor
-            make codescan
 
       # Runs a set of commands using the runners shell
