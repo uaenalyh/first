@@ -1,69 +1,35 @@
+# This is a basic workflow to help you get started with Actions
+
 name: CI
+
+# Controls when the workflow will run
 on:
-    push:
+  # Triggers the workflow on push or pull request events but only for the main branch
+  push:
     branches: [ main ]
-    pull_request:
+  pull_request:
     branches: [ main ]
-    workflow_dispatch:
+
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
+
+# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-    acrn_clang_tidy_job:
-        runs-on: ubuntu-latest
-        name: scan_1
-        steps:
-            run:
-                - echo "start to check coding guideline violations ..."
-                - pwd
-                - cd hypervisor
-                - make codescan
-        only:
-            - merge_requests
-        
-    checkpatch_job:
-        runs-on: ubuntu-latest
-        name: scan_2
-        steps:
-            run:
-                - echo "start to check code styles and typos ..."
-                - pwd
-                - git rev-list `git merge-base HEAD origin/master`..HEAD | xargs -n 1 checkpatch.pl --notree --codespell -g
-            only:
-                - merge_requests
-                       
-    build_job:
-        runs-on: ubuntu-latest
-        name: build
-        uses: actions/upload-artifact@v2
-        steps:
-            run:
-                - echo "start to build ..."
-                - pwd
-                - python3 /opt/modify_bootargs.py acrn-sliced-mainline
-                - cd hypervisor
-                - make clean
-                - /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0 "make RELEASE=0"
-                - if [ $? -ne 0 ]; then exit 1; fi
-            needs:
-                - acrn_clang_tidy_job
-            with:
-                path:
-                - hypervisor/build/
-                expire_in: 3 weeks
-            only:
-                - merge_requests
-                - schedules
-       
-    test_launch_cl_zephyr_job:
-        runs-on: ubuntu-latest
-        name: test
-        steps:
-            run:        
-                - echo "start to test lauching clearlinux and zehpyr ..."
-                - pwd
-                - /opt/fusa_ci.sh launch_2_vms
-            needs:
-                - build_job
-            only:
-                - merge_requests
+  # This workflow contains a single job called "build"
+  acrn_clang_tidy_job:
+    # The type of runner that the job will run on
+    runs-on: ubuntu-latest
+    # Steps represent a sequence of tasks that will be executed as part of the job
+    steps:
+      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
+      - uses: actions/checkout@v2
 
+      # Runs a single command using the runners shell
+      - name: Run scan
+        run: 
+            echo "start to check coding guideline violations ..."
+            pwd
+            cd hypervisor
+            make codescan
 
-    
+      # Runs a set of commands using the runners shell
