@@ -1,14 +1,14 @@
 name: CI
 on:
     push:
-    branches: [ main ]
+        branches: [ main ]
     pull_request:
-    branches: [ main ]
+        branches: [ main ]
     workflow_dispatch:
 jobs:
     acrn_clang_tidy_job:
         runs-on: ubuntu-latest
-        name: scan
+        name: scan_1
         steps:
             run:
                 - echo "start to check coding guideline violations ..."
@@ -20,7 +20,7 @@ jobs:
         
     checkpatch_job:
         runs-on: ubuntu-latest
-        name: scan
+        name: scan_2
         steps:
             run:
                 - echo "start to check code styles and typos ..."
