@@ -28,6 +28,6 @@ jobs:
        - name: Run scan
          run: 
            pwd ; 
-           ls ;
+           ls -a;
            echo "start to check code styles and typos ...";
       # Runs a set of commands using the runners shell
