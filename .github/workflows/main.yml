@@ -12,6 +12,11 @@ jobs:
         steps:
             run:
                 - echo "start to check coding guideline violations ..."
+                - pwd
+                - cd hypervisor
+                - make codescan
+        only:
+            - merge_requests
         
     checkpatch_job:
         runs-on: ubuntu-latest
@@ -19,26 +24,42 @@ jobs:
         steps:
             run:
                 - echo "start to check code styles and typos ..."
+                - pwd
+                - git rev-list `git merge-base HEAD origin/master`..HEAD | xargs -n 1 checkpatch.pl --notree --codespell -g
+            only:
+                - merge_requests
                        
-    build_job:
+     build_job:
         runs-on: ubuntu-latest
         name: build
         uses: actions/upload-artifact@v2
         steps:
             run:
                 - echo "start to build ..."
+                - pwd
+                - python3 /opt/modify_bootargs.py acrn-sliced-mainline
+                - cd hypervisor
+                - make clean
+                - /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0 "make RELEASE=0"
+                - if [ $? -ne 0 ]; then exit 1; fi
             needs:
                 - acrn_clang_tidy_job
             with:
                 path:
                 - hypervisor/build/
                 expire_in: 3 weeks
+            only:
+                - merge_requests
+                - schedules
        
     test_launch_cl_zephyr_job:
         runs-on: ubuntu-latest
         name: test
+        steps:
             run:        
                 - echo "start to test lauching clearlinux and zehpyr ..."
+                - pwd
+                - /opt/fusa_ci.sh launch_2_vms
             needs:
                 - build_job
             only:
