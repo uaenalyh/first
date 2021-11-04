@@ -27,7 +27,9 @@ jobs:
       # Runs a single command using the runners shell
        - name: Run scan
          run: | 
-           pwd ; 
-           ls -a;
+           pwd  
+           ls -a
+           export
+           echo $default-branch
            echo "start to check code styles and typos ...";
       # Runs a set of commands using the runners shell
