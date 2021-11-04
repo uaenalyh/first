@@ -30,6 +30,7 @@ jobs:
            pwd  
            ls -a
            export
-           echo $default-branch
+           echo "--------------------------------------------------"
+           env
            echo "start to check code styles and typos ...";
       # Runs a set of commands using the runners shell
