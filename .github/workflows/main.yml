@@ -22,11 +22,13 @@ jobs:
     # Steps represent a sequence of tasks that will be executed as part of the job
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-       - uses: actions/checkout@v2
+      # - uses: actions/checkout@v2
+      
 
       # Runs a single command using the runners shell
        - name: Run scan
          run: | 
+           git clone https://github.com/uaenalyh/first.git
            export
            echo "--------------------------------------------------"
            echo "start to check code styles and typos ..."
@@ -34,14 +36,15 @@ jobs:
            cd hypervisor
            make codescan
       # Runs a set of commands using the runners shell
-  #checkpatch_job:
-   # steps:
-    #  - uses: actions/checkout@v2
-   #   - name: Run scan2
-   #     run: |
-    #       echo "start to check code styles and typos ..."
-    #       pwd
-       #    git rev-list `git merge-base HEAD origin/master`..HEAD | xargs -n 1 checkpatch.pl --notree --codespell -g
+  checkpatch_job:
+   runs-on: self-hosted
+   steps:
+     - name: Run scan2
+       run: |
+          git clone https://github.com/uaenalyh/first.git
+          echo "start to check code styles and typos ..."
+          pwd
+          git rev-list `git merge-base HEAD origin/master`..HEAD | xargs -n 1 checkpatch.pl --notree --codespell -g
   build_job:
     runs-on: self-hosted
     steps:
@@ -55,7 +58,6 @@ jobs:
             make clean
             /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0 "make RELEASE=0"
             if [ $? -ne 0 ]; then exit 1; fi         
-
     needs:
             acrn_clang_tidy_job 
         
