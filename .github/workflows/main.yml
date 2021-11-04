@@ -46,7 +46,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
        - name: build
-       - uses: actions/upload-artifact@v2
+       uses: actions/checkout@v2
          run: |
             echo "start to build ..."
             pwd
@@ -57,7 +57,10 @@ jobs:
             if [ $? -ne 0 ]; then exit 1; fi
          needs:
             acrn_clang_tidy_job
-         with:
-            path: hypervisor/build/
+       - name: Archive production artifacts     
+       uses: actions/upload-artifact@v2     
+       with:
+            path:
+            hypervisor/build/
             expire_in: 3 weeks
         
