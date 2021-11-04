@@ -45,22 +45,17 @@ jobs:
   build_job:
     runs-on: ubuntu-latest
     steps:
+    - uses: actions/checkout@v2
     - name: build
-        uses: actions/checkout@v2
-        run: |
+      run: |
             echo "start to build ..."
             pwd
             python3 /opt/modify_bootargs.py acrn-sliced-mainline
             cd hypervisor
             make clean
             /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0 "make RELEASE=0"
-            if [ $? -ne 0 ]; then exit 1; fi
-        needs:
-            acrn_clang_tidy_job
-    - name: Archive production artifacts     
-        uses: actions/upload-artifact@v2     
-        with:
-            path: |
-            hypervisor/build/
-            expire_in: 3 weeks
+            if [ $? -ne 0 ]; then exit 1; fi         
+
+    needs:
+            acrn_clang_tidy_job 
         
