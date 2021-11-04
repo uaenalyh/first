@@ -34,12 +34,30 @@ jobs:
            cd hypervisor
            make codescan
       # Runs a set of commands using the runners shell
-  checkpatch_job:
-    runs-on: self-hosted
+  #checkpatch_job:
+   # steps:
+    #  - uses: actions/checkout@v2
+   #   - name: Run scan2
+   #     run: |
+    #       echo "start to check code styles and typos ..."
+    #       pwd
+       #    git rev-list `git merge-base HEAD origin/master`..HEAD | xargs -n 1 checkpatch.pl --notree --codespell -g
+  build_job:
+    runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - name: Run scan2
-        run: |
-           echo "start to check code styles and typos ..."
-           pwd
-           git rev-list `git merge-base HEAD origin/master`..HEAD | xargs -n 1 checkpatch.pl --notree --codespell -g
+       - name: build
+       - uses: actions/upload-artifact@v2
+         run: |
+            echo "start to build ..."
+            pwd
+            python3 /opt/modify_bootargs.py acrn-sliced-mainline
+            cd hypervisor
+            make clean
+            /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0 "make RELEASE=0"
+            if [ $? -ne 0 ]; then exit 1; fi
+         needs:
+            acrn_clang_tidy_job
+         with:
+            path: hypervisor/build/
+            expire_in: 3 weeks
+        
