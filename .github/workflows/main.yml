@@ -42,7 +42,8 @@ jobs:
        run: |
           echo "start to check code styles and typos ..."
           pwd
-          git rev-list `git merge-base HEAD origin/master` | xargs -n 1 checkpatch.pl --notree --codespell -g
+          git status
+          # git rev-list `git merge-base HEAD origin/master` | xargs -n 1 checkpatch.pl --notree --codespell -g
   build_job:
     runs-on: self-hosted
     steps:
