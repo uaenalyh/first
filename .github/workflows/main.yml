@@ -41,7 +41,7 @@ jobs:
       - name: build
         run: |
           echo "start to build ..."
-          python3 /opt/actions/modify_bootargs.py acrn-sliced-mainline
+          python3 /opt/actions/modify_bootargs.py first
           cd hypervisor
           make clean
           /opt/actions/acrn-ebtool/docker_run.sh ubuntu:v2.0 "make RELEASE=0"
