@@ -25,7 +25,6 @@ jobs:
        - uses: actions/checkout@v2
          with: |
            fetch-depth: 0
-           branch:main
 
       # Runs a single command using the runners shell
        - name: Run scan
@@ -45,7 +44,7 @@ jobs:
           echo "start to check code styles and typos ..."
           pwd
           git status
-          # git rev-list `git merge-base HEAD origin/master` | xargs -n 1 checkpatch.pl --notree --codespell -g
+          git rev-list `git merge-base HEAD origin/master` | xargs -n 1 checkpatch.pl --notree --codespell -g
   build_job:
     runs-on: self-hosted
     steps:
@@ -53,10 +52,10 @@ jobs:
       run: |
             echo "start to build ..."
             pwd
-            python3 /opt/modify_bootargs.py acrn-sliced-mainline
+            python3 /opt/actions/modify_bootargs.py acrn-sliced-mainline
             cd hypervisor
             make clean
-            /opt/acrn-ebtool/docker_run.sh ubuntu:v2.0 "make RELEASE=0"
+            /opt/actions/acrn-ebtool/docker_run.sh ubuntu:v2.0 "make RELEASE=0"
             if [ $? -ne 0 ]; then exit 1; fi         
     needs:
             acrn_clang_tidy_job 
