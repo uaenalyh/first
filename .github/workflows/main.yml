@@ -41,6 +41,7 @@ jobs:
       - name: build
         run: |
           echo "start to build ..."
+          pwd
           python3 /opt/actions/modify_bootargs.py first
           cd hypervisor
           make clean
