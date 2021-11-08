@@ -24,16 +24,16 @@ jobs:
            echo "start to check code styles and typos ..."
            cd hypervisor
            make codescan
-  # Job#2
-#   checkpatch_job:
-#     runs-on: self-hosted
-#     steps:
-#       - name: Run scan2
-#         run: |
-#           echo "start to check code styles and typos ..."
-#           pwd
-#           git status
-#           git rev-list `git merge-base HEAD origin/main` | xargs -n 1 checkpatch.pl --notree --codespell -g
+#   Job#2
+  checkpatch_job:
+    runs-on: self-hosted
+    steps:
+      - name: Run scan2
+        run: |
+          echo "start to check code styles and typos ..."
+          pwd
+          git status
+          git rev-list `git merge-base HEAD origin/main` | xargs -n 1 checkpatch.pl --notree --codespell -g
   # Job#3
   build_job:
     runs-on: self-hosted
