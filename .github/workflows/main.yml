@@ -13,17 +13,17 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # Job#1
-  acrn_clang_tidy_job:
-    runs-on: self-hosted
-    steps:
-       - uses: actions/checkout@v2
-         with:
-           fetch-depth: 0
-       - name: Run scan
-         run: |
-           echo "start to check code styles and typos ..."
-           cd hypervisor
-           make codescan
+#   acrn_clang_tidy_job:
+#     runs-on: self-hosted
+#     steps:
+#        - uses: actions/checkout@v2
+#          with:
+#            fetch-depth: 0
+#        - name: Run scan
+#          run: |
+#            echo "start to check code styles and typos ..."
+#            cd hypervisor
+#            make codescan
 #   Job#2
 #   checkpatch_job:
 #     runs-on: self-hosted
@@ -36,21 +36,21 @@ jobs:
 #           git status
 #           git rev-list `git merge-base HEAD origin/main` | xargs -n 1 checkpatch.pl --notree --codespell -g
       
-  # Job#3
-  build_job:
-    runs-on: self-hosted
-    steps:
-      - name: build
-        run: |
-          echo "start to build ..."
-          pwd
-          python3 /opt/actions/modify_bootargs.py first
-          cd hypervisor
-          make clean
-          /opt/acrn-ebtool/docker_run.sh ubuntu:v3.0 "make RELEASE=0"
-          if [ $? -ne 0 ]; then exit 1; fi
-    needs:
-      acrn_clang_tidy_job
+#   # Job#3
+#   build_job:
+#     runs-on: self-hosted
+#     steps:
+#       - name: build
+#         run: |
+#           echo "start to build ..."
+#           pwd
+#           python3 /opt/actions/modify_bootargs.py first
+#           cd hypervisor
+#           make clean
+#           /opt/acrn-ebtool/docker_run.sh ubuntu:v3.0 "make RELEASE=0"
+#           if [ $? -ne 0 ]; then exit 1; fi
+#     needs:
+#       acrn_clang_tidy_job
   
   # Job#4  
   test_srs_build_job:
@@ -63,10 +63,9 @@ jobs:
           cd ../acrn-hypervisor
           git reset --hard && git checkout master && git pull
           python3 /opt/actions/modify_script.py vm1
-          cd hypervisor
           make clean
           sleep 3
-          /opt/acrn-ebtool/docker_run.sh ubuntu:v3.0 "make RELEASE=0" && ls -lh ../
+          /opt/acrn-ebtool/docker_run.sh ubuntu:v3.0 "make RELEASE=0" && cd hypervisor && ls -lh ../
           if [ $? -ne 0 ]; then exit 1; fi
           mv build/acrn.32.out /var/lib/tftpboot/acrn_srs/srs/acrn_pci_vm1.32.out
           git reset --hard && git checkout master && git pull
@@ -101,6 +100,6 @@ jobs:
           cp x86/memory_order_single_case.bzimage /var/lib/tftpboot/acrn_srs/acrn/
           cd ../../../../acrn-sliced-mainline
           /opt/fusa_ci.sh launch_acrn_unit_test
-    if: ${{ always() }}
-    needs:
-      build_job
+#     if: ${{ always() }}
+#     needs:
+#       build_job
