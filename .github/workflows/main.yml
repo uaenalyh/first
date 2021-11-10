@@ -47,7 +47,7 @@ jobs:
           python3 /opt/actions/modify_bootargs.py first
           cd hypervisor
           make clean
-          sh /opt/acrn-ebtool/docker_run.sh ubuntu:v3.0 "make RELEASE=0 && ls ../"
+          /opt/acrn-ebtool/docker_run.sh ubuntu:v3.0 "make RELEASE=0"
           if [ $? -ne 0 ]; then exit 1; fi
     needs:
       acrn_clang_tidy_job
